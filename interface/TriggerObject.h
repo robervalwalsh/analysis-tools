@@ -1,12 +1,12 @@
-#ifndef Analysis_Tools_TriggerObject_h
-#define Analysis_Tools_TriggerObject_h 1
+#ifndef Analysis_Core_TriggerObject_h
+#define Analysis_Core_TriggerObject_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Tools
+// Package:    Analysis/Core
 // Class:      TriggerObject
 //
-/**\class TriggerObject TriggerObject.cc Analysis/Tools/src/TriggerObject.cc
+/**\class TriggerObject TriggerObject.cc Analysis/Core/src/TriggerObject.cc
 
  Description: [one line class summary]
 
@@ -23,7 +23,7 @@
 #include <memory>
 //
 // user include files
-#include "Analysis/Tools/interface/Candidate.h"
+#include "Analysis/Core/interface/Candidate.h"
 //
 // class declaration
 //
@@ -47,4 +47,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Tools_TriggerObject_h
+#endif  // Analysis_Core_TriggerObject_h

@@ -1,12 +1,12 @@
-#ifndef Analysis_Tools_PhysicsObjectTree_h
-#define Analysis_Tools_PhysicsObjectTree_h 1
+#ifndef Analysis_Core_PhysicsObjectTree_h
+#define Analysis_Core_PhysicsObjectTree_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Tools
+// Package:    Analysis/Core
 // Class:      PhysicsObjectTree
 //
-/**\class PhysicsObjectTree PhysicsObjectTree.cc Analysis/Tools/src/PhysicsObjectTree.cc
+/**\class PhysicsObjectTree PhysicsObjectTree.cc Analysis/Core/src/PhysicsObjectTree.cc
 
  Description: [one line class summary]
 
@@ -27,8 +27,8 @@
 
 #include "TTree.h"
 #include "TChain.h"
-#include "Analysis/Tools/interface/PhysicsObjectTreeBase.h"
-#include "Analysis/Tools/interface/Collection.h"
+#include "Analysis/Core/interface/PhysicsObjectTreeBase.h"
+#include "Analysis/Core/interface/Collection.h"
 
 //
 // class declaration
@@ -227,4 +227,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Tools_PhysicsObjectTree_h
+#endif  // Analysis_Core_PhysicsObjectTree_h

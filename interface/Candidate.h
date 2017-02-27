@@ -1,12 +1,12 @@
-#ifndef Analysis_Tools_Candidate_h
-#define Analysis_Tools_Candidate_h 1
+#ifndef Analysis_Core_Candidate_h
+#define Analysis_Core_Candidate_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Tools
+// Package:    Analysis/Core
 // Class:      Candidate
 //
-/**\class Candidate Candidate.cc Analysis/Tools/src/Candidate.cc
+/**\class Candidate Candidate.cc Analysis/Core/src/Candidate.cc
 
  Description: [one line class summary]
 
@@ -114,4 +114,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Tools_Candidate_h
+#endif  // Analysis_Core_Candidate_h

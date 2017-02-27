@@ -1,4 +1,4 @@
-/**\class Candidate Candidate.cc Analysis/Tools/src/Candidate.cc
+/**\class Candidate Candidate.cc Analysis/Core/src/Candidate.cc
 
  Description: [one line class summary]
 
@@ -15,7 +15,7 @@
 //
 #include <iostream>
 // user include files
-#include "Analysis/Tools/interface/Candidate.h"
+#include "Analysis/Core/interface/Candidate.h"
 
 
 //

@@ -1,12 +1,12 @@
-#ifndef Analysis_Tools_Jet_h
-#define Analysis_Tools_Jet_h 1
+#ifndef Analysis_Core_Jet_h
+#define Analysis_Core_Jet_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Tools
+// Package:    Analysis/Core
 // Class:      Jet
 // 
-/**\class Jet Jet.cc Analysis/Tools/src/Jet.cc
+/**\class Jet Jet.cc Analysis/Core/src/Jet.cc
 
  Description: [one line class summary]
 
@@ -25,8 +25,8 @@
 
 // 
 // user include files
-#include "Analysis/Tools/interface/Candidate.h"
-#include "Analysis/Tools/interface/GenParticle.h"
+#include "Analysis/Core/interface/Candidate.h"
+#include "Analysis/Core/interface/GenParticle.h"
 //
 // class declaration
 //
@@ -185,4 +185,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Tools_Jet_h
+#endif  // Analysis_Core_Jet_h

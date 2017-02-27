@@ -1,4 +1,4 @@
-/**\class Muon Muon.cc Analysis/Tools/src/Muon.cc
+/**\class Muon Muon.cc Analysis/Core/src/Muon.cc
 
  Description: [one line class summary]
 
@@ -18,7 +18,7 @@
 // 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
  
-#include "Analysis/Tools/interface/Muon.h"
+#include "Analysis/Core/interface/Muon.h"
 
 
 //

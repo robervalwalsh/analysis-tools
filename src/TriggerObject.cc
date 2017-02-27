@@ -1,4 +1,4 @@
-/**\class TriggerObject TriggerObject.cc Analysis/Tools/src/TriggerObject.cc
+/**\class TriggerObject TriggerObject.cc Analysis/Core/src/TriggerObject.cc
 
  Description: [one line class summary]
 
@@ -18,7 +18,7 @@
 //
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "Analysis/Tools/interface/TriggerObject.h"
+#include "Analysis/Core/interface/TriggerObject.h"
 
 
 //

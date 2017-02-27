@@ -1,4 +1,4 @@
-/**\class GenParticle GenParticle.cc Analysis/Tools/src/GenParticle.cc
+/**\class GenParticle GenParticle.cc Analysis/Core/src/GenParticle.cc
 
  Description: [one line class summary]
 
@@ -18,7 +18,7 @@
 // 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
  
-#include "Analysis/Tools/interface/GenParticle.h"
+#include "Analysis/Core/interface/GenParticle.h"
 
 
 //

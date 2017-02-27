@@ -1,4 +1,4 @@
-/**\class Collection Collection.cc Analysis/Tools/src/Collection.cc
+/**\class Collection Collection.cc Analysis/Core/src/Collection.cc
 
  Description: [one line class summary]
 
@@ -17,15 +17,15 @@
 //
 #include "TRandom2.h"
 // user include files
-#include "Analysis/Tools/interface/Candidate.h"
-#include "Analysis/Tools/interface/Jet.h"
-#include "Analysis/Tools/interface/MET.h"
-#include "Analysis/Tools/interface/Muon.h"
-#include "Analysis/Tools/interface/Vertex.h"
-#include "Analysis/Tools/interface/GenParticle.h"
-#include "Analysis/Tools/interface/GenJet.h"
+#include "Analysis/Core/interface/Candidate.h"
+#include "Analysis/Core/interface/Jet.h"
+#include "Analysis/Core/interface/MET.h"
+#include "Analysis/Core/interface/Muon.h"
+#include "Analysis/Core/interface/Vertex.h"
+#include "Analysis/Core/interface/GenParticle.h"
+#include "Analysis/Core/interface/GenJet.h"
 
-#include "Analysis/Tools/interface/Collection.h"
+#include "Analysis/Core/interface/Collection.h"
 
 // member functions specialization - needed to be declared in the same namespace as the class
 namespace analysis {

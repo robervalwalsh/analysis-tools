@@ -1,4 +1,4 @@
-/**\class Analysis Analysis.cc Analysis/Tools/src/Analysis.cc
+/**\class Analysis Analysis.cc Analysis/Core/src/Analysis.cc
 
  Description: [one line class summary]
 
@@ -18,7 +18,7 @@
 //
 // user include files
 #include "TKey.h"
-#include "Analysis/Tools/interface/Analysis.h"
+#include "Analysis/Core/interface/Analysis.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 
@@ -373,7 +373,7 @@ FilterResults Analysis::eventFilter(const std::string & path)
 
 void Analysis::processJsonFile(const std::string & fileName)
 {
-	std::string scriptName = "source $CMSSW_BASE/src/Analysis/Tools/interface/strip.sh ";
+	std::string scriptName = "source $CMSSW_BASE/src/Analysis/Core/interface/strip.sh ";
 	std::system((scriptName + fileName).c_str());
 	const std::string modifidedJsonFileName("temp");
     std::ifstream fileStream(modifidedJsonFileName, std::ifstream::in);
