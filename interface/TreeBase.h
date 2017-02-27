@@ -1,12 +1,12 @@
-#ifndef Analysis_Tools_TreeBase_h
-#define Analysis_Tools_TreeBase_h 1
+#ifndef Analysis_Core_TreeBase_h
+#define Analysis_Core_TreeBase_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Tools
+// Package:    Analysis/Core
 // Class:      TreeBase
 // 
-/**\class TreeBase TreeBase.cc Analysis/Tools/src/TreeBase.cc
+/**\class TreeBase TreeBase.cc Analysis/Core/src/TreeBase.cc
 
  Description: [one line class summary]
 
@@ -27,10 +27,10 @@
 
 #include "TTree.h"
 #include "TChain.h"
-// #include "Analysis/Tools/interface/Jet.h"
-// #include "Analysis/Tools/interface/MET.h"
-// #include "Analysis/Tools/interface/Muon.h"
-// #include "Analysis/Tools/interface/Vertex.h"
+// #include "Analysis/Core/interface/Jet.h"
+// #include "Analysis/Core/interface/MET.h"
+// #include "Analysis/Core/interface/Muon.h"
+// #include "Analysis/Core/interface/Vertex.h"
 
 //
 // class declaration
@@ -66,4 +66,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Tools_TreeBase_h
+#endif  // Analysis_Core_TreeBase_h

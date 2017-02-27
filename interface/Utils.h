@@ -1,5 +1,5 @@
-#ifndef Analysis_Tools_Utils_h
-#define Analysis_Tools_Utils_h 1
+#ifndef Analysis_Core_Utils_h
+#define Analysis_Core_Utils_h 1
 
 namespace analysis {
    namespace tools {
@@ -19,4 +19,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Tools_Utils_h
+#endif  // Analysis_Core_Utils_h

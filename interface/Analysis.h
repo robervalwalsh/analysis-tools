@@ -1,12 +1,12 @@
-#ifndef Analysis_Tools_Analysis_h
-#define Analysis_Tools_Analysis_h 1
+#ifndef Analysis_Core_Analysis_h
+#define Analysis_Core_Analysis_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Tools
+// Package:    Analysis/Core
 // Class:      Analysis
 //
-/**\class Analysis Analysis.cc Analysis/Tools/src/Analysis.cc
+/**\class Analysis Analysis.cc Analysis/Core/src/Analysis.cc
 
  Description: [one line class summary]
 
@@ -36,10 +36,10 @@
 #include "TFileCollection.h"
 #include "TH2.h"
 
-#include "Analysis/Tools/interface/Utils.h"
+#include "Analysis/Core/interface/Utils.h"
 
-#include "Analysis/Tools/interface/PhysicsObjectTree.h"
-#include "Analysis/Tools/interface/Collection.h"
+#include "Analysis/Core/interface/PhysicsObjectTree.h"
+#include "Analysis/Core/interface/Collection.h"
 
 //
 // class declaration
@@ -355,4 +355,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Tools_Analysis_h
+#endif  // Analysis_Core_Analysis_h

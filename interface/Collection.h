@@ -1,12 +1,12 @@
-#ifndef Analysis_Tools_Collection_h
-#define Analysis_Tools_Collection_h 1
+#ifndef Analysis_Core_Collection_h
+#define Analysis_Core_Collection_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Tools
+// Package:    Analysis/Core
 // Class:      Collection
 // 
-/**\class Collection Collection.cc Analysis/Tools/src/Collection.cc
+/**\class Collection Collection.cc Analysis/Core/src/Collection.cc
 
  Description: [one line class summary]
 
@@ -24,10 +24,10 @@
 #include <vector>
 // 
 // user include files
-#include "Analysis/Tools/interface/Candidate.h"
-#include "Analysis/Tools/interface/Jet.h"
-#include "Analysis/Tools/interface/TriggerObject.h"
-#include "Analysis/Tools/interface/GenParticle.h"
+#include "Analysis/Core/interface/Candidate.h"
+#include "Analysis/Core/interface/Jet.h"
+#include "Analysis/Core/interface/TriggerObject.h"
+#include "Analysis/Core/interface/GenParticle.h"
 
 //
 // class declaration
@@ -93,4 +93,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Tools_Tree_h
+#endif  // Analysis_Core_Tree_h
