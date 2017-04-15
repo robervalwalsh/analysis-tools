@@ -129,6 +129,7 @@ void Analysis::event(const int & event, const bool & addCollections)
       if ( type == "TriggerObject" )  this->addCollection<TriggerObject>(name);
       if ( type == "GenParticle" )    this->addCollection<GenParticle>(name);
       if ( type == "Candidate" )      this->addCollection<Candidate>(name);
+      if ( type == "JetTag" )         this->addCollection<JetTag>(name);
    }
    
 }

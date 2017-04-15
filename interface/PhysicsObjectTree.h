@@ -174,6 +174,23 @@ namespace analysis {
 
       };
 
+               // Specialization for JetTag
+      template <>
+      class PhysicsObjectTree<JetTag> : public PhysicsObjectTreeBase<JetTag> {
+         public:
+            PhysicsObjectTree();
+            PhysicsObjectTree(TChain * tree, const std::string & name);
+           ~PhysicsObjectTree();
+
+            Collection<JetTag> collection();
+
+            // ----------member data ---------------------------
+         protected:
+            float btag_[max_] ;
+         private:
+
+      };
+
       // Specialization for GenJet
       template <>
       class PhysicsObjectTree<GenJet> : public PhysicsObjectTreeBase<GenJet> {
