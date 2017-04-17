@@ -237,6 +237,33 @@ Collection<Muon>  PhysicsObjectTree<Muon>::collection()
    return muonCollection;
 }
 
+// JETTAG
+// Constructors and destructor
+PhysicsObjectTree<JetTag>::PhysicsObjectTree() : PhysicsObjectTreeBase<JetTag>()
+{
+}
+PhysicsObjectTree<JetTag>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<JetTag>(tree, name)
+{
+   tree_  -> SetBranchAddress( "btag", btag_    );
+}
+PhysicsObjectTree<JetTag>::~PhysicsObjectTree()
+{
+}
+// Member functions
+Collection<JetTag>  PhysicsObjectTree<JetTag>::collection()
+{
+   std::vector<JetTag> jetstags;
+   for ( int i = 0 ; i < n_ ; ++i )
+   {
+      JetTag jettag(pt_[i], eta_[i], phi_[i], e_[i]);
+      jettag.btag(btag_[i]);
+      jetstags.push_back(jettag);
+   }
+   Collection<JetTag> jettagCollection(jetstags, name_);
+   return jettagCollection;
+}
+
+
 // GenJet
 // Constructors and destructor
 PhysicsObjectTree<GenJet>::PhysicsObjectTree() : PhysicsObjectTreeBase<GenJet>()

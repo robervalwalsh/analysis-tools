@@ -40,10 +40,11 @@ PhysicsObjectTreeBase<Object>::PhysicsObjectTreeBase(TChain * tree, const std::s
    tree_  -> SetBranchAddress( "eta",  eta_ );
    tree_  -> SetBranchAddress( "phi",  phi_ );
    tree_  -> SetBranchAddress( "e"  ,  e_   );
-   tree_  -> SetBranchAddress( "q"  ,  q_   );
-   tree_  -> SetBranchAddress( "px" ,  px_  );
-   tree_  -> SetBranchAddress( "py" ,  py_  );
-   tree_  -> SetBranchAddress( "pz" ,  pz_  );
+   std::vector<std::string>::iterator it;
+   it = std::find(branches_.begin(),branches_.end(),"q") ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , q_ );
+   it = std::find(branches_.begin(),branches_.end(),"px");  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , px_  );
+   it = std::find(branches_.begin(),branches_.end(),"py");  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , py_  );
+   it = std::find(branches_.begin(),branches_.end(),"pz");  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , pz_  );
 
 }
 
@@ -98,3 +99,4 @@ template class PhysicsObjectTreeBase<Vertex>;
 template class PhysicsObjectTreeBase<TriggerObject>;
 template class PhysicsObjectTreeBase<GenParticle>;
 template class PhysicsObjectTreeBase<GenJet>;
+template class PhysicsObjectTreeBase<JetTag>;

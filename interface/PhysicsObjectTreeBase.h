@@ -36,6 +36,7 @@
 #include "Analysis/Core/interface/TriggerObject.h"
 #include "Analysis/Core/interface/GenParticle.h"
 #include "Analysis/Core/interface/GenJet.h"
+#include "Analysis/Core/interface/JetTag.h"
 
 //
 // class declaration
