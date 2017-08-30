@@ -33,11 +33,57 @@ namespace analysis {
 
       class Muon : public Candidate {
          public:
+            /// default constructor
             Muon();
+	    /// constructor from 4-momentum information
             Muon(const float & pt, const float & eta, const float & phi, const float & e, const float & q);
+	    /// destructor
            ~Muon();
 //            using Candidate::set; // in case needed to overload the function set
-      
+	   // Gets
+	   bool  isPFMuon()        const ;
+	   bool  isGlobalMuon()    const ; 
+	   bool  isTrackerMuon()   const ; 
+	   bool  isLooseMuon()     const ; 
+	   bool  isMediumMuon()    const ;
+
+	   float validFraction()          const ;
+	   float segmentCompatibility()   const ; 
+	   float trkKink()                const ; 
+	   float chi2LocalPos()           const ;
+
+	   double normChi2()              const ;
+
+	   // Sets
+	   void isPFMuon     (const bool & isPFMuon)      ;    
+           void isGlobalMuon (const bool & isGlobalMuon)  ; 
+	   void isTrackerMuon(const bool & isTrackerMuon) ;  
+	   void isLooseMuon  (const bool & isLooseMuon)   ; 
+           void isMediumMuon (const bool & isMediumMuon)  ;
+   
+           void validFraction( const float & validFraction) ;     
+           void segmentCompatibility(const float & segmentCompatibility) ; 
+           void trkKink      ( const float & trkKink     )  ;
+           void chi2LocalPos ( const float & chi2LocalPos)  ;             	
+
+           void normChi2     ( const double & normChi2 )    ;           
+
+          protected:
+       // ----------member data ---------------------------
+	   bool isPFMuon_;             
+	   bool isGlobalMuon_;         
+	   bool isTrackerMuon_;        
+	   bool isLooseMuon_;          
+	   bool isMediumMuon_;         
+
+	   float validFraction_;        
+	   float segmentCompatibility_; 
+	   float trkKink_;              
+	   float chi2LocalPos_;         
+
+	   double normChi2_;
+	   /// muon id
+
          private:
             // ----------member data ---------------------------
             

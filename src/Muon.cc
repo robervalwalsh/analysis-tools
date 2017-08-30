@@ -1,6 +1,6 @@
-/**\class Muon Muon.cc Analysis/Core/src/Muon.cc
-
- Description: [one line class summary]
+ /**\class Muon Muon.cc Analysis/Core/src/Muon.cc
+ 
+Description: [one line class summary]
 
  Implementation:
      [Notes on implementation]
@@ -12,12 +12,12 @@
 //
 
 // system include files
-// 
+//
 // user include files
 #include "FWCore/Framework/interface/Event.h"
-// 
+//
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
- 
+
 #include "Analysis/Core/interface/Muon.h"
 
 
@@ -31,20 +31,59 @@ using namespace analysis::tools;
 //
 // constructors and destructor
 //
-Muon::Muon() : Candidate() 
+Muon::Muon() : Candidate()
 {
 }
-Muon::Muon(const float & pt, const float & eta, const float & phi, const float & e, const float & q) : 
-      Candidate(pt,eta,phi,e,q) 
+Muon::Muon(const float & pt, const float & eta, const float & phi, const float & e, const float & q) :
+  Candidate(pt,eta,phi,e,q)
 {
 }
 Muon::~Muon()
 {
-   // do anything here that needs to be done at desctruction time
-   // (e.g. close files, deallocate resources etc.)
+  // do anything here that needs to be done at desctruction time
+  // (e.g. close files, deallocate resources etc.)
 }
 
 
 //
 // member functions
 //
+
+// Gets 
+
+// pat muons
+bool  Muon::isPFMuon()                             const { return isPFMuon_;                }
+bool  Muon::isGlobalMuon()                         const { return isGlobalMuon_;            }
+bool  Muon::isTrackerMuon()                        const { return isTrackerMuon_;           }
+bool  Muon::isLooseMuon()                          const { return isLooseMuon_;             }
+bool  Muon::isMediumMuon()                         const { return isMediumMuon_;            }
+
+// Inner tracker vars 
+float Muon::validFraction()                        const { return validFraction_;           }
+float Muon::segmentCompatibility()                 const { return segmentCompatibility_;    }
+float Muon::trkKink()                              const { return trkKink_;                 }
+float Muon::chi2LocalPos()                         const { return chi2LocalPos_;            }
+
+// Global tracker vars
+double Muon::normChi2()                            const { return normChi2_;                }
+
+
+// Sets
+
+void Muon::isPFMuon     (const bool & isPFMuon)       { isPFMuon_      = isPFMuon;       }
+void Muon::isGlobalMuon (const bool & isGlobalMuon)   { isGlobalMuon_  = isGlobalMuon;   }
+void Muon::isTrackerMuon(const bool & isTrackerMuon)  { isTrackerMuon_ = isTrackerMuon;  }
+void Muon::isLooseMuon  (const bool & isLooseMuon)    { isLooseMuon_   = isLooseMuon;    }
+void Muon::isMediumMuon (const bool & isMediumMuon)   { isMediumMuon_  = isMediumMuon;   }
+
+void Muon::validFraction( const float & validFraction)                   { validFraction_        = validFraction ;       }
+void Muon::segmentCompatibility(const float & segmentCompatibility)      { segmentCompatibility_ = segmentCompatibility ;}
+void Muon::trkKink      ( const float & trkKink     )                    { trkKink_      = trkKink;         }
+void Muon::chi2LocalPos ( const float & chi2LocalPos)                    { chi2LocalPos_ = chi2LocalPos;    }
+
+void Muon::normChi2     ( const double & normChi2 )                      {  normChi2_ = normChi2 ;          }
+
+
+// ------------ methods  ------------
+//void Muon::id (){}
+
