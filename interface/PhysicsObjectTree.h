@@ -169,7 +169,18 @@ namespace analysis {
 
             // ----------member data ---------------------------
          protected:
+	   bool  isPFMuon_        [max_];
+	   bool  isGlobalMuon_    [max_]; 
+	   bool  isTrackerMuon_   [max_]; 
+	   bool  isLooseMuon_     [max_]; 
+	   bool  isMediumMuon_    [max_];
 
+	   float validFraction_          [max_];
+	   float segmentCompatibility_   [max_]; 
+	   float trkKink_                [max_]; 
+	   float chi2LocalPos_           [max_];
+
+	   float normChi2_  [max_];
          private:
 
       };
