@@ -65,7 +65,7 @@ float Muon::trkKink()                              const { return trkKink_;     
 float Muon::chi2LocalPos()                         const { return chi2LocalPos_;            }
 
 // Global tracker vars
-double Muon::normChi2()                            const { return normChi2_;                }
+float Muon::normChi2()                             const { return normChi2_;                }
 
 
 // Sets
@@ -81,7 +81,7 @@ void Muon::segmentCompatibility(const float & segmentCompatibility)      { segme
 void Muon::trkKink      ( const float & trkKink     )                    { trkKink_      = trkKink;         }
 void Muon::chi2LocalPos ( const float & chi2LocalPos)                    { chi2LocalPos_ = chi2LocalPos;    }
 
-void Muon::normChi2     ( const double & normChi2 )                      {  normChi2_ = normChi2 ;          }
+void Muon::normChi2     ( const float & normChi2 )                       {  normChi2_ = normChi2 ;          }
 
 
 // ------------ methods  ------------

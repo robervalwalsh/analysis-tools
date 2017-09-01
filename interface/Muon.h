@@ -52,7 +52,7 @@ namespace analysis {
 	   float trkKink()                const ; 
 	   float chi2LocalPos()           const ;
 
-	   double normChi2()              const ;
+	   float normChi2()               const ;
 
 	   // Sets
 	   void isPFMuon     (const bool & isPFMuon)      ;    
@@ -66,7 +66,7 @@ namespace analysis {
            void trkKink      ( const float & trkKink     )  ;
            void chi2LocalPos ( const float & chi2LocalPos)  ;             	
 
-           void normChi2     ( const double & normChi2 )    ;           
+           void normChi2     ( const float & normChi2 )    ;           
 
           protected:
        // ----------member data ---------------------------
@@ -81,7 +81,7 @@ namespace analysis {
 	   float trkKink_;              
 	   float chi2LocalPos_;         
 
-	   double normChi2_;
+	   float normChi2_;
 	   /// muon id
 
          private:

@@ -180,7 +180,7 @@ namespace analysis {
 	   float trkKink_                [max_]; 
 	   float chi2LocalPos_           [max_];
 
-	   double normChi2_  [max_];
+	   float normChi2_  [max_];
          private:
 
       };
