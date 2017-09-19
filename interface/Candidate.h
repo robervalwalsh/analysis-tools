@@ -88,6 +88,8 @@ namespace analysis {
            
            /// returns the deltaR between this and another candidate
            float deltaR(const Candidate & ) const;
+           /// returns the deltaPhi between this and another candidate
+           float deltaPhi(const Candidate & ) const;
            
 
            // made below virtual as this may be different for MET, or vertex
