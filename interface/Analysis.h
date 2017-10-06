@@ -115,8 +115,8 @@ namespace analysis {
             // Trigger results
             void triggerResults(const std::string & path);
             int triggerResult(const std::string & trig);
-            int triggerL1Prescale(const std::string & trig);
-            int triggerHLTPrescale(const std::string & trig);
+            int triggerPrescale(const std::string & trig);
+            std::map<std::string,int> triggerPrescale(const std::vector<std::string> & trigs);
 
             // Generator Filter
             FilterResults generatorFilter(const std::string & path);
