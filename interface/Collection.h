@@ -34,7 +34,7 @@
 //
 
 namespace analysis {
-   namespace tools {
+   namespace core {
       
       template <class Object>
       class Collection {

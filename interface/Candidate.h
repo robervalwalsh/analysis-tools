@@ -32,7 +32,7 @@
 //
 
 namespace analysis {
-   namespace tools {
+   namespace core {
 
       class Candidate {
          typedef std::vector<Candidate> Candidates;

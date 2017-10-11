@@ -46,7 +46,7 @@
 //
 
 namespace analysis {
-   namespace tools {
+   namespace core {
 
       class Analysis {
          public:
@@ -137,7 +137,7 @@ namespace analysis {
             
             // btag efficiencies
             void addBtagEfficiencies(const std::string & );
-            float btagEfficiency(const analysis::tools::Jet &, const int & rank = 0);
+            float btagEfficiency(const analysis::core::Jet &, const int & rank = 0);
             void  btagEfficienciesAlgo(const std::string & );
             void  btagEfficienciesFlavour(const std::string & );
             

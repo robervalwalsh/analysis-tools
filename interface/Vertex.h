@@ -30,7 +30,7 @@
 //Original
 
 namespace analysis {
-   namespace tools {
+   namespace core {
 
       class Vertex {
          public:

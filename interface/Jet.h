@@ -32,7 +32,7 @@
 //
 
 namespace analysis {
-   namespace tools {
+   namespace core {
       
       class Jet : public Candidate {
          public:

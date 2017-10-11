@@ -37,7 +37,7 @@
 //
 
 namespace analysis {
-   namespace tools {
+   namespace core {
 
 //       template <typename Object>
       class TreeBase : public TChain{

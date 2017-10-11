@@ -32,7 +32,7 @@
 using namespace boost::numeric::ublas;
 
 namespace analysis {
-   namespace tools {
+   namespace core {
 
       class MET : public Candidate {
          public:
