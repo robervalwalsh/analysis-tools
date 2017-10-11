@@ -35,7 +35,7 @@
 //
 
 namespace analysis {
-   namespace tools {
+   namespace core {
 
       template <class Object>
       class PhysicsObjectTree : public PhysicsObjectTreeBase<Object> {

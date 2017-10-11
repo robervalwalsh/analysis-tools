@@ -30,7 +30,7 @@
 
 // member functions specialization - needed to be declared in the same namespace as the class
 namespace analysis {
-   namespace tools {
+   namespace core {
       template <> Collection<Vertex>::Collection(const Objects & objects, const std::string & name);
       template <> std::vector<Candidate> * Collection<Vertex>::vectorCandidates() const;
       template <> void Collection<Vertex>::matchTo( const std::vector<Candidate>* vectorcandidates, const std::string & name, const float & deltaR );
@@ -49,7 +49,7 @@ namespace analysis {
 //
 
 using namespace analysis;
-using namespace analysis::tools;
+using namespace analysis::core;
 
 bool pTordering(Candidate j1, Candidate j2) {return (j1.pt()>j2.pt());}
 

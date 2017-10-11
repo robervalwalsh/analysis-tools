@@ -29,7 +29,7 @@
 //
 
 namespace analysis {
-   namespace tools {
+   namespace core {
 
       class Muon : public Candidate {
          public:

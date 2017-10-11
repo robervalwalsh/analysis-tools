@@ -23,7 +23,7 @@
 #include <boost/filesystem.hpp>
 
 using namespace analysis;
-using namespace analysis::tools;
+using namespace analysis::core;
 
 //
 // class declaration
@@ -451,7 +451,7 @@ void Analysis::addBtagEfficiencies(const std::string & filename)
    
 }
 
-float Analysis::btagEfficiency(const analysis::tools::Jet & jet, const int & rank)
+float Analysis::btagEfficiency(const analysis::core::Jet & jet, const int & rank)
 {
    float eff = 0.;
    std::string flav;

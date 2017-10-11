@@ -26,7 +26,7 @@
 //
 
 using namespace analysis;
-using namespace analysis::tools;
+using namespace analysis::core;
 
 //
 // constructors and destructor

@@ -2,7 +2,7 @@
 #define Analysis_Core_Utils_h 1
 
 namespace analysis {
-   namespace tools {
+   namespace core {
 
       struct FilterResults
       {
