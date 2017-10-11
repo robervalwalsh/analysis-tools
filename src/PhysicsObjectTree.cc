@@ -220,6 +220,18 @@ PhysicsObjectTree<Muon>::PhysicsObjectTree() : PhysicsObjectTreeBase<Muon>()
 }
 PhysicsObjectTree<Muon>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<Muon>(tree, name)
 {
+  tree_  -> SetBranchAddress ("isPFMuon"      , isPFMuon_     ) ;      
+  tree_  -> SetBranchAddress ("isGlobalMuon"  , isGlobalMuon_ ) ;  
+  tree_  -> SetBranchAddress ("isTrackerMuon" , isTrackerMuon_) ; 
+  tree_  -> SetBranchAddress ("isLooseMuon"   , isLooseMuon_  ) ;   
+  tree_  -> SetBranchAddress ("isMediumMuon"  , isMediumMuon_ ) ;  
+  
+  tree_  -> SetBranchAddress ("validFraction" ,validFraction_ ) ;
+  tree_  -> SetBranchAddress ("segmentCompatibility" , segmentCompatibility_) ;
+  tree_  -> SetBranchAddress ("trkKink" , trkKink_) ;      
+  tree_  -> SetBranchAddress ("chi2LocalPos" ,chi2LocalPos_) ;
+
+  tree_  -> SetBranchAddress ("normChi2" , normChi2_) ;
 }
 PhysicsObjectTree<Muon>::~PhysicsObjectTree()
 {
@@ -231,6 +243,18 @@ Collection<Muon>  PhysicsObjectTree<Muon>::collection()
    for ( int i = 0 ; i < n_ ; ++i )
    {
       Muon muon(pt_[i], eta_[i], phi_[i], e_[i], q_[i]);
+      muon.isPFMuon(isPFMuon_[i]) ;      
+      muon.isGlobalMuon(isGlobalMuon_[i]) ;  
+      muon.isTrackerMuon(isTrackerMuon_[i]) ; 
+      muon.isLooseMuon(isLooseMuon_[i]) ;   
+      muon.isMediumMuon(isMediumMuon_[i]) ;  
+      
+      muon.validFraction(validFraction_[i]) ;
+      muon.segmentCompatibility(segmentCompatibility_[i]) ;
+      muon.trkKink(trkKink_[i]) ;      
+      muon.chi2LocalPos(chi2LocalPos_[i]) ; 
+      
+      muon.normChi2(normChi2_[i]) ;
       muons.push_back(muon);
    }
    Collection<Muon> muonCollection(muons, name_);
