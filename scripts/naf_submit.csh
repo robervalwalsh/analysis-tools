@@ -26,7 +26,7 @@ endif
 
 mkdir $maindir
 
-./split.csh $nsplit $rootfilelist
+split.csh $nsplit $rootfilelist
 
 set files = `/bin/ls "."*_x????.txt`
 
