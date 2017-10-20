@@ -27,9 +27,17 @@ std::vector<float> jetsetamax_;
 std::vector<float> jetsbtagmin_;
 std::string jetsid_;
 
+int nmuonsmin_;
+std::vector<float> muonsptmin_;
+std::vector<float> muonsptmax_;
+std::vector<float> muonsetamax_;
+std::string muonsid_;
+
 float drmin_;
+float drmax_;
 float detamax_;
 float dphimin_;
+
 float btagwploose_;
 float btagwpmedium_;
 float btagwptight_;
@@ -43,7 +51,8 @@ std::vector<std::string> hltPaths_;
 std::string hltPathsLogic_;
 std::vector<std::string> hltPaths2_;
 std::string hltPathsLogic2_;
-
+std::vector<std::string> triggerObjectsJets_;
+std::vector<std::string> triggerObjectsMuons_;
 
 int macro_config(int argc, char * argv[])
 {
@@ -71,9 +80,16 @@ int macro_config(int argc, char * argv[])
          ("jetsBtagMin", po::value<std::vector<float> >(&jetsbtagmin_)->multitoken(),"Minimum btag of the jets; if < 0 -> reverse btag")
          ("jetsId",po::value <std::string> (&jetsid_)->default_value("LOOSE"),"Jets id criteria for all jets")
 //      
-         ("dRMin",po::value <float> (&drmin_)->default_value(0.),"Minimum delta R between jets")
-         ("dEtaMax",po::value <float> (&detamax_)->default_value(10.),"Maximum delta eta between jets")
-         ("dPhiMin",po::value <float> (&dphimin_)->default_value(0.),"Minimum delta phi between jets")
+         ("nMuonsMin",po::value <int> (&nmuonsmin_)->default_value(0),"Minimum number of muons")
+         ("muonsPtMin", po::value<std::vector<float> >(&muonsptmin_)->multitoken(),"Mimium pt of the muons")
+         ("muonsPtMax", po::value<std::vector<float> >(&muonsptmax_)->multitoken(),"Maximum pt of the muons")
+         ("muonsEtaMax", po::value<std::vector<float> >(&muonsetamax_)->multitoken(),"Maximum |eta| of the muons")
+         ("muonsId",po::value <std::string> (&muonsid_)->default_value("LOOSE"),"muons id criteria for all muons")
+//
+         ("dRMin",po::value <float> (&drmin_)->default_value(0.),"Minimum delta R between candidates")
+         ("dRMax",po::value <float> (&drmax_)->default_value(0.),"Maximum delta R between candidates")
+         ("dEtaMax",po::value <float> (&detamax_)->default_value(10.),"Maximum delta eta between candidates")
+         ("dPhiMin",po::value <float> (&dphimin_)->default_value(0.),"Minimum delta phi between candidates")
 //      
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
@@ -83,6 +99,8 @@ int macro_config(int argc, char * argv[])
          ("hltPathsLogic",po::value <std::string> (&hltPathsLogic_)->default_value("OR"),"HLT paths logic (OR/AND)")
          ("hltPathsList2", po::value<std::vector<std::string> >(&hltPaths2_)->multitoken(),"HLT paths second list")
          ("hltPathsLogic2",po::value <std::string> (&hltPathsLogic2_)->default_value("OR"),"HLT paths logic (OR/AND) for second list")
+         ("triggerObjectsJets", po::value<std::vector<std::string> >(&triggerObjectsJets_)->multitoken(),"Trigger objects for jets")
+         ("triggerObjectsMuons", po::value<std::vector<std::string> >(&triggerObjectsMuons_)->multitoken(),"Trigger objects for muons")
 //      
          ("btagWPLoose",po::value <float> (&btagwploose_)->default_value(0.46),"BTag working point LOOSE")
          ("btagWPMedium",po::value <float> (&btagwpmedium_)->default_value(0.84),"BTag working point MEDIUM")
@@ -135,6 +153,24 @@ int macro_config(int argc, char * argv[])
             return -1;
          }
 
+         
+         if ( (int)muonsptmin_.size() != nmuonsmin_ )
+         {
+            std::cout << "Config Error *** Muon minimum pt were not defined or the definition does not match the minimum number of muons" <<std::endl;
+            return -1;
+         }
+         if ( (int)muonsptmax_.size() != nmuonsmin_ && !muonsptmax_.empty() )
+         {
+            std::cout << "Config Error *** Muon maximum pt has been defined and does not match the minimum number of muons" <<std::endl;
+            return -1;
+         }
+         if ( (int)muonsetamax_.size() != nmuonsmin_ )
+         {
+            std::cout << "Config Error *** Muon maximum |eta| were not defined or the definition does not match the minimum number of muons" <<std::endl;
+            return -1;
+         }
+         
+         
       }
       catch(po::error& e)
       { 
