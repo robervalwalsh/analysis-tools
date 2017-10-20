@@ -192,9 +192,9 @@ void Analysis::triggerResults(const std::string & path)
    }
 }
 
-int Analysis::triggerResult(const std::string & trig)
+bool Analysis::triggerResult(const std::string & trig)
 {
-   if ( t_triggerResults_ == NULL ) return -1.;
+   if ( t_triggerResults_ == NULL ) return false;
    return triggerResults_[trig];
 }
 
