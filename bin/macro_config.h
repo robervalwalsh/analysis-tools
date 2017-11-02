@@ -13,6 +13,7 @@ int macro_config(int argc, char * argv[]);
 std::string cfg_;
 
 int nevtmax_;
+int nlumis_;
 bool isMC_;
 bool signalregion_;
 std::string inputlist_;
@@ -46,6 +47,10 @@ float nonbtagwp_;
 
 std::string hltPath_;
 std::vector<std::string> triggerObjects_;
+std::vector<std::string> hltPaths_;
+std::string hltPathsLogic_;
+std::vector<std::string> hltPaths2_;
+std::string hltPathsLogic2_;
 std::vector<std::string> triggerObjectsJets_;
 std::vector<std::string> triggerObjectsMuons_;
 
@@ -63,10 +68,11 @@ int macro_config(int argc, char * argv[])
       config.add_options()
          ("ntuplesList",po::value <std::string> (&inputlist_)->default_value("rootFileList.txt"),"File with list of ntuples")
          ("nEventsMax",po::value <int> (&nevtmax_)->default_value(-1), "Maximum number of events")
+         ("nLumiSections",po::value <int> (&nlumis_)->default_value(-1), "Number of lumi sections processed")
          ("output",po::value <std::string> (&outputRoot_)->default_value("histograms.root"),"Output root file")
-         ("json",po::value <std::string> (&json_)->default_value("json.txt"),"JSON file for data")
+         ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
 //      
-         ("nJetsMin",po::value <int> (&njetsmin_)->default_value(3),"Minimum number of jets")
+         ("nJetsMin",po::value <int> (&njetsmin_)->default_value(0),"Minimum number of jets")
          ("nBJetsMin",po::value <int> (&nbjetsmin_)->default_value(0),"Minimum number of btgaged jets")
          ("jetsPtMin", po::value<std::vector<float> >(&jetsptmin_)->multitoken(),"Mimium pt of the jets")
          ("jetsPtMax", po::value<std::vector<float> >(&jetsptmax_)->multitoken(),"Maximum pt of the jets")
@@ -74,7 +80,7 @@ int macro_config(int argc, char * argv[])
          ("jetsBtagMin", po::value<std::vector<float> >(&jetsbtagmin_)->multitoken(),"Minimum btag of the jets; if < 0 -> reverse btag")
          ("jetsId",po::value <std::string> (&jetsid_)->default_value("LOOSE"),"Jets id criteria for all jets")
 //      
-         ("nMuonsMin",po::value <int> (&nmuonsmin_)->default_value(3),"Minimum number of muons")
+         ("nMuonsMin",po::value <int> (&nmuonsmin_)->default_value(0),"Minimum number of muons")
          ("muonsPtMin", po::value<std::vector<float> >(&muonsptmin_)->multitoken(),"Mimium pt of the muons")
          ("muonsPtMax", po::value<std::vector<float> >(&muonsptmax_)->multitoken(),"Maximum pt of the muons")
          ("muonsEtaMax", po::value<std::vector<float> >(&muonsetamax_)->multitoken(),"Maximum |eta| of the muons")
@@ -89,6 +95,10 @@ int macro_config(int argc, char * argv[])
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
          ("hltPath",po::value <std::string> (&hltPath_),"HLT path name")
          ("triggerObjects", po::value<std::vector<std::string> >(&triggerObjects_)->multitoken(),"Trigger objects")
+         ("hltPathsList", po::value<std::vector<std::string> >(&hltPaths_)->multitoken(),"HLT paths list")
+         ("hltPathsLogic",po::value <std::string> (&hltPathsLogic_)->default_value("OR"),"HLT paths logic (OR/AND)")
+         ("hltPathsList2", po::value<std::vector<std::string> >(&hltPaths2_)->multitoken(),"HLT paths second list")
+         ("hltPathsLogic2",po::value <std::string> (&hltPathsLogic2_)->default_value("OR"),"HLT paths logic (OR/AND) for second list")
          ("triggerObjectsJets", po::value<std::vector<std::string> >(&triggerObjectsJets_)->multitoken(),"Trigger objects for jets")
          ("triggerObjectsMuons", po::value<std::vector<std::string> >(&triggerObjectsMuons_)->multitoken(),"Trigger objects for muons")
 //      
