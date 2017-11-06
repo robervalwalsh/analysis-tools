@@ -21,6 +21,8 @@
 #include "Analysis/Core/interface/Analysis.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 using namespace analysis;
 using namespace analysis::core;
@@ -377,54 +379,94 @@ FilterResults Analysis::eventFilter(const std::string & path)
 
 
 
-void Analysis::processJsonFile(const std::string & fileName)
+int Analysis::processJsonFile(const std::string & fileName)
 {
-	std::string scriptName = "source $CMSSW_BASE/src/Analysis/Core/interface/strip.sh ";
-	std::system((scriptName + fileName).c_str());
-	const std::string modifidedJsonFileName("temp");
-    std::ifstream fileStream(modifidedJsonFileName, std::ifstream::in);
-    if (!fileStream.good()) 
-    {
-    	std::cerr<<"Error in Analysis.cc! Cannot find file with name: "<< fileName <<"\n...break\n"<<std::endl;
-        exit(12);
-    }
-    // Loop over all lines in ccFile
-    int checker = 0;
-    while(fileStream.good())
-    {
-    	// Read input File
-    	std::string line;
-    	std::getline(fileStream, line);
-    	// Loop over words in cc-File line and fill vWord
-    	std::vector<std::string> vWord;
-    	std::string word;
-    	for (std::stringstream ss(line); ss >> word; )
-    	{
-    	    vWord.push_back(word);
-    	}
-            goodLumi_[checker] = vWord;
-            checker ++;
-    }
+   using boost::property_tree::ptree;
+   ptree pt;
+   read_json(fileName , pt);
+   
+   for (auto & element: pt)
+   {
+      int run = std::stoi(element.first);
+      std::vector<int> lumiranges;
+      for ( auto & property_array : element.second )
+      {
+         for ( auto & property : property_array.second )
+         {
+            lumiranges.push_back(property.second.get_value<int>());
+         }
+      }
+      if ( lumiranges.size()%2 != 0 ) return -1;
+      std::sort(lumiranges.begin(), lumiranges.end());
+      
+      json_[run] = lumiranges;
+   }
+   return 0;
 }
 
 bool Analysis::selectJson()
 {
-	bool lumi = false;
-    for( std::map<int, std::vector<std::string> >::iterator it = goodLumi_.begin(); it != --goodLumi_.end(); ++it)
-    {
-      if(std::stoi(it->second.at(0)) == run_)
-      {
-      	for(size_t lumiIt = 1; lumiIt < it->second.size()-1;  lumiIt = lumiIt + 2)
-      	{
-      		int lower = std::stoi(it->second.at(lumiIt));
-      		int bigger = std::stoi(it->second.at(lumiIt+1));
-      		if(lumi_ >= lower && lumi_ <= bigger ) lumi = true;
-      	}
-      }
-      else continue;
-    }
-    return lumi;
+	bool isGood = false;
+   
+   std::vector<int> lumiranges = json_[run_];
+   for ( size_t i = 0 ; i< lumiranges.size() ; i += 2 )
+   {
+      if ( lumi_ >= lumiranges.at(i) && lumi_ <= lumiranges.at(i+1) ) isGood = true;
+   }
+    return isGood;
 }
+
+// OLD JSON selection
+
+// void Analysis::processJsonFile(const std::string & fileName)
+// {
+// 	std::string scriptName = "source $CMSSW_BASE/src/Analysis/Core/interface/strip.sh ";
+// 	std::system((scriptName + fileName).c_str());
+// 	const std::string modifidedJsonFileName("temp");
+//     std::ifstream fileStream(modifidedJsonFileName, std::ifstream::in);
+//     if (!fileStream.good()) 
+//     {
+//     	std::cerr<<"Error in Analysis.cc! Cannot find file with name: "<< fileName <<"\n...break\n"<<std::endl;
+//         exit(12);
+//     }
+//     // Loop over all lines in ccFile
+//     int checker = 0;
+//     while(fileStream.good())
+//     {
+//     	// Read input File
+//     	std::string line;
+//     	std::getline(fileStream, line);
+//     	// Loop over words in cc-File line and fill vWord
+//     	std::vector<std::string> vWord;
+//     	std::string word;
+//     	for (std::stringstream ss(line); ss >> word; )
+//     	{
+//     	    vWord.push_back(word);
+//     	}
+//             goodLumi_[checker] = vWord;
+//             checker ++;
+//     }
+// }
+// 
+// bool Analysis::selectJson()
+// {
+// 	bool lumi = false;
+//     for( std::map<int, std::vector<std::string> >::iterator it = goodLumi_.begin(); it != --goodLumi_.end(); ++it)
+//     {
+//       if(std::stoi(it->second.at(0)) == run_)
+//       {
+//       	for(size_t lumiIt = 1; lumiIt < it->second.size()-1;  lumiIt = lumiIt + 2)
+//       	{
+//       		int lower = std::stoi(it->second.at(lumiIt));
+//       		int bigger = std::stoi(it->second.at(lumiIt+1));
+//       		if(lumi_ >= lower && lumi_ <= bigger ) lumi = true;
+//       	}
+//       }
+//       else continue;
+//     }
+//     return lumi;
+// }
+
 
 void Analysis::addBtagEfficiencies(const std::string & filename)
 {

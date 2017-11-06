@@ -132,7 +132,7 @@ namespace analysis {
             void match(const std::string & collection, const std::vector<std::string> & match_collections, const float & deltaR = 0.5);
             
             // good Json files
-            void processJsonFile(const std::string & fileName = "goodJson.txt");
+            int processJsonFile(const std::string & fileName = "goodJson.txt");
             bool selectJson();
             
             // btag efficiencies
@@ -210,6 +210,9 @@ namespace analysis {
             
             // Luminosity
             float mylumi_;
+            
+            // json
+            std::map<int,std::vector<int> > json_;
             
          private:
 
