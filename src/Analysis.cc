@@ -397,7 +397,7 @@ int Analysis::processJsonFile(const std::string & fileName)
          }
       }
       if ( lumiranges.size()%2 != 0 ) return -1;
-      std::sort(lumiranges.begin(), lumiranges.end());
+//      std::sort(lumiranges.begin(), lumiranges.end());  // not really needed
       
       json_[run] = lumiranges;
    }
