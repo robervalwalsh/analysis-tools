@@ -40,7 +40,15 @@ int main(int argc, char * argv[])
    
    analysis.triggerResults("MssmHbb/Events/TriggerResults");
    
-   if( !isMC_ ) analysis.processJsonFile(json_);
+   if( !isMC_ )
+   {
+      int json_status = analysis.processJsonFile(json_);
+      if ( json_status < 0 ) 
+      {
+         std::cout << "Error from processing json. Please check your json file." << std::endl;
+         return -1;
+      }
+   }
    
    std::string sr_s = "SR";
    if ( ! signalregion_ ) sr_s = "CR";
