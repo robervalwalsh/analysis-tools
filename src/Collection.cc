@@ -25,6 +25,7 @@
 #include "Analysis/Core/interface/GenParticle.h"
 #include "Analysis/Core/interface/GenJet.h"
 #include "Analysis/Core/interface/JetTag.h"
+#include "Analysis/Core/interface/L1Muon.h"
 
 #include "Analysis/Core/interface/Collection.h"
 
@@ -300,3 +301,4 @@ template class Collection<TriggerObject>;
 template class Collection<GenParticle>;
 template class Collection<GenJet>;
 template class Collection<JetTag>;
+template class Collection<L1Muon>;

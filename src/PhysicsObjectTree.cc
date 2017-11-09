@@ -362,6 +362,38 @@ Collection<TriggerObject>  PhysicsObjectTree<TriggerObject>::collection()
 
 }
 
+// L1MUON
+// Constructors and destructor
+PhysicsObjectTree<L1Muon>::PhysicsObjectTree() : PhysicsObjectTreeBase<L1Muon>()
+{
+}
+PhysicsObjectTree<L1Muon>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<L1Muon>(tree, name)
+{
+  tree_  -> SetBranchAddress ("hwQual"   , hwQual_   ) ;      
+  tree_  -> SetBranchAddress ("etaAtVtx" , etaAtVtx_ ) ;  
+  tree_  -> SetBranchAddress ("phiAtVtx" , phiAtVtx_ ) ; 
+}
+PhysicsObjectTree<L1Muon>::~PhysicsObjectTree()
+{
+}
+// Member functions
+Collection<L1Muon>  PhysicsObjectTree<L1Muon>::collection()
+{
+   std::vector<L1Muon> muons;
+   for ( int i = 0 ; i < n_ ; ++i )
+   {
+      L1Muon muon(pt_[i], eta_[i], phi_[i], e_[i], q_[i]);
+      muon.hwQual  (hwQual_  [i]) ;      
+      muon.etaAtVtx(etaAtVtx_[i]) ;  
+      muon.phiAtVtx(phiAtVtx_[i]) ; 
+      muons.push_back(muon);
+   }
+   Collection<L1Muon> muonCollection(muons, name_);
+   return muonCollection;
+}
+
+
+
 // ======================================
 // Templates declarations
 template class PhysicsObjectTree<Candidate>;
@@ -372,3 +404,4 @@ template class PhysicsObjectTree<Vertex>;
 template class PhysicsObjectTree<TriggerObject>;
 template class PhysicsObjectTree<GenParticle>;
 template class PhysicsObjectTree<GenJet>;
+template class PhysicsObjectTree<L1Muon>;

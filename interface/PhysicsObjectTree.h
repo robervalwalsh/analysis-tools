@@ -169,18 +169,18 @@ namespace analysis {
 
             // ----------member data ---------------------------
          protected:
-	   bool  isPFMuon_        [max_];
-	   bool  isGlobalMuon_    [max_]; 
-	   bool  isTrackerMuon_   [max_]; 
-	   bool  isLooseMuon_     [max_]; 
-	   bool  isMediumMuon_    [max_];
+           bool  isPFMuon_        [max_];
+           bool  isGlobalMuon_    [max_]; 
+           bool  isTrackerMuon_   [max_]; 
+           bool  isLooseMuon_     [max_]; 
+           bool  isMediumMuon_    [max_];
 
-	   float validFraction_          [max_];
-	   float segmentCompatibility_   [max_]; 
-	   float trkKink_                [max_]; 
-	   float chi2LocalPos_           [max_];
+           float validFraction_          [max_];
+           float segmentCompatibility_   [max_]; 
+           float trkKink_                [max_]; 
+           float chi2LocalPos_           [max_];
 
-	   float normChi2_  [max_];
+           float normChi2_  [max_];
          private:
 
       };
@@ -252,6 +252,27 @@ namespace analysis {
          private:
 
       };
+         
+      // Specialization for L1Muon
+      template <>
+      class PhysicsObjectTree<L1Muon> : public PhysicsObjectTreeBase<L1Muon> {
+         public:
+            PhysicsObjectTree();
+            PhysicsObjectTree(TChain * tree, const std::string & name);
+           ~PhysicsObjectTree();
+
+            Collection<L1Muon> collection();
+
+            // ----------member data ---------------------------
+         protected:
+           int    hwQual_   [max_];
+           float  etaAtVtx_ [max_]; 
+           float  phiAtVtx_ [max_]; 
+           
+         private:
+
+      };
+         
    }
 }
 
