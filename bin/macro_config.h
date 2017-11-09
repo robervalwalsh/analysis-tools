@@ -22,6 +22,7 @@ std::string json_;
 
 //
 bool matchonoff_;
+float matchonoffdrmax_;
 bool matchonoffref_;
 bool psweight_;
 bool trigemul_;
@@ -85,6 +86,7 @@ float nonbtagwp_;
 
 
 std::string hltPath_;
+std::string l1Seed_;
 std::string hltPathRef_;
 std::vector<std::string> triggerObjects_;
 std::vector<std::string> hltPaths_;
@@ -162,6 +164,7 @@ int macro_config(int argc, char * argv[])
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
          ("hltPath",po::value <std::string> (&hltPath_),"HLT path name")
+         ("l1Seed",po::value <std::string> (&l1Seed_),"L1 seed name")
          ("hltPathReference",po::value <std::string> (&hltPathRef_),"HLT path name for reference trigger for trigger efficiency")
          ("triggerObjects", po::value<std::vector<std::string> >(&triggerObjects_)->multitoken(),"Trigger objects")
          ("hltPathsList", po::value<std::vector<std::string> >(&hltPaths_)->multitoken(),"HLT paths list")
@@ -180,6 +183,7 @@ int macro_config(int argc, char * argv[])
          
 //
          ("matchOnlineOffline",po::value <bool> (&matchonoff_)->default_value(true),"Flag for doing matching online offline objects")
+         ("matchOnlineOfflineDeltaRMax",po::value <float> (&matchonoffdrmax_)->default_value(0.4),"DeltaR max for matching online-offline")
          ("matchOnlineOfflineReference",po::value <bool> (&matchonoffref_)->default_value(true),"Flag for doing matching online offline objects when using a reference trigger")
          ("prescaleWeight",po::value <bool> (&psweight_)->default_value(false),"Flag for weighting histograms with prescale")
          ("triggerEmulation",po::value <bool> (&trigemul_)->default_value(false),"Flag for using trigger emulation");
