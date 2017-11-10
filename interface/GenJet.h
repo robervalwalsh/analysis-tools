@@ -1,12 +1,12 @@
-#ifndef Analysis_Core_GenJet_h
-#define Analysis_Core_GenJet_h 1
+#ifndef Analysis_Tools_GenJet_h
+#define Analysis_Tools_GenJet_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Core
+// Package:    Analysis/Tools
 // Class:      GenJet
 // 
-/**\class GenJet GenJet.cc Analysis/Core/src/GenJet.cc
+/**\class GenJet GenJet.cc Analysis/Tools/src/GenJet.cc
 
  Description: [one line class summary]
 
@@ -23,13 +23,13 @@
 #include <memory>
 // 
 // user include files
-#include "Analysis/Core/interface/Candidate.h"
+#include "Analysis/Tools/interface/Candidate.h"
 //
 // class declaration
 //
 
 namespace analysis {
-   namespace core {
+   namespace tools {
 
       class GenJet : public Candidate {
          public:
@@ -46,4 +46,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Core_GenJet_h
+#endif  // Analysis_Tools_GenJet_h

@@ -1,5 +1,5 @@
-#ifndef Analysis_Core_macro_config_h_
-#define Analysis_Core_macro_config_h_
+#ifndef Analysis_Tools_macro_config_h_
+#define Analysis_Tools_macro_config_h_
 
 #include "boost/program_options.hpp"
 #include "boost/algorithm/string.hpp"

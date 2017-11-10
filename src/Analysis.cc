@@ -1,4 +1,4 @@
-/**\class Analysis Analysis.cc Analysis/Core/src/Analysis.cc
+/**\class Analysis Analysis.cc Analysis/Tools/src/Analysis.cc
 
  Description: [one line class summary]
 
@@ -18,14 +18,14 @@
 //
 // user include files
 #include "TKey.h"
-#include "Analysis/Core/interface/Analysis.h"
+#include "Analysis/Tools/interface/Analysis.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 //
 // class declaration
@@ -421,7 +421,7 @@ bool Analysis::selectJson()
 
 // void Analysis::processJsonFile(const std::string & fileName)
 // {
-// 	std::string scriptName = "source $CMSSW_BASE/src/Analysis/Core/interface/strip.sh ";
+// 	std::string scriptName = "source $CMSSW_BASE/src/Analysis/Tools/interface/strip.sh ";
 // 	std::system((scriptName + fileName).c_str());
 // 	const std::string modifidedJsonFileName("temp");
 //     std::ifstream fileStream(modifidedJsonFileName, std::ifstream::in);
@@ -494,7 +494,7 @@ void Analysis::addBtagEfficiencies(const std::string & filename)
    
 }
 
-float Analysis::btagEfficiency(const analysis::core::Jet & jet, const int & rank)
+float Analysis::btagEfficiency(const analysis::tools::Jet & jet, const int & rank)
 {
    float eff = 0.;
    std::string flav;

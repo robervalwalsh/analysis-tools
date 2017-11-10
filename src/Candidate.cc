@@ -1,4 +1,4 @@
-/**\class Candidate Candidate.cc Analysis/Core/src/Candidate.cc
+/**\class Candidate Candidate.cc Analysis/Tools/src/Candidate.cc
 
  Description: [one line class summary]
 
@@ -15,7 +15,7 @@
 //
 #include <iostream>
 // user include files
-#include "Analysis/Core/interface/Candidate.h"
+#include "Analysis/Tools/interface/Candidate.h"
 
 
 //
@@ -23,7 +23,7 @@
 //
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 //
 // constructors and destructor

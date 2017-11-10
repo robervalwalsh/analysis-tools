@@ -1,12 +1,12 @@
-#ifndef Analysis_Core_L1Muon_h
-#define Analysis_Core_L1Muon_h 1
+#ifndef Analysis_Tools_L1Muon_h
+#define Analysis_Tools_L1Muon_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Core
+// Package:    Analysis/Tools
 // Class:      L1Muon
 // 
-/**\class L1Muon L1Muon.cc Analysis/Core/src/L1Muon.cc
+/**\class L1Muon L1Muon.cc Analysis/Tools/src/L1Muon.cc
 
  Description: [one line class summary]
 
@@ -23,13 +23,13 @@
 #include <memory>
 // 
 // user include files
-#include "Analysis/Core/interface/Candidate.h"
+#include "Analysis/Tools/interface/Candidate.h"
 //
 // class declaration
 //
 
 namespace analysis {
-   namespace core {
+   namespace tools {
 
       class L1Muon : public Candidate {
          public:
@@ -64,4 +64,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Core_Muon_h
+#endif  // Analysis_Tools_Muon_h

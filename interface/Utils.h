@@ -1,8 +1,8 @@
-#ifndef Analysis_Core_Utils_h
-#define Analysis_Core_Utils_h 1
+#ifndef Analysis_Tools_Utils_h
+#define Analysis_Tools_Utils_h 1
 
 namespace analysis {
-   namespace core {
+   namespace tools {
 
       struct FilterResults
       {
@@ -19,4 +19,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Core_Utils_h
+#endif  // Analysis_Tools_Utils_h

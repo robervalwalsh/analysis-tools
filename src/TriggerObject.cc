@@ -1,4 +1,4 @@
-/**\class TriggerObject TriggerObject.cc Analysis/Core/src/TriggerObject.cc
+/**\class TriggerObject TriggerObject.cc Analysis/Tools/src/TriggerObject.cc
 
  Description: [one line class summary]
 
@@ -18,7 +18,7 @@
 //
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "Analysis/Core/interface/TriggerObject.h"
+#include "Analysis/Tools/interface/TriggerObject.h"
 
 
 //
@@ -26,7 +26,7 @@
 //
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 //
 // constructors and destructor

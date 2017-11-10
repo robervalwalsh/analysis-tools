@@ -1,4 +1,4 @@
- /**\class L1Muon L1Muon.cc Analysis/Core/src/L1Muon.cc
+ /**\class L1Muon L1Muon.cc Analysis/Tools/src/L1Muon.cc
  
 Description: [one line class summary]
 
@@ -18,7 +18,7 @@ Description: [one line class summary]
 //
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "Analysis/Core/interface/L1Muon.h"
+#include "Analysis/Tools/interface/L1Muon.h"
 
 
 //
@@ -26,7 +26,7 @@ Description: [one line class summary]
 //
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 //
 // constructors and destructor

@@ -24,7 +24,7 @@
 #include "RooCurve.h"
 #include "RooHist.h"
 
-#include "Analysis/Core/interface/utilLib.h"
+#include "Analysis/Tools/interface/utilLib.h"
 
 namespace analysis {
 

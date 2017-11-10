@@ -1,12 +1,12 @@
-#ifndef Analysis_Core_Analysis_h
-#define Analysis_Core_Analysis_h 1
+#ifndef Analysis_Tools_Analysis_h
+#define Analysis_Tools_Analysis_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Core
+// Package:    Analysis/Tools
 // Class:      Analysis
 //
-/**\class Analysis Analysis.cc Analysis/Core/src/Analysis.cc
+/**\class Analysis Analysis.cc Analysis/Tools/src/Analysis.cc
 
  Description: [one line class summary]
 
@@ -36,17 +36,17 @@
 #include "TFileCollection.h"
 #include "TH2.h"
 
-#include "Analysis/Core/interface/Utils.h"
+#include "Analysis/Tools/interface/Utils.h"
 
-#include "Analysis/Core/interface/PhysicsObjectTree.h"
-#include "Analysis/Core/interface/Collection.h"
+#include "Analysis/Tools/interface/PhysicsObjectTree.h"
+#include "Analysis/Tools/interface/Collection.h"
 
 //
 // class declaration
 //
 
 namespace analysis {
-   namespace core {
+   namespace tools {
 
       class Analysis {
          public:
@@ -137,7 +137,7 @@ namespace analysis {
             
             // btag efficiencies
             void addBtagEfficiencies(const std::string & );
-            float btagEfficiency(const analysis::core::Jet &, const int & rank = 0);
+            float btagEfficiency(const analysis::tools::Jet &, const int & rank = 0);
             void  btagEfficienciesAlgo(const std::string & );
             void  btagEfficienciesFlavour(const std::string & );
             
@@ -358,4 +358,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Core_Analysis_h
+#endif  // Analysis_Tools_Analysis_h

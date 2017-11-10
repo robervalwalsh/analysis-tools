@@ -1,4 +1,4 @@
-/**\class GenJet GenJet.cc Analysis/Core/src/GenJet.cc
+/**\class GenJet GenJet.cc Analysis/Tools/src/GenJet.cc
 
  Description: [one line class summary]
 
@@ -18,7 +18,7 @@
 // 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
  
-#include "Analysis/Core/interface/GenJet.h"
+#include "Analysis/Tools/interface/GenJet.h"
 
 
 //
@@ -26,7 +26,7 @@
 //
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 //
 // constructors and destructor

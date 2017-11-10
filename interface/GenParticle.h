@@ -1,12 +1,12 @@
-#ifndef Analysis_Core_GenParticle_h
-#define Analysis_Core_GenParticle_h 1
+#ifndef Analysis_Tools_GenParticle_h
+#define Analysis_Tools_GenParticle_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Core
+// Package:    Analysis/Tools
 // Class:      GenParticle
 // 
-/**\class GenParticle GenParticle.cc Analysis/Core/src/GenParticle.cc
+/**\class GenParticle GenParticle.cc Analysis/Tools/src/GenParticle.cc
 
  Description: [one line class summary]
 
@@ -23,13 +23,13 @@
 #include <memory>
 // 
 // user include files
-#include "Analysis/Core/interface/Candidate.h"
+#include "Analysis/Tools/interface/Candidate.h"
 //
 // class declaration
 //
 
 namespace analysis {
-   namespace core {
+   namespace tools {
 
       class GenParticle : public Candidate {
          public:
@@ -66,4 +66,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Core_GenParticle_h
+#endif  // Analysis_Tools_GenParticle_h

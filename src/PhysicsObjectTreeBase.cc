@@ -1,4 +1,4 @@
-/**\class PhysicsObjectTreeBase PhysicsObjectTreeBase.cc Analysis/Core/src/PhysicsObjectTreeBase.cc
+/**\class PhysicsObjectTreeBase PhysicsObjectTreeBase.cc Analysis/Tools/src/PhysicsObjectTreeBase.cc
 
  Description: [one line class summary]
 
@@ -15,7 +15,7 @@
 #include <iostream>
 //
 // user include files
-#include "Analysis/Core/interface/PhysicsObjectTreeBase.h"
+#include "Analysis/Tools/interface/PhysicsObjectTreeBase.h"
 
 
 //
@@ -23,7 +23,7 @@
 //
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 //
 // constructors and destructor
