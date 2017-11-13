@@ -253,15 +253,15 @@ namespace analysis {
 
       };
          
-      // Specialization for L1Muon
+      // Specialization for L1TMuon
       template <>
-      class PhysicsObjectTree<L1Muon> : public PhysicsObjectTreeBase<L1Muon> {
+      class PhysicsObjectTree<L1TMuon> : public PhysicsObjectTreeBase<L1TMuon> {
          public:
             PhysicsObjectTree();
             PhysicsObjectTree(TChain * tree, const std::string & name);
            ~PhysicsObjectTree();
 
-            Collection<L1Muon> collection();
+            Collection<L1TMuon> collection();
 
             // ----------member data ---------------------------
          protected:
@@ -273,15 +273,15 @@ namespace analysis {
 
       };
 
-      // Specialization for L1Jet
+      // Specialization for L1TJet
       template <>
-      class PhysicsObjectTree<L1Jet> : public PhysicsObjectTreeBase<L1Jet> {
+      class PhysicsObjectTree<L1TJet> : public PhysicsObjectTreeBase<L1TJet> {
          public:
             PhysicsObjectTree();
             PhysicsObjectTree(TChain * tree, const std::string & name);
            ~PhysicsObjectTree();
 
-            Collection<L1Jet> collection();
+            Collection<L1TJet> collection();
 
             // ----------member data ---------------------------
          protected:

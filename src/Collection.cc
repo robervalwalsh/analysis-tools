@@ -25,8 +25,8 @@
 #include "Analysis/Tools/interface/GenParticle.h"
 #include "Analysis/Tools/interface/GenJet.h"
 #include "Analysis/Tools/interface/JetTag.h"
-#include "Analysis/Tools/interface/L1Muon.h"
-#include "Analysis/Tools/interface/L1Jet.h"
+#include "Analysis/Tools/interface/L1TMuon.h"
+#include "Analysis/Tools/interface/L1TJet.h"
 
 #include "Analysis/Tools/interface/Collection.h"
 
@@ -302,5 +302,5 @@ template class Collection<TriggerObject>;
 template class Collection<GenParticle>;
 template class Collection<GenJet>;
 template class Collection<JetTag>;
-template class Collection<L1Muon>;
-template class Collection<L1Jet>;
+template class Collection<L1TMuon>;
+template class Collection<L1TJet>;

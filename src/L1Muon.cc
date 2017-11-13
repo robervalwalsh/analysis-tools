@@ -1,4 +1,4 @@
- /**\class L1Muon L1Muon.cc Analysis/Tools/src/L1Muon.cc
+ /**\class L1TMuon L1TMuon.cc Analysis/Tools/src/L1TMuon.cc
  
 Description: [one line class summary]
 
@@ -18,7 +18,7 @@ Description: [one line class summary]
 //
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "Analysis/Tools/interface/L1Muon.h"
+#include "Analysis/Tools/interface/L1TMuon.h"
 
 
 //
@@ -31,14 +31,14 @@ using namespace analysis::tools;
 //
 // constructors and destructor
 //
-L1Muon::L1Muon() : Candidate()
+L1TMuon::L1TMuon() : Candidate()
 {
 }
-L1Muon::L1Muon(const float & pt, const float & eta, const float & phi, const float & e, const float & q) :
+L1TMuon::L1TMuon(const float & pt, const float & eta, const float & phi, const float & e, const float & q) :
   Candidate(pt,eta,phi,e,q)
 {
 }
-L1Muon::~L1Muon()
+L1TMuon::~L1TMuon()
 {
   // do anything here that needs to be done at desctruction time
   // (e.g. close files, deallocate resources etc.)
@@ -52,15 +52,15 @@ L1Muon::~L1Muon()
 // Gets 
 
 // pat muons
-int    L1Muon::hwQual()     const { return hwQual_  ; }
-float  L1Muon::etaAtVtx()   const { return etaAtVtx_; }
-float  L1Muon::phiAtVtx()   const { return phiAtVtx_; }
+int    L1TMuon::hwQual()     const { return hwQual_  ; }
+float  L1TMuon::etaAtVtx()   const { return etaAtVtx_; }
+float  L1TMuon::phiAtVtx()   const { return phiAtVtx_; }
 
 // Sets
 
-void L1Muon::hwQual   (const int   & hwQual)    { hwQual_   = hwQual  ;  }
-void L1Muon::etaAtVtx (const float & etaAtVtx)  { etaAtVtx_ = etaAtVtx;  }
-void L1Muon::phiAtVtx (const float & phiAtVtx)  { phiAtVtx_ = phiAtVtx;  }
+void L1TMuon::hwQual   (const int   & hwQual)    { hwQual_   = hwQual  ;  }
+void L1TMuon::etaAtVtx (const float & etaAtVtx)  { etaAtVtx_ = etaAtVtx;  }
+void L1TMuon::phiAtVtx (const float & phiAtVtx)  { phiAtVtx_ = phiAtVtx;  }
 
 
 // ------------ methods  ------------

@@ -1,12 +1,12 @@
-#ifndef Analysis_Tools_L1Jet_h
-#define Analysis_Tools_L1Jet_h 1
+#ifndef Analysis_Tools_L1TJet_h
+#define Analysis_Tools_L1TJet_h 1
 
 // -*- C++ -*-
 //
 // Package:    Analysis/Tools
-// Class:      L1Jet
+// Class:      L1TJet
 // 
-/**\class L1Jet L1Jet.cc Analysis/Tools/src/L1Jet.cc
+/**\class L1TJet L1TJet.cc Analysis/Tools/src/L1TJet.cc
 
  Description: [one line class summary]
 
@@ -31,14 +31,14 @@
 namespace analysis {
    namespace tools {
 
-      class L1Jet : public Candidate {
+      class L1TJet : public Candidate {
          public:
             /// default constructor
-            L1Jet();
+            L1TJet();
 	    /// constructor from 4-momentum information
-            L1Jet(const float & pt, const float & eta, const float & phi, const float & e, const float & q);
+            L1TJet(const float & pt, const float & eta, const float & phi, const float & e, const float & q);
 	    /// destructor
-           ~L1Jet();
+           ~L1TJet();
 //            using Candidate::set; // in case needed to overload the function set
         	   // Gets
         

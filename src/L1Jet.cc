@@ -1,4 +1,4 @@
- /**\class L1Jet L1Jet.cc Analysis/Tools/src/L1Jet.cc
+ /**\class L1TJet L1TJet.cc Analysis/Tools/src/L1TJet.cc
  
 Description: [one line class summary]
 
@@ -18,7 +18,7 @@ Description: [one line class summary]
 //
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include "Analysis/Tools/interface/L1Jet.h"
+#include "Analysis/Tools/interface/L1TJet.h"
 
 
 //
@@ -31,14 +31,14 @@ using namespace analysis::tools;
 //
 // constructors and destructor
 //
-L1Jet::L1Jet() : Candidate()
+L1TJet::L1TJet() : Candidate()
 {
 }
-L1Jet::L1Jet(const float & pt, const float & eta, const float & phi, const float & e, const float & q) :
+L1TJet::L1TJet(const float & pt, const float & eta, const float & phi, const float & e, const float & q) :
   Candidate(pt,eta,phi,e,q)
 {
 }
-L1Jet::~L1Jet()
+L1TJet::~L1TJet()
 {
   // do anything here that needs to be done at desctruction time
   // (e.g. close files, deallocate resources etc.)

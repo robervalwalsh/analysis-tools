@@ -362,57 +362,57 @@ Collection<TriggerObject>  PhysicsObjectTree<TriggerObject>::collection()
 
 }
 
-// L1MUON
+// L1TMuon
 // Constructors and destructor
-PhysicsObjectTree<L1Muon>::PhysicsObjectTree() : PhysicsObjectTreeBase<L1Muon>()
+PhysicsObjectTree<L1TMuon>::PhysicsObjectTree() : PhysicsObjectTreeBase<L1TMuon>()
 {
 }
-PhysicsObjectTree<L1Muon>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<L1Muon>(tree, name)
+PhysicsObjectTree<L1TMuon>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<L1TMuon>(tree, name)
 {
   tree_  -> SetBranchAddress ("hwQual"   , hwQual_   ) ;      
   tree_  -> SetBranchAddress ("etaAtVtx" , etaAtVtx_ ) ;  
   tree_  -> SetBranchAddress ("phiAtVtx" , phiAtVtx_ ) ; 
 }
-PhysicsObjectTree<L1Muon>::~PhysicsObjectTree()
+PhysicsObjectTree<L1TMuon>::~PhysicsObjectTree()
 {
 }
 // Member functions
-Collection<L1Muon>  PhysicsObjectTree<L1Muon>::collection()
+Collection<L1TMuon>  PhysicsObjectTree<L1TMuon>::collection()
 {
-   std::vector<L1Muon> muons;
+   std::vector<L1TMuon> muons;
    for ( int i = 0 ; i < n_ ; ++i )
    {
-      L1Muon muon(pt_[i], eta_[i], phi_[i], e_[i], q_[i]);
+      L1TMuon muon(pt_[i], eta_[i], phi_[i], e_[i], q_[i]);
       muon.hwQual  (hwQual_  [i]) ;      
       muon.etaAtVtx(etaAtVtx_[i]) ;  
       muon.phiAtVtx(phiAtVtx_[i]) ; 
       muons.push_back(muon);
    }
-   Collection<L1Muon> muonCollection(muons, name_);
+   Collection<L1TMuon> muonCollection(muons, name_);
    return muonCollection;
 }
 
-// L1JET
+// L1TJet
 // Constructors and destructor
-PhysicsObjectTree<L1Jet>::PhysicsObjectTree() : PhysicsObjectTreeBase<L1Jet>()
+PhysicsObjectTree<L1TJet>::PhysicsObjectTree() : PhysicsObjectTreeBase<L1TJet>()
 {
 }
-PhysicsObjectTree<L1Jet>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<L1Jet>(tree, name)
+PhysicsObjectTree<L1TJet>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<L1TJet>(tree, name)
 {
 }
-PhysicsObjectTree<L1Jet>::~PhysicsObjectTree()
+PhysicsObjectTree<L1TJet>::~PhysicsObjectTree()
 {
 }
 // Member functions
-Collection<L1Jet>  PhysicsObjectTree<L1Jet>::collection()
+Collection<L1TJet>  PhysicsObjectTree<L1TJet>::collection()
 {
-   std::vector<L1Jet> jets;
+   std::vector<L1TJet> jets;
    for ( int i = 0 ; i < n_ ; ++i )
    {
-      L1Jet jet(pt_[i], eta_[i], phi_[i], e_[i], 0);
+      L1TJet jet(pt_[i], eta_[i], phi_[i], e_[i], 0);
       jets.push_back(jet);
    }
-   Collection<L1Jet> jetCollection(jets, name_);
+   Collection<L1TJet> jetCollection(jets, name_);
    return jetCollection;
 }
 
@@ -428,5 +428,5 @@ template class PhysicsObjectTree<Vertex>;
 template class PhysicsObjectTree<TriggerObject>;
 template class PhysicsObjectTree<GenParticle>;
 template class PhysicsObjectTree<GenJet>;
-template class PhysicsObjectTree<L1Muon>;
-template class PhysicsObjectTree<L1Jet>;
+template class PhysicsObjectTree<L1TMuon>;
+template class PhysicsObjectTree<L1TJet>;

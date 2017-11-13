@@ -37,8 +37,8 @@
 #include "Analysis/Tools/interface/GenParticle.h"
 #include "Analysis/Tools/interface/GenJet.h"
 #include "Analysis/Tools/interface/JetTag.h"
-#include "Analysis/Tools/interface/L1Muon.h"
-#include "Analysis/Tools/interface/L1Jet.h"
+#include "Analysis/Tools/interface/L1TMuon.h"
+#include "Analysis/Tools/interface/L1TJet.h"
 
 //
 // class declaration
