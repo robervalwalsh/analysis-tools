@@ -272,7 +272,24 @@ namespace analysis {
          private:
 
       };
-         
+
+      // Specialization for L1Jet
+      template <>
+      class PhysicsObjectTree<L1Jet> : public PhysicsObjectTreeBase<L1Jet> {
+         public:
+            PhysicsObjectTree();
+            PhysicsObjectTree(TChain * tree, const std::string & name);
+           ~PhysicsObjectTree();
+
+            Collection<L1Jet> collection();
+
+            // ----------member data ---------------------------
+         protected:
+           
+         private:
+
+      };
+                  
    }
 }
 

@@ -101,3 +101,4 @@ template class PhysicsObjectTreeBase<GenParticle>;
 template class PhysicsObjectTreeBase<GenJet>;
 template class PhysicsObjectTreeBase<JetTag>;
 template class PhysicsObjectTreeBase<L1Muon>;
+template class PhysicsObjectTreeBase<L1Jet>;

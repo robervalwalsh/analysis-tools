@@ -392,6 +392,30 @@ Collection<L1Muon>  PhysicsObjectTree<L1Muon>::collection()
    return muonCollection;
 }
 
+// L1JET
+// Constructors and destructor
+PhysicsObjectTree<L1Jet>::PhysicsObjectTree() : PhysicsObjectTreeBase<L1Jet>()
+{
+}
+PhysicsObjectTree<L1Jet>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<L1Jet>(tree, name)
+{
+}
+PhysicsObjectTree<L1Jet>::~PhysicsObjectTree()
+{
+}
+// Member functions
+Collection<L1Jet>  PhysicsObjectTree<L1Jet>::collection()
+{
+   std::vector<L1Jet> jets;
+   for ( int i = 0 ; i < n_ ; ++i )
+   {
+      L1Jet jet(pt_[i], eta_[i], phi_[i], e_[i], 0);
+      jets.push_back(jet);
+   }
+   Collection<L1Jet> jetCollection(jets, name_);
+   return jetCollection;
+}
+
 
 
 // ======================================
@@ -405,3 +429,4 @@ template class PhysicsObjectTree<TriggerObject>;
 template class PhysicsObjectTree<GenParticle>;
 template class PhysicsObjectTree<GenJet>;
 template class PhysicsObjectTree<L1Muon>;
+template class PhysicsObjectTree<L1Jet>;

@@ -38,6 +38,7 @@
 #include "Analysis/Tools/interface/GenJet.h"
 #include "Analysis/Tools/interface/JetTag.h"
 #include "Analysis/Tools/interface/L1Muon.h"
+#include "Analysis/Tools/interface/L1Jet.h"
 
 //
 // class declaration
