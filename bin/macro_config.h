@@ -96,6 +96,13 @@ std::string hltPathsLogic2_;
 std::vector<std::string> triggerObjectsJets_;
 std::vector<std::string> triggerObjectsMuons_;
 
+// ntuples collections
+std::string treePath_;
+std::string jetsCol_; 
+std::string muonsCol_; 
+std::string triggerCol_;
+std::string triggerObjDir_;
+
 int macro_config(int argc, char * argv[])
 {
    try
@@ -186,7 +193,14 @@ int macro_config(int argc, char * argv[])
          ("matchOnlineOfflineDeltaRMax",po::value <float> (&matchonoffdrmax_)->default_value(0.4),"DeltaR max for matching online-offline")
          ("matchOnlineOfflineReference",po::value <bool> (&matchonoffref_)->default_value(true),"Flag for doing matching online offline objects when using a reference trigger")
          ("prescaleWeight",po::value <bool> (&psweight_)->default_value(false),"Flag for weighting histograms with prescale")
-         ("triggerEmulation",po::value <bool> (&trigemul_)->default_value(false),"Flag for using trigger emulation");
+         ("triggerEmulation",po::value <bool> (&trigemul_)->default_value(false),"Flag for using trigger emulation")
+         
+         ("Jets",po::value <std::string> (&jetsCol_)->default_value("slimmedJetsPuppi"),"Name of the jets collection")
+         ("Muons",po::value <std::string> (&muonsCol_)->default_value("slimmedMuons"),"Name of the muons collection")
+         ("TriggerResults",po::value <std::string> (&triggerCol_)->default_value("TriggerResults"),"Name of the trigger results collection")
+         ("TriggerObjectsDirectory",po::value <std::string> (&triggerObjDir_)->default_value("slimmedPatTrigger"),"Name of the trigger objects directory")
+         ("CollectionsTreePath",po::value <std::string> (&treePath_)->default_value("Events"),"Name of the tree path for the event collections.");
+
          
       
       po::variables_map vm; 
