@@ -26,9 +26,14 @@ endif
 
 mkdir $maindir
 
+# split the ntuples in a temporary file
+set tmpdir = ".splitdir_"$$
+mkdir $tmpdir
+cp -p $rootfilelist $tmpdir
+cd $tmpdir
 split.csh $nsplit $rootfilelist
-
 set files = `/bin/ls "."*_x????.txt`
+cd -
 
 foreach file ( $files )
 
@@ -40,7 +45,7 @@ foreach file ( $files )
    endif
    mkdir -p $exedir
    cd $exedir
-   mv ../../$file ./rootFileList.txt
+   mv ../../$tmpdir/$file ./rootFileList.txt
    cp -p ../../$config .
    if ( $json != "" ) then
       cp -p ../../$json .
@@ -50,6 +55,7 @@ foreach file ( $files )
    cd -
 end
 
+rm -fR $tmpdir
 
 exit
 
