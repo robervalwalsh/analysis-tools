@@ -1,12 +1,12 @@
-#ifndef Analysis_Core_JetTag_h
-#define Analysis_Core_JetTag_h 1
+#ifndef Analysis_Tools_JetTag_h
+#define Analysis_Tools_JetTag_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Core
+// Package:    Analysis/Tools
 // Class:      JetTag
 // 
-/**\class JetTag JetTag.cc Analysis/Core/src/JetTag.cc
+/**\class JetTag JetTag.cc Analysis/Tools/src/JetTag.cc
 
  Description: [one line class summary]
 
@@ -23,13 +23,13 @@
 #include <memory>
 // 
 // user include files
-#include "Analysis/Core/interface/Candidate.h"
+#include "Analysis/Tools/interface/Candidate.h"
 //
 // class declaration
 //
 
 namespace analysis {
-   namespace core {
+   namespace tools {
 
       class JetTag : public Candidate {
          public:
@@ -60,4 +60,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Core_JetTag_h
+#endif  // Analysis_Tools_JetTag_h

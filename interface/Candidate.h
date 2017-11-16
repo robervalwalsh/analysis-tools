@@ -1,12 +1,12 @@
-#ifndef Analysis_Core_Candidate_h
-#define Analysis_Core_Candidate_h 1
+#ifndef Analysis_Tools_Candidate_h
+#define Analysis_Tools_Candidate_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Core
+// Package:    Analysis/Tools
 // Class:      Candidate
 //
-/**\class Candidate Candidate.cc Analysis/Core/src/Candidate.cc
+/**\class Candidate Candidate.cc Analysis/Tools/src/Candidate.cc
 
  Description: [one line class summary]
 
@@ -32,7 +32,7 @@
 //
 
 namespace analysis {
-   namespace core {
+   namespace tools {
 
       class Candidate {
          typedef std::vector<Candidate> Candidates;
@@ -116,4 +116,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Core_Candidate_h
+#endif  // Analysis_Tools_Candidate_h

@@ -1,4 +1,4 @@
-/**\class MET MET.cc Analysis/Core/src/MET.cc
+/**\class MET MET.cc Analysis/Tools/src/MET.cc
 
  Description: [one line class summary]
 
@@ -18,7 +18,7 @@
 // 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
  
-#include "Analysis/Core/interface/MET.h"
+#include "Analysis/Tools/interface/MET.h"
 
 
 //
@@ -26,7 +26,7 @@
 //
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 //
 // constructors and destructor

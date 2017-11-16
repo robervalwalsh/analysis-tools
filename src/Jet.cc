@@ -1,4 +1,4 @@
-/**\class Jet Jet.cc Analysis/Core/src/Jet.cc
+/**\class Jet Jet.cc Analysis/Tools/src/Jet.cc
 
  Description: [one line class summary]
 
@@ -18,7 +18,7 @@
 // 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
  
-#include "Analysis/Core/interface/Jet.h"
+#include "Analysis/Tools/interface/Jet.h"
 
 
 //
@@ -26,7 +26,7 @@
 //
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 //
 // constructors and destructor

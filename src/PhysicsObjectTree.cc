@@ -1,4 +1,4 @@
-/**\class PhysicsObjectTree PhysicsObjectTree.cc Analysis/Core/src/PhysicsObjectTree.cc
+/**\class PhysicsObjectTree PhysicsObjectTree.cc Analysis/Tools/src/PhysicsObjectTree.cc
 
  Description: [one line class summary]
 
@@ -15,7 +15,7 @@
 #include <iostream>
 //
 // user include files
-#include "Analysis/Core/interface/PhysicsObjectTree.h"
+#include "Analysis/Tools/interface/PhysicsObjectTree.h"
 
 
 //
@@ -23,7 +23,7 @@
 //
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 //
 // constructors and destructor
@@ -362,6 +362,62 @@ Collection<TriggerObject>  PhysicsObjectTree<TriggerObject>::collection()
 
 }
 
+// L1TMuon
+// Constructors and destructor
+PhysicsObjectTree<L1TMuon>::PhysicsObjectTree() : PhysicsObjectTreeBase<L1TMuon>()
+{
+}
+PhysicsObjectTree<L1TMuon>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<L1TMuon>(tree, name)
+{
+  tree_  -> SetBranchAddress ("hwQual"   , hwQual_   ) ;      
+  tree_  -> SetBranchAddress ("etaAtVtx" , etaAtVtx_ ) ;  
+  tree_  -> SetBranchAddress ("phiAtVtx" , phiAtVtx_ ) ; 
+}
+PhysicsObjectTree<L1TMuon>::~PhysicsObjectTree()
+{
+}
+// Member functions
+Collection<L1TMuon>  PhysicsObjectTree<L1TMuon>::collection()
+{
+   std::vector<L1TMuon> muons;
+   for ( int i = 0 ; i < n_ ; ++i )
+   {
+      L1TMuon muon(pt_[i], eta_[i], phi_[i], e_[i], q_[i]);
+      muon.hwQual  (hwQual_  [i]) ;      
+      muon.etaAtVtx(etaAtVtx_[i]) ;  
+      muon.phiAtVtx(phiAtVtx_[i]) ; 
+      muons.push_back(muon);
+   }
+   Collection<L1TMuon> muonCollection(muons, name_);
+   return muonCollection;
+}
+
+// L1TJet
+// Constructors and destructor
+PhysicsObjectTree<L1TJet>::PhysicsObjectTree() : PhysicsObjectTreeBase<L1TJet>()
+{
+}
+PhysicsObjectTree<L1TJet>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<L1TJet>(tree, name)
+{
+}
+PhysicsObjectTree<L1TJet>::~PhysicsObjectTree()
+{
+}
+// Member functions
+Collection<L1TJet>  PhysicsObjectTree<L1TJet>::collection()
+{
+   std::vector<L1TJet> jets;
+   for ( int i = 0 ; i < n_ ; ++i )
+   {
+      L1TJet jet(pt_[i], eta_[i], phi_[i], e_[i], 0);
+      jets.push_back(jet);
+   }
+   Collection<L1TJet> jetCollection(jets, name_);
+   return jetCollection;
+}
+
+
+
 // ======================================
 // Templates declarations
 template class PhysicsObjectTree<Candidate>;
@@ -372,3 +428,5 @@ template class PhysicsObjectTree<Vertex>;
 template class PhysicsObjectTree<TriggerObject>;
 template class PhysicsObjectTree<GenParticle>;
 template class PhysicsObjectTree<GenJet>;
+template class PhysicsObjectTree<L1TMuon>;
+template class PhysicsObjectTree<L1TJet>;

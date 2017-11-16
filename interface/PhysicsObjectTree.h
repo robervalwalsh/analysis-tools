@@ -1,12 +1,12 @@
-#ifndef Analysis_Core_PhysicsObjectTree_h
-#define Analysis_Core_PhysicsObjectTree_h 1
+#ifndef Analysis_Tools_PhysicsObjectTree_h
+#define Analysis_Tools_PhysicsObjectTree_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Core
+// Package:    Analysis/Tools
 // Class:      PhysicsObjectTree
 //
-/**\class PhysicsObjectTree PhysicsObjectTree.cc Analysis/Core/src/PhysicsObjectTree.cc
+/**\class PhysicsObjectTree PhysicsObjectTree.cc Analysis/Tools/src/PhysicsObjectTree.cc
 
  Description: [one line class summary]
 
@@ -27,15 +27,15 @@
 
 #include "TTree.h"
 #include "TChain.h"
-#include "Analysis/Core/interface/PhysicsObjectTreeBase.h"
-#include "Analysis/Core/interface/Collection.h"
+#include "Analysis/Tools/interface/PhysicsObjectTreeBase.h"
+#include "Analysis/Tools/interface/Collection.h"
 
 //
 // class declaration
 //
 
 namespace analysis {
-   namespace core {
+   namespace tools {
 
       template <class Object>
       class PhysicsObjectTree : public PhysicsObjectTreeBase<Object> {
@@ -169,18 +169,18 @@ namespace analysis {
 
             // ----------member data ---------------------------
          protected:
-	   bool  isPFMuon_        [max_];
-	   bool  isGlobalMuon_    [max_]; 
-	   bool  isTrackerMuon_   [max_]; 
-	   bool  isLooseMuon_     [max_]; 
-	   bool  isMediumMuon_    [max_];
+           bool  isPFMuon_        [max_];
+           bool  isGlobalMuon_    [max_]; 
+           bool  isTrackerMuon_   [max_]; 
+           bool  isLooseMuon_     [max_]; 
+           bool  isMediumMuon_    [max_];
 
-	   float validFraction_          [max_];
-	   float segmentCompatibility_   [max_]; 
-	   float trkKink_                [max_]; 
-	   float chi2LocalPos_           [max_];
+           float validFraction_          [max_];
+           float segmentCompatibility_   [max_]; 
+           float trkKink_                [max_]; 
+           float chi2LocalPos_           [max_];
 
-	   float normChi2_  [max_];
+           float normChi2_  [max_];
          private:
 
       };
@@ -252,7 +252,45 @@ namespace analysis {
          private:
 
       };
+         
+      // Specialization for L1TMuon
+      template <>
+      class PhysicsObjectTree<L1TMuon> : public PhysicsObjectTreeBase<L1TMuon> {
+         public:
+            PhysicsObjectTree();
+            PhysicsObjectTree(TChain * tree, const std::string & name);
+           ~PhysicsObjectTree();
+
+            Collection<L1TMuon> collection();
+
+            // ----------member data ---------------------------
+         protected:
+           int    hwQual_   [max_];
+           float  etaAtVtx_ [max_]; 
+           float  phiAtVtx_ [max_]; 
+           
+         private:
+
+      };
+
+      // Specialization for L1TJet
+      template <>
+      class PhysicsObjectTree<L1TJet> : public PhysicsObjectTreeBase<L1TJet> {
+         public:
+            PhysicsObjectTree();
+            PhysicsObjectTree(TChain * tree, const std::string & name);
+           ~PhysicsObjectTree();
+
+            Collection<L1TJet> collection();
+
+            // ----------member data ---------------------------
+         protected:
+           
+         private:
+
+      };
+                  
    }
 }
 
-#endif  // Analysis_Core_PhysicsObjectTree_h
+#endif  // Analysis_Tools_PhysicsObjectTree_h

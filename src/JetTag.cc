@@ -1,4 +1,4 @@
-/**\class JetTag JetTag.cc Analysis/Core/src/JetTag.cc
+/**\class JetTag JetTag.cc Analysis/Tools/src/JetTag.cc
 
  Description: [one line class summary]
 
@@ -18,7 +18,7 @@
 // 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
  
-#include "Analysis/Core/interface/JetTag.h"
+#include "Analysis/Tools/interface/JetTag.h"
 
 
 //
@@ -26,7 +26,7 @@
 //
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 //
 // constructors and destructor

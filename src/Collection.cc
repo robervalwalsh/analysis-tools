@@ -1,4 +1,4 @@
-/**\class Collection Collection.cc Analysis/Core/src/Collection.cc
+/**\class Collection Collection.cc Analysis/Tools/src/Collection.cc
 
  Description: [one line class summary]
 
@@ -17,20 +17,22 @@
 //
 #include "TRandom2.h"
 // user include files
-#include "Analysis/Core/interface/Candidate.h"
-#include "Analysis/Core/interface/Jet.h"
-#include "Analysis/Core/interface/MET.h"
-#include "Analysis/Core/interface/Muon.h"
-#include "Analysis/Core/interface/Vertex.h"
-#include "Analysis/Core/interface/GenParticle.h"
-#include "Analysis/Core/interface/GenJet.h"
-#include "Analysis/Core/interface/JetTag.h"
+#include "Analysis/Tools/interface/Candidate.h"
+#include "Analysis/Tools/interface/Jet.h"
+#include "Analysis/Tools/interface/MET.h"
+#include "Analysis/Tools/interface/Muon.h"
+#include "Analysis/Tools/interface/Vertex.h"
+#include "Analysis/Tools/interface/GenParticle.h"
+#include "Analysis/Tools/interface/GenJet.h"
+#include "Analysis/Tools/interface/JetTag.h"
+#include "Analysis/Tools/interface/L1TMuon.h"
+#include "Analysis/Tools/interface/L1TJet.h"
 
-#include "Analysis/Core/interface/Collection.h"
+#include "Analysis/Tools/interface/Collection.h"
 
 // member functions specialization - needed to be declared in the same namespace as the class
 namespace analysis {
-   namespace core {
+   namespace tools {
       template <> Collection<Vertex>::Collection(const Objects & objects, const std::string & name);
       template <> std::vector<Candidate> * Collection<Vertex>::vectorCandidates() const;
       template <> void Collection<Vertex>::matchTo( const std::vector<Candidate>* vectorcandidates, const std::string & name, const float & deltaR );
@@ -49,7 +51,7 @@ namespace analysis {
 //
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 bool pTordering(Candidate j1, Candidate j2) {return (j1.pt()>j2.pt());}
 
@@ -300,3 +302,5 @@ template class Collection<TriggerObject>;
 template class Collection<GenParticle>;
 template class Collection<GenJet>;
 template class Collection<JetTag>;
+template class Collection<L1TMuon>;
+template class Collection<L1TJet>;

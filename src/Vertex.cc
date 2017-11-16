@@ -1,4 +1,4 @@
-/**\class Vertex Vertex.cc Analysis/Core/src/Vertex.cc
+/**\class Vertex Vertex.cc Analysis/Tools/src/Vertex.cc
 
  Description: [one line class summary]
 
@@ -18,7 +18,7 @@
 // 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
  
-#include "Analysis/Core/interface/Vertex.h"
+#include "Analysis/Tools/interface/Vertex.h"
 
 
 //
@@ -26,7 +26,7 @@
 //
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 //
 // constructors and destructor
