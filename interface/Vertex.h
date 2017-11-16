@@ -1,12 +1,12 @@
-#ifndef Analysis_Core_Vertex_h
-#define Analysis_Core_Vertex_h 1
+#ifndef Analysis_Tools_Vertex_h
+#define Analysis_Tools_Vertex_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Core
+// Package:    Analysis/Tools
 // Class:      Vertex
 // 
-/**\class Vertex Vertex.cc Analysis/Core/src/Vertex.cc
+/**\class Vertex Vertex.cc Analysis/Tools/src/Vertex.cc
 
  Description: Reconstructed Vertex
 
@@ -30,7 +30,7 @@
 //Original
 
 namespace analysis {
-   namespace core {
+   namespace tools {
 
       class Vertex {
          public:
@@ -113,4 +113,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Core_Vertex_h
+#endif  // Analysis_Tools_Vertex_h

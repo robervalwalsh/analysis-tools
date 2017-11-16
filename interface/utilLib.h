@@ -1,6 +1,6 @@
 
-#ifndef Analysis_Core_utilLib_h_
-#define Analysis_Core_utilLib_h_
+#ifndef Analysis_Tools_utilLib_h_
+#define Analysis_Tools_utilLib_h_
 
 #include <sys/stat.h>
 

@@ -7,11 +7,11 @@
 #include "TChain.h"
 #include "TH1.h" 
 
-#include "Analysis/Core/interface/Analysis.h"
+#include "Analysis/Tools/interface/Analysis.h"
 
 using namespace std;
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 
 // =============================================================================================   
@@ -28,7 +28,7 @@ int main(int argc, char * argv[])
    float ptmin[3]   = { 100.0, 100.0, 40.0 };
    float etamax[3]  = {   2.2,   2.2 , 2.2 };
    float btagmin[3] = { btagcut[bWP], btagcut[bWP], btagcut[bWP]};
-   float nonbtag    = 0.46;
+//   float nonbtag    = 0.46;
    float dRmin      = 1.;
    float detamax    = 1.55;
    
@@ -91,13 +91,12 @@ int main(int argc, char * argv[])
    // 5: delta eta
    // 6: btag (bbnb)
    int nsel[10] = { };
-   int nmatch[10] = { };
    
    std::string prevFile = "";
    for ( int i = 0 ; i < analysis.size() ; ++i )
    {
       int njets = 0;
-      int njets_csv = 0;
+//      int njets_csv = 0;
       bool goodEvent = true;
       
       if ( i > 0 && i%100000==0 ) std::cout << i << "  events processed! " << std::endl;

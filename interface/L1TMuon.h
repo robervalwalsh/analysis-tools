@@ -1,12 +1,12 @@
-#ifndef Analysis_Core_L1Muon_h
-#define Analysis_Core_L1Muon_h 1
+#ifndef Analysis_Tools_L1TMuon_h
+#define Analysis_Tools_L1TMuon_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Core
-// Class:      L1Muon
+// Package:    Analysis/Tools
+// Class:      L1TMuon
 // 
-/**\class L1Muon L1Muon.cc Analysis/Core/src/L1Muon.cc
+/**\class L1TMuon L1TMuon.cc Analysis/Tools/src/L1TMuon.cc
 
  Description: [one line class summary]
 
@@ -23,22 +23,22 @@
 #include <memory>
 // 
 // user include files
-#include "Analysis/Core/interface/Candidate.h"
+#include "Analysis/Tools/interface/Candidate.h"
 //
 // class declaration
 //
 
 namespace analysis {
-   namespace core {
+   namespace tools {
 
-      class L1Muon : public Candidate {
+      class L1TMuon : public Candidate {
          public:
             /// default constructor
-            L1Muon();
+            L1TMuon();
 	    /// constructor from 4-momentum information
-            L1Muon(const float & pt, const float & eta, const float & phi, const float & e, const float & q);
+            L1TMuon(const float & pt, const float & eta, const float & phi, const float & e, const float & q);
 	    /// destructor
-           ~L1Muon();
+           ~L1TMuon();
 //            using Candidate::set; // in case needed to overload the function set
         	   // Gets
         	   int   hwQual()     const ;
@@ -64,4 +64,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Core_Muon_h
+#endif  // Analysis_Tools_Muon_h

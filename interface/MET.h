@@ -1,12 +1,12 @@
-#ifndef Analysis_Core_MET_h
-#define Analysis_Core_MET_h 1
+#ifndef Analysis_Tools_MET_h
+#define Analysis_Tools_MET_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Core
+// Package:    Analysis/Tools
 // Class:      MET
 // 
-/**\class MET MET.cc Analysis/Core/src/MET.cc
+/**\class MET MET.cc Analysis/Tools/src/MET.cc
 
  Description: [one line class summary]
 
@@ -25,14 +25,14 @@
 #include <boost/numeric/ublas/io.hpp>
 // 
 // user include files
-#include "Analysis/Core/interface/Candidate.h"
+#include "Analysis/Tools/interface/Candidate.h"
 //
 // class declaration
 //
 using namespace boost::numeric::ublas;
 
 namespace analysis {
-   namespace core {
+   namespace tools {
 
       class MET : public Candidate {
          public:
@@ -59,4 +59,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Core_MET_h
+#endif  // Analysis_Tools_MET_h

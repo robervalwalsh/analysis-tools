@@ -1,5 +1,5 @@
-#ifndef Analysis_Core_macro_config_h_
-#define Analysis_Core_macro_config_h_
+#ifndef Analysis_Tools_macro_config_h_
+#define Analysis_Tools_macro_config_h_
 
 #include "boost/program_options.hpp"
 #include "boost/algorithm/string.hpp"
@@ -27,18 +27,14 @@ bool matchonoffref_;
 bool psweight_;
 bool trigemul_;
 
+
+// triggerobjects emulation
+int ntomin_[10];
+std::vector<float> toptmin_[10];
+std::vector<float> toetamax_[10];
+
+
 // jets
-int nl1jetsmin_;
-std::vector<float> l1jetsptmin_;
-std::vector<float> l1jetsetamax_;
-
-int nl2jetsmin_;
-std::vector<float> l2jetsptmin_;
-std::vector<float> l2jetsetamax_;
-
-int nl3jetsmin_;
-std::vector<float> l3jetsptmin_;
-std::vector<float> l3jetsetamax_;
 
 int njetsmin_;
 int nbjetsmin_;
@@ -48,24 +44,24 @@ std::vector<float> jetsetamax_;
 std::vector<float> jetsbtagmin_;
 std::string jetsid_;
 
+int l1tjetsnmin_;
+std::vector<float> l1tjetsptmin_;
+std::vector<float> l1tjetsetamax_;
+
+
 // muons
-int nl1muonsmin_;
-std::vector<float> l1muonsptmin_;
-std::vector<float> l1muonsetamax_;
-
-int nl2muonsmin_;
-std::vector<float> l2muonsptmin_;
-std::vector<float> l2muonsetamax_;
-
-int nl3muonsmin_;
-std::vector<float> l3muonsptmin_;
-std::vector<float> l3muonsetamax_;
 
 int nmuonsmin_;
 std::vector<float> muonsptmin_;
 std::vector<float> muonsptmax_;
 std::vector<float> muonsetamax_;
 std::string muonsid_;
+
+int l1tmuonsnmin_;
+std::vector<float> l1tmuonsptmin_;
+std::vector<float> l1tmuonsetamax_;
+
+
 
 // additional cuts of unidentified objects or for extra selections
 int nmin_;
@@ -78,6 +74,7 @@ float drmax_;
 float detamax_;
 float dphimin_;
 
+std::string btagalgo_;
 float btagwploose_;
 float btagwpmedium_;
 float btagwptight_;
@@ -95,6 +92,15 @@ std::vector<std::string> hltPaths2_;
 std::string hltPathsLogic2_;
 std::vector<std::string> triggerObjectsJets_;
 std::vector<std::string> triggerObjectsMuons_;
+
+// ntuples collections
+std::string treePath_;
+std::string jetsCol_; 
+std::string muonsCol_; 
+std::string l1tjetsCol_; 
+std::string l1tmuonsCol_; 
+std::string triggerCol_;
+std::string triggerObjDir_;
 
 int macro_config(int argc, char * argv[])
 {
@@ -114,18 +120,6 @@ int macro_config(int argc, char * argv[])
          ("output",po::value <std::string> (&outputRoot_)->default_value("histograms.root"),"Output root file")
          ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
 //      
-         ("nL1JetsMin",po::value <int> (&nl1jetsmin_)->default_value(0),"Minimum number of L1 trigger jets")
-         ("l1JetsPtMin", po::value<std::vector<float> >(&l1jetsptmin_)->multitoken(),"Mimium pt of the L1 trigger jets")
-         ("l1JetsEtaMax", po::value<std::vector<float> >(&l1jetsetamax_)->multitoken(),"Maximum |eta| of the L1 trigger jets")
-         
-         ("nL2JetsMin",po::value <int> (&nl2jetsmin_)->default_value(0),"Minimum number of L2 trigger jets")
-         ("l2JetsPtMin", po::value<std::vector<float> >(&l2jetsptmin_)->multitoken(),"Mimium pt of the L2 trigger jets")
-         ("l2JetsEtaMax", po::value<std::vector<float> >(&l2jetsetamax_)->multitoken(),"Maximum |eta| of the L2 trigger jets")
-
-         ("nL3JetsMin",po::value <int> (&nl3jetsmin_)->default_value(0),"Minimum number of L3 trigger jets")
-         ("l3JetsPtMin", po::value<std::vector<float> >(&l3jetsptmin_)->multitoken(),"Mimium pt of the L3 trigger jets")
-         ("l3JetsEtaMax", po::value<std::vector<float> >(&l3jetsetamax_)->multitoken(),"Maximum |eta| of the L3 trigger jets")
-         
          ("nJetsMin",po::value <int> (&njetsmin_)->default_value(0),"Minimum number of jets")
          ("nBJetsMin",po::value <int> (&nbjetsmin_)->default_value(0),"Minimum number of btgaged jets")
          ("jetsPtMin", po::value<std::vector<float> >(&jetsptmin_)->multitoken(),"Mimium pt of the jets")
@@ -133,24 +127,22 @@ int macro_config(int argc, char * argv[])
          ("jetsEtaMax", po::value<std::vector<float> >(&jetsetamax_)->multitoken(),"Maximum |eta| of the jets")
          ("jetsBtagMin", po::value<std::vector<float> >(&jetsbtagmin_)->multitoken(),"Minimum btag of the jets; if < 0 -> reverse btag")
          ("jetsId",po::value <std::string> (&jetsid_)->default_value("LOOSE"),"Jets id criteria for all jets")
+         
+         ("l1tJetsNMin",po::value <int> (&l1tjetsnmin_)->default_value(0),"Minimum number of L1T jets")
+         ("l1tJetsPtMin", po::value<std::vector<float> >(&l1tjetsptmin_)->multitoken(),"Mimium pt of the L1T jets")
+         ("l1tJetsEtaMax", po::value<std::vector<float> >(&l1tjetsetamax_)->multitoken(),"Maximum |eta| of the L1T jets")
+         
 //      
-         ("nL1MuonsMin",po::value <int> (&nl1muonsmin_)->default_value(0),"Minimum number of L1 trigger muons")
-         ("l1MuonsPtMin", po::value<std::vector<float> >(&l1muonsptmin_)->multitoken(),"Mimium pt of the L1 trigger muons")
-         ("l1MuonsEtaMax", po::value<std::vector<float> >(&l1muonsetamax_)->multitoken(),"Maximum |eta| of the L1 trigger muons")
-         
-         ("nL2MuonsMin",po::value <int> (&nl2muonsmin_)->default_value(0),"Minimum number of L2 trigger muons")
-         ("l2MuonsPtMin", po::value<std::vector<float> >(&l2muonsptmin_)->multitoken(),"Mimium pt of the L2 trigger muons")
-         ("l2MuonsEtaMax", po::value<std::vector<float> >(&l2muonsetamax_)->multitoken(),"Maximum |eta| of the L2 trigger muons")
-
-         ("nL3MuonsMin",po::value <int> (&nl3muonsmin_)->default_value(0),"Minimum number of L3 trigger muons")
-         ("l3MuonsPtMin", po::value<std::vector<float> >(&l3muonsptmin_)->multitoken(),"Mimium pt of the L3 trigger muons")
-         ("l3MuonsEtaMax", po::value<std::vector<float> >(&l3muonsetamax_)->multitoken(),"Maximum |eta| of the L3 trigger muons")
-         
          ("nMuonsMin",po::value <int> (&nmuonsmin_)->default_value(0),"Minimum number of muons")
          ("muonsPtMin", po::value<std::vector<float> >(&muonsptmin_)->multitoken(),"Mimium pt of the muons")
          ("muonsPtMax", po::value<std::vector<float> >(&muonsptmax_)->multitoken(),"Maximum pt of the muons")
          ("muonsEtaMax", po::value<std::vector<float> >(&muonsetamax_)->multitoken(),"Maximum |eta| of the muons")
          ("muonsId",po::value <std::string> (&muonsid_)->default_value("LOOSE"),"muons id criteria for all muons")
+         
+         ("l1tMuonsNMin",po::value <int> (&l1tmuonsnmin_)->default_value(0),"Minimum number of L1T muons")
+         ("l1tMuonsPtMin", po::value<std::vector<float> >(&l1tmuonsptmin_)->multitoken(),"Mimium pt of the L1T muons")
+         ("l1tMuonsNEtaMax", po::value<std::vector<float> >(&l1tmuonsetamax_)->multitoken(),"Maximum |eta| of the L1T muons")
+         
 //
          ("nMin",po::value <int> (&nmin_)->default_value(0),"Minimum number objects")
          ("ptMin", po::value<std::vector<float> >(&ptmin_)->multitoken(),"Mimium pt of an object")
@@ -164,7 +156,7 @@ int macro_config(int argc, char * argv[])
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
          ("hltPath",po::value <std::string> (&hltPath_),"HLT path name")
-         ("l1Seed",po::value <std::string> (&l1Seed_),"L1 seed name")
+         ("l1Seed",po::value <std::string> (&l1Seed_)->default_value(""),"L1 seed name")
          ("hltPathReference",po::value <std::string> (&hltPathRef_),"HLT path name for reference trigger for trigger efficiency")
          ("triggerObjects", po::value<std::vector<std::string> >(&triggerObjects_)->multitoken(),"Trigger objects")
          ("hltPathsList", po::value<std::vector<std::string> >(&hltPaths_)->multitoken(),"HLT paths list")
@@ -174,6 +166,7 @@ int macro_config(int argc, char * argv[])
          ("triggerObjectsJets", po::value<std::vector<std::string> >(&triggerObjectsJets_)->multitoken(),"Trigger objects for jets")
          ("triggerObjectsMuons", po::value<std::vector<std::string> >(&triggerObjectsMuons_)->multitoken(),"Trigger objects for muons")
 //      
+         ("btagAlgorithm",po::value <std::string> (&btagalgo_)->default_value("csvivf"),"BTag algorithm")
          ("btagWPLoose",po::value <float> (&btagwploose_)->default_value(0.46),"BTag working point LOOSE")
          ("btagWPMedium",po::value <float> (&btagwpmedium_)->default_value(0.84),"BTag working point MEDIUM")
          ("btagWPTight",po::value <float> (&btagwptight_)->default_value(0.92),"BTag working point TIGHT")
@@ -186,8 +179,26 @@ int macro_config(int argc, char * argv[])
          ("matchOnlineOfflineDeltaRMax",po::value <float> (&matchonoffdrmax_)->default_value(0.4),"DeltaR max for matching online-offline")
          ("matchOnlineOfflineReference",po::value <bool> (&matchonoffref_)->default_value(true),"Flag for doing matching online offline objects when using a reference trigger")
          ("prescaleWeight",po::value <bool> (&psweight_)->default_value(false),"Flag for weighting histograms with prescale")
-         ("triggerEmulation",po::value <bool> (&trigemul_)->default_value(false),"Flag for using trigger emulation");
+         ("triggerEmulation",po::value <bool> (&trigemul_)->default_value(false),"Flag for using trigger emulation")
          
+         ("jetsCollection",po::value <std::string> (&jetsCol_)->default_value("slimmedJetsPuppi"),"Name of the jets collection")
+         ("muonsCollection",po::value <std::string> (&muonsCol_)->default_value("slimmedMuons"),"Name of the muons collection")
+         ("l1tJetsCollection",po::value <std::string> (&l1tjetsCol_)->default_value("l1tJets"),"Name of the L1T jets collection")
+         ("l1tMuonsCollection",po::value <std::string> (&l1tmuonsCol_)->default_value("l1tMuons"),"Name of the L1T muons collection")
+
+         ("triggerResultsCollection",po::value <std::string> (&triggerCol_)->default_value("TriggerResults"),"Name of the trigger results collection")
+         ("triggerObjectsDirectory",po::value <std::string> (&triggerObjDir_)->default_value("slimmedPatTrigger"),"Name of the trigger objects directory")
+         ("collectionsTreePath",po::value <std::string> (&treePath_)->default_value("Events"),"Name of the tree path for the event collections.");
+         
+         
+
+         for ( int i = 0 ; i < 10 ; ++i )
+         {
+            config.add_options()
+               (Form("triggerObject%dNMin",i),po::value <int> (&(ntomin_[i]))->default_value(0),Form("Minimum number of trigger objects #%d",i))
+               (Form("triggerObject%dPtMin",i),po::value<std::vector<float> >(&(toptmin_[i]))->multitoken(),Form("Minimum pT of trigger objects #%d",i))
+               (Form("triggerObject%dEtaMax",i),po::value<std::vector<float> >(&(toetamax_[i]))->multitoken(),Form("Minimum eta of trigger objects #%d",i));
+         }
       
       po::variables_map vm; 
       try

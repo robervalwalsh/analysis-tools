@@ -1,4 +1,4 @@
-/**\class GenParticle GenParticle.cc Analysis/Core/src/GenParticle.cc
+/**\class GenParticle GenParticle.cc Analysis/Tools/src/GenParticle.cc
 
  Description: [one line class summary]
 
@@ -18,7 +18,7 @@
 // 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
  
-#include "Analysis/Core/interface/GenParticle.h"
+#include "Analysis/Tools/interface/GenParticle.h"
 
 
 //
@@ -26,7 +26,7 @@
 //
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 //
 // constructors and destructor

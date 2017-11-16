@@ -1,4 +1,4 @@
-/**\class TreeBase TreeBase.cc Analysis/Core/src/TreeBase.cc
+/**\class TreeBase TreeBase.cc Analysis/Tools/src/TreeBase.cc
 
  Description: [one line class summary]
 
@@ -17,7 +17,7 @@
 #include <algorithm> 
 // 
 // user include files
-#include "Analysis/Core/interface/TreeBase.h"
+#include "Analysis/Tools/interface/TreeBase.h"
 
 
 //
@@ -25,7 +25,7 @@
 //
 
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 //
 // constructors and destructor

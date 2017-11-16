@@ -1,12 +1,12 @@
-#ifndef Analysis_Tools_GenJet_h
-#define Analysis_Tools_GenJet_h 1
+#ifndef Analysis_Tools_L1TJet_h
+#define Analysis_Tools_L1TJet_h 1
 
 // -*- C++ -*-
 //
 // Package:    Analysis/Tools
-// Class:      GenJet
+// Class:      L1TJet
 // 
-/**\class GenJet GenJet.cc Analysis/Tools/src/GenJet.cc
+/**\class L1TJet L1TJet.cc Analysis/Tools/src/L1TJet.cc
 
  Description: [one line class summary]
 
@@ -31,13 +31,22 @@
 namespace analysis {
    namespace tools {
 
-      class GenJet : public Candidate {
+      class L1TJet : public Candidate {
          public:
-            GenJet();
-            GenJet(const float & pt, const float & eta, const float & phi, const float & e, const float & q);
-           ~GenJet();
+            /// default constructor
+            L1TJet();
+	    /// constructor from 4-momentum information
+            L1TJet(const float & pt, const float & eta, const float & phi, const float & e, const float & q);
+	    /// destructor
+           ~L1TJet();
 //            using Candidate::set; // in case needed to overload the function set
-      
+        	   // Gets
+        
+        	   // Sets
+   
+          protected:
+       // ----------member data ---------------------------
+
          private:
             // ----------member data ---------------------------
             
@@ -46,4 +55,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Tools_GenJet_h
+#endif  // Analysis_Tools_Jet_h

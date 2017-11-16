@@ -1,12 +1,12 @@
-#ifndef Analysis_Core_PhysicsObjectTreeBase_h
-#define Analysis_Core_PhysicsObjectTreeBase_h 1
+#ifndef Analysis_Tools_PhysicsObjectTreeBase_h
+#define Analysis_Tools_PhysicsObjectTreeBase_h 1
 
 // -*- C++ -*-
 //
-// Package:    Analysis/Core
+// Package:    Analysis/Tools
 // Class:      PhysicsObjectTreeBase
 //
-/**\class PhysicsObjectTreeBase PhysicsObjectTreeBase.cc Analysis/Core/src/PhysicsObjectTreeBase.cc
+/**\class PhysicsObjectTreeBase PhysicsObjectTreeBase.cc Analysis/Tools/src/PhysicsObjectTreeBase.cc
 
  Description: [one line class summary]
 
@@ -27,24 +27,25 @@
 
 #include "TTree.h"
 #include "TChain.h"
-#include "Analysis/Core/interface/TreeBase.h"
-#include "Analysis/Core/interface/Collection.h"
-#include "Analysis/Core/interface/Jet.h"
-#include "Analysis/Core/interface/MET.h"
-#include "Analysis/Core/interface/Muon.h"
-#include "Analysis/Core/interface/Vertex.h"
-#include "Analysis/Core/interface/TriggerObject.h"
-#include "Analysis/Core/interface/GenParticle.h"
-#include "Analysis/Core/interface/GenJet.h"
-#include "Analysis/Core/interface/JetTag.h"
-#include "Analysis/Core/interface/L1Muon.h"
+#include "Analysis/Tools/interface/TreeBase.h"
+#include "Analysis/Tools/interface/Collection.h"
+#include "Analysis/Tools/interface/Jet.h"
+#include "Analysis/Tools/interface/MET.h"
+#include "Analysis/Tools/interface/Muon.h"
+#include "Analysis/Tools/interface/Vertex.h"
+#include "Analysis/Tools/interface/TriggerObject.h"
+#include "Analysis/Tools/interface/GenParticle.h"
+#include "Analysis/Tools/interface/GenJet.h"
+#include "Analysis/Tools/interface/JetTag.h"
+#include "Analysis/Tools/interface/L1TMuon.h"
+#include "Analysis/Tools/interface/L1TJet.h"
 
 //
 // class declaration
 //
 
 namespace analysis {
-   namespace core {
+   namespace tools {
 
       template <typename Object>
       class PhysicsObjectTreeBase : public TreeBase {
@@ -102,4 +103,4 @@ namespace analysis {
    }
 }
 
-#endif  // Analysis_Core_PhysicsObjectTreeBase_h
+#endif  // Analysis_Tools_PhysicsObjectTreeBase_h

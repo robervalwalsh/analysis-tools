@@ -7,19 +7,17 @@
 #include "TChain.h"
 #include "TH1.h" 
 
-#include "Analysis/Core/interface/Analysis.h"
+#include "Analysis/Tools/interface/Analysis.h"
 
 using namespace std;
 using namespace analysis;
-using namespace analysis::core;
+using namespace analysis::tools;
 
 
 // =============================================================================================   
 int main(int argc, char * argv[])
 {
-   double ptmin = 0.;
-   
-   bool isMC = false;
+//   bool isMC = false;
    TH1::SetDefaultSumw2();  // proper treatment of errors when scaling histograms
    
    // Input files list
