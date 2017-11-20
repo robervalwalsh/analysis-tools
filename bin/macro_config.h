@@ -29,9 +29,13 @@ bool trigemul_;
 
 
 // triggerobjects emulation
-int ntomin_[10];
+int tonmin_[10];
 std::vector<float> toptmin_[10];
 std::vector<float> toetamax_[10];
+
+int torefnmin_[10];
+std::vector<float> torefptmin_[10];
+std::vector<float> torefetamax_[10];
 
 
 // jets
@@ -47,6 +51,10 @@ std::string jetsid_;
 int l1tjetsnmin_;
 std::vector<float> l1tjetsptmin_;
 std::vector<float> l1tjetsetamax_;
+
+int l1tjetsrefnmin_;
+std::vector<float> l1tjetsrefptmin_;
+std::vector<float> l1tjetsrefetamax_;
 
 
 // muons
@@ -85,6 +93,7 @@ float nonbtagwp_;
 std::string hltPath_;
 std::string l1Seed_;
 std::string hltPathRef_;
+std::string l1SeedRef_;
 std::vector<std::string> triggerObjects_;
 std::vector<std::string> hltPaths_;
 std::string hltPathsLogic_;
@@ -131,6 +140,9 @@ int macro_config(int argc, char * argv[])
          ("l1tJetsNMin",po::value <int> (&l1tjetsnmin_)->default_value(0),"Minimum number of L1T jets")
          ("l1tJetsPtMin", po::value<std::vector<float> >(&l1tjetsptmin_)->multitoken(),"Mimium pt of the L1T jets")
          ("l1tJetsEtaMax", po::value<std::vector<float> >(&l1tjetsetamax_)->multitoken(),"Maximum |eta| of the L1T jets")
+         ("l1tJetsRefNMin",po::value <int> (&l1tjetsrefnmin_)->default_value(0),"Minimum number of L1T jets for reference trigger")
+         ("l1tJetsRefPtMin", po::value<std::vector<float> >(&l1tjetsrefptmin_)->multitoken(),"Mimium pt of the L1T jets for reference trigger")
+         ("l1tJetsRefEtaMax", po::value<std::vector<float> >(&l1tjetsrefetamax_)->multitoken(),"Maximum |eta| of the L1T jets for reference trigger")
          
 //      
          ("nMuonsMin",po::value <int> (&nmuonsmin_)->default_value(0),"Minimum number of muons")
@@ -158,6 +170,7 @@ int macro_config(int argc, char * argv[])
          ("hltPath",po::value <std::string> (&hltPath_),"HLT path name")
          ("l1Seed",po::value <std::string> (&l1Seed_)->default_value(""),"L1 seed name")
          ("hltPathReference",po::value <std::string> (&hltPathRef_),"HLT path name for reference trigger for trigger efficiency")
+         ("l1SeedReference",po::value <std::string> (&l1SeedRef_)->default_value(""),"L1 seed name for reference trigger")
          ("triggerObjects", po::value<std::vector<std::string> >(&triggerObjects_)->multitoken(),"Trigger objects")
          ("hltPathsList", po::value<std::vector<std::string> >(&hltPaths_)->multitoken(),"HLT paths list")
          ("hltPathsLogic",po::value <std::string> (&hltPathsLogic_)->default_value("OR"),"HLT paths logic (OR/AND)")
@@ -195,9 +208,12 @@ int macro_config(int argc, char * argv[])
          for ( int i = 0 ; i < 10 ; ++i )
          {
             config.add_options()
-               (Form("triggerObject%dNMin",i),po::value <int> (&(ntomin_[i]))->default_value(0),Form("Minimum number of trigger objects #%d",i))
+               (Form("triggerObject%dNMin",i),po::value <int> (&(tonmin_[i]))->default_value(0),Form("Minimum number of trigger objects #%d",i))
                (Form("triggerObject%dPtMin",i),po::value<std::vector<float> >(&(toptmin_[i]))->multitoken(),Form("Minimum pT of trigger objects #%d",i))
-               (Form("triggerObject%dEtaMax",i),po::value<std::vector<float> >(&(toetamax_[i]))->multitoken(),Form("Minimum eta of trigger objects #%d",i));
+               (Form("triggerObject%dEtaMax",i),po::value<std::vector<float> >(&(toetamax_[i]))->multitoken(),Form("Minimum eta of trigger objects #%d",i))
+               (Form("triggerObject%dRefNMin",i),po::value <int> (&(torefnmin_[i]))->default_value(0),Form("Minimum number of trigger objects #%d for reference trigger",i))
+               (Form("triggerObject%dRefPtMin",i),po::value<std::vector<float> >(&(torefptmin_[i]))->multitoken(),Form("Minimum pT of trigger objects #%d for reference trigger",i))
+               (Form("triggerObject%dRefEtaMax",i),po::value<std::vector<float> >(&(torefetamax_[i]))->multitoken(),Form("Minimum eta of trigger objects #%d for reference trigger",i));
          }
       
       po::variables_map vm; 
