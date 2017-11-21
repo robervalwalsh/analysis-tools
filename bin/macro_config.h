@@ -95,6 +95,7 @@ std::string l1Seed_;
 std::string hltPathRef_;
 std::string l1SeedRef_;
 std::vector<std::string> triggerObjects_;
+std::vector<std::string> triggerObjectsRef_;
 std::vector<std::string> hltPaths_;
 std::string hltPathsLogic_;
 std::vector<std::string> hltPaths2_;
@@ -172,6 +173,7 @@ int macro_config(int argc, char * argv[])
          ("hltPathReference",po::value <std::string> (&hltPathRef_),"HLT path name for reference trigger for trigger efficiency")
          ("l1SeedReference",po::value <std::string> (&l1SeedRef_)->default_value(""),"L1 seed name for reference trigger")
          ("triggerObjects", po::value<std::vector<std::string> >(&triggerObjects_)->multitoken(),"Trigger objects")
+         ("triggerObjectsReference", po::value<std::vector<std::string> >(&triggerObjectsRef_)->multitoken(),"Trigger objects reference trigger")
          ("hltPathsList", po::value<std::vector<std::string> >(&hltPaths_)->multitoken(),"HLT paths list")
          ("hltPathsLogic",po::value <std::string> (&hltPathsLogic_)->default_value("OR"),"HLT paths logic (OR/AND)")
          ("hltPathsList2", po::value<std::vector<std::string> >(&hltPaths2_)->multitoken(),"HLT paths second list")
