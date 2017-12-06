@@ -87,6 +87,9 @@ namespace analysis {
             float jerSFUp_ [max_];
             float jerSFDown_ [max_];
             float jerResolution_ [max_];
+            float qgLikelihood_ [max_];
+            float puJetIdFullDisc_ [max_];
+            int   puJetIdFullId_ [max_];
             
             bool isSimpleJet_;
 

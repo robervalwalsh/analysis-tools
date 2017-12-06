@@ -77,6 +77,26 @@ int   Jet::chargedMultiplicity()                   const { return cMult_;    }
 float Jet::muonFraction()                          const { return muFrac_;   }
 int   Jet::constituents()                          const { return nConst_;   }
 
+float Jet::qgLikelihood()                          const { return qgLikelihood_; }
+float Jet::pileupJetIdFullDiscriminant()           const { return puJetIdFullDisc_; }
+int   Jet::pileupJetIdFullId()                     const { return puJetIdFullId_; }
+
+bool  Jet::pileupJetIdFullId(const std::string & wp) const
+{ 
+   std::string wplow = wp;
+   std::transform(wplow.begin(), wplow.end(), wplow.begin(), ::tolower);
+   if ( puJetIdFullId_ < 0 )
+   {
+      std::cout << "analysis:tools::Jet *W* Pileup Jet ID FullId is negative; the collection may not have this information." << std::endl;
+      std::cout << "                        All jets are accepted." << std::endl;
+      return true;
+   }
+   if ( wplow == "loose"  && (puJetIdFullId_ & (1 << 2)) ) return true;
+   if ( wplow == "medium" && (puJetIdFullId_ & (1 << 1)) ) return true;
+   if ( wplow == "tight"  && (puJetIdFullId_ & (1 << 0)) ) return true;
+   return false;
+}
+
 
 
 // Sets                                                             
@@ -94,6 +114,10 @@ void Jet::JerResolution(const float & jerResolution)                  { jerResol
 void Jet::JerSf(const float & jerSf)                                  { jerSF_ = jerSf; }
 void Jet::JerSfDown(const float & jerSfDown)                          { jerSFDown_ = jerSfDown; }
 void Jet::JerSfUp(const float & jerSfUp)                              { jerSFUp_ = jerSfUp; }
+
+void Jet::qgLikelihood(const float & discr)                           { qgLikelihood_ = discr; }
+void Jet::pileupJetIdFullDiscriminant(const float & discr)            { puJetIdFullDisc_ = discr; }
+void Jet::pileupJetIdFullId(const int & id)                           { puJetIdFullId_ = id; }
 
 int Jet::removeParton(const int & i)
 {
