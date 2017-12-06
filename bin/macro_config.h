@@ -196,7 +196,7 @@ int macro_config(int argc, char * argv[])
          ("prescaleWeight",po::value <bool> (&psweight_)->default_value(false),"Flag for weighting histograms with prescale")
          ("triggerEmulation",po::value <bool> (&trigemul_)->default_value(false),"Flag for using trigger emulation")
          
-         ("jetsCollection",po::value <std::string> (&jetsCol_)->default_value("slimmedJetsPuppi"),"Name of the jets collection")
+         ("jetsCollection",po::value <std::string> (&jetsCol_)->default_value("slimmedJets"),"Name of the jets collection")
          ("muonsCollection",po::value <std::string> (&muonsCol_)->default_value("slimmedMuons"),"Name of the muons collection")
          ("l1tJetsCollection",po::value <std::string> (&l1tjetsCol_)->default_value("l1tJets"),"Name of the L1T jets collection")
          ("l1tMuonsCollection",po::value <std::string> (&l1tmuonsCol_)->default_value("l1tMuons"),"Name of the L1T muons collection")
