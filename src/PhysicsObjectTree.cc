@@ -150,6 +150,9 @@ Collection<Jet>  PhysicsObjectTree<Jet>::collection()
       jet.JerSf(jerSF_[i]);
       jet.JerSfUp(jerSFUp_[i]);
       jet.JerSfDown(jerSFDown_[i]);
+      jet.qgLikelihood(qgLikelihood_[i]);
+      jet.pileupJetIdFullDiscriminant(puJetIdFullDisc_[i]);
+      jet.pileupJetIdFullId(puJetIdFullId_[i]);
       jets.push_back(jet);
    }
    Collection<Jet> jetCollection(jets, name_);
