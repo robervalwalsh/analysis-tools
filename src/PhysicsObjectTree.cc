@@ -108,6 +108,10 @@ PhysicsObjectTree<Jet>::PhysicsObjectTree(TChain * tree, const std::string & nam
       tree_  -> SetBranchAddress( "jerSFDown", jerSFDown_);
       tree_  -> SetBranchAddress( "jerSFUp", jerSFUp_);
       tree_  -> SetBranchAddress( "jerResolution", jerResolution_);
+      tree_  -> SetBranchAddress( "qgLikelihood", qgLikelihood_);
+      tree_  -> SetBranchAddress( "puJetIdFullDiscriminant", puJetIdFullDisc_);
+      tree_  -> SetBranchAddress( "puJetIdFullId", puJetIdFullId_);
+      
    }
    else
    {

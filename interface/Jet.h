@@ -85,6 +85,14 @@ namespace analysis {
             float muonFraction()           const ;
             int   constituents()           const ;
             
+            /// quark-gluon separation
+            float qgLikelihood()  const;
+            
+            /// pile up jet id
+            float pileupJetIdFullDiscriminant() const;
+            int pileupJetIdFullId() const;
+            bool pileupJetIdFullId(const std::string & wp) const;
+            
                
             // Sets
             /// sets the btag value
@@ -133,6 +141,13 @@ namespace analysis {
                     const float & cMult   ,
                     const float & muFrac  );
             
+            /// quark-gluon separation
+            void qgLikelihood(const float & discr);
+            
+            /// pile up jet id
+            void pileupJetIdFullDiscriminant(const float & discr);
+            void pileupJetIdFullId(const int & id);
+            
             /// associate partons to the jet
             void associatePartons(const std::vector< std::shared_ptr<GenParticle> > &, const float & dRmax = 0.5, const float & ptMin = 1., const bool & pythi8 = true );
 //            using Candidate::set; // in case needed to overload the function set
@@ -169,6 +184,7 @@ namespace analysis {
             /// jet energy resolution
             float jerResolution_;
             
+            /// jet id
             float nHadFrac_;
             float nEmFrac_;
             int   nMult_;
@@ -177,6 +193,12 @@ namespace analysis {
             int   cMult_;
             float muFrac_;
             int   nConst_;
+            /// quark-gluon separation
+            float qgLikelihood_;
+            /// pileup jet id
+            float puJetIdFullDisc_;
+            int   puJetIdFullId_;
+            
             
          private:
             // ----------member data ---------------------------
