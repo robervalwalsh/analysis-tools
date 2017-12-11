@@ -51,7 +51,7 @@ foreach file ( $files )
       cp -p ../../$json .
    endif
    qsub.sh "job_"$counter $macro $config
-   sleep 1
+   sleep 0.2
    cd -
 end
 
