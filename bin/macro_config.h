@@ -82,6 +82,8 @@ float drmax_;
 float detamax_;
 float dphimin_;
 
+float ptimbalmax_;
+
 std::string btagalgo_;
 float btagwploose_;
 float btagwpmedium_;
@@ -165,6 +167,7 @@ int macro_config(int argc, char * argv[])
          ("dRMax",po::value <float> (&drmax_)->default_value(0.),"Maximum delta R between candidates")
          ("dEtaMax",po::value <float> (&detamax_)->default_value(10.),"Maximum delta eta between candidates")
          ("dPhiMin",po::value <float> (&dphimin_)->default_value(0.),"Minimum delta phi between candidates")
+         ("ptImbalanceMax",po::value <float> (&ptimbalmax_)->default_value(1000.),"Maximum relative imbalance between two candidates")
 //      
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
