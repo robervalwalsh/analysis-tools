@@ -41,6 +41,7 @@ std::vector<float> torefetamax_[10];
 // jets
 
 int njetsmin_;
+int njetsmax_;
 int nbjetsmin_;
 std::vector<float> jetsptmin_;
 std::vector<float> jetsptmax_;
@@ -73,7 +74,9 @@ std::vector<float> l1tmuonsetamax_;
 
 // additional cuts of unidentified objects or for extra selections
 int nmin_;
+int nmax_;
 std::vector<float> ptmin_;
+std::vector<float> ptmax_;
 std::vector<float> etamax_;
 
 
@@ -133,6 +136,7 @@ int macro_config(int argc, char * argv[])
          ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
 //      
          ("nJetsMin",po::value <int> (&njetsmin_)->default_value(0),"Minimum number of jets")
+         ("nJetsMax",po::value <int> (&njetsmax_)->default_value(100),"Maximum number of jets")
          ("nBJetsMin",po::value <int> (&nbjetsmin_)->default_value(0),"Minimum number of btgaged jets")
          ("jetsPtMin", po::value<std::vector<float> >(&jetsptmin_)->multitoken(),"Mimium pt of the jets")
          ("jetsPtMax", po::value<std::vector<float> >(&jetsptmax_)->multitoken(),"Maximum pt of the jets")
@@ -160,7 +164,9 @@ int macro_config(int argc, char * argv[])
          
 //
          ("nMin",po::value <int> (&nmin_)->default_value(0),"Minimum number objects")
+         ("nMax",po::value <int> (&nmax_)->default_value(0),"Maximum number objects")
          ("ptMin", po::value<std::vector<float> >(&ptmin_)->multitoken(),"Mimium pt of an object")
+         ("ptMax", po::value<std::vector<float> >(&ptmax_)->multitoken(),"Maximum pt of an object")
          ("etaMax", po::value<std::vector<float> >(&etamax_)->multitoken(),"Maximum |eta| of an object")
 //
          ("dRMin",po::value <float> (&drmin_)->default_value(0.),"Minimum delta R between candidates")
