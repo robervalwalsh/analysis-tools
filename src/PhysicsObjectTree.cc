@@ -108,10 +108,10 @@ PhysicsObjectTree<Jet>::PhysicsObjectTree(TChain * tree, const std::string & nam
       tree_  -> SetBranchAddress( "jerSFDown", jerSFDown_);
       tree_  -> SetBranchAddress( "jerSFUp", jerSFUp_);
       tree_  -> SetBranchAddress( "jerResolution", jerResolution_);
-      tree_  -> SetBranchAddress( "qgLikelihood", qgLikelihood_);
-      tree_  -> SetBranchAddress( "puJetIdFullDiscriminant", puJetIdFullDisc_);
-      tree_  -> SetBranchAddress( "puJetIdFullId", puJetIdFullId_);
-      
+      std::vector<std::string>::iterator it;
+      it = std::find(branches_.begin(),branches_.end(),"qgLikelihood")            ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , qgLikelihood_ );
+      it = std::find(branches_.begin(),branches_.end(),"puJetIdFullDiscriminant") ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , puJetIdFullDisc_ );
+      it = std::find(branches_.begin(),branches_.end(),"puJetIdFullId")           ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , puJetIdFullId_ );
    }
    else
    {
@@ -150,6 +150,9 @@ Collection<Jet>  PhysicsObjectTree<Jet>::collection()
       jet.JerSf(jerSF_[i]);
       jet.JerSfUp(jerSFUp_[i]);
       jet.JerSfDown(jerSFDown_[i]);
+      jet.qgLikelihood(qgLikelihood_[i]);
+      jet.pileupJetIdFullDiscriminant(puJetIdFullDisc_[i]);
+      jet.pileupJetIdFullId(puJetIdFullId_[i]);
       jets.push_back(jet);
    }
    Collection<Jet> jetCollection(jets, name_);

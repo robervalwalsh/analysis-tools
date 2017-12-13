@@ -41,6 +41,7 @@ std::vector<float> torefetamax_[10];
 // jets
 
 int njetsmin_;
+int njetsmax_;
 int nbjetsmin_;
 std::vector<float> jetsptmin_;
 std::vector<float> jetsptmax_;
@@ -73,7 +74,9 @@ std::vector<float> l1tmuonsetamax_;
 
 // additional cuts of unidentified objects or for extra selections
 int nmin_;
+int nmax_;
 std::vector<float> ptmin_;
+std::vector<float> ptmax_;
 std::vector<float> etamax_;
 
 
@@ -81,6 +84,8 @@ float drmin_;
 float drmax_;
 float detamax_;
 float dphimin_;
+
+float ptimbalmax_;
 
 std::string btagalgo_;
 float btagwploose_;
@@ -131,6 +136,7 @@ int macro_config(int argc, char * argv[])
          ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
 //      
          ("nJetsMin",po::value <int> (&njetsmin_)->default_value(0),"Minimum number of jets")
+         ("nJetsMax",po::value <int> (&njetsmax_)->default_value(100),"Maximum number of jets")
          ("nBJetsMin",po::value <int> (&nbjetsmin_)->default_value(0),"Minimum number of btgaged jets")
          ("jetsPtMin", po::value<std::vector<float> >(&jetsptmin_)->multitoken(),"Mimium pt of the jets")
          ("jetsPtMax", po::value<std::vector<float> >(&jetsptmax_)->multitoken(),"Maximum pt of the jets")
@@ -158,13 +164,16 @@ int macro_config(int argc, char * argv[])
          
 //
          ("nMin",po::value <int> (&nmin_)->default_value(0),"Minimum number objects")
+         ("nMax",po::value <int> (&nmax_)->default_value(0),"Maximum number objects")
          ("ptMin", po::value<std::vector<float> >(&ptmin_)->multitoken(),"Mimium pt of an object")
+         ("ptMax", po::value<std::vector<float> >(&ptmax_)->multitoken(),"Maximum pt of an object")
          ("etaMax", po::value<std::vector<float> >(&etamax_)->multitoken(),"Maximum |eta| of an object")
 //
          ("dRMin",po::value <float> (&drmin_)->default_value(0.),"Minimum delta R between candidates")
          ("dRMax",po::value <float> (&drmax_)->default_value(0.),"Maximum delta R between candidates")
          ("dEtaMax",po::value <float> (&detamax_)->default_value(10.),"Maximum delta eta between candidates")
          ("dPhiMin",po::value <float> (&dphimin_)->default_value(0.),"Minimum delta phi between candidates")
+         ("ptImbalanceMax",po::value <float> (&ptimbalmax_)->default_value(1000.),"Maximum relative imbalance between two candidates")
 //      
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
@@ -196,7 +205,7 @@ int macro_config(int argc, char * argv[])
          ("prescaleWeight",po::value <bool> (&psweight_)->default_value(false),"Flag for weighting histograms with prescale")
          ("triggerEmulation",po::value <bool> (&trigemul_)->default_value(false),"Flag for using trigger emulation")
          
-         ("jetsCollection",po::value <std::string> (&jetsCol_)->default_value("slimmedJetsPuppi"),"Name of the jets collection")
+         ("jetsCollection",po::value <std::string> (&jetsCol_)->default_value("slimmedJets"),"Name of the jets collection")
          ("muonsCollection",po::value <std::string> (&muonsCol_)->default_value("slimmedMuons"),"Name of the muons collection")
          ("l1tJetsCollection",po::value <std::string> (&l1tjetsCol_)->default_value("l1tJets"),"Name of the L1T jets collection")
          ("l1tMuonsCollection",po::value <std::string> (&l1tmuonsCol_)->default_value("l1tMuons"),"Name of the L1T muons collection")
