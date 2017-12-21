@@ -37,11 +37,19 @@ namespace analysis {
             TriggerObject(const float & pt, const float & eta, const float & phi, const float & e);
            ~TriggerObject();
            
+	   //Gets
+	   /// returns the type of the trigger object (L1mu, L1jet, hltmu, etc)
+	   int type()          const;
+	   
+	   //Sets
+	   //sets the type of the trigger object
+	   void type(const int &);
+
          protected:
 
          private:
             // ----------member data ---------------------------
-
+	   int type_;
             //
       };
    }

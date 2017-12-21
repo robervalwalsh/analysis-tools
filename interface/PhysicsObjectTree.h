@@ -253,7 +253,7 @@ namespace analysis {
          protected:
 
          private:
-
+	    int type_    [max_];
       };
          
       // Specialization for L1TMuon
