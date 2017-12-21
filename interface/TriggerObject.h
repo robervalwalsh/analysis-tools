@@ -46,10 +46,10 @@ namespace analysis {
 	   void type(const int &);
 
          protected:
+            int type_;
 
          private:
             // ----------member data ---------------------------
-	   int type_;
             //
       };
    }

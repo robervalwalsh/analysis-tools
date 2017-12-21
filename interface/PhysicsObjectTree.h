@@ -251,9 +251,9 @@ namespace analysis {
 
             // ----------member data ---------------------------
          protected:
+            int type_    [max_];
 
          private:
-	    int type_    [max_];
       };
          
       // Specialization for L1TMuon
