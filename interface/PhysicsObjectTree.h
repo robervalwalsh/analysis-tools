@@ -177,6 +177,7 @@ namespace analysis {
            bool  isTrackerMuon_   [max_]; 
            bool  isLooseMuon_     [max_]; 
            bool  isMediumMuon_    [max_];
+	   bool  isTightMuon_     [max_];
 
            float validFraction_          [max_];
            float segmentCompatibility_   [max_]; 
