@@ -33,6 +33,22 @@ std::vector<float> muonsptmax_;
 std::vector<float> muonsetamax_;
 std::string muonsid_;
 
+int l1tmuonsnmin_;
+std::vector<float> l1tmuonsptmin_;
+std::vector<float> l1tmuonsetamax_;
+
+int l1tmuonsrefnmin_;
+std::vector<float> l1tmuonsrefptmin_;
+std::vector<float> l1tmuonsrefetamax_;
+
+
+// additional cuts of unidentified objects or for extra selections
+int nmin_;
+int nmax_;
+std::vector<float> ptmin_;
+std::vector<float> ptmax_;
+std::vector<float> etamax_;
+
 float drmin_;
 float drmax_;
 float detamax_;
@@ -82,6 +98,21 @@ int macro_config(int argc, char * argv[])
          ("muonsPtMax", po::value<std::vector<float> >(&muonsptmax_)->multitoken(),"Maximum pt of the muons")
          ("muonsEtaMax", po::value<std::vector<float> >(&muonsetamax_)->multitoken(),"Maximum |eta| of the muons")
          ("muonsId",po::value <std::string> (&muonsid_)->default_value("LOOSE"),"muons id criteria for all muons")
+         
+         ("l1tMuonsNMin",po::value <int> (&l1tmuonsnmin_)->default_value(0),"Minimum number of L1T muons")
+         ("l1tMuonsPtMin", po::value<std::vector<float> >(&l1tmuonsptmin_)->multitoken(),"Mimium pt of the L1T muons")
+         ("l1tMuonsEtaMax", po::value<std::vector<float> >(&l1tmuonsetamax_)->multitoken(),"Maximum |eta| of the L1T muons")
+         ("l1tMuonsRefNMin",po::value <int> (&l1tmuonsrefnmin_)->default_value(0),"Minimum number of L1T muons for reference trigger")
+         ("l1tMuonsRefPtMin", po::value<std::vector<float> >(&l1tmuonsrefptmin_)->multitoken(),"Mimium pt of the L1T muons for reference trigger")
+         ("l1tMuonsRefEtaMax", po::value<std::vector<float> >(&l1tmuonsrefetamax_)->multitoken(),"Maximum |eta| of the L1T muons for reference trigger")
+         
+//
+         ("nMin",po::value <int> (&nmin_)->default_value(0),"Minimum number objects")
+         ("nMax",po::value <int> (&nmax_)->default_value(0),"Maximum number objects")
+         ("ptMin", po::value<std::vector<float> >(&ptmin_)->multitoken(),"Mimium pt of an object")
+         ("ptMax", po::value<std::vector<float> >(&ptmax_)->multitoken(),"Maximum pt of an object")
+         ("etaMax", po::value<std::vector<float> >(&etamax_)->multitoken(),"Maximum |eta| of an object")
+
 //
          ("dRMin",po::value <float> (&drmin_)->default_value(0.),"Minimum delta R between candidates")
          ("dRMax",po::value <float> (&drmax_)->default_value(0.),"Maximum delta R between candidates")
