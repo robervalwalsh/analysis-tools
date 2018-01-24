@@ -70,9 +70,6 @@ int l1tmuonsnmin_;
 std::vector<float> l1tmuonsptmin_;
 std::vector<float> l1tmuonsetamax_;
 
-int l1tmuonsrefnmin_;
-std::vector<float> l1tmuonsrefptmin_;
-std::vector<float> l1tmuonsrefetamax_;
 
 
 // additional cuts of unidentified objects or for extra selections
@@ -163,10 +160,7 @@ int macro_config(int argc, char * argv[])
          
          ("l1tMuonsNMin",po::value <int> (&l1tmuonsnmin_)->default_value(0),"Minimum number of L1T muons")
          ("l1tMuonsPtMin", po::value<std::vector<float> >(&l1tmuonsptmin_)->multitoken(),"Mimium pt of the L1T muons")
-         ("l1tMuonsEtaMax", po::value<std::vector<float> >(&l1tmuonsetamax_)->multitoken(),"Maximum |eta| of the L1T muons")
-         ("l1tMuonsRefNMin",po::value <int> (&l1tmuonsrefnmin_)->default_value(0),"Minimum number of L1T muons for reference trigger")
-         ("l1tMuonsRefPtMin", po::value<std::vector<float> >(&l1tmuonsrefptmin_)->multitoken(),"Mimium pt of the L1T muons for reference trigger")
-         ("l1tMuonsRefEtaMax", po::value<std::vector<float> >(&l1tmuonsrefetamax_)->multitoken(),"Maximum |eta| of the L1T muons for reference trigger")
+         ("l1tMuonsNEtaMax", po::value<std::vector<float> >(&l1tmuonsetamax_)->multitoken(),"Maximum |eta| of the L1T muons")
          
 //
          ("nMin",po::value <int> (&nmin_)->default_value(0),"Minimum number objects")
