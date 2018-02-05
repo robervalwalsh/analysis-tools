@@ -242,7 +242,7 @@ PhysicsObjectTree<Muon>::PhysicsObjectTree(TChain * tree, const std::string & na
   tree_  -> SetBranchAddress ("normChi2" , normChi2_) ;
 
   std::vector<std::string>::iterator it;
-  it = std::find(branches_.begin(),branches_.end(),"isTightMuon")            ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , isTightMuon_ );
+   it = std::find(branches_.begin(),branches_.end(),"isTightMuon")            ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , isTightMuon_ );
 
 }
 PhysicsObjectTree<Muon>::~PhysicsObjectTree()
