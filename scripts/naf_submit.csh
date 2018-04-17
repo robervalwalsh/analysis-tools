@@ -50,7 +50,7 @@ foreach file ( $files )
    if ( $json != "" ) then
       cp -p ../../$json .
    endif
-   qsub.sh "job_"$counter $macro $config
+   qsub.sh "job_"$counter $macro `basename $config`
    sleep 0.2
    cd -
 end
