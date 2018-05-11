@@ -120,6 +120,10 @@ std::string l1tmuonsCol_;
 std::string triggerCol_;
 std::string triggerObjDir_;
 
+//Prescale across eras
+std::vector<float> prescale_;
+
+
 int macro_config(int argc, char * argv[])
 {
    try
@@ -293,6 +297,11 @@ int macro_config(int argc, char * argv[])
             std::cout << "Config Error *** Muon maximum |eta| were not defined or the definition does not match the minimum number of muons" <<std::endl;
             return -1;
          }
+	 if ( (int)prescale_.size() != 4 )
+ 	   {
+ 	     std::cout << "Config Error *** The prescales for the CR in each era were not defined or the definition does not match the number of eras" <<std::endl;
+ 	     return -1;
+ 	   }
          
          
       }
