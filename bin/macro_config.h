@@ -222,9 +222,10 @@ int macro_config(int argc, char * argv[])
 
          ("triggerResultsCollection",po::value <std::string> (&triggerCol_)->default_value("TriggerResults"),"Name of the trigger results collection")
          ("triggerObjectsDirectory",po::value <std::string> (&triggerObjDir_)->default_value("slimmedPatTrigger"),"Name of the trigger objects directory")
-         ("collectionsTreePath",po::value <std::string> (&treePath_)->default_value("Events"),"Name of the tree path for the event collections.");
-         
-         
+	("collectionsTreePath",po::value <std::string> (&treePath_)->default_value("Events"),"Name of the tree path for the event collections.")
+
+       	("prescaleEra",po::value <std::vector<float> >(&prescaleEra_)->multitoken(),"Prescale CR by # events in SR in each era");
+
 
          for ( int i = 0 ; i < 10 ; ++i )
          {
