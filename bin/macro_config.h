@@ -14,6 +14,8 @@ std::string cfg_;
 
 int nevtmax_;
 int nlumis_;
+int runmin_;
+int runmax_;
 bool isMC_;
 bool signalregion_;
 std::string inputlist_;
@@ -136,6 +138,8 @@ int macro_config(int argc, char * argv[])
          ("ntuplesList",po::value <std::string> (&inputlist_)->default_value("rootFileList.txt"),"File with list of ntuples")
          ("nEventsMax",po::value <int> (&nevtmax_)->default_value(-1), "Maximum number of events")
          ("nLumiSections",po::value <int> (&nlumis_)->default_value(-1), "Number of lumi sections processed")
+         ("runMin",po::value <int> (&runmin_)->default_value(-1), "Minimum run number")
+         ("runMax",po::value <int> (&runmax_)->default_value(-1), "Minimum run number")
          ("output",po::value <std::string> (&outputRoot_)->default_value("histograms.root"),"Output root file")
          ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
 //      
