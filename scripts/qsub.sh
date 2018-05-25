@@ -32,4 +32,4 @@ $2 -c $3
 EOF
 
 chmod u+x $1.zsh
-qsub -q "short.q" $1.zsh
+qsub -q "default.q" $1.zsh

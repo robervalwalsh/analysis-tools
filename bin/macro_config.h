@@ -27,6 +27,7 @@ bool matchonoff_;
 float matchonoffdrmax_;
 bool matchonoffref_;
 bool psweight_;
+float psnorm_;
 bool trigemul_;
 
 
@@ -105,6 +106,8 @@ std::string l1Seed_;
 std::string hltPathRef_;
 std::string l1SeedRef_;
 std::vector<std::string> triggerObjects_;
+std::vector<int> triggerObjectsMatches_;
+std::vector<int> triggerObjectsMatchesRank_;
 std::vector<std::string> triggerObjectsRef_;
 std::vector<std::string> hltPaths_;
 std::string hltPathsLogic_;
@@ -193,6 +196,8 @@ int macro_config(int argc, char * argv[])
          ("hltPathReference",po::value <std::string> (&hltPathRef_),"HLT path name for reference trigger for trigger efficiency")
          ("l1SeedReference",po::value <std::string> (&l1SeedRef_)->default_value(""),"L1 seed name for reference trigger")
          ("triggerObjects", po::value<std::vector<std::string> >(&triggerObjects_)->multitoken(),"Trigger objects")
+         ("triggerObjectsMatches", po::value<std::vector<int> >(&triggerObjectsMatches_)->multitoken(),"Number of trigger objects matches")
+         ("triggerObjectsMatchesRank", po::value<std::vector<int> >(&triggerObjectsMatchesRank_)->multitoken(),"Rank of offline object the trigger objects matches")
          ("triggerObjectsReference", po::value<std::vector<std::string> >(&triggerObjectsRef_)->multitoken(),"Trigger objects reference trigger")
          ("hltPathsList", po::value<std::vector<std::string> >(&hltPaths_)->multitoken(),"HLT paths list")
          ("hltPathsLogic",po::value <std::string> (&hltPathsLogic_)->default_value("OR"),"HLT paths logic (OR/AND)")
@@ -214,6 +219,7 @@ int macro_config(int argc, char * argv[])
          ("matchOnlineOfflineDeltaRMax",po::value <float> (&matchonoffdrmax_)->default_value(0.4),"DeltaR max for matching online-offline")
          ("matchOnlineOfflineReference",po::value <bool> (&matchonoffref_)->default_value(true),"Flag for doing matching online offline objects when using a reference trigger")
          ("prescaleWeight",po::value <bool> (&psweight_)->default_value(false),"Flag for weighting histograms with prescale")
+         ("prescaleNormalisation",po::value <float> (&psnorm_)->default_value(1.),"Normalisation factor of prescale weight")
          ("triggerEmulation",po::value <bool> (&trigemul_)->default_value(false),"Flag for using trigger emulation")
          
          ("jetsCollection",po::value <std::string> (&jetsCol_)->default_value("slimmedJets"),"Name of the jets collection")
