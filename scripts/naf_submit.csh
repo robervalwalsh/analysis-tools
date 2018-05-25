@@ -1,7 +1,7 @@
 #!/bin/csh -f
 
 if ( $#argv < 4 ) then
-   echo Need to give sample name, the macro name, the config file name and the number of splits
+   echo Need to give sample name, the macro name, the config file name and the number of splits, optional json
    exit
 endif
 
