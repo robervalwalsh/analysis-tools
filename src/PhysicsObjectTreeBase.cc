@@ -104,3 +104,4 @@ template class PhysicsObjectTreeBase<JetTag>;
 template class PhysicsObjectTreeBase<L1TMuon>;
 template class PhysicsObjectTreeBase<L1TJet>;
 template class PhysicsObjectTreeBase<RecoMuon>;
+template class PhysicsObjectTreeBase<RecoTrack>;

@@ -449,6 +449,30 @@ Collection<RecoMuon>  PhysicsObjectTree<RecoMuon>::collection()
 
 }
 
+// RecoTrack
+// Constructors and destructor
+PhysicsObjectTree<RecoTrack>::PhysicsObjectTree() : PhysicsObjectTreeBase<RecoTrack>()
+{
+}
+PhysicsObjectTree<RecoTrack>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<RecoTrack>(tree, name)
+{
+}
+PhysicsObjectTree<RecoTrack>::~PhysicsObjectTree() {}
+
+// Member functions
+Collection<RecoTrack>  PhysicsObjectTree<RecoTrack>::collection()
+{
+   std::vector<RecoTrack> candidates;
+   for ( int i = 0 ; i < n_ ; ++i )
+   {
+      RecoTrack cand(px_[i], py_[i], px_[i], q_[i]);
+      candidates.push_back(cand);
+   }
+   Collection<RecoTrack> RecoTrackCollection(candidates, name_);
+   return RecoTrackCollection;
+
+}
+
 
 // ======================================
 // Templates declarations
@@ -463,3 +487,4 @@ template class PhysicsObjectTree<GenJet>;
 template class PhysicsObjectTree<L1TMuon>;
 template class PhysicsObjectTree<L1TJet>;
 template class PhysicsObjectTree<RecoMuon>;
+template class PhysicsObjectTree<RecoTrack>;

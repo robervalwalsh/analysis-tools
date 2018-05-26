@@ -310,6 +310,22 @@ namespace analysis {
 
       };  
 
+      // Specialization for RecoTrack
+      template <>
+      class PhysicsObjectTree<RecoTrack> : public PhysicsObjectTreeBase<RecoTrack> {
+         public:
+            PhysicsObjectTree();
+            PhysicsObjectTree(TChain * tree, const std::string & name);
+           ~PhysicsObjectTree();
+
+            Collection<RecoTrack> collection();
+
+            // ----------member data ---------------------------
+         protected:
+
+         private:
+
+      };  
    }
 }
 
