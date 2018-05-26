@@ -97,7 +97,6 @@ namespace analysis {
           float ndof_;
           float d0_;
           float dxy_;
-          std::map<TrackQuality,bool> qual_;
           int   nLostMuHits_;
           int   nBadMuHits_;
           int   nValMuHits_;
@@ -110,6 +109,7 @@ namespace analysis {
           int   muStationsWithBadHits_;
           int   inMuStationWithValHits_;
           int   outMuStationWithValHits_;
+          std::map<TrackQuality,bool> qual_;
 
          private:
          // ----------member data ---------------------------
