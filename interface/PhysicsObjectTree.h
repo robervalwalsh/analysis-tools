@@ -293,6 +293,23 @@ namespace analysis {
 
       };
                   
+      // Specialization for RecoMuon
+      template <>
+      class PhysicsObjectTree<RecoMuon> : public PhysicsObjectTreeBase<RecoMuon> {
+         public:
+            PhysicsObjectTree();
+            PhysicsObjectTree(TChain * tree, const std::string & name);
+           ~PhysicsObjectTree();
+
+            Collection<RecoMuon> collection();
+
+            // ----------member data ---------------------------
+         protected:
+
+         private:
+
+      };  
+
    }
 }
 

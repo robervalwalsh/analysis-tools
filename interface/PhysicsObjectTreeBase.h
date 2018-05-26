@@ -39,6 +39,7 @@
 #include "Analysis/Tools/interface/JetTag.h"
 #include "Analysis/Tools/interface/L1TMuon.h"
 #include "Analysis/Tools/interface/L1TJet.h"
+#include "Analysis/Tools/interface/RecoMuon.h"
 
 //
 // class declaration

@@ -425,6 +425,29 @@ Collection<L1TJet>  PhysicsObjectTree<L1TJet>::collection()
    return jetCollection;
 }
 
+// RecoMuon
+// Constructors and destructor
+PhysicsObjectTree<RecoMuon>::PhysicsObjectTree() : PhysicsObjectTreeBase<RecoMuon>()
+{
+}
+PhysicsObjectTree<RecoMuon>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<RecoMuon>(tree, name)
+{
+}
+PhysicsObjectTree<RecoMuon>::~PhysicsObjectTree() {}
+
+// Member functions
+Collection<RecoMuon>  PhysicsObjectTree<RecoMuon>::collection()
+{
+   std::vector<RecoMuon> candidates;
+   for ( int i = 0 ; i < n_ ; ++i )
+   {
+      RecoMuon cand(pt_[i], eta_[i], phi_[i], e_[i], q_[i]);
+      candidates.push_back(cand);
+   }
+   Collection<RecoMuon> RecoMuonCollection(candidates, name_);
+   return RecoMuonCollection;
+
+}
 
 
 // ======================================
@@ -439,3 +462,4 @@ template class PhysicsObjectTree<GenParticle>;
 template class PhysicsObjectTree<GenJet>;
 template class PhysicsObjectTree<L1TMuon>;
 template class PhysicsObjectTree<L1TJet>;
+template class PhysicsObjectTree<RecoMuon>;
