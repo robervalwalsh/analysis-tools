@@ -36,6 +36,7 @@ int main(int argc, char * argv[])
    h1["eta"]      = new TH1F("eta" , "" , 100, -5.30, 3.30);
    h1["phi"]      = new TH1F("phi" , "" , 100, -3.7, 3.7);
    h1["q"]        = new TH1F("q", "", 4, -2, 2);
+   h1["loose_qual"] = new TH1F("loose_qual", "", 2, 0, 2);
    
    // Analysis of events
    std::cout << "This analysis has " << analysis.size() << " events" << std::endl;
@@ -58,6 +59,7 @@ int main(int argc, char * argv[])
          h1["eta"]        -> Fill(track.eta());
          h1["phi"]        -> Fill(track.phi());
          h1["q"]          -> Fill(track.q());
+         h1["loose_qual"] -> Fill(track.quality(TrackQuality::loose));
          ++ntracks;
          
       }
