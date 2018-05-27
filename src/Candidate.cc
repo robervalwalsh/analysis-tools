@@ -46,6 +46,12 @@ Candidate::Candidate(const float & px, const float & py, const float & pz)
    p4_.SetXYZM(px,py,pz,0.);
 }
 
+Candidate::Candidate(const float & px, const float & py, const float & pz, const float & q)
+{
+   q_ = q;
+   p4_.SetXYZM(px,py,pz,0.);
+}
+
 
 Candidate::~Candidate()
 {

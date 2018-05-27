@@ -39,8 +39,9 @@ PhysicsObjectTreeBase<Object>::PhysicsObjectTreeBase(TChain * tree, const std::s
    tree_  -> SetBranchAddress( "pt" ,  pt_  );
    tree_  -> SetBranchAddress( "eta",  eta_ );
    tree_  -> SetBranchAddress( "phi",  phi_ );
-   tree_  -> SetBranchAddress( "e"  ,  e_   );
+//   tree_  -> SetBranchAddress( "e"  ,  e_   );
    std::vector<std::string>::iterator it;
+   it = std::find(branches_.begin(),branches_.end(),"e") ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , e_ );
    it = std::find(branches_.begin(),branches_.end(),"q") ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , q_ );
    it = std::find(branches_.begin(),branches_.end(),"px");  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , px_  );
    it = std::find(branches_.begin(),branches_.end(),"py");  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , py_  );
@@ -102,3 +103,5 @@ template class PhysicsObjectTreeBase<GenJet>;
 template class PhysicsObjectTreeBase<JetTag>;
 template class PhysicsObjectTreeBase<L1TMuon>;
 template class PhysicsObjectTreeBase<L1TJet>;
+template class PhysicsObjectTreeBase<RecoMuon>;
+template class PhysicsObjectTreeBase<RecoTrack>;

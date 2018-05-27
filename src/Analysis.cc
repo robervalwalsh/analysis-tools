@@ -134,6 +134,8 @@ void Analysis::event(const int & event, const bool & addCollections)
       if ( type == "JetTag" )         this->addCollection<JetTag>(name);
       if ( type == "L1TMuon" )        this->addCollection<L1TMuon>(name);
       if ( type == "L1TJet" )         this->addCollection<L1TJet>(name);
+      if ( type == "RecoMuon" )       this->addCollection<RecoMuon>(name);
+      if ( type == "RecoTrack" )      this->addCollection<RecoTrack>(name);
    }
    
 }
