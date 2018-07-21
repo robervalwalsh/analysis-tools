@@ -42,9 +42,10 @@ Int_t genjet_id_[kLen];
 Float_t btag_deep_[kLen];
 
 // I'd better check if it is correct this flag selection
-const Int_t kTight = 1;
+const Int_t kTight = 6;
 const array<Float_t, 3> pt_cut{{100, 100, 40}};
 const array<Float_t, 3> eta_cut{{2.2, 2.2, 2.2}};
+const bool debug = false;
 
 
 int SetTreeBranches(TTree * t) {
@@ -65,46 +66,75 @@ int SetTreeBranches(TTree * t) {
 
 
 bool check_distance_enough(const TLorentzVector &a, const TLorentzVector &b) {
-  return a.DeltaR(b) > 1 && (TMath::Abs(a.Eta() - b.Eta()) < 1.5);
+  if (debug) {
+    cout << "Delta R: " << a.DeltaR(b) << endl;
+    cout << "Eta bw 4vec: " << TMath::Abs(a.Eta() - b.Eta()) << endl;
+  }
+  return a.DeltaR(b) > 1;
 }
 
 
 void fill_histogram(TTree* tree, TH1F* mass_histo) {
-  for (int i = 0; i < tree->GetEntries(); i++) {
+  ULong64_t how_many;
+  if (debug) {
+    how_many = 100;
+  } else {
+    how_many = tree->GetEntries();
+  }
+
+  for (ULong64_t i = 0; i < how_many; i++) {
     tree->GetEntry(i);
-#ifdef _DEBUG_
-    cout << "Run = " << run_ << " | Lumi Section = " \
-         << lumisection_ << " | Event = " << event_ << endl;
-    cout << " number of gen jets from ngenjet = " << \
-      ngenjet_ << "  number of gen jets from vector size = " \
-         << (*pgenjet_pt_).size() << endl;
-    cout << " number of gen jets from ngenjet = " << ngenjet_ << endl;
-#endif
+    if (debug) {
+      cout << "\033[0;33m\n\nNew event\033[0m" << endl;
+      cout << "Run = " << run_ << " | Lumi Section = "          \
+           << lumisection_ << " | Event = " << event_ << endl;
+      cout << " number of gen jets from ngenjet = " << ngenjet_ << endl;
+    }
+
     // If we have less than 3 jets the event is not useful
+    if (debug) {
+      cout << "ngenjets: " << ngenjet_ << endl;
+    }
     if (ngenjet_ < 3) {
       continue;
     }
 
+    
     // Apply first cut on momentum and eta without checking
     // real identity
+    bool prosegui = true;
     for (unsigned int i = 0; i < pt_cut.size(); i++) {
-      if (genjet_pt_[i] > pt_cut[i]) {
-        continue;
+      if (debug) {
+        cout << "pt: " << genjet_pt_[i] << "\neta: " << \
+          genjet_eta_[i] << "\nid: " << genjet_id_[i] << endl;
       }
-      if (genjet_eta_[i] < eta_cut[i]) {
-        continue;
+      if (genjet_pt_[i] < pt_cut[i]) {
+        prosegui = false; break;
+      }
+      if (TMath::Abs(genjet_eta_[i]) > eta_cut[i]) {
+        prosegui = false; break;
       }
       if (genjet_id_[i] != kTight) {
-        continue;
+        prosegui = false; break;
       }
+    }
+    if (!prosegui) {
+      continue;
     }
 
     // Now check btags
     unsigned int btaggati = 0;
     vector<UInt_t> bjet_indexes;
+    if (debug) {
+      cout << "Starting btagging check" << endl;
+    }
     for (unsigned int i = 0; i < ngenjet_ && btaggati < 3; i++) {
-      if (btag_deep_[i] > deepcsv_cut && genjet_pt_[i] > \
-          pt_cut[btaggati] && genjet_eta_[i] < eta_cut[btaggati]) {
+      if (debug) {
+        cout << "btag_deep: " << btag_deep_[i] << "\tpt: " << genjet_pt_[i] \
+             << "\teta: " << genjet_eta_[i] << endl;
+      }
+      if (btag_deep_[i] > deepcsv_cut && genjet_pt_[i] >                \
+          pt_cut[btaggati] && TMath::Abs(genjet_eta_[i]) < eta_cut[btaggati]) {
         btaggati++;
         bjet_indexes.push_back(i);
       } else {
@@ -113,9 +143,13 @@ void fill_histogram(TTree* tree, TH1F* mass_histo) {
         }
       }
     }
+    if (debug) {
+      cout << "btagged: " << btaggati << endl;
+    }
     if (btaggati < 3) {
       continue;
     }
+
     // Now let's build the lorentz vectors and check the couples
     array<TLorentzVector, 3> jets;
     for (int i = 0; i < 3; i++) {
@@ -136,8 +170,11 @@ void fill_histogram(TTree* tree, TH1F* mass_histo) {
       }
     }
     if (!success) { continue; }
+    if (TMath::Abs(jets[0].Eta() - jets[1].Eta()) > 1.5) {
+      continue;
+    }
     TLorentzVector appo = jets[0] - jets[1];
-    cout << "Filling with " << -appo.M() << endl;
+    cout << "\033[0;32mFilling with " << -appo.M() << "\033[0m" << endl;
     mass_histo->Fill(-appo.M());
   }
 }
@@ -160,10 +197,9 @@ int main(int argc, char* argv[]) {
   TH1F mass_histo("mass_histo", "Invariant mass of bb jets", 50, 0, 800);
   fill_histogram(tree, &mass_histo);
   output.cd();
-  cout << mass_histo.GetEntries() << endl;
+  cout << "Entries in histo: " << mass_histo.GetEntries() << endl;
   mass_histo.Write();
   nano.Close();
-  return 0;
-  
+  return 0;  
 }
 
