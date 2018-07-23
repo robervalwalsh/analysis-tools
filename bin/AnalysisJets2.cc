@@ -183,14 +183,20 @@ void fill_histogram(TTree* tree, TH1F* mass_histo) {
 int main(int argc, char* argv[]) {
   TH1::SetDefaultSumw2();  // proper treatment of errors when scaling histograms
   TFile nano(file.c_str(), "old");
-  if (nano.IsZombie()) {
-    cerr << "Error opening file! Aborting." << endl;
+  if (argc != 2) {
+    cerr << "\033[0;31mPlease give the name of the file where you want to" <<
+      "put the output as an argument. Aborting.\033[0m" << endl;
     return -1;
   }
-  TFile output("output_bjets.root", "create");
+  if (nano.IsZombie()) {
+    cerr << "Error opening input file! Aborting." << endl;
+    return -2;
+  }
+  TFile output(argv[1], "create");
   if (output.IsZombie()) {
-    cerr << "Error opening output file. Aborting" << endl;
-    return -1;
+    cerr << "Error opening output file " << argv[1] << ". Make sure that "
+      "the file does not exist. Aborting." << endl;
+    return -3;
   }
   TTree* tree = reinterpret_cast<TTree*>(nano.Get("Events"));
   SetTreeBranches(tree);
@@ -200,6 +206,6 @@ int main(int argc, char* argv[]) {
   cout << "Entries in histo: " << mass_histo.GetEntries() << endl;
   mass_histo.Write();
   nano.Close();
-  return 0;  
+  return 0;
 }
 
