@@ -42,7 +42,7 @@ Int_t genjet_id_[kLen];
 Float_t btag_deep_[kLen];
 
 // I'd better check if it is correct this flag selection
-const Int_t kTight = 6;
+const Int_t kTight = 2;
 const array<Float_t, 3> pt_cut{{100, 100, 40}};
 const array<Float_t, 3> eta_cut{{2.2, 2.2, 2.2}};
 const bool debug = false;
@@ -114,7 +114,12 @@ void fill_histogram(TTree* tree, TH1F* mass_histo) {
       if (TMath::Abs(genjet_eta_[i]) > eta_cut[i]) {
         prosegui = false; break;
       }
-      if (genjet_id_[i] != kTight) {
+      if (debug) {
+      cout << "genjetid: " << genjet_id_[i] << "\tktight: "  \
+           << kTight << "\tbitwise: " << (genjet_id_[i] & kTight) \
+           << endl;
+      }
+      if ((genjet_id_[i] & kTight) == 0) {
         prosegui = false; break;
       }
     }
