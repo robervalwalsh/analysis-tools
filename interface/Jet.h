@@ -47,6 +47,8 @@ namespace analysis {
            ~Jet();
            
             // Gets
+            /// returns if jet is Puppi
+            bool  isPuppi()                     const;
             /// returns the btag value of btag_csvivf
             float btag()                        const;
             /// returns the btag value of algorithm
@@ -95,6 +97,8 @@ namespace analysis {
             
                
             // Sets
+            /// sets the isPuppi value
+            void  isPuppi(const bool &);
             /// sets the btag value
             void  btag(const float &);
             /// sets the btag value for difference algorithms
@@ -155,6 +159,9 @@ namespace analysis {
          protected:
             // ----------member data ---------------------------
             //
+               
+            // Jet type
+            bool isPuppi_;
             /// btag value 
             float btag_ ;
             /// btag value for each algo

@@ -52,6 +52,7 @@ Jet::~Jet()
 // member functions
 //
 // Gets
+bool  Jet::isPuppi()                               const { return isPuppi_;    } 
 float Jet::btag()                                  const { return btags_.at(btagAlgo_);    }                   
 float Jet::btag(const std::string & algo)          const { return btags_.at(algo);         }                   
 int   Jet::flavour()                               const { return flavour_.at("Hadron");   }                   
@@ -100,6 +101,7 @@ bool  Jet::pileupJetIdFullId(const std::string & wp) const
 
 
 // Sets                                                             
+void Jet::isPuppi  (const bool & ispuppi)                             { isPuppi_  = ispuppi; } 
 void Jet::btag     (const float & btag)                               { btag_    = btag; } 
 void Jet::btag     (const std::string & algo, const float & btag)     { btags_[algo]  = btag; } 
 void Jet::flavour  (const int   & flav)                               { flavour_["Hadron"] = flav; } 
