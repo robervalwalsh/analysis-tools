@@ -71,12 +71,12 @@ float Jet::JerSfUp()                               const { return jerSFUp_; }
 
 float Jet::neutralHadronFraction()                 const { return nHadFrac_; }
 float Jet::neutralEmFraction()                     const { return nEmFrac_;  }
-int   Jet::neutralMultiplicity()                   const { return nMult_;    }
+float Jet::neutralMultiplicity()                   const { return nMult_;    }
 float Jet::chargedHadronFraction()                 const { return cHadFrac_; }
 float Jet::chargedEmFraction()                     const { return cEmFrac_;  }
-int   Jet::chargedMultiplicity()                   const { return cMult_;    }
+float Jet::chargedMultiplicity()                   const { return cMult_;    }
 float Jet::muonFraction()                          const { return muFrac_;   }
-int   Jet::constituents()                          const { return nConst_;   }
+float Jet::constituents()                          const { return nConst_;   }
 
 float Jet::qgLikelihood()                          const { return qgLikelihood_; }
 float Jet::pileupJetIdFullDiscriminant()           const { return puJetIdFullDisc_; }
@@ -204,9 +204,21 @@ void Jet::id      (const float & nHadFrac,
                    const float & cMult   ,
                    const float & muFrac  )
 {
-   int nM = (int)round(nMult);
-   int cM = (int)round(cMult);
-   int numConst = nM + cM;
+   float nM;
+   float cM;
+   float numConst;
+   if ( isPuppi_ )
+   {
+      nM = nMult;
+      cM = cMult;
+      numConst = nM + cM;
+   }
+   else
+   {
+      nM = round(nMult);
+      cM = round(cMult);
+      numConst = round(nM + cM);
+   }
    nHadFrac_ = nHadFrac;
    nEmFrac_  = nEmFrac;
    nMult_    = nM;
@@ -226,12 +238,26 @@ void Jet::id      (const float & nHadFrac,
    else if ( fabs(p4_.Eta()) > 2.7 && fabs(p4_.Eta()) <= 3. )
    {
       idloose_ = false;
-      idtight_ = (nEmFrac>0.02 && nEmFrac<0.90 && nM>2);
+      if ( isPuppi_ )
+      {
+         idtight_ = (nHadFrac<0.99);
+      }
+      else
+      {
+         idtight_ = (nEmFrac>0.02 && nEmFrac<0.90 && nM>2);
+      }
    }
    else
    {
       idloose_ = false;
-      idtight_ = (nHadFrac>0.02 && nEmFrac<0.90 && nM>10);
+      if ( isPuppi_ )
+      {
+         idtight_ = (nHadFrac>0.02 && nEmFrac<0.90 && nM>10);
+      }
+      else
+      {
+         idtight_ = (nHadFrac>0.02 && nEmFrac<0.90 && nM>2 && nM<15);
+      }
    }
    
    

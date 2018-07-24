@@ -80,12 +80,12 @@ namespace analysis {
             
             float neutralHadronFraction()  const ;
             float neutralEmFraction()      const ;
-            int   neutralMultiplicity()    const ;
+            float neutralMultiplicity()    const ;
             float chargedHadronFraction()  const ;
             float chargedEmFraction()      const ;
-            int   chargedMultiplicity()    const ;
+            float chargedMultiplicity()    const ;
             float muonFraction()           const ;
-            int   constituents()           const ;
+            float constituents()           const ;
             
             /// quark-gluon separation
             float qgLikelihood()  const;
@@ -130,10 +130,10 @@ namespace analysis {
             
             void neutralHadronFraction(const float & nHadFrac);
             void neutralEmFraction(const float & nEmFrac);
-            void neutralMultiplicity(const int & nMult);
+            void neutralMultiplicity(const float & nMult);
             void chargedHadronFraction(const float & cHadFrac);
             void chargedEmFraction(const float & cEmFrac);
-            void chargedMultiplicity(const int & cMult);
+            void chargedMultiplicity(const float & cMult);
             void muonFraction(const float & muFrac);
             
             /// calculates the jet id
@@ -194,12 +194,12 @@ namespace analysis {
             /// jet id
             float nHadFrac_;
             float nEmFrac_;
-            int   nMult_;
+            float nMult_;
             float cHadFrac_;
             float cEmFrac_;
-            int   cMult_;
+            float cMult_;
             float muFrac_;
-            int   nConst_;
+            float nConst_;
             /// quark-gluon separation
             float qgLikelihood_;
             /// pileup jet id
