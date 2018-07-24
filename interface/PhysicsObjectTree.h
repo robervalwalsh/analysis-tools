@@ -80,6 +80,7 @@ namespace analysis {
             float cEmFrac_ [max_];
             float cMult_   [max_];
             float muFrac_  [max_];
+            float puppi_   [max_];
             bool  idLoose_ [max_];
             bool  idTight_ [max_];
             float jecUnc_  [max_];
@@ -92,6 +93,8 @@ namespace analysis {
             int   puJetIdFullId_ [max_];
             
             bool isSimpleJet_;
+            bool hasPuppiInfo_;
+            bool hasQGLikelihood_;
 
          private:
 

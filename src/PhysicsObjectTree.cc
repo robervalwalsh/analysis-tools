@@ -73,6 +73,9 @@ Collection<Candidate>  PhysicsObjectTree<Candidate>::collection()
 PhysicsObjectTree<Jet>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<Jet>(tree, name)
 {
    isSimpleJet_ = false;
+   hasPuppiInfo_ = false;
+   hasQGLikelihood_ = false;
+   
 //   tree_  -> SetBranchAddress( "btag_csvivf", btag_    );
    int algos = 0;
    for ( auto & branch : branches_ )
@@ -109,9 +112,10 @@ PhysicsObjectTree<Jet>::PhysicsObjectTree(TChain * tree, const std::string & nam
       tree_  -> SetBranchAddress( "jerSFUp", jerSFUp_);
       tree_  -> SetBranchAddress( "jerResolution", jerResolution_);
       std::vector<std::string>::iterator it;
-      it = std::find(branches_.begin(),branches_.end(),"qgLikelihood")            ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , qgLikelihood_ );
+      it = std::find(branches_.begin(),branches_.end(),"qgLikelihood")            ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , qgLikelihood_ ); hasQGLikelihood_ = true; }
       it = std::find(branches_.begin(),branches_.end(),"puJetIdFullDiscriminant") ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , puJetIdFullDisc_ );
       it = std::find(branches_.begin(),branches_.end(),"puJetIdFullId")           ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , puJetIdFullId_ );
+      it = std::find(branches_.begin(),branches_.end(),"id_puppi")                ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , puppi_ )       ; hasPuppiInfo_ = true; }
    }
    else
    {
@@ -127,9 +131,9 @@ PhysicsObjectTree<Jet>::~PhysicsObjectTree() {}
 // Member functions
 Collection<Jet>  PhysicsObjectTree<Jet>::collection()
 {
-   std::string treename = (std::string)tree_->GetName();
-   std::size_t foundPuppi = treename.find("Puppi");
-   bool ispuppi = (foundPuppi != std::string::npos);
+//    std::string treename = (std::string)tree_->GetName();
+//    std::size_t foundPuppi = treename.find("Puppi");
+//    bool ispuppi = (foundPuppi != std::string::npos);
    
    std::vector<Jet> jets;
    for ( int i = 0 ; i < n_ ; ++i )
@@ -154,10 +158,12 @@ Collection<Jet>  PhysicsObjectTree<Jet>::collection()
       jet.JerSf(jerSF_[i]);
       jet.JerSfUp(jerSFUp_[i]);
       jet.JerSfDown(jerSFDown_[i]);
-      jet.qgLikelihood(qgLikelihood_[i]);
+      if ( hasQGLikelihood_ ) jet.qgLikelihood(qgLikelihood_[i]);
+      else                    jet.qgLikelihood(-10.);
       jet.pileupJetIdFullDiscriminant(puJetIdFullDisc_[i]);
       jet.pileupJetIdFullId(puJetIdFullId_[i]);
-      jet.isPuppi(ispuppi);
+      if ( hasPuppiInfo_ ) jet.isPuppi(puppi_[i]>0);
+      else                 jet.isPuppi(false);
       jets.push_back(jet);
    }
    Collection<Jet> jetCollection(jets, name_);
