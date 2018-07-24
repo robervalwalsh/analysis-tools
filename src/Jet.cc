@@ -202,26 +202,54 @@ void Jet::id      (const float & nHadFrac,
                    const float & cMult   ,
                    const float & muFrac  )
 {
-   // Jet ID
-   // Update: https://twiki.cern.ch/twiki/bin/view/CMS/JetID?rev=95#Recommendations_for_13_TeV_data
    int nM = (int)round(nMult);
    int cM = (int)round(cMult);
    int numConst = nM + cM;
+   nHadFrac_ = nHadFrac;
+   nEmFrac_  = nEmFrac;
+   nMult_    = nM;
+   cHadFrac_ = cHadFrac;
+   cEmFrac_  = cEmFrac;
+   cMult_    = cM;
+   muFrac_   = muFrac;
+   nConst_   = numConst;
+
+   // Jet ID 2017 - only for AK4CHS (slimmedJets)
+   // https://twiki.cern.ch/twiki/bin/view/CMS/JetID13TeVRun2017?rev=6
    if ( fabs(p4_.Eta()) <= 2.7 )
    {
-      idloose_ = ((nHadFrac<0.99 && nEmFrac<0.99 && numConst>1) && ((abs(p4_.Eta())<=2.4 && cHadFrac>0 && cM>0 && cEmFrac<0.99) || fabs(p4_.Eta())>2.4) && fabs(p4_.Eta())<=2.7);
-      idtight_ = ((nHadFrac<0.90 && nEmFrac<0.90 && numConst>1) && ((abs(p4_.Eta())<=2.4 && cHadFrac>0 && cM>0 && cEmFrac<0.99) || fabs(p4_.Eta())>2.4) && fabs(p4_.Eta())<=2.7);
+      idloose_ = false;
+      idtight_ = ((nHadFrac<0.90 && nEmFrac<0.90 && numConst>1) && ((abs(p4_.Eta())<=2.4 && cHadFrac>0 && cM>0 ) || fabs(p4_.Eta())>2.4) && fabs(p4_.Eta())<=2.7);
    }
    else if ( fabs(p4_.Eta()) > 2.7 && fabs(p4_.Eta()) <= 3. )
    {
-      idloose_ = (nEmFrac<0.90 && nM>2);
-      idtight_ = (nEmFrac<0.90 && nM>2);
+      idloose_ = false;
+      idtight_ = (nEmFrac>0.02 && nEmFrac<0.90 && nM>2);
    }
    else
    {
-      idloose_ = (nEmFrac<0.90 && nM>10);
-      idtight_ = (nEmFrac<0.90 && nM>10);
+      idloose_ = false;
+      idtight_ = (nHadFrac>0.02 && nEmFrac<0.90 && nM>10);
    }
+   
+   
+//    // Jet ID 2016
+//    // https://twiki.cern.ch/twiki/bin/view/CMS/JetID?rev=95#Recommendations_for_13_TeV_data
+//    if ( fabs(p4_.Eta()) <= 2.7 )
+//    {
+//       idloose_ = ((nHadFrac<0.99 && nEmFrac<0.99 && numConst>1) && ((abs(p4_.Eta())<=2.4 && cHadFrac>0 && cM>0 && cEmFrac<0.99) || fabs(p4_.Eta())>2.4) && fabs(p4_.Eta())<=2.7);
+//       idtight_ = ((nHadFrac<0.90 && nEmFrac<0.90 && numConst>1) && ((abs(p4_.Eta())<=2.4 && cHadFrac>0 && cM>0 && cEmFrac<0.99) || fabs(p4_.Eta())>2.4) && fabs(p4_.Eta())<=2.7);
+//    }
+//    else if ( fabs(p4_.Eta()) > 2.7 && fabs(p4_.Eta()) <= 3. )
+//    {
+//       idloose_ = (nEmFrac<0.90 && nM>2);
+//       idtight_ = (nEmFrac<0.90 && nM>2);
+//    }
+//    else
+//    {
+//       idloose_ = (nEmFrac<0.90 && nM>10);
+//       idtight_ = (nEmFrac<0.90 && nM>10);
+//    }
    
 //    if ( tag_ == "JetIdOld" )
 //    {
@@ -237,13 +265,4 @@ void Jet::id      (const float & nHadFrac,
 //       }
 //    }
    
-   nHadFrac_ = nHadFrac;
-   nEmFrac_  = nEmFrac;
-   nMult_    = nM;
-   cHadFrac_ = cHadFrac;
-   cEmFrac_  = cEmFrac;
-   cMult_    = cM;
-   muFrac_   = muFrac;
-   nConst_   = numConst;
-
 }
