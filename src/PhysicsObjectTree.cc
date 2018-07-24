@@ -127,6 +127,10 @@ PhysicsObjectTree<Jet>::~PhysicsObjectTree() {}
 // Member functions
 Collection<Jet>  PhysicsObjectTree<Jet>::collection()
 {
+   std::string treename = (std::string)tree_->GetName();
+   std::size_t foundPuppi = treename.find("Puppi");
+   bool ispuppi = (foundPuppi != std::string::npos);
+   
    std::vector<Jet> jets;
    for ( int i = 0 ; i < n_ ; ++i )
    {
@@ -153,6 +157,7 @@ Collection<Jet>  PhysicsObjectTree<Jet>::collection()
       jet.qgLikelihood(qgLikelihood_[i]);
       jet.pileupJetIdFullDiscriminant(puJetIdFullDisc_[i]);
       jet.pileupJetIdFullId(puJetIdFullId_[i]);
+      jet.isPuppi(ispuppi);
       jets.push_back(jet);
    }
    Collection<Jet> jetCollection(jets, name_);
