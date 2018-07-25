@@ -49,6 +49,6 @@ int main(int argc, char* argv[]) {
 
   CMSPrelim(Form("%.1f fb^{-1} (13 TeV)", lumi), "", 0.15, 0.78);
   c1->Update();
-  c1->SaveAs(("output/plots/" + string(argv[2]) + ".png").c_str());
+  c1->SaveAs(("output/plots/" + string(argv[2]) + ".pdf").c_str());
   return 0;
 }
