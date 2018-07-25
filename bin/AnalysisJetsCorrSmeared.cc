@@ -53,6 +53,8 @@ Float_t genjet_pt_[kLen];
 Float_t genjet_eta_[kLen];
 Float_t genjet_phi_[kLen];
 
+Float_t output_corrected_pt[kLen];
+
 
 namespace Smearing {
   enum class method {scaling, stochastic};
@@ -81,6 +83,31 @@ int SetTreeBranches(TTree * t) {
   t->SetBranchAddress("GenJet_phi", genjet_phi_);
   return 0;
 }
+
+void CreateTree(TTree* t) {
+  // Event Info
+  t->Branch("event", &event_, "event/i");
+  t->Branch("run", &run_, "run/l");
+  t->Branch("luminosityBlock", &lumisection_, "luminosityBlock/i");
+  // gen jets
+  t->Branch("nJet", &njet_, "nJet/i");
+  t->Branch("Jet_pt", jet_pt_, "Jet_pt/F");
+  t->Branch("Jet_eta", jet_eta_, "Jet_eta/F");
+  t->Branch("Jet_phi", jet_phi_, "Jet_phi/F");
+  t->Branch("Jet_mass", jet_mass_, "Jet_mass/F");
+  t->Branch("Jet_jetId", jet_id_, "Jet_jetId/I");
+  t->Branch("Jet_btagDeepB", btag_deep_, "Jet_btagDeepB/F");
+  t->Branch("Jet_bRegCorr", jet_b_reg_corr, "Jet_bRegCorr/F");
+  t->Branch("Jet_nElectrons", &jet_n_electrons, "Jet_nElectrons/I");
+  t->Branch("Jet_nMuons", &jet_n_muons, "Jet_nMuons/F");
+  t->Branch("Jet_genJetIdx", jet_genjet_idx_, "Jet_genJetIdx/I");
+  t->Branch("GenJet_pt", genjet_pt_, "GenJet_pt/F");
+  t->Branch("GenJet_eta", genjet_eta_, "GenJet_eta/F");
+  t->Branch("GenJet_phi", genjet_phi_, "GenJet_phi/F");
+  t->Branch("Jet_Corrected_pt", output_corrected_pt, "Jet_Corrected_pt/F");
+}
+ 
+
 
 
 bool check_distance_enough(const TLorentzVector &a, const TLorentzVector &b) {
@@ -147,7 +174,7 @@ Smearing::method smearing(const TVector3& jet, const TVector3& genjet, \
 
 
 void fill_histogram(TTree* tree, TH1F* plot1, \
-                    TH1F* plot2, TH1F* plot3, TH1F* plot4) {
+                    TH1F* plot2, TH1F* plot3, TH1F* plot4, TTree* out_tree) {
   ULong64_t how_many;
   if (debug) {
     how_many = 100;
@@ -283,6 +310,10 @@ void fill_histogram(TTree* tree, TH1F* plot1, \
     cout << "\033[0;32mFilling with m = " << -appo.M() << \
       " and pt = " << jets[0].Pt() << "\033[0m" << endl;
 
+    for (auto it : bjet_indexes) {
+      output_corrected_pt[it] = real_pt_smeared[it];
+    }
+    out_tree->Fill();
     if (debug) {
       cout << "Leptons in the event: electron " << \
         jet_n_electrons << "\tmuons: " << jet_n_muons << endl;
@@ -320,7 +351,9 @@ int main(int argc, char* argv[]) {
     return -3;
   }
   TTree* tree = reinterpret_cast<TTree*>(nano.Get("Events"));
+  TTree output_tree("output_tree", "Histograms and data for H->bb decay");
   SetTreeBranches(tree);
+  CreateTree(&output_tree);
   TH1F mass_histo_chromo("mass_histo_chromo", \
                       "Invariant mass of bb jets", 50, 0, 800);
   TH1F mass_histo_lepton("mass_histo_lepton", \
@@ -331,7 +364,7 @@ int main(int argc, char* argv[]) {
                           "Pt spectrum for lepton events", 50, 0, 800);
   
   fill_histogram(tree, &mass_histo_chromo, &mass_histo_lepton,  \
-                 &pt_spectrum_chromo, &pt_spectrum_lepto);
+                 &pt_spectrum_chromo, &pt_spectrum_lepto, &output_tree);
   output.cd();
   cout << "Entries in chromo histo: " << \
     mass_histo_chromo.GetEntries() << endl;
@@ -347,6 +380,7 @@ int main(int argc, char* argv[]) {
   mass_histo_sum.Add(&mass_histo_lepton, 1.);
   mass_histo_sum.SetLineColor(kBlue);
   mass_histo_sum.Write();
+  output_tree.Write();
   nano.Close();
   return 0;
 }
