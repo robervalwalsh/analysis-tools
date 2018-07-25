@@ -13,7 +13,7 @@
 #include "TLorentzVector.h"
 #include "TMath.h"
 #include "TCanvas.h"
-#include "TRandom.h"
+#include "TRandom3.h"
 #include "JetMETCorrections/Modules/interface/JetResolution.h"
 
 using std::cout;
@@ -52,7 +52,6 @@ Int_t jet_genjet_idx_[kLen];
 Float_t genjet_pt_[kLen];
 Float_t genjet_eta_[kLen];
 Float_t genjet_phi_[kLen];
-Float_t jet_area_[kLen];
 
 
 namespace Smearing {
@@ -80,7 +79,6 @@ int SetTreeBranches(TTree * t) {
   t->SetBranchAddress("GenJet_pt", genjet_pt_);
   t->SetBranchAddress("GenJet_eta", genjet_eta_);
   t->SetBranchAddress("GenJet_phi", genjet_phi_);
-  t->SetBranchAddress("Jet_area", jet_area_);  // CUSU Better to check
   return 0;
 }
 
@@ -121,7 +119,7 @@ Smearing::method smearing(const TVector3& jet, const TVector3& genjet, \
   parameters.setRho((jet.Pt() - genjet.Pt())/jet.Pt());
   Float_t sigmajer = resolution.getResolution(parameters);
   Float_t sjer = resolution_sf.getScaleFactor(parameters);
-  if ((2*jet.DeltaR(genjet) < radius) ||                                \
+  if ((2*jet.DeltaR(genjet) < radius) && \
       (TMath::Abs(jet.Pt() - genjet.Pt()) < 3*sigmajer*jet.Pt())) {
     Float_t cjer = 1 + (sjer - 1)*(jet.Pt() - genjet.Pt())/jet.Pt();
     if (cjer < 0) {
@@ -130,17 +128,17 @@ Smearing::method smearing(const TVector3& jet, const TVector3& genjet, \
     *realpt = jet.Pt()*cjer;
     if (debug) {
       cout << "Smearing scaling: cjer " << cjer << endl;
-      cout << "Old pt: " << jet.Pt() << "new pt: " << *realpt << endl;
+      cout << "Old pt: " << jet.Pt() << "\tnew pt: " << *realpt << endl;
     }
     return Smearing::method::scaling;
   } else {
-    TRandom generator;
+    TRandom3 generator;
     Float_t cjer = 1 + generator.Gaus(0, sigmajer) * \
       TMath::Sqrt(TMath::Max(sjer*sjer - 1, Float_t(0)));
     *realpt = jet.Pt()*cjer;
     if (debug) {
       cout << "Smearing stochastic: cjer " << cjer << endl;
-      cout << "Old pt: " << jet.Pt() << "new pt: " << *realpt << endl;
+      cout << "Old pt: " << jet.Pt() << "\tnew pt: " << *realpt << endl;
     }
     return Smearing::method::stochastic;
   }
@@ -149,7 +147,7 @@ Smearing::method smearing(const TVector3& jet, const TVector3& genjet, \
 
 
 void fill_histogram(TTree* tree, TH1F* plot1, \
-                    TH1F* plot2) {
+                    TH1F* plot2, TH1F* plot3, TH1F* plot4) {
   ULong64_t how_many;
   if (debug) {
     how_many = 100;
@@ -180,13 +178,15 @@ void fill_histogram(TTree* tree, TH1F* plot1, \
     
     bool prosegui = true;
     Float_t real_pt_smeared[kLen];
-    
-    // Correction on pt
+
+    // Now we use only corrected pt
     for (unsigned int i = 0; i < pt_cut.size(); i++) {
+      // Correction on pt
       TVector3 jet, genjet;
       if (debug) {
-        cout << "Pt before: " << jet_pt_[i] << "\tjet_b_reg_corr: " << \
-          jet_b_reg_corr[i] << endl;
+        cout << "pt before: " << jet_pt_[i] << "\neta: " <<    \
+          jet_eta_[i] << "\nid: " << jet_id_[i] <<                     \
+          "\tjet_b_reg_correction: " << jet_b_reg_corr[i] << endl;
       }
       if (jet_b_reg_corr[i] != 0) {
         jet.SetPtEtaPhi(jet_pt_[i]*jet_b_reg_corr[i], jet_eta_[i], jet_phi_[i]);
@@ -195,15 +195,8 @@ void fill_histogram(TTree* tree, TH1F* plot1, \
       }
       genjet.SetPtEtaPhi(genjet_pt_[i], genjet_eta_[i], genjet_phi_[i]);
       smearing(jet, genjet, rcone, real_pt_smeared + i);
-    }
-
-    // Now we use only corrected pt
-    for (unsigned int i = 0; i < pt_cut.size(); i++) {
       if (debug) {
-        cout << "pt: " << jet_pt_[i] << "\neta: " << \
-          jet_eta_[i] << "\nid: " << jet_id_[i] << \
-          "\tcorrection: " << jet_b_reg_corr[i] << "\tsmeared value: " \
-             << real_pt_smeared[i] << endl;
+        cout << "smeared value: "  << real_pt_smeared[i] << endl;
       }
       if (real_pt_smeared[i] < pt_cut[i]) {
         prosegui = false; break;
@@ -225,6 +218,7 @@ void fill_histogram(TTree* tree, TH1F* plot1, \
     }
 
 
+    // Now we correct the pt of the other jets
     for (unsigned int i = pt_cut.size(); i < njet_; i++) {
       TVector3 jet, genjet;
       jet.SetPtEtaPhi(jet_pt_[i]*jet_b_reg_corr[i], jet_eta_[i], jet_phi_[i]);
@@ -232,7 +226,6 @@ void fill_histogram(TTree* tree, TH1F* plot1, \
       smearing(jet, genjet, rcone, real_pt_smeared + i);
     }
 
-    
     // Now check btags
     unsigned int btaggati = 0;
     vector<UInt_t> bjet_indexes;
@@ -241,7 +234,8 @@ void fill_histogram(TTree* tree, TH1F* plot1, \
     }
     for (unsigned int i = 0; i < njet_ && btaggati < 3; i++) {
       if (debug) {
-        cout << "btag_deep: " << btag_deep_[i] << "\tpt: " << jet_pt_[i] \
+        cout << "btag_deep: " << btag_deep_[i] << "\tpt smeared corrected: " << \
+          real_pt_smeared[i]                                            \
              << "\teta: " << jet_eta_[i] << "\tjet_b_regcor: " << \
           jet_b_reg_corr[i] << endl;
       }
@@ -286,7 +280,8 @@ void fill_histogram(TTree* tree, TH1F* plot1, \
       continue;
     }
     TLorentzVector appo = jets[0] - jets[1];
-    cout << "\033[0;32mFilling with " << -appo.M() << "\033[0m" << endl;
+    cout << "\033[0;32mFilling with m = " << -appo.M() << \
+      " and pt = " << jets[0].Pt() << "\033[0m" << endl;
 
     if (debug) {
       cout << "Leptons in the event: electron " << \
@@ -295,8 +290,12 @@ void fill_histogram(TTree* tree, TH1F* plot1, \
     
     if (jet_n_muons != 0 || jet_n_electrons != 0) {
       plot1->Fill(-appo.M());
+      plot3->Fill(jets[0].Pt());
+      // plot3->Fill(jets[1].Pt());
     } else {
       plot2->Fill(-appo.M());
+      plot4->Fill(jets[0].Pt());
+      // plot4->Fill(jets[1].Pt());
     }
   }
 }
@@ -326,7 +325,13 @@ int main(int argc, char* argv[]) {
                       "Invariant mass of bb jets", 50, 0, 800);
   TH1F mass_histo_lepton("mass_histo_lepton", \
                             "Invariant mass of bb jets", 50, 0, 800);
-  fill_histogram(tree, &mass_histo_chromo, &mass_histo_lepton);
+  TH1F pt_spectrum_chromo("pt_spectrum_chromo", \
+                          "Pt spectrum for chromo events", 50, 0, 800);
+  TH1F pt_spectrum_lepto("pt_spectrum_lepto", \
+                          "Pt spectrum for lepton events", 50, 0, 800);
+  
+  fill_histogram(tree, &mass_histo_chromo, &mass_histo_lepton,  \
+                 &pt_spectrum_chromo, &pt_spectrum_lepto);
   output.cd();
   cout << "Entries in chromo histo: " << \
     mass_histo_chromo.GetEntries() << endl;
@@ -336,6 +341,8 @@ int main(int argc, char* argv[]) {
   mass_histo_lepton.SetLineColor(kRed);
   mass_histo_chromo.Write();
   mass_histo_lepton.Write();
+  pt_spectrum_lepto.Write();
+  pt_spectrum_chromo.Write();
   TH1F mass_histo_sum(mass_histo_chromo);
   mass_histo_sum.Add(&mass_histo_lepton, 1.);
   mass_histo_sum.SetLineColor(kBlue);
