@@ -14,11 +14,11 @@
 #include "tdrstyle.C"
 #include "HbbStylesNew.cc"
 
-Float_t lumi = -1.;
+Float_t lumi = 2.;
 
 int main(int argc, char* argv[]) {
   using std::cerr; using std::endl; using std::string;
-  TFile file("output/chromo_lepton.root", "read");
+  TFile file("output/hists/chromo_lepton.root", "read");
   if (file.IsZombie()) {
     cerr << "Error opening file. Aborting" << endl;
     return -2;
@@ -34,23 +34,24 @@ int main(int argc, char* argv[]) {
   style.SetStyle();
   gStyle->SetOptStat(0);
   setTDRStyle();
-
   THStack stack("stack", "");
-
   TCanvas* c1 = style.MakeCanvas("c1", "", 700, 700);
-  style.InitHist(lepto, "Leptons", "Entries / 20 GeV", kRed, 0);
-  style.InitHist(chromo, "Chromo", "Entries / 20 GeV", kBlue, 0);
-  // style.InitHist(reinterpret_cast<TH1*>(&stack), "Sum", "Entries / 20 GeV", kBlack, 0);
 
+  lepto->SetFillColor(kRed);
+  chromo->SetFillColor(kBlue);
   stack.Add(lepto);
   stack.Add(chromo);
-  stack.Draw();
-  TLegend* leg = new TLegend(0.58, 0.63, 0.98, 0.93);
-  style.SetLegendStyle(leg);
-  leg->AddEntry(&stack, "Titolo, Prompt", "L");
-  leg->Draw("same");
-
-  CMSPrelim(Form("%.1f fb^{-1} (13 TeV)", lumi), "", 0.15, 0.78);
+  stack.Draw("hist");
+  TLegend leg(0.58, 0.63, 0.98, 0.93);
+  style.SetLegendStyle(&leg);
+  stack.GetXaxis()->SetTitle("m_{12} [GeV]");
+  stack.GetYaxis()->SetTitle("Events / 16 GeV");
+  // TLegendEntry* l1 = leg->AddEntry(lepto, "Leptonic event", "lp");
+  leg.AddEntry(lepto, "Leptonic", "pf");
+  leg.AddEntry(chromo, "Non-leptonic", "pf");
+  // CMSPrelim(Form("%.1f fb^{-1} (13 TeV)", lumi), "", 0.15, 0.78);
+  CMSPrelim(true, "MC", 0.15, 0.79);
+  leg.Draw("same");
   c1->Update();
   c1->SaveAs("output/plots/stack_lepto_chromo.pdf");
   return 0;
