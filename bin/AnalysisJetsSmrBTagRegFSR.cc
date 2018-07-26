@@ -25,7 +25,12 @@
 #include "TMath.h"
 #include "TCanvas.h"
 #include "TRandom3.h"
+
 #include "JetMETCorrections/Modules/interface/JetResolution.h"
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
+
+
 
 using std::cout;
 using std::string;
@@ -45,6 +50,7 @@ const string file("/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC
 const Float_t rcone(0.4);
 const unsigned int kLen = 100;
 const Float_t deepcsv_cut = 0.4941;
+const Float_t b_tagging_efficiency = 0.99;
 const Int_t kTight = 2;
 const array<Float_t, 3> pt_cut{{100, 100, 40}};
 const array<Float_t, 3> eta_cut{{2.2, 2.2, 2.2}};
@@ -52,16 +58,101 @@ const bool debug = false;
 const CorrectionLevel correction_level = CorrectionLevel::smearing_btag_regression;
 
 
+
+
+bool check_distance_enough(const TLorentzVector &a, const TLorentzVector &b) {
+  if (debug) {
+    cout << "Delta R: " << a.DeltaR(b) << endl;
+    cout << "Eta bw 4vec: " << TMath::Abs(a.Eta() - b.Eta()) << endl;
+  }
+  return a.DeltaR(b) > 1;
+}
+
+
+
+class DataContainer {
+ public:
+  
+  DataContainer();
+  int SetTreeBranches(TTree* tree);
+  void CreateTree(TTree* tree);
+  bool get_real_pt(Int_t index, Float_t* pt);
+  void fill_histogram(TTree*, std::vector<TH1F*>, TTree*);
+
+  Smearing::method smearing(const TVector3& jet, const TVector3& genjet, \
+                            const Float_t& radius, Float_t* realpt) const;
+  
+  /**
+   * @brief Applies the smearing to the pt
+   * MC data is better than the real one, so MC data have to been smeared.
+   * The new pt is stored in current_jet_pt_[index]
+   */
+  void smear_current_data(UInt_t index);
+
+  /**
+   * @brief Other scale factors for the MC with btagging
+   * The new pt is always current_jet_pt_[index]
+   */
+  void apply_btag_sf();
+
+  /**
+   * @brief Applied the new regression algorithm that improves jet energy
+   * resolution for events with leptons. In fact it is a scale factor on the pt
+   */
+  void apply_jet_reg_sf(UInt_t index);
+  void apply_fsr_correction(UInt_t index);
+  
+  /**
+   * @brief Reads lev and decides what corrections have to be applied on pt
+   */
+  void apply_all_corrections(UInt_t i, CorrectionLevel lev);
+  
+ private:
+  JME::JetResolution resolution;
+  JME::JetResolutionScaleFactor resolution_sf;
+  BTagCalibration calib;
+  BTagCalibrationReader reader;
+
+
+  Float_t weigth;
+  // Data from tree
+  UInt_t run_;
+  ULong64_t event_;
+  UInt_t lumisection_;
+  UInt_t njet_;
+  Float_t jet_pt_[kLen];
+  Float_t jet_eta_[kLen];
+  Float_t jet_phi_[kLen];
+  Float_t jet_mass_[kLen];
+  Int_t jet_id_[kLen];
+  Float_t btag_deep_[kLen];
+  Float_t jet_b_reg_corr[kLen];
+  Int_t jet_n_electrons;
+  Int_t jet_n_muons;
+  Int_t jet_genjet_idx_[kLen];
+  Float_t genjet_pt_[kLen];
+  Float_t genjet_eta_[kLen];
+  Float_t genjet_phi_[kLen];
+  Float_t current_jet_pt_[kLen];
+  Float_t jet_b_reg_res_[kLen];
+};
+
+/**
+ * @danger I am using the old data table because I did not find the new one.
+ */
+DataContainer::DataContainer() : resolution("tables/Fall17_25nsV1_MC_PtResolution_AK4PFchs.txt"), \
+                                 resolution_sf("tables/Fall17_25nsV1_MC_SF_AK4PFchs.txt"), \
+                                 calib("csvv1", "tables/8TeV_SF/CSVV1.csv"),                       \
+                                 reader(BTagEntry::OP_TIGHT, "central", {"up", "down"}) {
+  reader.load(calib, BTagEntry::FLAV_B, "comb");
+}
+
 /**
  * @brief Smears MC pt to simulate real data
  * See https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution
  */
-Smearing::method smearing(const TVector3& jet, const TVector3& genjet, \
-              const Float_t& radius, Float_t* realpt) {
-  JME::JetResolution resolution =                                       \
-    JME::JetResolution("tables/Fall17_25nsV1_MC_PtResolution_AK4PFchs.txt");
-  JME::JetResolutionScaleFactor resolution_sf =                         \
-    JME::JetResolutionScaleFactor("tables/Fall17_25nsV1_MC_SF_AK4PFchs.txt");
+Smearing::method DataContainer::smearing(const TVector3& jet, const TVector3& genjet, \
+              const Float_t& radius, Float_t* realpt) const {
   JME::JetParameters parameters;
   parameters.setJetPt(jet.Pt());
   parameters.setJetEta(jet.Eta());
@@ -92,71 +183,6 @@ Smearing::method smearing(const TVector3& jet, const TVector3& genjet, \
     return Smearing::method::stochastic;
   }
 }
-
-bool check_distance_enough(const TLorentzVector &a, const TLorentzVector &b) {
-  if (debug) {
-    cout << "Delta R: " << a.DeltaR(b) << endl;
-    cout << "Eta bw 4vec: " << TMath::Abs(a.Eta() - b.Eta()) << endl;
-  }
-  return a.DeltaR(b) > 1;
-}
-
-
-
-class DataContainer {
- public:
-
-  int SetTreeBranches(TTree* tree);
-  void CreateTree(TTree* tree);
-  bool get_real_pt(Int_t index, Float_t* pt);
-  void fill_histogram(TTree*, std::vector<TH1F*>, TTree*);
-
-  /**
-   * @brief Applies the smearing to the pt
-   * MC data is better than the real one, so MC data have to been smeared.
-   * The new pt is stored in current_jet_pt_[index]
-   */
-  void smear_current_data(UInt_t index);
-
-  /**
-   * @brief Other scale factors for the MC with btagging
-   * The new pt is always current_jet_pt_[index]
-   */
-  void apply_btag_sf(UInt_t index);
-
-  /**
-   * @brief Applied the new regression algorithm that improves jet energy
-   * resolution for events with leptons. In fact it is a scale factor on the pt
-   */
-  void apply_jet_reg_sf(UInt_t index);
-  void apply_fsr_correction(UInt_t index);
-  
-  /**
-   * @brief Reads lev and decides what corrections have to be applied on pt
-   */
-  void apply_all_corrections(UInt_t i, CorrectionLevel lev);
-  
- private:
-  UInt_t run_;
-  ULong64_t event_;
-  UInt_t lumisection_;
-  UInt_t njet_;
-  Float_t jet_pt_[kLen];
-  Float_t jet_eta_[kLen];
-  Float_t jet_phi_[kLen];
-  Float_t jet_mass_[kLen];
-  Int_t jet_id_[kLen];
-  Float_t btag_deep_[kLen];
-  Float_t jet_b_reg_corr[kLen];
-  Int_t jet_n_electrons;
-  Int_t jet_n_muons;
-  Int_t jet_genjet_idx_[kLen];
-  Float_t genjet_pt_[kLen];
-  Float_t genjet_eta_[kLen];
-  Float_t genjet_phi_[kLen];
-  Float_t current_jet_pt_[kLen];
-  Float_t jet_b_reg_res_[kLen];
-};
 
 
 
@@ -227,14 +253,14 @@ void DataContainer::apply_all_corrections(UInt_t i, CorrectionLevel lev) {
     smear_current_data(i); break;
   case CorrectionLevel::smearing_btag:
     smear_current_data(i);
-    apply_btag_sf(i); break;
+    apply_btag_sf(); break;
   case CorrectionLevel::smearing_btag_regression:
     smear_current_data(i);
-    apply_btag_sf(i);
+    apply_btag_sf();
     apply_jet_reg_sf(i); break;
   case CorrectionLevel::smearing_btag_regression_fsr:
     smear_current_data(i);
-    apply_btag_sf(i);
+    apply_btag_sf();
     apply_jet_reg_sf(i);
     apply_fsr_correction(i);
     break;        
@@ -261,6 +287,7 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
 
   for (ULong64_t i = 0; i < how_many; i++) {
     tree->GetEntry(i);
+    weigth = 1;
     if (debug) {
       cout << "\033[0;33m\n\nNew event\033[0m" << endl;
       cout << "Run = " << run_ << " | Lumi Section = "          \
@@ -375,19 +402,42 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
     }
     
     if (jet_n_muons != 0 || jet_n_electrons != 0) {
-      plots[0]->Fill(-appo.M());
-      plots[2]->Fill(jets[0].Pt());
-      plots[4]->Fill(jet_b_reg_res_[0]);
+      plots[0]->Fill(-appo.M(), weigth);
+      plots[2]->Fill(jets[0].Pt(), weigth);
+      plots[4]->Fill(jet_b_reg_res_[0], weigth);
     } else {
-      plots[1]->Fill(-appo.M());
-      plots[3]->Fill(jets[0].Pt());
-      plots[5]->Fill(jet_b_reg_res_[0]);
+      plots[1]->Fill(-appo.M(), weigth);
+      plots[3]->Fill(jets[0].Pt(), weigth);
+      plots[5]->Fill(jet_b_reg_res_[0], weigth);
     }
   }
 }
 
-void DataContainer::apply_btag_sf(UInt_t i) {
-  cerr << "Please implement me. I am apply_btag_sf. I currently do nothing." << endl;
+void DataContainer::apply_btag_sf() {
+  if (debug) {
+    cout << "Here weigth should be 1: "  << weigth << endl;
+    if (weigth != 1) {
+      cerr << "Error. weigth is not 1. Something wrong happened" << endl;
+    }
+  }
+
+  bool tagged[njet_];
+  int how_many = njet_;
+  for (unsigned int i = 0; i < njet_; i++) {
+    tagged[i] = (btag_deep_[i] > deepcsv_cut);
+    Float_t sf = reader.\
+      eval_auto_bounds("central", BTagEntry::FLAV_B, current_jet_pt_[i], jet_eta_[i]);
+    if (tagged[i]) {
+      how_many--;
+      weigth *= (sf);
+    } else {
+      weigth *= (1 - b_tagging_efficiency*sf);
+    }
+    weigth *= TMath::Power(1 - b_tagging_efficiency, how_many);
+  }
+  if (debug) {
+    cout << "Weigth of this event: " << weigth << endl; 
+  }           
   return;
 }
 

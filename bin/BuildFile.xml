@@ -111,7 +111,7 @@
 </bin>
 
 <bin name="AnalysisJetsSmrBTagRegFSR" file="AnalysisJetsSmrBTagRegFSR.cc">
-  <use name="JetMETCorrections/Modules" />
+  <use name="JetMETCorrections/Modules CondFormats/BTauObjects CondTools/BTau" />
   <flags   LDFLAGS="-lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -lm -ldl -rdynamic"/>
 </bin>
 
