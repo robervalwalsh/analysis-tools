@@ -44,10 +44,10 @@ int main(int argc, char* argv[]) {
   histo->Draw();
   TLegend* leg = new TLegend(0.58, 0.63, 0.98, 0.93);
   style.SetLegendStyle(leg);
-  leg->AddEntry(histo, "Titolo, Prompt", "L");
+  leg->AddEntry(histo, "p_{T}", "L");
   leg->Draw("same");
 
-  CMSPrelim(Form("%.1f fb^{-1} (13 TeV)", lumi), "", 0.15, 0.78);
+  style.CMSPrelim(Form("%.1f fb^{-1} (13 TeV)", lumi), "", 0.15, 0.78);
   c1->Update();
   c1->SaveAs(("output/plots/" + string(argv[2]) + ".pdf").c_str());
   return 0;

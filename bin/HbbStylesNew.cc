@@ -18,6 +18,9 @@
 class HbbStylesNew {
 public:
 
+  HbbStylesNew();
+  ~HbbStylesNew();
+  
   /// define common styles
   void SetStyle();
   /// create a canveas in common style (default is square)
@@ -38,6 +41,10 @@ public:
 
 private:
   static double textSize_;
+  TLatex* tex;
+  TPaveText* wip;
+  TPaveText* lumi;
+  TPaveText* cmsprel;
 };
 
 double HbbStylesNew::textSize_ = 0.05;
@@ -220,16 +227,15 @@ void HbbStylesNew::SetLegendStyle(TLegend* leg)
   leg->SetTextSize(textSize_);
 }
 
-void CMSPrelim(bool MC, const char* dataset, double lowX, double lowY)
-{
-  TPaveText* cmsprel  = new TPaveText(lowX, lowY+0.06, lowX+0.30, lowY+0.16, "NDC");
+void HbbStylesNew::CMSPrelim(bool MC, const char* dataset, double lowX, double lowY) {
+  cmsprel  = new TPaveText(lowX, lowY+0.06, lowX+0.30, lowY+0.16, "NDC");
   cmsprel->SetBorderSize(   0 );
   cmsprel->SetFillStyle(    0 );
   cmsprel->SetTextAlign(   12 );
   cmsprel->SetTextSize ( 0.05 );
   cmsprel->SetTextColor(    1 );
   cmsprel->SetTextFont (   62 );
-  if ( !MC ) cmsprel->AddText("CMS           ");
+  if (!MC) cmsprel->AddText("CMS           ");
   else       cmsprel->AddText("CMS Simulation");
   cmsprel->Draw();
 
@@ -238,18 +244,14 @@ void CMSPrelim(bool MC, const char* dataset, double lowX, double lowY)
   float highXlumi = lowX+0.72;
   float highYlumi = lowY+0.161;
 
-  if ( !MC ) 
-    {
-      lowXlumi  = lowX+0.48;
-      lowYlumi  = lowY+0.155;
-      highXlumi = lowX+0.75;
-      highYlumi = lowY+0.232;
-    }
+  if (!MC) {
+    lowXlumi  = lowX+0.48;
+    lowYlumi  = lowY+0.155;
+    highXlumi = lowX+0.75;
+    highYlumi = lowY+0.232;
+  }
 
-
-  TPaveText* lumi     = new TPaveText(lowXlumi, lowYlumi, highXlumi, highYlumi, "NDC"); 
-  //  TPaveText* lumi     = new TPaveText(lowX+0.48, lowY+0.155, lowX+0.75, lowY+0.232, "NDC"); 
-  // //  TPaveText* lumi     = new TPaveText(lowX+0.08, lowY+0.06, lowX+0.45, lowY+0.16, "NDC");
+  lumi     = new TPaveText(lowXlumi, lowYlumi, highXlumi, highYlumi, "NDC"); 
 
   lumi->SetBorderSize(   0 );
   lumi->SetFillStyle(    0 );
@@ -261,7 +263,7 @@ void CMSPrelim(bool MC, const char* dataset, double lowX, double lowY)
   else lumi->AddText("13 TeV");
   lumi->Draw();
 
-  TPaveText* wip     = new TPaveText(lowX-0.005, lowY+0.05, lowX+0.4, lowY+0.06, "NDC");
+  wip     = new TPaveText(lowX-0.005, lowY+0.05, lowX+0.4, lowY+0.06, "NDC");
   wip->SetBorderSize(   0 );
   wip->SetFillStyle(    0 );
   wip->SetTextAlign(   12 );
@@ -270,17 +272,29 @@ void CMSPrelim(bool MC, const char* dataset, double lowX, double lowY)
   wip->SetTextFont (   52 );
   wip->AddText("Work in Progress");
   wip->Draw();
-
-
 }
-void plotchannel(TString channel) {
 
+
+void HbbStylesNew::plotchannel(TString channel) {
   TLatex * tex = new TLatex(0.2,0.94,channel);
   tex->SetNDC();
   tex->SetTextSize(0.06);
   tex->SetLineWidth(2);
   tex->Draw();
+}
 
+HbbStylesNew::HbbStylesNew() {
+  tex = nullptr;
+  wip = nullptr;
+  lumi = nullptr;
+  cmsprel = nullptr;
+}
+
+HbbStylesNew::~HbbStylesNew() {
+  delete tex;
+  delete wip;
+  delete lumi;
+  delete cmsprel;
 }
 
 #endif /* MSSMHBB_MACROS_DRAWER_HBBSTYLESNEW_C_ */
