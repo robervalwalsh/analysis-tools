@@ -169,12 +169,12 @@ int main(int argc, char* argv[]) {
   style.SetStyle();
   gStyle->SetOptStat(0);
   setTDRStyle();
-  TCanvas* c1 = style.MakeCanvas("c1", "", 700, 700);
-
   if (argc != 3) {
     cerr << "./PlotStackStyle input.json output.pdf" << endl;
     return -1;
   }
+
+  TCanvas* c1 = style.MakeCanvas("c1", "", 700, 700);
   THStackBetter stack(argv[1], true, lumi);
   stack.Draw();
   style.CMSPrelim(true, "MC", 0.15, 0.79);
