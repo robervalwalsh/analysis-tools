@@ -31,37 +31,46 @@ const Float_t deepcsv_cut = 0.4941;
 const Int_t kTight = 2;
 const array<Float_t, 3> pt_cut{{100, 100, 40}};
 const array<Float_t, 3> eta_cut{{2.2, 2.2, 2.2}};
-const bool debug = false;
+const bool debug = true;
 
 
 
-UInt_t run_;
-ULong64_t event_;
-UInt_t lumisection_;
-UInt_t njet_;
-Float_t jet_pt_[kLen];
-Float_t jet_eta_[kLen];
-Float_t jet_phi_[kLen];
-Float_t jet_mass_[kLen];
-Int_t jet_id_[kLen];
-Float_t btag_deep_[kLen];
-Float_t jet_b_reg_corr[kLen];
-Int_t jet_n_electrons;
-Int_t jet_n_muons;
-Int_t jet_genjet_idx_[kLen];
-Float_t genjet_pt_[kLen];
-Float_t genjet_eta_[kLen];
-Float_t genjet_phi_[kLen];
+class DataContainer {
+ public:
 
-Float_t output_corrected_pt[kLen];
+  int SetTreeBranches(TTree* tree);
+  void CreateTree(TTree* tree);
+  bool get_real_pt(Int_t index, Float_t* pt);
+  void fill_histogram(TTree*, TH1F*, TH1F*, TH1F*, TH1F*, TTree*);
+  
+ private:
+  UInt_t run_;
+  ULong64_t event_;
+  UInt_t lumisection_;
+  UInt_t njet_;
+  Float_t jet_pt_[kLen];
+  Float_t jet_eta_[kLen];
+  Float_t jet_phi_[kLen];
+  Float_t jet_mass_[kLen];
+  Int_t jet_id_[kLen];
+  Float_t btag_deep_[kLen];
+  Float_t jet_b_reg_corr[kLen];
+  Int_t jet_n_electrons;
+  Int_t jet_n_muons;
+  Int_t jet_genjet_idx_[kLen];
+  Float_t genjet_pt_[kLen];
+  Float_t genjet_eta_[kLen];
+  Float_t genjet_phi_[kLen];
 
+  Float_t output_corrected_pt[kLen];
+};
 
 namespace Smearing {
   enum class method {scaling, stochastic};
 }
 
 
-int SetTreeBranches(TTree * t) {
+int DataContainer::SetTreeBranches(TTree * t) {
   // Event Info
   t->SetBranchAddress("event", &event_);
   t->SetBranchAddress("run", &run_);
@@ -84,7 +93,7 @@ int SetTreeBranches(TTree * t) {
   return 0;
 }
 
-void CreateTree(TTree* t) {
+void DataContainer::CreateTree(TTree* t) {
   // Event Info
   t->Branch("event", &event_, "event/i");
   t->Branch("run", &run_, "run/l");
@@ -119,7 +128,7 @@ bool check_distance_enough(const TLorentzVector &a, const TLorentzVector &b) {
 }
 
 
-bool get_real_pt(Int_t index, Float_t *pt) {
+bool DataContainer::get_real_pt(Int_t index, Float_t *pt) {
   if (jet_b_reg_corr[index] != 0) {
     *pt = jet_b_reg_corr[index] * jet_pt_[index];
     return true;
@@ -173,7 +182,7 @@ Smearing::method smearing(const TVector3& jet, const TVector3& genjet, \
 
 
 
-void fill_histogram(TTree* tree, TH1F* plot1, \
+void DataContainer::fill_histogram(TTree* tree, TH1F* plot1,            \
                     TH1F* plot2, TH1F* plot3, TH1F* plot4, TTree* out_tree) {
   ULong64_t how_many;
   if (debug) {
@@ -352,8 +361,9 @@ int main(int argc, char* argv[]) {
   }
   TTree* tree = reinterpret_cast<TTree*>(nano.Get("Events"));
   TTree output_tree("output_tree", "Histograms and data for H->bb decay");
-  SetTreeBranches(tree);
-  CreateTree(&output_tree);
+  DataContainer container;
+  container.SetTreeBranches(tree);
+  container.CreateTree(&output_tree);
   TH1F mass_histo_chromo("mass_histo_chromo", \
                       "Invariant mass of bb jets", 50, 0, 800);
   TH1F mass_histo_lepton("mass_histo_lepton", \
@@ -363,7 +373,7 @@ int main(int argc, char* argv[]) {
   TH1F pt_spectrum_lepto("pt_spectrum_lepto", \
                           "Pt spectrum for lepton events", 50, 0, 800);
   
-  fill_histogram(tree, &mass_histo_chromo, &mass_histo_lepton,  \
+  container.fill_histogram(tree, &mass_histo_chromo, &mass_histo_lepton,  \
                  &pt_spectrum_chromo, &pt_spectrum_lepto, &output_tree);
   output.cd();
   cout << "Entries in chromo histo: " << \
