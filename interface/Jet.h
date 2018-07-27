@@ -95,6 +95,9 @@ namespace analysis {
             int pileupJetIdFullId() const;
             bool pileupJetIdFullId(const std::string & wp) const;
             
+            /// b-jet regression
+            float bRegCorr() const;
+            float bRegRes()  const;
                
             // Sets
             /// sets the isPuppi value
@@ -152,6 +155,11 @@ namespace analysis {
             void pileupJetIdFullDiscriminant(const float & discr);
             void pileupJetIdFullId(const int & id);
             
+            /// b-jet regression
+            void bRegCorr(const float &);
+            void bRegRes(const float &);
+            
+            
             /// associate partons to the jet
             void associatePartons(const std::vector< std::shared_ptr<GenParticle> > &, const float & dRmax = 0.5, const float & ptMin = 1., const bool & pythi8 = true );
 //            using Candidate::set; // in case needed to overload the function set
@@ -205,6 +213,10 @@ namespace analysis {
             /// pileup jet id
             float puJetIdFullDisc_;
             int   puJetIdFullId_;
+            
+            /// b-jet regression
+            float bRegCorr_;
+            float bRegRes_;
             
             
          private:

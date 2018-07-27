@@ -82,6 +82,10 @@ float Jet::qgLikelihood()                          const { return qgLikelihood_;
 float Jet::pileupJetIdFullDiscriminant()           const { return puJetIdFullDisc_; }
 int   Jet::pileupJetIdFullId()                     const { return puJetIdFullId_; }
 
+float Jet::bRegCorr() const  { return bRegCorr_; }
+float Jet::bRegRes()  const  { return bRegRes_; }
+
+
 bool  Jet::pileupJetIdFullId(const std::string & wp) const
 { 
    std::string wplow = wp;
@@ -120,6 +124,11 @@ void Jet::JerSfUp(const float & jerSfUp)                              { jerSFUp_
 void Jet::qgLikelihood(const float & discr)                           { qgLikelihood_ = discr; }
 void Jet::pileupJetIdFullDiscriminant(const float & discr)            { puJetIdFullDisc_ = discr; }
 void Jet::pileupJetIdFullId(const int & id)                           { puJetIdFullId_ = id; }
+
+void Jet::bRegCorr(const float & bRegCorr)                            { bRegCorr_ = bRegCorr; }
+void Jet::bRegRes(const float & bRegRes)                              { bRegRes_  = bRegRes; }
+
+
 
 int Jet::removeParton(const int & i)
 {

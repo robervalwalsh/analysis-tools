@@ -92,9 +92,14 @@ namespace analysis {
             float puJetIdFullDisc_ [max_];
             int   puJetIdFullId_ [max_];
             
+            float bRegCorr_ [max_];
+            float bRegRes_  [max_];
+            
             bool isSimpleJet_;
             bool hasPuppiInfo_;
             bool hasQGLikelihood_;
+            bool hasBRegCorr_;
+            bool hasBRegRes_;
 
          private:
 

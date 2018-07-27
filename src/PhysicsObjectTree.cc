@@ -116,6 +116,8 @@ PhysicsObjectTree<Jet>::PhysicsObjectTree(TChain * tree, const std::string & nam
       it = std::find(branches_.begin(),branches_.end(),"puJetIdFullDiscriminant") ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , puJetIdFullDisc_ );
       it = std::find(branches_.begin(),branches_.end(),"puJetIdFullId")           ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , puJetIdFullId_ );
       it = std::find(branches_.begin(),branches_.end(),"id_puppi")                ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , puppi_ )       ; hasPuppiInfo_ = true; }
+      it = std::find(branches_.begin(),branches_.end(),"bjetRegCorr")             ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , bRegCorr_ )    ; hasBRegCorr_ = true; }
+      it = std::find(branches_.begin(),branches_.end(),"bjetRegRes")              ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , bRegRes_ )     ; hasBRegRes_  = true; }
    }
    else
    {
@@ -164,6 +166,11 @@ Collection<Jet>  PhysicsObjectTree<Jet>::collection()
       jet.pileupJetIdFullId(puJetIdFullId_[i]);
       if ( hasPuppiInfo_ ) jet.isPuppi(puppi_[i]>0);
       else                 jet.isPuppi(false);
+      if ( hasBRegCorr_ )  jet.bRegCorr(bRegCorr_[i]);
+      else                 jet.bRegCorr(1);
+      if ( hasBRegRes_  )  jet.bRegRes (bRegRes_[i]);
+      else                 jet.bRegRes(1);
+      
       jets.push_back(jet);
    }
    Collection<Jet> jetCollection(jets, name_);
