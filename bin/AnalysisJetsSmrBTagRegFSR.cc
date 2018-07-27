@@ -267,9 +267,8 @@ void DataContainer::CreateTree(TTree* t) {
 void DataContainer::smear_current_data(UInt_t i) {
   TVector3 genjet;
   Float_t appo;
-  genjet.SetPtEtaPhi(genjet_pt_[corrected_jet[i].Idx()], \
-                     genjet_eta_[corrected_jet[i].Idx()], \
-                     genjet_phi_[corrected_jet[i].Idx()]);
+  UInt_t j = corrected_jet[i].Idx();
+  genjet.SetPtEtaPhi(genjet_pt_[j], genjet_eta_[j], genjet_phi_[j]);
   smearing(corrected_jet[i].Vect(), genjet, rcone, &appo);
   corrected_jet[i].SetPtEtaPhiM(appo, corrected_jet[i].Eta(),\
                               corrected_jet[i].Phi(), corrected_jet[i].M());
@@ -358,8 +357,8 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
     how_many = tree->GetEntries();
   }
 
-  for (ULong64_t i = 0; i < how_many; i++) {
-    tree->GetEntry(i);
+  for (ULong64_t event = 0; event < how_many; event++) {
+    tree->GetEntry(event);
     if (!trigger_path) {
       continue;
     }
@@ -384,26 +383,27 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
     // real identity
     bool prosegui = true;    
     apply_all_corrections(correction_level);
-    for (unsigned int i = 0; i < pt_cut.size(); i++) {
+    unsigned int i = 0;
+    for (auto it = corrected_jet.begin(); it != corrected_jet.end() && i < pt_cut.size(); it++) {
       // Correction on pt
       if (debug) {
-        cout << "pt before: " << jet_pt_[corrected_jet[i].Idx()] << "\neta: " <<    \
-          jet_eta_[corrected_jet[i].Idx()] << "\tcurrent_jet_pt: " << corrected_jet[i].Pt() \
-             << "\tcurrent_jet_eta_:" << corrected_jet[i].Eta() <<      \
-          "\nid: " << jet_id_[corrected_jet[i].Idx()] <<                \
-          "\tjet_b_reg_correction: " << jet_b_reg_corr[i] << "\tjetid: " \
-             << jet_id_[corrected_jet[i].Idx()] << "\tktight: " << kTight << "\tbitwise: " \
-             << (jet_id_[corrected_jet[i].Idx()] & kTight) << endl;
+        cout << "pt before: " << jet_pt_[it->Idx()] << "\neta: " <<     \
+          jet_eta_[it->Idx()] << "\tcurrent_jet_pt: " << it->Pt()       \
+             << "\tcurrent_jet_eta_:" << it->Eta() << "\nid: " << jet_id_[it->Idx()] << \
+          "\tjet_b_reg_correction: " << jet_b_reg_corr[it->Idx()] << "\tjetid: " \
+             << jet_id_[it->Idx()] << "\tktight: " << kTight << "\tbitwise: " \
+             << (jet_id_[it->Idx()] & kTight) << endl;
       }
-      if ((jet_id_[corrected_jet[i].Idx()] & kTight) == 0) {
+      if ((jet_id_[it->Idx()] & kTight) == 0) {
         prosegui = false; break;
       }
-      if (TMath::Abs(corrected_jet[i].Eta()) > eta_cut[i]) {
+      if (TMath::Abs(it->Eta()) > eta_cut[i]) {
         prosegui = false; break;
       }
-      if (corrected_jet[i].Pt() < pt_cut[i]) {
+      if (it->Pt() < pt_cut[i]) {
         prosegui = false; break;
       }
+      i++;
     }
     if (!prosegui) {
       continue;
@@ -411,34 +411,34 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
 
     // Now check btags
     unsigned int btaggati = 0;
-    vector<UInt_t> bjet_indexes;
+    vector<Jet> bjets;
     if (debug) {
       cout << "Starting btagging check" << endl;
     }
-    for (unsigned int i = 0; i < njet_ && btaggati < 3; i++) {
+    int j = -1;
+    for (auto it = corrected_jet.begin(); it < corrected_jet.end() && btaggati < 3; it++) {
       if (debug) {
-        cout << "btag_deep: " << btag_deep_[corrected_jet[i].Idx()] << "\tpt smeared corrected: " << \
-          corrected_jet[i].Pt()                                            \
-             << "\teta: " << jet_eta_[corrected_jet[i].Idx()] << "\tcurrent_jet_eta_: " << \
-          corrected_jet[i].Eta() << "\tjet_b_regcor: " <<                 \
-          jet_b_reg_corr[corrected_jet[i].Idx()] << endl;
+        cout << "btag_deep: " << btag_deep_[it->Idx()] << "\tpt smeared corrected: " << \
+          it->Pt() << "\teta: " << jet_eta_[it->Idx()] << "\tcurrent_jet_eta_: " << \
+          it->Eta() << "\tjet_b_regcor: " << jet_b_reg_corr[it->Idx()] << endl;
       }
+      j++;
       bool success = true;
-      if (btag_deep_[corrected_jet[i].Idx()] > deepcsv_cut) {
-        if (i >= 3) {
-          if (TMath::Abs(corrected_jet[i].Eta()) > eta_cut[btaggati]) {
+      if (btag_deep_[it->Idx()] > deepcsv_cut) {
+        if (j >= 3) {
+          if (TMath::Abs(it->Eta()) > eta_cut[btaggati]) {
             success = false;
           } else {
-            if (corrected_jet[i].Pt() < pt_cut[btaggati])
+            if (it->Pt() < pt_cut[btaggati])
               success = false;
           }
         }
         if (success) {
           btaggati++;
-          bjet_indexes.push_back(i);
+          bjets.push_back(*it);
         }
       }
-      if (corrected_jet[i].Pt() < pt_cut[pt_cut.size() - 1]) {
+      if (it->Pt() < pt_cut[pt_cut.size() - 1]) {
         break;
       }
     }
@@ -448,28 +448,24 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
     if (btaggati < 3) {
       continue;
     }
-
     
     // Now i check if the couples jets are distant enough
     bool success = true;
-    for (unsigned int i = 0; i < 3; i++) {
-      for (unsigned int j = i + 1; j < 3; j++) {
-        unsigned int a = bjet_indexes[i];
-        unsigned int b = bjet_indexes[j];
-        if (!check_distance_enough(corrected_jet[a], corrected_jet[b])) {
+    for (auto it = bjets.begin(); it != bjets.end(); it++) {
+      for (auto jt = it + 1; jt != bjets.end(); jt++) {
+        if (!check_distance_enough(*it, *jt)) {
           success = false;
           break;
         }
       }
     }
     if (!success) { continue; }
-    if (TMath::Abs(corrected_jet[bjet_indexes[0]].Eta() - \
-                   corrected_jet[bjet_indexes[1]].Eta()) > 1.5) {
+    if (TMath::Abs(bjets[0].Eta() - bjets[1].Eta()) > 1.5) {
       continue;
     }
-    TLorentzVector appo = corrected_jet[bjet_indexes[0]] - corrected_jet[bjet_indexes[1]];
+    TLorentzVector appo = bjets[0] - bjets[1];
     cout << "\033[0;32mFilling with m = " << -appo.M() << \
-      " and pt = " << corrected_jet[bjet_indexes[0]].Pt() << "\033[0m" << endl;
+      " and pt = " << bjets[0].Pt() << "\033[0m" << endl;
     out_tree->Fill();
     if (debug) {
       cout << "Leptons in the event: electron " << \
@@ -478,12 +474,12 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
     
     if (jet_n_muons != 0 || jet_n_electrons != 0) {
       plots[0]->Fill(-appo.M(), weigth);
-      plots[2]->Fill(corrected_jet[bjet_indexes[0]].Pt(), weigth);
-      plots[4]->Fill(jet_b_reg_res_[0], weigth);
+      plots[2]->Fill(bjets[0].Pt(), weigth);
+      plots[4]->Fill(jet_b_reg_res_[bjets[0].Idx()], weigth);
     } else {
       plots[1]->Fill(-appo.M(), weigth);
-      plots[3]->Fill(corrected_jet[bjet_indexes[0]].Pt(), weigth);
-      plots[5]->Fill(jet_b_reg_res_[0], weigth);
+      plots[3]->Fill(bjets[0].Pt(), weigth);
+      plots[5]->Fill(jet_b_reg_res_[bjets[0].Idx()], weigth);
     }
   }
 }
@@ -500,7 +496,7 @@ void DataContainer::apply_btag_sf() {
   bool tagged[njet_];
   int how_many = njet_;
   for (unsigned int i = 0; i < njet_; i++) {
-    tagged[i] = (btag_deep_[i] > deepcsv_cut);
+    tagged[i] = (btag_deep_[corrected_jet[i].Idx()] > deepcsv_cut);
     Float_t sf = reader.\
       eval_auto_bounds("central", BTagEntry::FLAV_B, corrected_jet[i].Pt(), \
                        corrected_jet[i].Eta());
@@ -528,8 +524,8 @@ void DataContainer::apply_btag_sf() {
 }
 
 void DataContainer::apply_jet_reg_sf(UInt_t i) {
-  if (jet_b_reg_corr[i] != 0) {
-    corrected_jet[i].SetPtEtaPhiM(corrected_jet[i].Pt()*jet_b_reg_corr[i],\
+  if (jet_b_reg_corr[corrected_jet[i].Idx()] != 0) {
+    corrected_jet[i].SetPtEtaPhiM(corrected_jet[i].Pt()*jet_b_reg_corr[corrected_jet[i].Idx()], \
                                   corrected_jet[i].Eta(), corrected_jet[i].Phi(),\
                                   corrected_jet[i].M());
   } else {
