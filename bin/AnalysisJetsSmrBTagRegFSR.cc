@@ -80,7 +80,7 @@ class DataContainer {
   bool get_real_pt(Int_t index, Float_t* pt);
   void fill_histogram(TTree*, std::vector<TH1F*>, TTree*);
   void initialize_current_data(UInt_t i);
-  
+  void sort_by_Pt();
   Smearing::method smearing(const TVector3& jet, const TVector3& genjet, \
                             const Float_t& radius, Float_t* realpt) const;
   
@@ -107,7 +107,7 @@ class DataContainer {
   /**
    * @brief Reads lev and decides what corrections have to be applied on pt
    */
-  void apply_all_corrections(UInt_t i, CorrectionLevel lev);
+  void apply_all_corrections(CorrectionLevel lev);
   
  private:
   JME::JetResolution resolution;
@@ -135,10 +135,9 @@ class DataContainer {
   Float_t genjet_pt_[kLen];
   Float_t genjet_eta_[kLen];
   Float_t genjet_phi_[kLen];
-  Float_t current_jet_pt_[kLen];
-  Float_t current_jet_eta_[kLen];
-  Float_t current_jet_phi_[kLen];
-  Float_t current_jet_mass_[kLen];
+  Bool_t trigger_path;
+  
+  vector<TLorentzVector> corrected_jet;
   Float_t jet_b_reg_res_[kLen];
 };
 
@@ -150,6 +149,14 @@ DataContainer::DataContainer() : resolution("tables/Fall17_25nsV1_MC_PtResolutio
                                  calib("csvv1", "tables/8TeV_SF/CSVV1.csv"),                       \
                                  reader(BTagEntry::OP_TIGHT, "central", {"up", "down"}) {
   reader.load(calib, BTagEntry::FLAV_B, "comb");
+}
+
+
+void DataContainer::sort_by_Pt() {
+  std::sort(corrected_jet.begin(), corrected_jet.end(),\
+            [](const TLorentzVector&a, const TLorentzVector& b) {
+              return a.Pt() > b.Pt();
+            });
 }
 
 /**
@@ -212,6 +219,7 @@ int DataContainer::SetTreeBranches(TTree * t) {
   t->SetBranchAddress("GenJet_eta", genjet_eta_);
   t->SetBranchAddress("GenJet_phi", genjet_phi_);
   t->SetBranchAddress("Jet_bRegRes", jet_b_reg_res_);
+  t->SetBranchAddress("HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33", &trigger_path);
   return 0;
 }
 
@@ -235,49 +243,76 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("GenJet_pt", genjet_pt_, "GenJet_pt/F");
   t->Branch("GenJet_eta", genjet_eta_, "GenJet_eta/F");
   t->Branch("GenJet_phi", genjet_phi_, "GenJet_phi/F");
-  t->Branch("Jet_Corrected_pt", current_jet_pt_, "Jet_Corrected_pt/F");
   t->Branch("Jet_bRegRes", jet_b_reg_res_, "Jet_bRegRes/F");
 }
 
 
 void DataContainer::smear_current_data(UInt_t i) {
-  TVector3 jet, genjet;
-  jet.SetPtEtaPhi(current_jet_pt_[i], current_jet_eta_[i], current_jet_phi_[i]);
+  TVector3 genjet;
+  Float_t appo;
   genjet.SetPtEtaPhi(genjet_pt_[i], genjet_eta_[i], genjet_phi_[i]);
-  smearing(jet, genjet, rcone, current_jet_pt_ + i);
+  smearing(corrected_jet[i].Vect(), genjet, rcone, &appo);
+  corrected_jet[i].SetPtEtaPhiM(appo, corrected_jet[i].Eta(),\
+                              corrected_jet[i].Phi(), corrected_jet[i].M());
   if (debug) {
-    cout << "smeared value: "  << current_jet_pt_[i] << endl;
+    cout << "smeared value: "  << appo << endl;
   }
 }
 
-void DataContainer::apply_all_corrections(UInt_t i, CorrectionLevel lev) {
-  initialize_current_data(i);
+void DataContainer::apply_all_corrections(CorrectionLevel lev) {
+  for (unsigned int i = 0; i < njet_; i++) {
+    initialize_current_data(i);
+  }
   switch (lev) {
   case CorrectionLevel::nothing: break;
   case CorrectionLevel::only_smearing:
-    smear_current_data(i); break;
+    for (unsigned int i = 0; i < njet_; i++) {
+      smear_current_data(i);
+    }
+    sort_by_Pt();
+    break;
   case CorrectionLevel::smearing_btag:
-    smear_current_data(i);
-    apply_btag_sf(); break;
+    for (unsigned int i = 0; i < njet_; i++) {
+      smear_current_data(i);
+    }
+    sort_by_Pt();
+    apply_btag_sf();
+    sort_by_Pt();
+    break;
   case CorrectionLevel::smearing_btag_regression:
-    smear_current_data(i);
+    for (unsigned int i = 0; i < njet_; i++) {
+      smear_current_data(i);
+    }
+    sort_by_Pt();
     apply_btag_sf();
-    apply_jet_reg_sf(i); break;
+    sort_by_Pt();
+    for (unsigned int i = 0; i < njet_; i++) {
+      apply_jet_reg_sf(i);
+    }
+    sort_by_Pt();
+    break;
   case CorrectionLevel::smearing_btag_regression_fsr:
-    smear_current_data(i);
+    for (unsigned int i = 0; i < njet_; i++) {
+      smear_current_data(i);
+    }
+    sort_by_Pt();
     apply_btag_sf();
-    apply_jet_reg_sf(i);
+    sort_by_Pt();
+    for (unsigned int i = 0; i < njet_; i++) {
+      apply_jet_reg_sf(i);
+    }
+    sort_by_Pt();
     apply_fsr_correction();
+    sort_by_Pt();
     break;        
   }  
 }
 
 
 void DataContainer::initialize_current_data(UInt_t i) {
-  current_jet_pt_[i] = jet_pt_[i];
-  current_jet_eta_[i] = jet_eta_[i];
-  current_jet_phi_[i] = jet_phi_[i];
-  current_jet_mass_[i] = jet_mass_[i];
+  TLorentzVector appo;
+  appo.SetPtEtaPhiM(jet_pt_[i], jet_eta_[i], jet_phi_[i], jet_mass_[i]);
+  corrected_jet.push_back(appo);
 }
 
 bool DataContainer::get_real_pt(Int_t index, Float_t *pt) {
@@ -293,14 +328,18 @@ bool DataContainer::get_real_pt(Int_t index, Float_t *pt) {
 void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree* out_tree) {
   ULong64_t how_many;
   if (debug) {
-    how_many = 100;
+    how_many = 1000;
   } else {
     how_many = tree->GetEntries();
   }
 
   for (ULong64_t i = 0; i < how_many; i++) {
     tree->GetEntry(i);
+    if (!trigger_path) {
+      continue;
+    }
     weigth = 1;
+    corrected_jet.clear();
     if (debug) {
       cout << "\033[0;33m\n\nNew event\033[0m" << endl;
       cout << "Run = " << run_ << " | Lumi Section = "          \
@@ -319,12 +358,13 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
     // Apply first cut on momentum and eta without checking
     // real identity
     bool prosegui = true;    
+    apply_all_corrections(correction_level);
     for (unsigned int i = 0; i < pt_cut.size(); i++) {
       // Correction on pt
-      apply_all_corrections(i, correction_level);
       if (debug) {
         cout << "pt before: " << jet_pt_[i] << "\neta: " <<    \
-          jet_eta_[i] << "\tcurrent_jet_eta_:" << current_jet_eta_[i] <<\
+          jet_eta_[i] << "\tcurrent_jet_pt: " << corrected_jet[i].Pt() \
+             << "\tcurrent_jet_eta_:" << corrected_jet[i].Eta() <<      \
           "\nid: " << jet_id_[i] <<                                     \
           "\tjet_b_reg_correction: " << jet_b_reg_corr[i] << "\tjetid: " \
              << jet_id_[i] << "\tktight: " << kTight << "\tbitwise: " \
@@ -333,11 +373,10 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
       if ((jet_id_[i] & kTight) == 0) {
         prosegui = false; break;
       }
-
-      if (TMath::Abs(current_jet_eta_[i]) > eta_cut[i]) {
+      if (TMath::Abs(corrected_jet[i].Eta()) > eta_cut[i]) {
         prosegui = false; break;
       }
-      if (current_jet_pt_[i] < pt_cut[i]) {
+      if (corrected_jet[i].Pt() < pt_cut[i]) {
         prosegui = false; break;
       }
     }
@@ -354,19 +393,18 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
     for (unsigned int i = 0; i < njet_ && btaggati < 3; i++) {
       if (debug) {
         cout << "btag_deep: " << btag_deep_[i] << "\tpt smeared corrected: " << \
-          current_jet_pt_[i]                                            \
+          corrected_jet[i].Pt()                                            \
              << "\teta: " << jet_eta_[i] << "\tcurrent_jet_eta_: " << \
-          current_jet_eta_[i] << "\tjet_b_regcor: " <<                 \
+          corrected_jet[i].Eta() << "\tjet_b_regcor: " <<                 \
           jet_b_reg_corr[i] << endl;
       }
       bool success = true;
       if (btag_deep_[i] > deepcsv_cut) {
         if (i >= 3) {
-          if (TMath::Abs(current_jet_eta_[i]) > eta_cut[btaggati]) {
+          if (TMath::Abs(corrected_jet[i].Eta()) > eta_cut[btaggati]) {
             success = false;
           } else {
-            apply_all_corrections(i, correction_level);
-            if (current_jet_pt_[i] < pt_cut[btaggati])
+            if (corrected_jet[i].Pt() < pt_cut[btaggati])
               success = false;
           }
         }
@@ -375,7 +413,7 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
           bjet_indexes.push_back(i);
         }
       }
-      if (current_jet_pt_[i] < pt_cut[pt_cut.size() - 1]) {
+      if (corrected_jet[i].Pt() < pt_cut[pt_cut.size() - 1]) {
         break;
       }
     }
@@ -386,31 +424,27 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
       continue;
     }
 
-    // Now let's build the lorentz vectors and check the couples
-    array<TLorentzVector, 3> jets;
-    for (int i = 0; i < 3; i++) {
-      UInt_t j = bjet_indexes[i];
-      jets[i].SetPtEtaPhiM(current_jet_pt_[j], current_jet_eta_[j],     \
-                           current_jet_phi_[j], current_jet_mass_[j]);
-    }
     
     // Now i check if the couples jets are distant enough
     bool success = true;
     for (unsigned int i = 0; i < 3; i++) {
       for (unsigned int j = i + 1; j < 3; j++) {
-        if (!check_distance_enough(jets[i], jets[j])) {
+        unsigned int a = bjet_indexes[i];
+        unsigned int b = bjet_indexes[j];
+        if (!check_distance_enough(corrected_jet[a], corrected_jet[b])) {
           success = false;
           break;
         }
       }
     }
     if (!success) { continue; }
-    if (TMath::Abs(jets[0].Eta() - jets[1].Eta()) > 1.5) {
+    if (TMath::Abs(corrected_jet[bjet_indexes[0]].Eta() - \
+                   corrected_jet[bjet_indexes[1]].Eta()) > 1.5) {
       continue;
     }
-    TLorentzVector appo = jets[0] - jets[1];
+    TLorentzVector appo = corrected_jet[bjet_indexes[0]] - corrected_jet[bjet_indexes[1]];
     cout << "\033[0;32mFilling with m = " << -appo.M() << \
-      " and pt = " << jets[0].Pt() << "\033[0m" << endl;
+      " and pt = " << corrected_jet[bjet_indexes[0]].Pt() << "\033[0m" << endl;
     out_tree->Fill();
     if (debug) {
       cout << "Leptons in the event: electron " << \
@@ -419,11 +453,11 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
     
     if (jet_n_muons != 0 || jet_n_electrons != 0) {
       plots[0]->Fill(-appo.M(), weigth);
-      plots[2]->Fill(jets[0].Pt(), weigth);
+      plots[2]->Fill(corrected_jet[bjet_indexes[0]].Pt(), weigth);
       plots[4]->Fill(jet_b_reg_res_[0], weigth);
     } else {
       plots[1]->Fill(-appo.M(), weigth);
-      plots[3]->Fill(jets[0].Pt(), weigth);
+      plots[3]->Fill(corrected_jet[bjet_indexes[0]].Pt(), weigth);
       plots[5]->Fill(jet_b_reg_res_[0], weigth);
     }
   }
@@ -443,7 +477,8 @@ void DataContainer::apply_btag_sf() {
   for (unsigned int i = 0; i < njet_; i++) {
     tagged[i] = (btag_deep_[i] > deepcsv_cut);
     Float_t sf = reader.\
-      eval_auto_bounds("central", BTagEntry::FLAV_B, current_jet_pt_[i], jet_eta_[i]);
+      eval_auto_bounds("central", BTagEntry::FLAV_B, corrected_jet[i].Pt(), \
+                       corrected_jet[i].Eta());
     sf = 1; // this is because the current file is not the right one
     if (debug) {
       cout << "Retrieved scale factor: " << sf << endl;
@@ -469,7 +504,9 @@ void DataContainer::apply_btag_sf() {
 
 void DataContainer::apply_jet_reg_sf(UInt_t i) {
   if (jet_b_reg_corr[i] != 0) {
-    current_jet_pt_[i] *= jet_b_reg_corr[i];
+    corrected_jet[i].SetPtEtaPhiM(corrected_jet[i].Pt()*jet_b_reg_corr[i],\
+                                  corrected_jet[i].Eta(), corrected_jet[i].Phi(),\
+                                  corrected_jet[i].M());
   } else {
     cerr << "Something nasty is happening. jet_b_reg_correction is 0." << endl;
   }
@@ -478,38 +515,40 @@ void DataContainer::apply_jet_reg_sf(UInt_t i) {
 void DataContainer::apply_fsr_correction() {
   std::vector<std::tuple<TLorentzVector, UInt_t>> bjets;
   std::vector<TLorentzVector> softjets;
+  if (debug) {
+    cout << "FSR\n\n" << endl;
+  }
   if (njet_ < 4) {
     return;
   }
   for (unsigned int i = 0; i < njet_; i++) {
-    TLorentzVector appo;
-    appo.SetPtEtaPhiM(current_jet_pt_[i], current_jet_eta_[i],  \
-                      current_jet_phi_[i], current_jet_mass_[i]);
     if (btag_deep_[i] > deepcsv_cut) {
-      bjets.push_back(std::make_tuple(appo, i));
+      bjets.push_back(std::make_tuple(corrected_jet[i], i));
     } else {
-      softjets.push_back(appo);
+      softjets.push_back(corrected_jet[i]);
     }
+  }
+  if (softjets.empty()) {
+    return;
   }
   for (auto it : bjets) {
     auto appo = std::get<0>(it);
-    auto i = std::get<1>(it);    
+    auto i = std::get<1>(it);
     vector<TLorentzVector>::iterator best = std::min_element(\
        softjets.begin(), softjets.end(), [&appo](const TLorentzVector& a, const TLorentzVector& b) {
          return appo.DeltaR(a) < appo.DeltaR(b);
        });
-    if (best->DeltaR(appo) > soft_jet_distance) { continue; }
+    if (best != softjets.end() && best->DeltaR(appo) > soft_jet_distance) { continue; }
     
     if (debug) {
-      cout << "Correcting for fsr. Added something.\n" << \
+      cout << "Correcting for fsr. Added something.\n" <<               \
         "PtBefore: " << appo.Pt() << "\tPt after: " << (appo + *best).Pt() << \
         "\tEta before: " << appo.Eta() << "\tEta after: " << (appo + *best).Eta() << endl;
+      cout << "Best candidate had pt: " << best->Pt() << " R distance: " \
+           << appo.DeltaR(*best) << endl;
     }
     appo += *best;
-    current_jet_pt_[i] = appo.Pt();
-    current_jet_eta_[i] = appo.Eta();
-    current_jet_phi_[i] = appo.Phi();
-    current_jet_mass_[i] = appo.M();
+    corrected_jet[i] = appo;
   }
   return;
 }
