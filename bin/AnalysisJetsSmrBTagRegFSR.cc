@@ -69,6 +69,17 @@ bool check_distance_enough(const TLorentzVector &a, const TLorentzVector &b) {
   return a.DeltaR(b) > 1;
 }
 
+class Jet : public TLorentzVector {
+public:
+  Jet(const TLorentzVector& a, UInt_t i) : TLorentzVector(a) {
+    orig_index_ = i;
+  }
+  UInt_t Idx() const { return orig_index_; }
+  
+private:
+  
+  UInt_t orig_index_;
+};
 
 
 class DataContainer {
@@ -137,7 +148,7 @@ class DataContainer {
   Float_t genjet_phi_[kLen];
   Bool_t trigger_path;
   
-  vector<TLorentzVector> corrected_jet;
+  vector<Jet> corrected_jet;
   Float_t jet_b_reg_res_[kLen];
 };
 
@@ -223,6 +234,8 @@ int DataContainer::SetTreeBranches(TTree * t) {
   return 0;
 }
 
+
+
 void DataContainer::CreateTree(TTree* t) {
   // Event Info
   t->Branch("event", &event_, "event/i");
@@ -247,10 +260,16 @@ void DataContainer::CreateTree(TTree* t) {
 }
 
 
+
+/**
+ * Modifies current_jet[i] smearing the pt.
+ */
 void DataContainer::smear_current_data(UInt_t i) {
   TVector3 genjet;
   Float_t appo;
-  genjet.SetPtEtaPhi(genjet_pt_[i], genjet_eta_[i], genjet_phi_[i]);
+  genjet.SetPtEtaPhi(genjet_pt_[corrected_jet[i].Idx()], \
+                     genjet_eta_[corrected_jet[i].Idx()], \
+                     genjet_phi_[corrected_jet[i].Idx()]);
   smearing(corrected_jet[i].Vect(), genjet, rcone, &appo);
   corrected_jet[i].SetPtEtaPhiM(appo, corrected_jet[i].Eta(),\
                               corrected_jet[i].Phi(), corrected_jet[i].M());
@@ -312,18 +331,24 @@ void DataContainer::apply_all_corrections(CorrectionLevel lev) {
 void DataContainer::initialize_current_data(UInt_t i) {
   TLorentzVector appo;
   appo.SetPtEtaPhiM(jet_pt_[i], jet_eta_[i], jet_phi_[i], jet_mass_[i]);
-  corrected_jet.push_back(appo);
+  Jet appo1(appo, i);
+  corrected_jet.push_back(appo1);
 }
 
+/**
+ * Deprecated
+ */
 bool DataContainer::get_real_pt(Int_t index, Float_t *pt) {
   if (jet_b_reg_corr[index] != 0) {
     *pt = jet_b_reg_corr[index] * jet_pt_[index];
     return true;
   } else {
-    *pt = jet_b_reg_corr[index];
+    *pt = jet_pt_[index];
     return false;
   }
 }
+
+
 
 void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree* out_tree) {
   ULong64_t how_many;
@@ -362,15 +387,15 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
     for (unsigned int i = 0; i < pt_cut.size(); i++) {
       // Correction on pt
       if (debug) {
-        cout << "pt before: " << jet_pt_[i] << "\neta: " <<    \
-          jet_eta_[i] << "\tcurrent_jet_pt: " << corrected_jet[i].Pt() \
+        cout << "pt before: " << jet_pt_[corrected_jet[i].Idx()] << "\neta: " <<    \
+          jet_eta_[corrected_jet[i].Idx()] << "\tcurrent_jet_pt: " << corrected_jet[i].Pt() \
              << "\tcurrent_jet_eta_:" << corrected_jet[i].Eta() <<      \
-          "\nid: " << jet_id_[i] <<                                     \
+          "\nid: " << jet_id_[corrected_jet[i].Idx()] <<                \
           "\tjet_b_reg_correction: " << jet_b_reg_corr[i] << "\tjetid: " \
-             << jet_id_[i] << "\tktight: " << kTight << "\tbitwise: " \
-             << (jet_id_[i] & kTight) << endl;
+             << jet_id_[corrected_jet[i].Idx()] << "\tktight: " << kTight << "\tbitwise: " \
+             << (jet_id_[corrected_jet[i].Idx()] & kTight) << endl;
       }
-      if ((jet_id_[i] & kTight) == 0) {
+      if ((jet_id_[corrected_jet[i].Idx()] & kTight) == 0) {
         prosegui = false; break;
       }
       if (TMath::Abs(corrected_jet[i].Eta()) > eta_cut[i]) {
@@ -392,14 +417,14 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
     }
     for (unsigned int i = 0; i < njet_ && btaggati < 3; i++) {
       if (debug) {
-        cout << "btag_deep: " << btag_deep_[i] << "\tpt smeared corrected: " << \
+        cout << "btag_deep: " << btag_deep_[corrected_jet[i].Idx()] << "\tpt smeared corrected: " << \
           corrected_jet[i].Pt()                                            \
-             << "\teta: " << jet_eta_[i] << "\tcurrent_jet_eta_: " << \
+             << "\teta: " << jet_eta_[corrected_jet[i].Idx()] << "\tcurrent_jet_eta_: " << \
           corrected_jet[i].Eta() << "\tjet_b_regcor: " <<                 \
-          jet_b_reg_corr[i] << endl;
+          jet_b_reg_corr[corrected_jet[i].Idx()] << endl;
       }
       bool success = true;
-      if (btag_deep_[i] > deepcsv_cut) {
+      if (btag_deep_[corrected_jet[i].Idx()] > deepcsv_cut) {
         if (i >= 3) {
           if (TMath::Abs(corrected_jet[i].Eta()) > eta_cut[btaggati]) {
             success = false;
@@ -513,16 +538,16 @@ void DataContainer::apply_jet_reg_sf(UInt_t i) {
 }
 
 void DataContainer::apply_fsr_correction() {
-  std::vector<std::tuple<TLorentzVector, UInt_t>> bjets;
-  std::vector<TLorentzVector> softjets;
+  std::vector<std::tuple<Jet, UInt_t>> bjets;
+  std::vector<Jet> softjets;
   if (debug) {
     cout << "FSR\n\n" << endl;
   }
   if (njet_ < 4) {
     return;
   }
-  for (unsigned int i = 0; i < njet_; i++) {
-    if (btag_deep_[i] > deepcsv_cut) {
+  for (UInt_t i = 0; i < njet_; i++) {
+    if (btag_deep_[corrected_jet[i].Idx()] > deepcsv_cut){
       bjets.push_back(std::make_tuple(corrected_jet[i], i));
     } else {
       softjets.push_back(corrected_jet[i]);
@@ -534,8 +559,8 @@ void DataContainer::apply_fsr_correction() {
   for (auto it : bjets) {
     auto appo = std::get<0>(it);
     auto i = std::get<1>(it);
-    vector<TLorentzVector>::iterator best = std::min_element(\
-       softjets.begin(), softjets.end(), [&appo](const TLorentzVector& a, const TLorentzVector& b) {
+    vector<Jet>::iterator best = std::min_element(\
+       softjets.begin(), softjets.end(), [&appo](const Jet& a, const Jet& b) {
          return appo.DeltaR(a) < appo.DeltaR(b);
        });
     if (best != softjets.end() && best->DeltaR(appo) > soft_jet_distance) { continue; }
@@ -548,7 +573,7 @@ void DataContainer::apply_fsr_correction() {
            << appo.DeltaR(*best) << endl;
     }
     appo += *best;
-    corrected_jet[i] = appo;
+    corrected_jet[i].SetPtEtaPhiM(appo.Pt(), appo.Eta(), appo.Phi(), appo.M());
   }
   return;
 }
