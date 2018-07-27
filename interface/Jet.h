@@ -26,6 +26,7 @@
 // 
 // user include files
 #include "Analysis/Tools/interface/Candidate.h"
+#include "Analysis/Tools/interface/Muon.h"
 #include "Analysis/Tools/interface/GenParticle.h"
 //
 // class declaration
@@ -101,6 +102,9 @@ namespace analysis {
             
             /// pointer to the FSR jet
             Jet * fsrJet();
+            
+            /// pointer to the muon
+            Muon * muon();
                
             // Sets
             /// sets the isPuppi value
@@ -172,6 +176,12 @@ namespace analysis {
             /// remove the final state radiation jet, will change back the original 4-momentum
             void rmFSR();
             
+            /// associate a muon to the jet
+            void addMuon(Muon*);
+            /// remove muon association to the jet
+            void rmMuon();
+            
+            
          protected:
             // ----------member data ---------------------------
             //
@@ -230,6 +240,9 @@ namespace analysis {
             Jet * fsr_;
             /// 4-momentum before FSR correction
             TLorentzVector uncorrJetp4_;
+            
+            /// muon in jet
+            Muon * muon_;
             
             
          private:

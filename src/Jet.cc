@@ -36,6 +36,7 @@ Jet::Jet() : Candidate()
    extendedFlavour_ = "?";
    btagAlgo_ = "btag_csvivf";
    fsr_ = nullptr;
+   muon_ = nullptr;
    uncorrJetp4_ = p4_;
 }
 Jet::Jet(const float & pt, const float & eta, const float & phi, const float & e) : Candidate(pt,eta,phi,e,0.) 
@@ -43,6 +44,7 @@ Jet::Jet(const float & pt, const float & eta, const float & phi, const float & e
    extendedFlavour_ = "?";
    btagAlgo_ = "btag_csvivf";
    fsr_ = nullptr;
+   muon_ = nullptr;
    uncorrJetp4_ = p4_;
    
 }
@@ -52,7 +54,6 @@ Jet::~Jet()
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
 }
-
 
 //
 // member functions
@@ -192,6 +193,29 @@ Jet * Jet::fsrJet()
 {
    return fsr_;
 }
+
+void Jet::addMuon(Muon* m)
+{
+   if ( m == nullptr ) return;
+   if ( muon_ != nullptr )
+   {
+      std::cout << "A muon is already associated to this jet" << std::endl;
+      return;
+   }
+   muon_ = m;
+}
+
+void Jet::rmMuon()
+{
+   muon_ = nullptr;
+}
+
+Muon * Jet::muon()
+{
+   return muon_;
+}
+
+
 
 void Jet::associatePartons(const std::vector< std::shared_ptr<GenParticle> > & particles, const float & dRmax, const float & ptMin,  const bool & pythia8 )
 {
