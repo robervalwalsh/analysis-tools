@@ -188,11 +188,10 @@ void Jet::rmFSR()
    fsr_ = nullptr;
 }
 
-Jet::Jet * Jet::fsrJet()
+Jet * Jet::fsrJet()
 {
    return fsr_;
 }
-
 
 void Jet::associatePartons(const std::vector< std::shared_ptr<GenParticle> > & particles, const float & dRmax, const float & ptMin,  const bool & pythia8 )
 {
