@@ -169,7 +169,7 @@ int Jet::removeParton(const int & i)
    
 }
 
-// ------------ methods  ------------
+// ------------ methods  -----------
 void Jet::addFSR(Jet* j)
 {
    if ( j == nullptr ) return;
