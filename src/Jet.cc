@@ -35,12 +35,18 @@ Jet::Jet() : Candidate()
 {
    extendedFlavour_ = "?";
    btagAlgo_ = "btag_csvivf";
+   fsr_ = nullptr;
+   uncorrJetp4_ = p4_;
 }
 Jet::Jet(const float & pt, const float & eta, const float & phi, const float & e) : Candidate(pt,eta,phi,e,0.) 
 {
    extendedFlavour_ = "?";
    btagAlgo_ = "btag_csvivf";
+   fsr_ = nullptr;
+   uncorrJetp4_ = p4_;
+   
 }
+
 Jet::~Jet()
 {
    // do anything here that needs to be done at desctruction time
@@ -163,7 +169,31 @@ int Jet::removeParton(const int & i)
    
 }
 
-// ------------ methods  ------------
+// ------------ methods  -----------
+void Jet::addFSR(Jet* j)
+{
+   if ( j == nullptr ) return;
+   if ( fsr_ != nullptr )
+   {
+      std::cout << "FSR jet will not be added because FSR already exists" << std::endl;
+      return;
+   }
+   fsr_ = j;
+   p4_ = p4_ + fsr_->p4();
+}
+
+void Jet::rmFSR()
+{
+   p4_ = uncorrJetp4_;
+   fsr_ = nullptr;
+}
+
+Jet::Jet * Jet::fsrJet()
+{
+   return fsr_;
+}
+
+
 void Jet::associatePartons(const std::vector< std::shared_ptr<GenParticle> > & particles, const float & dRmax, const float & ptMin,  const bool & pythia8 )
 {
    int flavour = abs(this->flavour());

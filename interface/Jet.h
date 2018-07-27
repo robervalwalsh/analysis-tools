@@ -42,11 +42,11 @@ namespace analysis {
             Jet(const float & pt, const float & eta, const float & phi, const float & e);
             /// constructor from TLorentzVector
             Jet(const TLorentzVector & p4);
-
             /// destructor
            ~Jet();
            
             // Gets
+           
             /// returns if jet is Puppi
             bool  isPuppi()                     const;
             /// returns the btag value of btag_csvivf
@@ -98,6 +98,9 @@ namespace analysis {
             /// b-jet regression
             float bRegCorr() const;
             float bRegRes()  const;
+            
+            /// pointer to the FSR jet
+            Jet * fsrJet();
                
             // Sets
             /// sets the isPuppi value
@@ -164,6 +167,11 @@ namespace analysis {
             void associatePartons(const std::vector< std::shared_ptr<GenParticle> > &, const float & dRmax = 0.5, const float & ptMin = 1., const bool & pythi8 = true );
 //            using Candidate::set; // in case needed to overload the function set
             
+            /// add a final state radiation jet, will modify the 4-momentum
+            void addFSR(Jet*);
+            /// remove the final state radiation jet, will change back the original 4-momentum
+            void rmFSR();
+            
          protected:
             // ----------member data ---------------------------
             //
@@ -217,6 +225,11 @@ namespace analysis {
             /// b-jet regression
             float bRegCorr_;
             float bRegRes_;
+            
+            /// final state radiation
+            Jet * fsr_;
+            /// 4-momentum before FSR correction
+            TLorentzVector uncorrJetp4_;
             
             
          private:
