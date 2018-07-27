@@ -17,6 +17,7 @@
 #include <iostream>
 #include <vector>
 #include <array>
+#include <tuple>
 
 #include "TTree.h"
 #include "TFile.h"
@@ -55,8 +56,8 @@ const Int_t kTight = 2;
 const array<Float_t, 3> pt_cut{{100, 100, 40}};
 const array<Float_t, 3> eta_cut{{2.2, 2.2, 2.2}};
 const bool debug = false;
-const CorrectionLevel correction_level = CorrectionLevel::smearing_btag_regression;
-
+const CorrectionLevel correction_level = CorrectionLevel::smearing_btag_regression_fsr;
+const Float_t soft_jet_distance = 0.8;
 
 
 
@@ -78,7 +79,8 @@ class DataContainer {
   void CreateTree(TTree* tree);
   bool get_real_pt(Int_t index, Float_t* pt);
   void fill_histogram(TTree*, std::vector<TH1F*>, TTree*);
-
+  void initialize_current_data(UInt_t i);
+  
   Smearing::method smearing(const TVector3& jet, const TVector3& genjet, \
                             const Float_t& radius, Float_t* realpt) const;
   
@@ -100,7 +102,7 @@ class DataContainer {
    * resolution for events with leptons. In fact it is a scale factor on the pt
    */
   void apply_jet_reg_sf(UInt_t index);
-  void apply_fsr_correction(UInt_t index);
+  void apply_fsr_correction();
   
   /**
    * @brief Reads lev and decides what corrections have to be applied on pt
@@ -134,6 +136,9 @@ class DataContainer {
   Float_t genjet_eta_[kLen];
   Float_t genjet_phi_[kLen];
   Float_t current_jet_pt_[kLen];
+  Float_t current_jet_eta_[kLen];
+  Float_t current_jet_phi_[kLen];
+  Float_t current_jet_mass_[kLen];
   Float_t jet_b_reg_res_[kLen];
 };
 
@@ -237,7 +242,7 @@ void DataContainer::CreateTree(TTree* t) {
 
 void DataContainer::smear_current_data(UInt_t i) {
   TVector3 jet, genjet;
-  jet.SetPtEtaPhi(jet_pt_[i], jet_eta_[i], jet_phi_[i]);
+  jet.SetPtEtaPhi(current_jet_pt_[i], current_jet_eta_[i], current_jet_phi_[i]);
   genjet.SetPtEtaPhi(genjet_pt_[i], genjet_eta_[i], genjet_phi_[i]);
   smearing(jet, genjet, rcone, current_jet_pt_ + i);
   if (debug) {
@@ -246,9 +251,9 @@ void DataContainer::smear_current_data(UInt_t i) {
 }
 
 void DataContainer::apply_all_corrections(UInt_t i, CorrectionLevel lev) {
+  initialize_current_data(i);
   switch (lev) {
-  case CorrectionLevel::nothing:
-    current_jet_pt_[i] = jet_pt_[i]; break;
+  case CorrectionLevel::nothing: break;
   case CorrectionLevel::only_smearing:
     smear_current_data(i); break;
   case CorrectionLevel::smearing_btag:
@@ -262,9 +267,17 @@ void DataContainer::apply_all_corrections(UInt_t i, CorrectionLevel lev) {
     smear_current_data(i);
     apply_btag_sf();
     apply_jet_reg_sf(i);
-    apply_fsr_correction(i);
+    apply_fsr_correction();
     break;        
   }  
+}
+
+
+void DataContainer::initialize_current_data(UInt_t i) {
+  current_jet_pt_[i] = jet_pt_[i];
+  current_jet_eta_[i] = jet_eta_[i];
+  current_jet_phi_[i] = jet_phi_[i];
+  current_jet_mass_[i] = jet_mass_[i];
 }
 
 bool DataContainer::get_real_pt(Int_t index, Float_t *pt) {
@@ -308,9 +321,11 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
     bool prosegui = true;    
     for (unsigned int i = 0; i < pt_cut.size(); i++) {
       // Correction on pt
+      apply_all_corrections(i, correction_level);
       if (debug) {
         cout << "pt before: " << jet_pt_[i] << "\neta: " <<    \
-          jet_eta_[i] << "\nid: " << jet_id_[i] <<                     \
+          jet_eta_[i] << "\tcurrent_jet_eta_:" << current_jet_eta_[i] <<\
+          "\nid: " << jet_id_[i] <<                                     \
           "\tjet_b_reg_correction: " << jet_b_reg_corr[i] << "\tjetid: " \
              << jet_id_[i] << "\tktight: " << kTight << "\tbitwise: " \
              << (jet_id_[i] & kTight) << endl;
@@ -318,10 +333,10 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
       if ((jet_id_[i] & kTight) == 0) {
         prosegui = false; break;
       }
-      if (TMath::Abs(jet_eta_[i]) > eta_cut[i]) {
+
+      if (TMath::Abs(current_jet_eta_[i]) > eta_cut[i]) {
         prosegui = false; break;
       }
-      apply_all_corrections(i, correction_level);
       if (current_jet_pt_[i] < pt_cut[i]) {
         prosegui = false; break;
       }
@@ -340,13 +355,14 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
       if (debug) {
         cout << "btag_deep: " << btag_deep_[i] << "\tpt smeared corrected: " << \
           current_jet_pt_[i]                                            \
-             << "\teta: " << jet_eta_[i] << "\tjet_b_regcor: " << \
+             << "\teta: " << jet_eta_[i] << "\tcurrent_jet_eta_: " << \
+          current_jet_eta_[i] << "\tjet_b_regcor: " <<                 \
           jet_b_reg_corr[i] << endl;
       }
       bool success = true;
       if (btag_deep_[i] > deepcsv_cut) {
         if (i >= 3) {
-          if (TMath::Abs(jet_eta_[i]) > eta_cut[btaggati]) {
+          if (TMath::Abs(current_jet_eta_[i]) > eta_cut[btaggati]) {
             success = false;
           } else {
             apply_all_corrections(i, correction_level);
@@ -374,8 +390,8 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
     array<TLorentzVector, 3> jets;
     for (int i = 0; i < 3; i++) {
       UInt_t j = bjet_indexes[i];
-      jets[i].SetPtEtaPhiM(current_jet_pt_[j], jet_eta_[j],     \
-                           jet_phi_[j], jet_mass_[j]);
+      jets[i].SetPtEtaPhiM(current_jet_pt_[j], current_jet_eta_[j],     \
+                           current_jet_phi_[j], current_jet_mass_[j]);
     }
     
     // Now i check if the couples jets are distant enough
@@ -414,26 +430,36 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
 }
 
 void DataContainer::apply_btag_sf() {
+  weigth = 1;
   if (debug) {
     cout << "Here weigth should be 1: "  << weigth << endl;
-    if (weigth != 1) {
+    if (weigth != 1.) {
       cerr << "Error. weigth is not 1. Something wrong happened" << endl;
     }
   }
-
+  
   bool tagged[njet_];
   int how_many = njet_;
   for (unsigned int i = 0; i < njet_; i++) {
     tagged[i] = (btag_deep_[i] > deepcsv_cut);
     Float_t sf = reader.\
       eval_auto_bounds("central", BTagEntry::FLAV_B, current_jet_pt_[i], jet_eta_[i]);
+    sf = 1; // this is because the current file is not the right one
+    if (debug) {
+      cout << "Retrieved scale factor: " << sf << endl;
+    }
     if (tagged[i]) {
       how_many--;
       weigth *= (sf);
+      if (debug) {
+        cout << "weight: (calculating) " << weigth << " factor1 " << sf << endl;
+      }
     } else {
-      weigth *= (1 - b_tagging_efficiency*sf);
+      weigth *= (1. - b_tagging_efficiency*sf)/(1. - b_tagging_efficiency);
+      if (debug) {
+        cout << "weight: (calculating) " << weigth << " factor2 " << (1. - b_tagging_efficiency*sf)/(1. - b_tagging_efficiency) << endl;
+      }
     }
-    weigth *= TMath::Power(1 - b_tagging_efficiency, how_many);
   }
   if (debug) {
     cout << "Weigth of this event: " << weigth << endl; 
@@ -449,8 +475,42 @@ void DataContainer::apply_jet_reg_sf(UInt_t i) {
   }
 }
 
-void DataContainer::apply_fsr_correction(UInt_t i) {
-  cerr << "Please implement me. I am apply_fsr_correction. I currently do nothing." << endl;
+void DataContainer::apply_fsr_correction() {
+  std::vector<std::tuple<TLorentzVector, UInt_t>> bjets;
+  std::vector<TLorentzVector> softjets;
+  if (njet_ < 4) {
+    return;
+  }
+  for (unsigned int i = 0; i < njet_; i++) {
+    TLorentzVector appo;
+    appo.SetPtEtaPhiM(current_jet_pt_[i], current_jet_eta_[i],  \
+                      current_jet_phi_[i], current_jet_mass_[i]);
+    if (btag_deep_[i] > deepcsv_cut) {
+      bjets.push_back(std::make_tuple(appo, i));
+    } else {
+      softjets.push_back(appo);
+    }
+  }
+  for (auto it : bjets) {
+    auto appo = std::get<0>(it);
+    auto i = std::get<1>(it);    
+    vector<TLorentzVector>::iterator best = std::min_element(\
+       softjets.begin(), softjets.end(), [&appo](const TLorentzVector& a, const TLorentzVector& b) {
+         return appo.DeltaR(a) < appo.DeltaR(b);
+       });
+    if (best->DeltaR(appo) > soft_jet_distance) { continue; }
+    
+    if (debug) {
+      cout << "Correcting for fsr. Added something.\n" << \
+        "PtBefore: " << appo.Pt() << "\tPt after: " << (appo + *best).Pt() << \
+        "\tEta before: " << appo.Eta() << "\tEta after: " << (appo + *best).Eta() << endl;
+    }
+    appo += *best;
+    current_jet_pt_[i] = appo.Pt();
+    current_jet_eta_[i] = appo.Eta();
+    current_jet_phi_[i] = appo.Phi();
+    current_jet_mass_[i] = appo.M();
+  }
   return;
 }
 
