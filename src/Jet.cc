@@ -52,6 +52,7 @@ Jet::~Jet()
 // member functions
 //
 // Gets
+bool  Jet::isPuppi()                               const { return isPuppi_;    } 
 float Jet::btag()                                  const { return btags_.at(btagAlgo_);    }                   
 float Jet::btag(const std::string & algo)          const { return btags_.at(algo);         }                   
 int   Jet::flavour()                               const { return flavour_.at("Hadron");   }                   
@@ -70,16 +71,20 @@ float Jet::JerSfUp()                               const { return jerSFUp_; }
 
 float Jet::neutralHadronFraction()                 const { return nHadFrac_; }
 float Jet::neutralEmFraction()                     const { return nEmFrac_;  }
-int   Jet::neutralMultiplicity()                   const { return nMult_;    }
+float Jet::neutralMultiplicity()                   const { return nMult_;    }
 float Jet::chargedHadronFraction()                 const { return cHadFrac_; }
 float Jet::chargedEmFraction()                     const { return cEmFrac_;  }
-int   Jet::chargedMultiplicity()                   const { return cMult_;    }
+float Jet::chargedMultiplicity()                   const { return cMult_;    }
 float Jet::muonFraction()                          const { return muFrac_;   }
-int   Jet::constituents()                          const { return nConst_;   }
+float Jet::constituents()                          const { return nConst_;   }
 
 float Jet::qgLikelihood()                          const { return qgLikelihood_; }
 float Jet::pileupJetIdFullDiscriminant()           const { return puJetIdFullDisc_; }
 int   Jet::pileupJetIdFullId()                     const { return puJetIdFullId_; }
+
+float Jet::bRegCorr() const  { return bRegCorr_; }
+float Jet::bRegRes()  const  { return bRegRes_; }
+
 
 bool  Jet::pileupJetIdFullId(const std::string & wp) const
 { 
@@ -100,6 +105,7 @@ bool  Jet::pileupJetIdFullId(const std::string & wp) const
 
 
 // Sets                                                             
+void Jet::isPuppi  (const bool & ispuppi)                             { isPuppi_  = ispuppi; } 
 void Jet::btag     (const float & btag)                               { btag_    = btag; } 
 void Jet::btag     (const std::string & algo, const float & btag)     { btags_[algo]  = btag; } 
 void Jet::flavour  (const int   & flav)                               { flavour_["Hadron"] = flav; } 
@@ -118,6 +124,11 @@ void Jet::JerSfUp(const float & jerSfUp)                              { jerSFUp_
 void Jet::qgLikelihood(const float & discr)                           { qgLikelihood_ = discr; }
 void Jet::pileupJetIdFullDiscriminant(const float & discr)            { puJetIdFullDisc_ = discr; }
 void Jet::pileupJetIdFullId(const int & id)                           { puJetIdFullId_ = id; }
+
+void Jet::bRegCorr(const float & bRegCorr)                            { bRegCorr_ = bRegCorr; }
+void Jet::bRegRes(const float & bRegRes)                              { bRegRes_  = bRegRes; }
+
+
 
 int Jet::removeParton(const int & i)
 {
@@ -202,9 +213,21 @@ void Jet::id      (const float & nHadFrac,
                    const float & cMult   ,
                    const float & muFrac  )
 {
-   int nM = (int)round(nMult);
-   int cM = (int)round(cMult);
-   int numConst = nM + cM;
+   float nM;
+   float cM;
+   float numConst;
+   if ( isPuppi_ )
+   {
+      nM = nMult;
+      cM = cMult;
+      numConst = nM + cM;
+   }
+   else
+   {
+      nM = round(nMult);
+      cM = round(cMult);
+      numConst = round(nM + cM);
+   }
    nHadFrac_ = nHadFrac;
    nEmFrac_  = nEmFrac;
    nMult_    = nM;
@@ -224,12 +247,26 @@ void Jet::id      (const float & nHadFrac,
    else if ( fabs(p4_.Eta()) > 2.7 && fabs(p4_.Eta()) <= 3. )
    {
       idloose_ = false;
-      idtight_ = (nEmFrac>0.02 && nEmFrac<0.90 && nM>2);
+      if ( isPuppi_ )
+      {
+         idtight_ = (nHadFrac<0.99);
+      }
+      else
+      {
+         idtight_ = (nEmFrac>0.02 && nEmFrac<0.90 && nM>2);
+      }
    }
    else
    {
       idloose_ = false;
-      idtight_ = (nHadFrac>0.02 && nEmFrac<0.90 && nM>10);
+      if ( isPuppi_ )
+      {
+         idtight_ = (nHadFrac>0.02 && nEmFrac<0.90 && nM>10);
+      }
+      else
+      {
+         idtight_ = (nHadFrac>0.02 && nEmFrac<0.90 && nM>2 && nM<15);
+      }
    }
    
    

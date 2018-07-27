@@ -47,6 +47,8 @@ namespace analysis {
            ~Jet();
            
             // Gets
+            /// returns if jet is Puppi
+            bool  isPuppi()                     const;
             /// returns the btag value of btag_csvivf
             float btag()                        const;
             /// returns the btag value of algorithm
@@ -78,12 +80,12 @@ namespace analysis {
             
             float neutralHadronFraction()  const ;
             float neutralEmFraction()      const ;
-            int   neutralMultiplicity()    const ;
+            float neutralMultiplicity()    const ;
             float chargedHadronFraction()  const ;
             float chargedEmFraction()      const ;
-            int   chargedMultiplicity()    const ;
+            float chargedMultiplicity()    const ;
             float muonFraction()           const ;
-            int   constituents()           const ;
+            float constituents()           const ;
             
             /// quark-gluon separation
             float qgLikelihood()  const;
@@ -93,8 +95,13 @@ namespace analysis {
             int pileupJetIdFullId() const;
             bool pileupJetIdFullId(const std::string & wp) const;
             
+            /// b-jet regression
+            float bRegCorr() const;
+            float bRegRes()  const;
                
             // Sets
+            /// sets the isPuppi value
+            void  isPuppi(const bool &);
             /// sets the btag value
             void  btag(const float &);
             /// sets the btag value for difference algorithms
@@ -126,10 +133,10 @@ namespace analysis {
             
             void neutralHadronFraction(const float & nHadFrac);
             void neutralEmFraction(const float & nEmFrac);
-            void neutralMultiplicity(const int & nMult);
+            void neutralMultiplicity(const float & nMult);
             void chargedHadronFraction(const float & cHadFrac);
             void chargedEmFraction(const float & cEmFrac);
-            void chargedMultiplicity(const int & cMult);
+            void chargedMultiplicity(const float & cMult);
             void muonFraction(const float & muFrac);
             
             /// calculates the jet id
@@ -148,6 +155,11 @@ namespace analysis {
             void pileupJetIdFullDiscriminant(const float & discr);
             void pileupJetIdFullId(const int & id);
             
+            /// b-jet regression
+            void bRegCorr(const float &);
+            void bRegRes(const float &);
+            
+            
             /// associate partons to the jet
             void associatePartons(const std::vector< std::shared_ptr<GenParticle> > &, const float & dRmax = 0.5, const float & ptMin = 1., const bool & pythi8 = true );
 //            using Candidate::set; // in case needed to overload the function set
@@ -155,6 +167,9 @@ namespace analysis {
          protected:
             // ----------member data ---------------------------
             //
+               
+            // Jet type
+            bool isPuppi_;
             /// btag value 
             float btag_ ;
             /// btag value for each algo
@@ -187,17 +202,21 @@ namespace analysis {
             /// jet id
             float nHadFrac_;
             float nEmFrac_;
-            int   nMult_;
+            float nMult_;
             float cHadFrac_;
             float cEmFrac_;
-            int   cMult_;
+            float cMult_;
             float muFrac_;
-            int   nConst_;
+            float nConst_;
             /// quark-gluon separation
             float qgLikelihood_;
             /// pileup jet id
             float puJetIdFullDisc_;
             int   puJetIdFullId_;
+            
+            /// b-jet regression
+            float bRegCorr_;
+            float bRegRes_;
             
             
          private:
