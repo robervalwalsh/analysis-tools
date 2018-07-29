@@ -56,7 +56,11 @@ const Int_t kTight = 2;
 const array<Float_t, 3> pt_cut{{100, 100, 40}};
 const array<Float_t, 3> eta_cut{{2.2, 2.2, 2.2}};
 const bool debug = false;
-const CorrectionLevel correction_level = CorrectionLevel::smearing_btag_regression_fsr;
+// The following line includes 2 variables:
+// const CorrectionLevel correction_level = something;
+// const bool apply_trigger_cut = something;
+// I used this method to script more easily when I have to do all the plots
+#include "Parameters.cc"
 const Float_t soft_jet_distance = 0.8;
 
 
@@ -70,13 +74,13 @@ bool check_distance_enough(const TLorentzVector &a, const TLorentzVector &b) {
 }
 
 class Jet : public TLorentzVector {
-public:
+ public:
   Jet(const TLorentzVector& a, UInt_t i) : TLorentzVector(a) {
     orig_index_ = i;
   }
   UInt_t Idx() const { return orig_index_; }
   
-private:
+ private:
   
   UInt_t orig_index_;
 };
@@ -157,14 +161,14 @@ class DataContainer {
  */
 DataContainer::DataContainer() : resolution("tables/Fall17_25nsV1_MC_PtResolution_AK4PFchs.txt"), \
                                  resolution_sf("tables/Fall17_25nsV1_MC_SF_AK4PFchs.txt"), \
-                                 calib("csvv1", "tables/8TeV_SF/CSVV1.csv"),                       \
+                                 calib("csvv1", "tables/8TeV_SF/CSVV1.csv"),  \
                                  reader(BTagEntry::OP_TIGHT, "central", {"up", "down"}) {
   reader.load(calib, BTagEntry::FLAV_B, "comb");
 }
 
 
 void DataContainer::sort_by_Pt() {
-  std::sort(corrected_jet.begin(), corrected_jet.end(),\
+  std::sort(corrected_jet.begin(), corrected_jet.end(), \
             [](const TLorentzVector&a, const TLorentzVector& b) {
               return a.Pt() > b.Pt();
             });
@@ -322,8 +326,8 @@ void DataContainer::apply_all_corrections(CorrectionLevel lev) {
     sort_by_Pt();
     apply_fsr_correction();
     sort_by_Pt();
-    break;        
-  }  
+    break;
+  }
 }
 
 
@@ -349,7 +353,8 @@ bool DataContainer::get_real_pt(Int_t index, Float_t *pt) {
 
 
 
-void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree* out_tree) {
+void DataContainer::fill_histogram(TTree* tree, \
+                                   std::vector<TH1F*> plots, TTree* out_tree) {
   ULong64_t how_many;
   if (debug) {
     how_many = 1000;
@@ -379,15 +384,17 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
     if (njet_ < 3) {
       continue;
     }
-
     
-    // Apply first cut on momentum and eta without checking
-    // real identity
-    bool prosegui = true;    
     apply_all_corrections(correction_level);
-    unsigned int i = 0;
-    for (auto it = corrected_jet.begin(); it != corrected_jet.end() && i < pt_cut.size(); it++) {
-      // Correction on pt
+    
+    // Now check btags
+    unsigned int btaggati = 0;
+    vector<Jet> bjets;
+    if (debug) {
+      cout << "Starting btagging check" << endl;
+    }
+    for (auto it = corrected_jet.begin(); it < corrected_jet.end() && \
+           btaggati < 3; it++) {
       if (debug) {
         cout << "pt before: " << jet_pt_[it->Idx()] << "\neta: " <<     \
           jet_eta_[it->Idx()] << "\tcurrent_jet_pt: " << it->Pt()       \
@@ -395,53 +402,29 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
           "\tjet_b_reg_correction: " << jet_b_reg_corr[it->Idx()] << "\tjetid: " \
              << jet_id_[it->Idx()] << "\tktight: " << kTight << "\tbitwise: " \
              << (jet_id_[it->Idx()] & kTight) << endl;
-      }
-      if ((jet_id_[it->Idx()] & kTight) == 0) {
-        prosegui = false; break;
-      }
-      if (TMath::Abs(it->Eta()) > eta_cut[i]) {
-        prosegui = false; break;
-      }
-      if (it->Pt() < pt_cut[i]) {
-        prosegui = false; break;
-      }
-      i++;
-    }
-    if (!prosegui) {
-      continue;
-    }
-
-    // Now check btags
-    unsigned int btaggati = 0;
-    vector<Jet> bjets;
-    if (debug) {
-      cout << "Starting btagging check" << endl;
-    }
-    int j = -1;
-    for (auto it = corrected_jet.begin(); it < corrected_jet.end() && btaggati < 3; it++) {
-      if (debug) {
-        cout << "btag_deep: " << btag_deep_[it->Idx()] << "\tpt smeared corrected: " << \
-          it->Pt() << "\teta: " << jet_eta_[it->Idx()] << "\tcurrent_jet_eta_: " << \
+        cout << "btag_deep: " << btag_deep_[it->Idx()] <<               \
+          "\tpt smeared corrected: " << it->Pt() << "\teta: " <<        \
+          jet_eta_[it->Idx()] << "\tcurrent_jet_eta_: " <<              \
           it->Eta() << "\tjet_b_regcor: " << jet_b_reg_corr[it->Idx()] << endl;
       }
-      j++;
-      bool success = true;
-      if (btag_deep_[it->Idx()] > deepcsv_cut) {
-        if (j >= 3) {
-          if (TMath::Abs(it->Eta()) > eta_cut[btaggati]) {
-            success = false;
-          } else {
-            if (it->Pt() < pt_cut[btaggati])
-              success = false;
-          }
-        }
-        if (success) {
-          btaggati++;
-          bjets.push_back(*it);
-        }
-      }
+      // First i check if we are already with a too small pt.
       if (it->Pt() < pt_cut[pt_cut.size() - 1]) {
         break;
+      }
+      if ((jet_id_[it->Idx()] & kTight) == 0) {
+        continue;
+      }
+      // Look at pt only if it is btagged
+      if (btag_deep_[it->Idx()] > deepcsv_cut) {
+        // cuts on eta and pt
+        if (TMath::Abs(it->Eta()) > eta_cut[btaggati]) {
+          continue;
+        } else {
+          if (it->Pt() < pt_cut[btaggati])
+            continue;
+        }
+        btaggati++;
+        bjets.push_back(*it);
       }
     }
     if (debug) {
@@ -502,7 +485,7 @@ void DataContainer::apply_btag_sf() {
     Float_t sf = reader.\
       eval_auto_bounds("central", BTagEntry::FLAV_B, corrected_jet[i].Pt(), \
                        corrected_jet[i].Eta());
-    sf = 1; // this is because the current file is not the right one
+    sf = 1;  // this is because the current file is not the right one
     if (debug) {
       cout << "Retrieved scale factor: " << sf << endl;
     }
@@ -515,20 +498,21 @@ void DataContainer::apply_btag_sf() {
     } else {
       weigth *= (1. - b_tagging_efficiency*sf)/(1. - b_tagging_efficiency);
       if (debug) {
-        cout << "weight: (calculating) " << weigth << " factor2 " << (1. - b_tagging_efficiency*sf)/(1. - b_tagging_efficiency) << endl;
+        cout << "weight: (calculating) " << weigth << " factor2 " << \
+          (1. - b_tagging_efficiency*sf)/(1. - b_tagging_efficiency) << endl;
       }
     }
   }
   if (debug) {
-    cout << "Weigth of this event: " << weigth << endl; 
-  }           
+    cout << "Weigth of this event: " << weigth << endl;
+  }
   return;
 }
 
 void DataContainer::apply_jet_reg_sf(UInt_t i) {
   if (jet_b_reg_corr[corrected_jet[i].Idx()] != 0) {
     corrected_jet[i].SetPtEtaPhiM(corrected_jet[i].Pt()*jet_b_reg_corr[corrected_jet[i].Idx()], \
-                                  corrected_jet[i].Eta(), corrected_jet[i].Phi(),\
+                                  corrected_jet[i].Eta(), corrected_jet[i].Phi(), \
                                   corrected_jet[i].M());
   } else {
     cerr << "Something nasty is happening. jet_b_reg_correction is 0." << endl;
@@ -545,7 +529,7 @@ void DataContainer::apply_fsr_correction() {
     return;
   }
   for (UInt_t i = 0; i < njet_; i++) {
-    if (btag_deep_[corrected_jet[i].Idx()] > deepcsv_cut){
+    if (btag_deep_[corrected_jet[i].Idx()] > deepcsv_cut) {
       bjets.push_back(std::make_tuple(corrected_jet[i], i));
     } else {
       softjets.push_back(corrected_jet[i]);
