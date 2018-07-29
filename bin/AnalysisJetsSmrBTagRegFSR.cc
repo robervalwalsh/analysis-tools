@@ -359,8 +359,10 @@ void DataContainer::fill_histogram(TTree* tree, std::vector<TH1F*> plots, TTree*
 
   for (ULong64_t event = 0; event < how_many; event++) {
     tree->GetEntry(event);
-    if (!trigger_path) {
-      continue;
+    if (apply_trigger_cut) {
+      if (!trigger_path) {
+        continue;
+      }
     }
     weigth = 1;
     corrected_jet.clear();
