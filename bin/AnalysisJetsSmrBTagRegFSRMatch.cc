@@ -16,6 +16,7 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <array>
 #include <tuple>
@@ -29,8 +30,7 @@
 #include "TRandom3.h"
 
 #include "JetMETCorrections/Modules/interface/JetResolution.h"
-#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
-#include "CondTools/BTau/interface/BTagCalibrationReader.h"
+#include "Analysis/Tools/interface/BTagCalibrationStandalone.h"
 
 
 
@@ -179,9 +179,9 @@ class DataContainer {
   JME::JetResolutionScaleFactor resolution_sf;
   BTagCalibration calib;
   BTagCalibrationReader reader;
-
-
+  vector<Jet> corrected_jet;
   Float_t weigth;
+  
   // Data from tree
   UInt_t run_;
   ULong64_t event_;
@@ -209,7 +209,6 @@ class DataContainer {
   Float_t genpart_phi_[kLen];
   Float_t genpart_mass_[kLen];
   Int_t genpart_pdgid_[kLen];
-  vector<Jet> corrected_jet;
   Float_t jet_b_reg_res_[kLen];
 };
 
@@ -217,11 +216,9 @@ class DataContainer {
  * @danger I am using the old data table because I did not find the new one.
  */
 DataContainer::DataContainer() : resolution("tables/Fall17_25nsV1_MC_PtResolution_AK4PFchs.txt"), \
-                                 resolution_sf("tables/Fall17_25nsV1_MC_SF_AK4PFchs.txt"), \
-                                 calib("csvv1", "tables/8TeV_SF/CSVV1.csv"),  \
-                                 reader(BTagEntry::OP_TIGHT, "central", {"up", "down"}) {
-  reader.load(calib, BTagEntry::FLAV_B, "comb");
-}
+                                 resolution_sf("tables/Fall17_25nsV1_MC_SF_AK4PFchs.txt") , \
+                                 calib("deepcsv", "tables/DeepCSV_94XSF_V3_B_F.csv"), \
+                                 reader(&calib, BTagEntry::OP_MEDIUM) {}
 
 
 void DataContainer::sort_by_Pt() {
@@ -618,45 +615,20 @@ void DataContainer::fill_histogram(TTree* tree, \
   }
 }
 
+
 void DataContainer::apply_btag_sf() {
-  weigth = 1;
   if (debug) {
-    cout << "Here weigth should be 1: "  << weigth << endl;
-    if (weigth != 1.) {
-      cerr << "Error. weigth is not 1. Something wrong happened" << endl;
-    }
+    cout << "Using scale factors for btagging" << endl;
   }
-  
-  bool tagged[njet_];
-  int how_many = njet_;
-  for (unsigned int i = 0; i < njet_; i++) {
-    tagged[i] = (btag_deep_[corrected_jet[i].Idx()] > deepcsv_cut);
-    Float_t sf = reader.\
-      eval_auto_bounds("central", BTagEntry::FLAV_B, corrected_jet[i].Pt(), \
-                       corrected_jet[i].Eta());
-    sf = 1;  // this is because the current file is not the right one
+  for (auto it = corrected_jet.begin(); it != corrected_jet.end(); it++) {
+    Double_t sf = reader.eval(BTagEntry::FLAV_B, it->Eta(), it->Pt(), 0);
     if (debug) {
-      cout << "Retrieved scale factor: " << sf << endl;
+      cout << "sf: " << sf << endl;
     }
-    if (tagged[i]) {
-      how_many--;
-      weigth *= (sf);
-      if (debug) {
-        cout << "weight: (calculating) " << weigth << " factor1 " << sf << endl;
-      }
-    } else {
-      weigth *= (1. - b_tagging_efficiency*sf)/(1. - b_tagging_efficiency);
-      if (debug) {
-        cout << "weight: (calculating) " << weigth << " factor2 " << \
-          (1. - b_tagging_efficiency*sf)/(1. - b_tagging_efficiency) << endl;
-      }
-    }
+    it->SetPtEtaPhiM((it->Pt())*sf, it->Eta(), it->Phi(), it->M());
   }
-  if (debug) {
-    cout << "Weigth of this event: " << weigth << endl;
-  }
-  return;
 }
+
 
 void DataContainer::apply_jet_reg_sf(UInt_t i) {
   if (jet_b_reg_corr[corrected_jet[i].Idx()] != 0) {
