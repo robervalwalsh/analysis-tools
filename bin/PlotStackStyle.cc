@@ -99,6 +99,7 @@ class THStackBetter {
   explicit THStackBetter(const char* name, const bool simulation, const Float_t lumi);
   ~THStackBetter();
   void Draw();
+  TLegend* GetLegend() { return &leg; }
   
  private:
   std::vector<TH1InStack*> histos_;
@@ -172,6 +173,7 @@ int main(int argc, char* argv[]) {
   THStackBetter stack(argv[1], true, lumi);
   stack.Draw();
   style.CMSPrelim(true, "MC", 0.15, 0.79);
+  style.SetLegendStyle(stack.GetLegend());
   // style.CMSPrelim(Form("%.1f fb^{-1} (13 TeV)", lumi), "", 0.15, 0.78);
   c1->Update();
   c1->SaveAs(argv[2]);
