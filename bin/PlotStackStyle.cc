@@ -94,12 +94,6 @@ TH1InStack::TH1InStack(const std::string filename, const std::string inputname, 
 
 
 
-
-
-
-/**
- * Reads json file and returns pointer to THStack
- */
 class THStackBetter {
  public:
   explicit THStackBetter(const char* name, const bool simulation, const Float_t lumi);
@@ -157,7 +151,7 @@ THStackBetter::THStackBetter(const char* filename, const bool simulation, const 
 void THStackBetter::Draw() {
   stack_hist_.Draw("hist");
   stack_hist_.GetXaxis()->SetTitle(x_axis_.c_str());
-  stack_hist_.GetXaxis()->SetTitle(y_axis_.c_str());
+  stack_hist_.GetYaxis()->SetTitle(y_axis_.c_str());
   stack_hist_.SetTitle(title_.c_str());
   leg.Draw("same");
 }
