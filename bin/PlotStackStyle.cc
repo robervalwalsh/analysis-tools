@@ -176,7 +176,7 @@ int main(int argc, char* argv[]) {
   style.SetLegendStyle(stack.GetLegend());
   // style.CMSPrelim(Form("%.1f fb^{-1} (13 TeV)", lumi), "", 0.15, 0.78);
   c1->Update();
-  c1->SaveAs(argv[2]);
+  c1->Print(argv[2]);
   delete c1;
   return 0;
 }
