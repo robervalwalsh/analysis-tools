@@ -157,6 +157,12 @@ class DataContainer {
    * resolution for events with leptons. In fact it is a scale factor on the pt
    */
   void apply_jet_reg_sf(UInt_t index);
+
+  /**
+   * @brief Looks for all jets with btag_deep > deepcsv_cut and checks if there are
+   * very close light flavour jets. If yes, it adds the closest TLorentzVector of the
+   * soft jet to the original one. (which is saved in corrected_jet[i])
+   */
   void apply_fsr_correction();
   
   /**
@@ -171,6 +177,11 @@ class DataContainer {
    */
   void match_jet_with_part(Jet& jet);
 
+
+  /**
+   * @brief Recursive function that looks at the origin of the genpart i.
+   * It will stop when it encounters a higgs or something that is not a b-flavour jet
+   */
   Match match_genpart(UInt_t i);
 
   
@@ -210,6 +221,21 @@ class DataContainer {
   Float_t genpart_mass_[kLen];
   Int_t genpart_pdgid_[kLen];
   Float_t jet_b_reg_res_[kLen];
+
+  // Extra values to put in the new tree
+  UInt_t matches_;
+  Float_t mass_;
+  Float_t new_pt_[kLen];
+  Float_t new_eta_[kLen];
+  Float_t new_phi_[kLen];
+  Float_t new_mass_[kLen];
+  /**
+   * This variable is used to see if the corrected_jets are not in the same
+   * order as the original ones. If this array is for example [1, 3, 2] means
+   * that the corrected jet #1 was in first position, the corrected_jet #2 was
+   * in third position and the corrected_jet #3 was in second position.
+   */
+  UInt_t reordering_[kLen];
 };
 
 /**
@@ -323,6 +349,24 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("GenJet_eta", genjet_eta_, "GenJet_eta/F");
   t->Branch("GenJet_phi", genjet_phi_, "GenJet_phi/F");
   t->Branch("Jet_bRegRes", jet_b_reg_res_, "Jet_bRegRes/F");
+  t->Branch("HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33", &trigger_path, \
+            "HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33/O");
+  t->Branch("nGenPart", &ngenpart_, "nGenPart/i");
+  t->Branch("GenJet_partonFlavour", genjet_parton_flavour_, "GenJet_partonFlavour/I");
+  t->Branch("GenPart_genPartIdxMother", genpart_genpart_idxmother_, "GenPart_genPartIdxMother/i");
+  t->Branch("GenPart_pt", genpart_pt_, "GenPart_pt/F");
+  t->Branch("GenPart_eta", genpart_eta_, "GenPart_eta/F");
+  t->Branch("GenPart_phi", genpart_phi_, "GenPart_phi/F");
+  t->Branch("GenPart_mass", genpart_mass_, "GenPart_mass/F");
+  t->Branch("GenPart_pdgId", genpart_pdgid_, "GenPart_pdgId/F");
+  // new data
+  t->Branch("nMatches", &matches_, "nMatches/i");
+  t->Branch("Mass", &mass_, "Mass/F");
+  t->Branch("Jet_newPt", new_pt_, "Jet_newPt/F");
+  t->Branch("Jet_newEta", new_eta_, "Jet_newEta/F");
+  t->Branch("Jet_newPhi", new_phi_, "Jet_newPhi/F");
+  t->Branch("Jet_newMass", new_mass_, "Jet_newMass/F");
+  t->Branch("Jet_newOriginalOrder", reordering_, "Jet_newOriginalOrder/i");
 }
 
 
@@ -594,8 +638,17 @@ void DataContainer::fill_histogram(TTree* tree, \
     if (debug) {
       cout << "Matched " << matched << " jets" << endl;
     }
-    TLorentzVector appo = bjets[0] - bjets[1];
-    cout << "\033[0;32mFilling with m = " << -appo.M() << \
+
+    mass_ = -(bjets[0] - bjets[1]).M();
+    matches_ = matched;
+    for (unsigned int k = 0; k < corrected_jet.size(); k++) {
+      new_pt_[k] = corrected_jet[k].Pt();
+      new_eta_[k] = corrected_jet[k].Eta();
+      new_phi_[k] = corrected_jet[k].Phi();
+      new_mass_[k] = corrected_jet[k].M();
+      reordering_[k] = corrected_jet[k].Idx();
+    }
+    cout << "\033[0;32mFilling with m = " << mass_ << \
       " and pt = " << bjets[0].Pt() << "\033[0m" << endl;
     out_tree->Fill();
     if (debug) {
@@ -604,11 +657,11 @@ void DataContainer::fill_histogram(TTree* tree, \
     }
     
     if (jet_n_muons != 0 || jet_n_electrons != 0) {
-      plots[matched + 3]->Fill(-appo.M(), weigth);      
+      plots[matched + 3]->Fill(mass_, weigth);      
       plots[7]->Fill(bjets[0].Pt(), weigth);
       plots[9]->Fill(jet_b_reg_res_[bjets[0].Idx()], weigth);
     } else {
-      plots[matched]->Fill(-appo.M(), weigth);
+      plots[matched]->Fill(mass_, weigth);
       plots[6]->Fill(bjets[0].Pt(), weigth);
       plots[8]->Fill(jet_b_reg_res_[bjets[0].Idx()], weigth);
     }
