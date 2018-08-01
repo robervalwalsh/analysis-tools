@@ -212,6 +212,7 @@ class DataContainer {
   Int_t jet_n_electrons;
   Int_t jet_n_muons;
   Int_t jet_genjet_idx_[kLen];
+  UInt_t n_gen_jet_;
   Float_t genjet_pt_[kLen];
   Float_t genjet_eta_[kLen];
   Float_t genjet_phi_[kLen];
@@ -314,6 +315,7 @@ int DataContainer::SetTreeBranches(TTree * t) {
   t->SetBranchAddress("Jet_nElectrons", &jet_n_electrons);
   t->SetBranchAddress("Jet_nMuons", &jet_n_muons);
   t->SetBranchAddress("Jet_genJetIdx", jet_genjet_idx_);
+  t->SetBranchAddress("nGenJet", &n_gen_jet_);
   t->SetBranchAddress("GenJet_pt", genjet_pt_);
   t->SetBranchAddress("GenJet_eta", genjet_eta_);
   t->SetBranchAddress("GenJet_phi", genjet_phi_);
@@ -339,38 +341,39 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("luminosityBlock", &lumisection_, "luminosityBlock/i");
   // gen jets
   t->Branch("nJet", &njet_, "nJet/i");
-  t->Branch("Jet_pt", jet_pt_, "Jet_pt/F");
-  t->Branch("Jet_eta", jet_eta_, "Jet_eta/F");
-  t->Branch("Jet_phi", jet_phi_, "Jet_phi/F");
-  t->Branch("Jet_mass", jet_mass_, "Jet_mass/F");
-  t->Branch("Jet_jetId", jet_id_, "Jet_jetId/I");
-  t->Branch("Jet_btagDeepB", btag_deep_, "Jet_btagDeepB/F");
-  t->Branch("Jet_bRegCorr", jet_b_reg_corr, "Jet_bRegCorr/F");
+  t->Branch("Jet_pt", jet_pt_, "Jet_pt[nJet]/F");
+  t->Branch("Jet_eta", jet_eta_, "Jet_eta[nJet]/F");
+  t->Branch("Jet_phi", jet_phi_, "Jet_phi[nJet]/F");
+  t->Branch("Jet_mass", jet_mass_, "Jet_mass[nJet]/F");
+  t->Branch("Jet_jetId", jet_id_, "Jet_jetId[nJet]/I");
+  t->Branch("Jet_btagDeepB", btag_deep_, "Jet_btagDeepB[nJet]/F");
+  t->Branch("Jet_bRegCorr", jet_b_reg_corr, "Jet_bRegCorr[nJet]/F");
   t->Branch("Jet_nElectrons", &jet_n_electrons, "Jet_nElectrons/I");
   t->Branch("Jet_nMuons", &jet_n_muons, "Jet_nMuons/F");
-  t->Branch("Jet_genJetIdx", jet_genjet_idx_, "Jet_genJetIdx/I");
-  t->Branch("GenJet_pt", genjet_pt_, "GenJet_pt/F");
-  t->Branch("GenJet_eta", genjet_eta_, "GenJet_eta/F");
-  t->Branch("GenJet_phi", genjet_phi_, "GenJet_phi/F");
-  t->Branch("Jet_bRegRes", jet_b_reg_res_, "Jet_bRegRes/F");
+  t->Branch("Jet_genJetIdx", jet_genjet_idx_, "Jet_genJetIdx[nJet]/I");
+  t->Branch("nGenJet", &n_gen_jet_, "nGenJet/i");
+  t->Branch("GenJet_pt", genjet_pt_, "GenJet_pt[nGenJet]/F");
+  t->Branch("GenJet_eta", genjet_eta_, "GenJet_eta[nGenJet]/F");
+  t->Branch("GenJet_phi", genjet_phi_, "GenJet_phi[nGenJet]/F");
+  t->Branch("Jet_bRegRes", jet_b_reg_res_, "Jet_bRegRes[nJet]/F");
   t->Branch("HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33", &trigger_path, \
             "HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33/O");
   t->Branch("nGenPart", &ngenpart_, "nGenPart/i");
-  t->Branch("GenJet_partonFlavour", genjet_parton_flavour_, "GenJet_partonFlavour/I");
-  t->Branch("GenPart_genPartIdxMother", genpart_genpart_idxmother_, "GenPart_genPartIdxMother/i");
-  t->Branch("GenPart_pt", genpart_pt_, "GenPart_pt/F");
-  t->Branch("GenPart_eta", genpart_eta_, "GenPart_eta/F");
-  t->Branch("GenPart_phi", genpart_phi_, "GenPart_phi/F");
-  t->Branch("GenPart_mass", genpart_mass_, "GenPart_mass/F");
-  t->Branch("GenPart_pdgId", genpart_pdgid_, "GenPart_pdgId/F");
+  t->Branch("GenJet_partonFlavour", genjet_parton_flavour_, "GenJet_partonFlavour[nGenJet]/I");
+  t->Branch("GenPart_genPartIdxMother", genpart_genpart_idxmother_, "GenPart_genPartIdxMother[nGenPart]/i");
+  t->Branch("GenPart_pt", genpart_pt_, "GenPart_pt[nGenPart]/F");
+  t->Branch("GenPart_eta", genpart_eta_, "GenPart_eta[nGenPart]/F");
+  t->Branch("GenPart_phi", genpart_phi_, "GenPart_phi[nGenPart]/F");
+  t->Branch("GenPart_mass", genpart_mass_, "GenPart_mass[nGenPart]/F");
+  t->Branch("GenPart_pdgId", genpart_pdgid_, "GenPart_pdgId[nGenPart]/F");
   // new data
   t->Branch("nMatches", &matches_, "nMatches/i");
   t->Branch("Mass", &mass_, "Mass/F");
-  t->Branch("Jet_newPt", new_pt_, "Jet_newPt/F");
-  t->Branch("Jet_newEta", new_eta_, "Jet_newEta/F");
-  t->Branch("Jet_newPhi", new_phi_, "Jet_newPhi/F");
-  t->Branch("Jet_newMass", new_mass_, "Jet_newMass/F");
-  t->Branch("Jet_newOriginalOrder", reordering_, "Jet_newOriginalOrder/i");
+  t->Branch("Jet_newPt", new_pt_, "Jet_newPt[nJet]/F");
+  t->Branch("Jet_newEta", new_eta_, "Jet_newEta[nJet]/F");
+  t->Branch("Jet_newPhi", new_phi_, "Jet_newPhi[nJet]/F");
+  t->Branch("Jet_newMass", new_mass_, "Jet_newMass[nJet]/F");
+  t->Branch("Jet_newOriginalOrder", reordering_, "Jet_newOriginalOrder[nJet]/i");
 }
 
 
