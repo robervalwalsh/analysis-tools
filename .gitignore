@@ -7,3 +7,4 @@ __init__.py
 ._*
 bin/output/*
 bin/_tmp/*
+bin/params/*
