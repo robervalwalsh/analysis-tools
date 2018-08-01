@@ -55,7 +55,7 @@ enum class Match {
 };
 
 
-const string file("/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC/Fall17/nano_94X_mc_2017_fall17-v1/SUSYGluGluToBBHToBB_NarrowWidth_M-350_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/180712_150216/0000/nano_1.root");
+
 const Float_t rcone(0.4);
 const unsigned int kLen = 100;
 const Float_t deepcsv_cut = 0.4941;
@@ -64,11 +64,15 @@ const Int_t kTight = 2;
 const array<Float_t, 3> pt_cut{{100, 100, 40}};
 const array<Float_t, 3> eta_cut{{2.2, 2.2, 2.2}};
 const bool debug = false;
-// The following line includes 2 variables:
+// The following line includes 3 variables:
 // const CorrectionLevel correction_level = something;
 // const bool apply_trigger_cut = something;
 // I used this method to script more easily when I have to do all the plots
 #include "Parameters.cc"
+// const string file("something");
+// const UInt_t highx = 500;
+// const UInt_t bins = 50;
+#include "_tmp/mass_point.cc"
 const Float_t soft_jet_distance = 0.8;
 const Int_t pdgBId = 5;
 const Int_t heavyHiggs = 36;
@@ -759,25 +763,25 @@ int main(int argc, char* argv[]) {
   container.SetTreeBranches(tree);
   container.CreateTree(&output_tree);
   TH1F mass_histo_chromo_0_match("mass_histo_chromo_0_match", \
-                      "Invariant mass of bb jets", 50, 0, 800);
+                      "Invariant mass of bb jets", bins, 0, highx);
   TH1F mass_histo_lepton_0_match("mass_histo_lepton_0_match", \
-                            "Invariant mass of bb jets", 50, 0, 800);
+                            "Invariant mass of bb jets", bins, 0, highx);
   TH1F mass_histo_chromo_1_match("mass_histo_chromo_1_match",                           \
-                         "Invariant mass of bb jets", 50, 0, 800);
+                         "Invariant mass of bb jets", bins, 0, highx);
   TH1F mass_histo_lepton_1_match("mass_histo_lepton_1_match",                           \
-                            "Invariant mass of bb jets", 50, 0, 800);
+                            "Invariant mass of bb jets", bins, 0, highx);
   TH1F mass_histo_chromo_2_match("mass_histo_chromo_2_match",           \
-                                 "Invariant mass of bb jets", 50, 0, 800);
+                                 "Invariant mass of bb jets", bins, 0, highx);
   TH1F mass_histo_lepton_2_match("mass_histo_lepton_2_match",           \
-                         "Invariant mass of bb jets", 50, 0, 800);
+                         "Invariant mass of bb jets", bins, 0, highx);
   TH1F pt_spectrum_chromo("pt_spectrum_chromo", \
-                          "Pt spectrum for chromo events", 50, 0, 800);
+                          "Pt spectrum for chromo events", bins, 0, highx);
   TH1F pt_spectrum_lepton("pt_spectrum_lepton", \
-                          "Pt spectrum for lepton events", 50, 0, 800);
+                          "Pt spectrum for lepton events", bins, 0, highx);
   TH1F reg_res_chromo("reg_res_chromo", "RegRes for non lepton events", \
-                      50, 0, 1);
+                      bins, 0, 1);
   TH1F reg_res_lepton("reg_res_lepton", "RegRes for lepton events", \
-                      50, 0, 1);
+                      bins, 0, 1);
   std::vector<TH1F*> histos;
   histos.push_back(&mass_histo_chromo_0_match);
   histos.push_back(&mass_histo_chromo_1_match);
