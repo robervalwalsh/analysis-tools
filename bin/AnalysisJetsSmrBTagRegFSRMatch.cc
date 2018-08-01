@@ -77,6 +77,7 @@ const Float_t soft_jet_distance = 0.8;
 const Int_t pdgBId = 5;
 const Int_t heavyHiggs = 36;
 const Float_t gen_part_deltarcut = 0.3;
+const Int_t kPuId = 4;
 
 
 
@@ -226,7 +227,8 @@ class DataContainer {
   Float_t genpart_mass_[kLen];
   Int_t genpart_pdgid_[kLen];
   Float_t jet_b_reg_res_[kLen];
-
+  Int_t jet_puId_[kLen];
+  
   // Extra values to put in the new tree
   UInt_t matches_;
   Float_t mass_;
@@ -329,6 +331,7 @@ int DataContainer::SetTreeBranches(TTree * t) {
   t->SetBranchAddress("GenPart_phi", genpart_phi_);
   t->SetBranchAddress("GenPart_mass", genpart_mass_);
   t->SetBranchAddress("GenPart_pdgId", genpart_pdgid_);
+  t->SetBranchAddress("Jet_puId", jet_puId_);
   return 0;
 }
 
@@ -374,6 +377,7 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("Jet_newPhi", new_phi_, "Jet_newPhi[nJet]/F");
   t->Branch("Jet_newMass", new_mass_, "Jet_newMass[nJet]/F");
   t->Branch("Jet_newOriginalOrder", reordering_, "Jet_newOriginalOrder[nJet]/i");
+  t->Branch("Jet_puId", jet_puId_, "Jet_puId[nJet]/I");
 }
 
 
@@ -590,12 +594,17 @@ void DataContainer::fill_histogram(TTree* tree, \
           "\tpt smeared corrected: " << it->Pt() << "\teta: " <<        \
           jet_eta_[it->Idx()] << "\tcurrent_jet_eta_: " <<              \
           it->Eta() << "\tjet_b_regcor: " << jet_b_reg_corr[it->Idx()] << endl;
+        cout << "Pileup id: " << jet_puId_[it->Idx()] << endl;
       }
       // First i check if we are already with a too small pt.
       if (it->Pt() < pt_cut[pt_cut.size() - 1]) {
         break;
       }
       if ((jet_id_[it->Idx()] & kTight) == 0) {
+        continue;
+      }
+      // Check for pileup and throw away jet (not event)
+      if ((jet_puId_[it->Idx()] & kPuId) == 0) {
         continue;
       }
       // Look at pt only if it is btagged
