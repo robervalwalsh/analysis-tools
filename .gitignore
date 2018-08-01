@@ -8,3 +8,4 @@ __init__.py
 bin/output/*
 bin/_tmp/*
 bin/params/*
+bin/tables/DeepCSV_94XSF_V3_B_F.csv
