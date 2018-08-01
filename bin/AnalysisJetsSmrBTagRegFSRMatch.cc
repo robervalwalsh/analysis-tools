@@ -20,6 +20,7 @@
 #include <vector>
 #include <array>
 #include <tuple>
+#include <cmath>
 
 #include "TTree.h"
 #include "TFile.h"
@@ -63,6 +64,7 @@ const Float_t b_tagging_efficiency = 0.99;
 const Int_t kTight = 2;
 const array<Float_t, 3> pt_cut{{100, 100, 40}};
 const array<Float_t, 3> eta_cut{{2.2, 2.2, 2.2}};
+const Float_t lepton_in_jet_pt_cut = 12;
 const bool debug = false;
 // The following line includes 3 variables:
 // const CorrectionLevel correction_level = something;
@@ -210,8 +212,8 @@ class DataContainer {
   Int_t jet_id_[kLen];
   Float_t btag_deep_[kLen];
   Float_t jet_b_reg_corr[kLen];
-  Int_t jet_n_electrons;
-  Int_t jet_n_muons;
+  Int_t jet_n_electrons[kLen];
+  Int_t jet_n_muons[kLen];
   Int_t jet_genjet_idx_[kLen];
   UInt_t n_gen_jet_;
   Float_t genjet_pt_[kLen];
@@ -228,6 +230,18 @@ class DataContainer {
   Int_t genpart_pdgid_[kLen];
   Float_t jet_b_reg_res_[kLen];
   Int_t jet_puId_[kLen];
+  // 
+  Int_t jet_electron_idx1[kLen];
+  UInt_t n_electron;
+  Float_t electron_pt_[kLen];
+  Float_t electron_eta_[kLen];
+  Float_t electron_phi_[kLen];
+  Int_t jet_muon_idx1[kLen];
+  UInt_t n_muon;
+  Float_t muon_pt_[kLen];
+  Float_t muon_eta_[kLen];
+  Float_t muon_phi_[kLen];
+  Bool_t muon_medium_id_[kLen];
   
   // Extra values to put in the new tree
   UInt_t matches_;
@@ -332,6 +346,17 @@ int DataContainer::SetTreeBranches(TTree * t) {
   t->SetBranchAddress("GenPart_mass", genpart_mass_);
   t->SetBranchAddress("GenPart_pdgId", genpart_pdgid_);
   t->SetBranchAddress("Jet_puId", jet_puId_);
+  t->SetBranchAddress("Jet_electronIdx1", &jet_electron_idx1);
+  t->SetBranchAddress("nElectron", &n_electron);
+  t->SetBranchAddress("Electron_pt", electron_pt_);
+  t->SetBranchAddress("Electron_eta", electron_eta_);
+  t->SetBranchAddress("Electron_phi", electron_phi_);
+  t->SetBranchAddress("Jet_muonIdx1", &jet_muon_idx1);
+  t->SetBranchAddress("nMuon", &n_muon);
+  t->SetBranchAddress("Muon_pt", muon_pt_);
+  t->SetBranchAddress("Muon_eta", muon_eta_);
+  t->SetBranchAddress("Muon_phi", muon_phi_);
+  t->SetBranchAddress("Muon_mediumId", &muon_medium_id_);
   return 0;
 }
 
@@ -378,8 +403,20 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("Jet_newMass", new_mass_, "Jet_newMass[nJet]/F");
   t->Branch("Jet_newOriginalOrder", reordering_, "Jet_newOriginalOrder[nJet]/i");
   t->Branch("Jet_puId", jet_puId_, "Jet_puId[nJet]/I");
+  t->Branch("Jet_electronIdx1", jet_electron_idx1, "Jet_electronIdx1/I");
+  t->Branch("nElectron", &n_electron, "nElectron/i");
+  t->Branch("Electron_pt", electron_pt_, "Electron_pt[nElectron]/F");
+  t->Branch("Electron_eta", electron_eta_, "Electron_eta[nElectron]/F");
+  t->Branch("Electron_phi", electron_phi_, "Electron_phi[nElectron]/F");
+  t->Branch("Jet_muonIdx1", jet_muon_idx1, "Jet_muonIdx1[nElectron]/I");
+  t->Branch("nMuon", &n_muon, "nMuon/i");
+  t->Branch("Muon_pt", muon_pt_, "Muon_pt[nMuon]/F");
+  t->Branch("Muon_eta", muon_eta_, "Muon_eta[nMuon]/F");
+  t->Branch("Muon_phi", muon_phi_, "Muon_phi[nMuon]/F");
+  t->Branch("Muon_mediumId", &muon_medium_id_, "Muon_mediumId[nMuon]/O");
 }
-
+// suggested regex
+// t->SetBranchAddress(\"\([a-zA-Z_0-9]*\)\", \([&]*[a-zA-Z_0-9]*\));
 
 
 /**
@@ -574,7 +611,7 @@ void DataContainer::fill_histogram(TTree* tree, \
     }
     
     apply_all_corrections(correction_level);
-    
+
     // Now check btags
     unsigned int btaggati = 0;
     vector<Jet> bjets;
@@ -606,6 +643,35 @@ void DataContainer::fill_histogram(TTree* tree, \
       // Check for pileup and throw away jet (not event)
       if ((jet_puId_[it->Idx()] & kPuId) == 0) {
         continue;
+      }
+
+      if (jet_n_electrons[it->Idx()] != 0) {
+        if (debug) {
+          cout << "There is an electron. Checking for pt cut" << \
+            electron_pt_[jet_electron_idx1[it->Idx()]] << endl;
+          cout << "Electrons in event: " << jet_n_electrons[it->Idx()] << endl;
+        }
+        if (electron_pt_[jet_electron_idx1[it->Idx()]] < lepton_in_jet_pt_cut || \
+            std::isnan(electron_pt_[jet_electron_idx1[it->Idx()]])) {
+          if (debug) {
+            cout << "Electron too low energetic. Skipping" << endl;
+          }
+          continue;
+        }
+      }
+      if (jet_n_muons[it->Idx()] != 0) {
+        if (debug) {
+          cout << "There is a muon. Checking for pt cut: " << muon_pt_[jet_muon_idx1[it->Idx()]] \
+               << "\tI want a medium muon: " << muon_medium_id_[jet_muon_idx1[it->Idx()]] << endl;
+          cout << "Muons in event: " << jet_n_muons[it->Idx()] << endl;
+        }
+        if (muon_pt_[jet_muon_idx1[it->Idx()]] < lepton_in_jet_pt_cut ||   \
+            !(muon_medium_id_[jet_muon_idx1[it->Idx()]])) {
+          if (debug) {
+            cout << "Muon too low energetic or too bad. Skipping" << endl;
+          }
+          continue;
+        }
       }
       // Look at pt only if it is btagged
       if (btag_deep_[it->Idx()] > deepcsv_cut) {
@@ -667,12 +733,19 @@ void DataContainer::fill_histogram(TTree* tree, \
     cout << "\033[0;32mFilling with m = " << mass_ << \
       " and pt = " << bjets[0].Pt() << "\033[0m" << endl;
     out_tree->Fill();
+
+    Int_t appo_elc = 0;
+    appo_elc += jet_n_electrons[bjets[0].Idx()];
+    appo_elc += jet_n_electrons[bjets[1].Idx()];
+    Int_t appo_muon = 0;
+    appo_muon += jet_n_muons[bjets[0].Idx()];
+    appo_muon += jet_n_muons[bjets[1].Idx()];
     if (debug) {
-      cout << "Leptons in the event: electron " << \
-        jet_n_electrons << "\tmuons: " << jet_n_muons << endl;
+      cout << "Leptons in the event: electron " <<              \
+        appo_elc << "\tmuons: " << appo_muon << endl;
     }
     
-    if (jet_n_muons != 0 || jet_n_electrons != 0) {
+    if (appo_elc != 0 || appo_muon != 0) {
       plots[matched + 3]->Fill(mass_, weigth);      
       plots[7]->Fill(bjets[0].Pt(), weigth);
       plots[9]->Fill(jet_b_reg_res_[bjets[0].Idx()], weigth);
