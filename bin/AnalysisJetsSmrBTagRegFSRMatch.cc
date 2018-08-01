@@ -250,6 +250,7 @@ class DataContainer {
   Float_t new_eta_[kLen];
   Float_t new_phi_[kLen];
   Float_t new_mass_[kLen];
+  Bool_t leptonic;
   /**
    * This variable is used to see if the corrected_jets are not in the same
    * order as the original ones. If this array is for example [1, 3, 2] means
@@ -414,6 +415,7 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("Muon_eta", muon_eta_, "Muon_eta[nMuon]/F");
   t->Branch("Muon_phi", muon_phi_, "Muon_phi[nMuon]/F");
   t->Branch("Muon_mediumId", &muon_medium_id_, "Muon_mediumId[nMuon]/O");
+  t->Branch("Leptonic_event", &leptonic, "Leptonic_event/O");
 }
 // suggested regex
 // t->SetBranchAddress(\"\([a-zA-Z_0-9]*\)\", \([&]*[a-zA-Z_0-9]*\));
@@ -732,14 +734,19 @@ void DataContainer::fill_histogram(TTree* tree, \
     }
     cout << "\033[0;32mFilling with m = " << mass_ << \
       " and pt = " << bjets[0].Pt() << "\033[0m" << endl;
-    out_tree->Fill();
-
     Int_t appo_elc = 0;
     appo_elc += jet_n_electrons[bjets[0].Idx()];
     appo_elc += jet_n_electrons[bjets[1].Idx()];
     Int_t appo_muon = 0;
     appo_muon += jet_n_muons[bjets[0].Idx()];
     appo_muon += jet_n_muons[bjets[1].Idx()];
+    if (appo_elc != 0 || appo_muon != 0) {
+      leptonic = true;
+    } else {
+      leptonic = false;
+    }
+    out_tree->Fill();
+
     if (debug) {
       cout << "Leptons in the event: electron " <<              \
         appo_elc << "\tmuons: " << appo_muon << endl;
