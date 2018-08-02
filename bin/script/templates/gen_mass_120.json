@@ -1,0 +1,15 @@
+{
+    "histograms": [
+{% for c in coppie %}
+        {
+            "file_name": "{{ file_name }}",
+            "name": "{{ c.0 }};1",
+            "legend": "{{ c.1 }}",
+            "color": {{ c.2 }}
+        }{% if not loop.last %},{% endif %}
+{% endfor %}
+    ],
+    "title": "Invariant mass of bb jets",
+    "x_axis": "m_{12} [GeV]",
+    "y_axis": "Events / 20 GeV"
+}

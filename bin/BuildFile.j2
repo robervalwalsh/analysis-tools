@@ -112,3 +112,10 @@
   <use name="JetMETCorrections/Modules" />
   <flags   LDFLAGS="-lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -lm -ldl -rdynamic" CXXFLAGS="-g -O0"/>
 </bin>
+
+{% for name in names %}
+<bin name="{{ name }}" file="_tmp/src/{{ name }}.cc">
+  <use name="JetMETCorrections/Modules" />
+  <flags   LDFLAGS="-lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -lm -ldl -rdynamic"/>
+</bin>
+{% endfor %}

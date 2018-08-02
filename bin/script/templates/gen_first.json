@@ -1,0 +1,19 @@
+{
+    "histograms": [
+        {
+            "file_name": "output/hists/old/smeared2.root",
+            "name": "mass_histo_chromo",
+            "legend": "Non leptonic",
+            "color": [255, 0, 0]
+        },
+        {
+            "file_name": "output/hists/old/smeared2.root",
+            "name": "mass_histo_lepton",
+            "legend": "Leptonic",
+            "color": [0, 0, 255]
+        }
+    ],
+    "title": "Invariant mass of bb jets",
+    "x_axis": "m_{12} [GeV]",
+    "y_axis": "Events / 16 GeV"
+}
