@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
 from ROOT import TH1F, TFile, TMath, TF1
 
 import os
@@ -41,7 +44,8 @@ for mass in mass_points:
     print("Mass point: " + mass)
     for l in lep:
         cur_dir = directory + mass
-        output_filename = os.path.join("output_tables", "new_fit" + "_".join([l, mass]) + ".txt")
+        output_filename = os.path.join("../output/tables/before/",
+                                       "_".join(["fit", l, mass]) + ".txt")
         out_file = open(output_filename, "w")
         out_file.write("# media (2 match)\t\t\t sigma(2 match)\t\t\tmedia (tutti)\t\t\tsigma (tutti)")
         for c in correction_level:
@@ -60,13 +64,13 @@ for mass in mass_points:
                 filter_string = " && !(Leptonic_event)"
 
             # funzioneVoigt = TF1("voigt", funVoigt, limits[mass][0], limits[mass][1], 3)
-                
-            funzione = TF1("gaus1", "gaus/sqrt(2*3.1415*[2])/gaus(0)", limits[mass][0], limits[mass][1])
+            funzione = TF1("gaus1", "gaus/sqrt(2*3.1415*[2])/gaus(0)",
+                           limits[mass][0], limits[mass][1])
             funzione.SetParameters(10, limits[mass][2], 50)
             funzione.SetParLimits(0, 0, 50)
-            fit_2_match = tree.UnbinnedFit("gaus1", "Mass",
-                                           "nMatches==2 && " + limit_string + filter_string, "RLME")
-
+            fit_2_match = tree.UnbinnedFit(
+                "gaus1", "Mass", "nMatches==2 && " +
+                limit_string + filter_string, "RLME")
             media = funzione.GetParameter(1)
             dmedia = funzione.GetParError(1)
             sigma = funzione.GetParameter(2)
@@ -77,7 +81,8 @@ for mass in mass_points:
 
             out_file.write(str(media) + "\t" + str(dmedia) + 
                            "\t" + str(sigma) + "\t" + str(dsigma) + "\t")
-            fit_2_match = tree.UnbinnedFit("gaus1", "Mass", limit_string + filter_string, "RLME")
+            fit_2_match = tree.UnbinnedFit("gaus1", "Mass",
+                                           limit_string + filter_string, "RLME")
             media = funzione.GetParameter(1)
             dmedia = funzione.GetParError(1)
             sigma = funzione.GetParameter(2)
