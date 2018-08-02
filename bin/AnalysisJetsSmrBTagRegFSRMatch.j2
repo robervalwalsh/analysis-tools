@@ -197,7 +197,7 @@ class DataContainer {
    * It will also check that the trigObj as at least kTrigobj_pt and other requirements
    * on eta. To be matched it will check from the selected TrigObj the one with least deltaR
    * It will reject the match if it is further than kTrigobj_deltaRmin
-   * @returns The index of matched trigObj. -1 if no is found.
+   * @returns The index of matched trigObj. -1 if no is found and trigger is not fired. -2 if trigger is fired but no particle found.
    */
   Int_t match_trigger_object(const Jet& jet);
 
@@ -266,6 +266,8 @@ class DataContainer {
   Float_t new_phi_[kLen];
   Float_t new_mass_[kLen];
   Bool_t leptonic;
+  Bool_t first_bjet_matched;
+  Bool_t second_bjet_matched;
   /**
    * This variable is used to see if the corrected_jets are not in the same
    * order as the original ones. If this array is for example [1, 3, 2] means
@@ -442,7 +444,8 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("Jet_newPhi", new_phi_, "Jet_newPhi[nJet]/F");
   t->Branch("Jet_newMass", new_mass_, "Jet_newMass[nJet]/F");
   t->Branch("Jet_newOriginalOrder", reordering_, "Jet_newOriginalOrder[nJet]/i");
-
+  t->Branch("BjetMatched1", &first_bjet_matched, "BjetMatched1/O");
+  t->Branch("BjetMatched2", &second_bjet_matched, "BjetMatched2/O");
 }
 // suggested regex
 // t->SetBranchAddress(\"\([a-zA-Z_0-9]*\)\", \([&]*[a-zA-Z_0-9]*\));
@@ -775,6 +778,8 @@ void DataContainer::fill_histogram(TTree* tree, \
       if (debug) {
         cout << "Trigger passed." << endl;
       }
+      first_bjet_matched = (appo1 != -2);
+      second_bjet_matched = (appo2 != -2);
     }
 
     if (corrections_after) {
@@ -840,6 +845,7 @@ Int_t DataContainer::match_trigger_object(const Jet& jet) {
 
   Float_t deltaR_min = 100;
   Int_t idx = -1;
+  bool trovato = false;
   if (debug) {
     cout << "Trying to match trigger objects." << endl;
   }
@@ -859,6 +865,7 @@ Int_t DataContainer::match_trigger_object(const Jet& jet) {
     if (TMath::Abs(trig_obj_eta_[i]) > kTrigobj_eta) {
       continue;
     }
+    trovato = true;
     Float_t cdeltaR = delta_R(trig_obj_eta_[i], trig_obj_phi_[i],\
                               jet.Eta(), jet.Phi());
     if (debug) {
@@ -869,8 +876,10 @@ Int_t DataContainer::match_trigger_object(const Jet& jet) {
       idx = i;
     }
   }
-  if (deltaR_min > kTrigobj_deltaRmin) {
-    idx = -1;
+  if (deltaR_min > kTrigobj_deltaRmin && trovato) {
+    return -2;
+  } else if (deltaR_min > kTrigobj_deltaRmin && !trovato) {
+    return -1;
   }
   if (debug) {
     cout << "Exited from loop. Found: (-1 means not found) " << idx << endl;
