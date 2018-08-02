@@ -66,6 +66,7 @@ const array<Float_t, 3> pt_cut{ {100, 100, 40} };
 const array<Float_t, 3> eta_cut{ {2.2, 2.2, 2.2} };
 const Float_t lepton_in_jet_pt_cut = 12;
 const bool debug = false;
+const bool corrections_after = true;
 
 const CorrectionLevel correction_level = CorrectionLevel::{{ cl }};
 const bool apply_trigger_cut = {{ trig }};
@@ -77,7 +78,10 @@ const Int_t pdgBId = 5;
 const Int_t heavyHiggs = 36;
 const Float_t gen_part_deltarcut = 0.3;
 const Int_t kPuId = 4;
-
+const Int_t kTrigobj_jet_id = 1;
+const Float_t kTrigobj_pt = 100;
+const Float_t kTrigobj_eta = 2.2;
+const Float_t kTrigobj_deltaRmin = 0.3;
 
 
 bool check_distance_enough(const TLorentzVector &a, const TLorentzVector &b) {
@@ -188,6 +192,15 @@ class DataContainer {
    */
   Match match_genpart(UInt_t i);
 
+  /**
+   * Checks whether if there is a trigger object matching the jet.
+   * It will also check that the trigObj as at least kTrigobj_pt and other requirements
+   * on eta. To be matched it will check from the selected TrigObj the one with least deltaR
+   * It will reject the match if it is further than kTrigobj_deltaRmin
+   * @returns The index of matched trigObj. -1 if no is found.
+   */
+  Int_t match_trigger_object(const Jet& jet);
+
   
  private:
   JME::JetResolution resolution;
@@ -239,6 +252,11 @@ class DataContainer {
   Float_t muon_eta_[kLen];
   Float_t muon_phi_[kLen];
   Bool_t muon_medium_id_[kLen];
+  UInt_t n_trig_obj_;
+  Int_t trig_obj_id_[kLen];
+  Float_t trig_obj_pt_[kLen];
+  Float_t trig_obj_eta_[kLen];
+  Float_t trig_obj_phi_[kLen];
   
   // Extra values to put in the new tree
   UInt_t matches_;
@@ -355,6 +373,11 @@ int DataContainer::SetTreeBranches(TTree * t) {
   t->SetBranchAddress("Muon_eta", muon_eta_);
   t->SetBranchAddress("Muon_phi", muon_phi_);
   t->SetBranchAddress("Muon_mediumId", &muon_medium_id_);
+  t->SetBranchAddress("nTrigObj", &n_trig_obj_);
+  t->SetBranchAddress("TrigObj_id", trig_obj_id_);
+  t->SetBranchAddress("TrigObj_pt", trig_obj_pt_);
+  t->SetBranchAddress("TrigObj_eta", trig_obj_eta_);
+  t->SetBranchAddress("TrigObj_phi", trig_obj_phi_);
   return 0;
 }
 
@@ -392,14 +415,6 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("GenPart_phi", genpart_phi_, "GenPart_phi[nGenPart]/F");
   t->Branch("GenPart_mass", genpart_mass_, "GenPart_mass[nGenPart]/F");
   t->Branch("GenPart_pdgId", genpart_pdgid_, "GenPart_pdgId[nGenPart]/F");
-  // new data
-  t->Branch("nMatches", &matches_, "nMatches/i");
-  t->Branch("Mass", &mass_, "Mass/F");
-  t->Branch("Jet_newPt", new_pt_, "Jet_newPt[nJet]/F");
-  t->Branch("Jet_newEta", new_eta_, "Jet_newEta[nJet]/F");
-  t->Branch("Jet_newPhi", new_phi_, "Jet_newPhi[nJet]/F");
-  t->Branch("Jet_newMass", new_mass_, "Jet_newMass[nJet]/F");
-  t->Branch("Jet_newOriginalOrder", reordering_, "Jet_newOriginalOrder[nJet]/i");
   t->Branch("Jet_puId", jet_puId_, "Jet_puId[nJet]/I");
   t->Branch("Jet_electronIdx1", jet_electron_idx1, "Jet_electronIdx1/I");
   t->Branch("nElectron", &n_electron, "nElectron/i");
@@ -413,6 +428,21 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("Muon_phi", muon_phi_, "Muon_phi[nMuon]/F");
   t->Branch("Muon_mediumId", &muon_medium_id_, "Muon_mediumId[nMuon]/O");
   t->Branch("Leptonic_event", &leptonic, "Leptonic_event/O");
+  t->Branch("nTrigObj", &n_trig_obj_, "nTrigObj/i");
+  t->Branch("TrigObj_id", trig_obj_id_, "TrigObj_id[nTrigObj]/F");
+  t->Branch("TrigObj_pt", trig_obj_pt_, "TrigObj_pt[nTrigObj]/F");
+  t->Branch("TrigObj_eta", trig_obj_eta_, "TrigObj_eta[nTrigObj]/F");
+  t->Branch("TrigObj_phi", trig_obj_phi_, "TrigObj_phi[nTrigObj]/F");
+
+  // new data
+  t->Branch("nMatches", &matches_, "nMatches/i");
+  t->Branch("Mass", &mass_, "Mass/F");
+  t->Branch("Jet_newPt", new_pt_, "Jet_newPt[nJet]/F");
+  t->Branch("Jet_newEta", new_eta_, "Jet_newEta[nJet]/F");
+  t->Branch("Jet_newPhi", new_phi_, "Jet_newPhi[nJet]/F");
+  t->Branch("Jet_newMass", new_mass_, "Jet_newMass[nJet]/F");
+  t->Branch("Jet_newOriginalOrder", reordering_, "Jet_newOriginalOrder[nJet]/i");
+
 }
 // suggested regex
 // t->SetBranchAddress(\"\([a-zA-Z_0-9]*\)\", \([&]*[a-zA-Z_0-9]*\));
@@ -435,9 +465,11 @@ void DataContainer::smear_current_data(UInt_t i) {
 }
 
 void DataContainer::apply_all_corrections(CorrectionLevel lev) {
-  // for (unsigned int i = 0; i < njet_; i++) {
-  //   initialize_current_data(i);
-  // }
+  if (!corrections_after) {
+    for (unsigned int i = 0; i < njet_; i++) {
+      initialize_current_data(i);
+    }
+  }
   switch (lev) {
   case CorrectionLevel::nothing: break;
   case CorrectionLevel::only_smearing:
@@ -609,8 +641,12 @@ void DataContainer::fill_histogram(TTree* tree, \
       continue;
     }
 
-    for (unsigned int i = 0; i < njet_; i++) {
-      initialize_current_data(i);
+    if (corrections_after) {
+      for (unsigned int i = 0; i < njet_; i++) {
+        initialize_current_data(i);
+      }
+    } else {
+      apply_all_corrections(correction_level);
     }
 
     // Now check btags
@@ -709,8 +745,6 @@ void DataContainer::fill_histogram(TTree* tree, \
       continue;
     }
 
-    apply_all_corrections(correction_level);
-    
     unsigned int matched = 0;
     for (unsigned int i = 0; i < 2; i++) {
       match_jet_with_part(bjets[i]);
@@ -722,7 +756,37 @@ void DataContainer::fill_histogram(TTree* tree, \
       }
     }
     if (debug) {
-      cout << "Matched " << matched << " jets" << endl;
+      cout << "Matched as higgs daughter " << matched << " jets" << endl;
+    }
+
+    if (apply_trigger_cut) {
+      Int_t appo1, appo2;
+      appo1 = match_trigger_object(bjets[0]);
+      appo2 = match_trigger_object(bjets[1]);
+      if (debug) {
+        cout << "Matching trigg" << endl;
+      }
+      if (appo1 == -1 || appo2 == -1) {
+        if (debug) {
+          cout << "Trigger failed. Skipping event" << endl;
+        }
+        continue;
+      }
+      if (debug) {
+        cout << "Trigger passed." << endl;
+      }
+    }
+
+    if (corrections_after) {
+      apply_all_corrections(correction_level);
+      for (auto it : corrected_jet) {
+        if (it.Idx() == bjets[0].Idx()) {
+          bjets[0] = it;
+        }
+        if (it.Idx() == bjets[1].Idx()) {
+          bjets[1] = it;
+        }
+      }
     }
 
     mass_ = -(bjets[0] - bjets[1]).M();
@@ -764,6 +828,54 @@ void DataContainer::fill_histogram(TTree* tree, \
       plots[8]->Fill(jet_b_reg_res_[bjets[0].Idx()], weigth);
     }
   }
+}
+
+inline Float_t delta_R(const Float_t eta1, const Float_t phi1, \
+                const Float_t eta2, const Float_t phi2) {
+  return TMath::Sqrt(TMath::Power(eta1 - eta2, 2) + TMath::Power(phi1 - phi2, 2));
+}
+
+
+Int_t DataContainer::match_trigger_object(const Jet& jet) {
+
+  Float_t deltaR_min = 100;
+  Int_t idx = -1;
+  if (debug) {
+    cout << "Trying to match trigger objects." << endl;
+  }
+  for (UInt_t i = 0; i < n_trig_obj_; i++) {
+    if (debug) {
+      cout << "trig id: " << trig_obj_id_[i] << "\ttrig pt: " <<        \
+        trig_obj_pt_[i] << "\ttrig eta: " << trig_obj_eta_[i] <<        \
+        "\ttrig phi: " << trig_obj_phi_[i] << endl;
+    }
+
+    if (trig_obj_id_[i] != kTrigobj_jet_id) {
+      continue;
+    }
+    if (trig_obj_pt_[i] < kTrigobj_pt) {
+      continue;
+    }
+    if (TMath::Abs(trig_obj_eta_[i]) > kTrigobj_eta) {
+      continue;
+    }
+    Float_t cdeltaR = delta_R(trig_obj_eta_[i], trig_obj_phi_[i],\
+                              jet.Eta(), jet.Phi());
+    if (debug) {
+      cout << "DeltaR: " << cdeltaR << endl;
+    }
+    if (cdeltaR < deltaR_min) {
+      deltaR_min = cdeltaR;
+      idx = i;
+    }
+  }
+  if (deltaR_min > kTrigobj_deltaRmin) {
+    idx = -1;
+  }
+  if (debug) {
+    cout << "Exited from loop. Found: (-1 means not found) " << idx << endl;
+  }
+  return idx;
 }
 
 
@@ -826,8 +938,10 @@ void DataContainer::apply_fsr_correction() {
       cout << "Best candidate had pt: " << best->Pt() << " R distance: " \
            << appo.DeltaR(*best) << endl;
     }
-    appo += *best;
-    corrected_jet[i].SetPtEtaPhiM(appo.Pt(), appo.Eta(), appo.Phi(), appo.M());
+    if ((appo + *best).Pt() > pt_cut[pt_cut.size() - 1]) {
+      appo += *best;
+      corrected_jet[i].SetPtEtaPhiM(appo.Pt(), appo.Eta(), appo.Phi(), appo.M());
+    }
   }
   return;
 }
