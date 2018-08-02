@@ -97,20 +97,8 @@
   <flags   LDFLAGS="-lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -lm -ldl -rdynamic"/>
 </bin>
 
-<bin name="AnalysisJetsSmrBTagRegFSR" file="AnalysisJetsSmrBTagRegFSR.cc">
-  <use name="JetMETCorrections/Modules CondFormats/BTauObjects CondTools/BTau" />
-  <flags   LDFLAGS="-lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -lm -ldl -rdynamic"/>
-</bin>
-
 <bin name="PlotStackStyle" file="PlotStackStyle.cc">
   <flags   LDFLAGS="-lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -lm -ldl -rdynamic" CXXFLAGS="-Wno-error=maybe-uninitialized" />
-</bin>
-
-
-<bin name="AnalysisJetsSmrBTagRegFSRMatch" file="AnalysisJetsSmrBTagRegFSRMatch.cc">
-  <!-- <use name="JetMETCorrections/Modules CondFormats/BTauObjects CondTools/BTau" /> -->
-  <use name="JetMETCorrections/Modules" />
-  <flags   LDFLAGS="-lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -lm -ldl -rdynamic" CXXFLAGS="-g -O0"/>
 </bin>
 
 {% for name in names %}
