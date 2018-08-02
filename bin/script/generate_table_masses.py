@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
 # Reads all histograms and puts in a table the number of entries
 
 from ROOT import TH1F, TFile
@@ -5,7 +8,7 @@ from ROOT import TH1F, TFile
 import os
 
 
-directory = 'hists/jets/'
+directory = '../output/hists/jets/'
 
 matches = [0, 1, 2]
 lep = ["lep", "chr"]
@@ -20,9 +23,9 @@ mass_points = ["120", "350", "1200"]
 
 
 for mass in mass_points:
-    cur_dir = os.path.join(directory, "mass_" + mass)
+    cur_dir = os.path.join(directory, "before_mass_" + mass)
     for l in lep:
-        output_filename = os.path.join("output_tables", str(mass))
+        output_filename = os.path.join("../output/tables/before/match", str(mass))
         output_filename = os.path.join(output_filename, "_".join([l, mass]) + ".txt")
         print(output_filename)
         out_file = open(output_filename, "w")
