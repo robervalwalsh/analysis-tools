@@ -2,26 +2,27 @@
 # -*- coding:utf-8 -*-
 
 from jinja2 import FileSystemLoader, Environment
+import os
 
-correction_level = ["nothing",
-                    "only_smearing",
-                    "smearing_btag",
-                    "smearing_btag_regression",
-                    "smearing_btag_regression_fsr"]
+correction_level = ["nothing_false",
+                    "only_smearing_false",
+                    "smearing_btag_false",
+                    "smearing_btag_regression_false",
+                    "smearing_btag_regression_fsr_false",
+                    "smearing_btag_regression_fsr_true"]
 
-trigger_cuus = [
-    "true",
-    "false"
-    ]
 matches = ["0", "1", "2"]
+mass_points = ["120", "350", "1200"]
 
-template_loader = FileSystemLoader(searchpath='./')
+template_loader = FileSystemLoader(searchpath='./templates/')
 template_env = Environment(loader=template_loader)
-template_file = "gen_match.json"
-template = template_env.get_template(template_file)
+base_dir = "output/hists/jets/test_"
 
-for c in correction_level:
-    for t in trigger_cuus:
+for mass in mass_points:
+    template_file = "gen_mass_" + mass + ".json"
+    template = template_env.get_template(template_file)
+    cur_dir = base_dir + mass
+    for c in correction_level:
         for lep in (True, False):
             coppie = []
             for m in matches:
@@ -43,13 +44,12 @@ for c in correction_level:
                 coppie.append((nome, leg, colore))
             outname = ""
             if lep:
-                outname = c + "_" + t + "_lep.json"
+                outname = "_".join([c, "lep"]) + ".json"
             else:
-                outname = c + "_" + t + "_chr.json"
-            context = {'file_name': 'output/hists/jets/script_match/' +
-                       c + "_" + t + ".root",
+                outname = "_".join([c, "chr"]) + ".json"
+            context = {'file_name': os.path.join(cur_dir, c + ".root"),
                        'coppie': coppie}
             out_text = template.render(**context)
-            f = open("outdir/" + outname, "w")
+            f = open(os.path.join("../" + cur_dir, outname), "w")
             f.write(out_text)
             f.close()
