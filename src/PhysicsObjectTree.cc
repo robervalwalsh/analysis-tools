@@ -75,6 +75,9 @@ PhysicsObjectTree<Jet>::PhysicsObjectTree(TChain * tree, const std::string & nam
    isSimpleJet_ = false;
    hasPuppiInfo_ = false;
    hasQGLikelihood_ = false;
+   hasBRegCorr_ = false;
+   hasBRegRes_ = false;
+   hasRho_ = false;
    
 //   tree_  -> SetBranchAddress( "btag_csvivf", btag_    );
    int algos = 0;
@@ -116,8 +119,9 @@ PhysicsObjectTree<Jet>::PhysicsObjectTree(TChain * tree, const std::string & nam
       it = std::find(branches_.begin(),branches_.end(),"puJetIdFullDiscriminant") ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , puJetIdFullDisc_ );
       it = std::find(branches_.begin(),branches_.end(),"puJetIdFullId")           ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , puJetIdFullId_ );
       it = std::find(branches_.begin(),branches_.end(),"id_puppi")                ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , puppi_ )       ; hasPuppiInfo_ = true; }
-      it = std::find(branches_.begin(),branches_.end(),"bjetRegCorr")             ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , bRegCorr_ )    ; hasBRegCorr_ = true; }
-      it = std::find(branches_.begin(),branches_.end(),"bjetRegRes")              ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , bRegRes_ )     ; hasBRegRes_  = true; }
+      it = std::find(branches_.begin(),branches_.end(),"bjetRegCorr")             ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , bRegCorr_ )    ; hasBRegCorr_  = true; }
+      it = std::find(branches_.begin(),branches_.end(),"bjetRegRes")              ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , bRegRes_ )     ; hasBRegRes_   = true; }
+      it = std::find(branches_.begin(),branches_.end(),"Rho")                     ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , &rho_ )        ; hasRho_       = true; }
    }
    else
    {
@@ -170,6 +174,8 @@ Collection<Jet>  PhysicsObjectTree<Jet>::collection()
       else                 jet.bRegCorr(1);
       if ( hasBRegRes_  )  jet.bRegRes (bRegRes_[i]);
       else                 jet.bRegRes(1);
+      if ( hasRho_ )       jet.rho(rho_);
+      else                 jet.rho(-1);
       
       jets.push_back(jet);
    }

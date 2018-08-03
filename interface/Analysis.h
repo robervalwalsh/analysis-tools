@@ -80,6 +80,9 @@ namespace analysis {
             double genScale();
             PDF    pdf();
             
+            /// fixedGridRhoAll
+            double rho();
+            
 
             // Trees
             template<class Object>
@@ -186,6 +189,8 @@ namespace analysis {
             double genWeight_;
             double genScale_;
             PDF    pdf_;
+            
+            double rho_;
 
             int nevents_;
 
@@ -347,6 +352,7 @@ namespace analysis {
       inline double Analysis::genWeight()   { return genWeight_; }
       inline double Analysis::genScale()    { return genScale_;  }
       inline PDF    Analysis::pdf()         { return pdf_;       }
+      inline double Analysis::rho()         { return rho_; }
       
       inline void Analysis::btagEfficienciesAlgo(const std::string & algo )      { btageff_algo_    = algo; }
       inline void Analysis::btagEfficienciesFlavour(const std::string & flavour) { btageff_flavour_ = flavour; }

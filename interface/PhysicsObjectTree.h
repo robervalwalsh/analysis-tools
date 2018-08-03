@@ -100,6 +100,9 @@ namespace analysis {
             bool hasQGLikelihood_;
             bool hasBRegCorr_;
             bool hasBRegRes_;
+            
+            bool hasRho_;
+            double rho_;
 
          private:
 

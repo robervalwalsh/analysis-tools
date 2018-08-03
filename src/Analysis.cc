@@ -69,6 +69,7 @@ Analysis::Analysis(const std::string & inputFilelist, const std::string & evtinf
    it = std::find(branches.begin(),branches.end(),"pdfx1");        if ( it != branches.end() ) t_event_  -> SetBranchAddress( (*it).c_str(), &pdf_.x.first);
    it = std::find(branches.begin(),branches.end(),"pdfx2");        if ( it != branches.end() ) t_event_  -> SetBranchAddress( (*it).c_str(), &pdf_.x.second);
    
+   it = std::find(branches.begin(),branches.end(),"rho");          if ( it != branches.end() ) t_event_  -> SetBranchAddress( (*it).c_str(), &rho_);
    
 //   t_event_ -> SetBranchAddress("nPileup", &n_pu_);
 //   t_event_ -> SetBranchAddress("nTruePileup", &n_true_pu_);
