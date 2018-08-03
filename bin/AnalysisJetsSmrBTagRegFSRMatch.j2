@@ -82,6 +82,7 @@ const Int_t kTrigobj_jet_id = 1;
 const Float_t kTrigobj_pt = 100;
 const Float_t kTrigobj_eta = 2.3;
 const Float_t kTrigobj_deltaRmin = 0.3;
+const Int_t kTrigobj_id_had_jet = 580;
 
 
 bool check_distance_enough(const TLorentzVector &a, const TLorentzVector &b) {
@@ -257,6 +258,8 @@ class DataContainer {
   Float_t trig_obj_pt_[kLen];
   Float_t trig_obj_eta_[kLen];
   Float_t trig_obj_phi_[kLen];
+  Float_t trig_obj_l1pt_[kLen];
+  Float_t trig_obj_l2pt_[kLen];
   Float_t rho_jec_;
   
   // Extra values to put in the new tree
@@ -381,6 +384,8 @@ int DataContainer::SetTreeBranches(TTree * t) {
   t->SetBranchAddress("TrigObj_pt", trig_obj_pt_);
   t->SetBranchAddress("TrigObj_eta", trig_obj_eta_);
   t->SetBranchAddress("TrigObj_phi", trig_obj_phi_);
+  t->SetBranchAddress("TrigObj_l1pt", trig_obj_l1pt_);
+  t->SetBranchAddress("TrigObj_l2pt", trig_obj_l2pt_);
   t->SetBranchAddress("fixedGridRhoFastjetAll", &rho_jec_);
   return 0;
 }
@@ -437,6 +442,8 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("TrigObj_pt", trig_obj_pt_, "TrigObj_pt[nTrigObj]/F");
   t->Branch("TrigObj_eta", trig_obj_eta_, "TrigObj_eta[nTrigObj]/F");
   t->Branch("TrigObj_phi", trig_obj_phi_, "TrigObj_phi[nTrigObj]/F");
+  t->Branch("TrigObj_l1pt", trig_obj_l1pt_, "TrigObj_l1pt[nTrigObj]/F");
+  t->Branch("TrigObj_l2pt", trig_obj_l2pt_, "TrigObj_l2pt[nTrigObj]/F");
   t->Branch("fixedGridRhoFastjetAll", &rho_jec_, "fixedGridRhoFastjetAll/F");
 
   // new data
@@ -629,6 +636,14 @@ void DataContainer::fill_histogram(TTree* tree, \
   for (ULong64_t event = 0; event < how_many; event++) {
     tree->GetEntry(event);
     if (apply_trigger_cut) {
+      if (debug) {
+        cout << "Printing a lot of stuff for trigger for debug." << endl;
+      }
+      if (debug) {
+        for (UInt_t i = 0; i < n_trig_obj_; i++) {
+          cout << "Trigid: " << trig_obj_id_[i] << "\tTrigger path: " << trigger_path << endl;
+        }
+      }
       if (!trigger_path) {
         continue;
       }
@@ -772,7 +787,7 @@ void DataContainer::fill_histogram(TTree* tree, \
       if (debug) {
         cout << "Matching trigg" << endl;
       }
-      if (appo1 == -1 || appo2 == -1) {
+      if (appo1 < 0 || appo2 < 0) {
         if (debug) {
           cout << "Trigger failed. Skipping event" << endl;
         }
@@ -891,7 +906,74 @@ Int_t DataContainer::match_trigger_object(const Jet& jet) {
     idx = -1;
   }
   if (debug) {
-    cout << "Exited from loop. Found: (-1 means not found) " << idx << endl;
+    cout << "Exited from first loop. Found: (-1 means not found) " << idx << endl;
+  }
+  if (idx < 0) {
+    return idx;
+  }
+  
+  UInt_t l1trig = 0;
+  if (debug) {
+    cout << "Checking level 1 trigger" << endl;
+  }
+  for (UInt_t i = 0; i < n_trig_obj_; i++) {
+    if (trig_obj_l1pt_[i] >= kTrigobj_pt) {
+      l1trig++;
+    }
+  }
+  if (debug) {
+    cout << "Found l1: " << l1trig << endl;
+  }
+  if (l1trig < 2) {
+    return -3;
+  }
+  
+  if (debug) {
+    cout << "Checking level 2 trigger" << endl;
+  }
+  UInt_t l2trig = 0;
+  for (UInt_t i = 0; i < n_trig_obj_; i++) {
+    if (trig_obj_l2pt_[i] >= kTrigobj_pt) {
+      l2trig++;
+    }
+  }
+  if (debug) {
+    cout << "Found l2: " << l2trig << endl;
+  }
+  if (l2trig < 2) {
+    return -4;
+  }
+
+  // now i check for full hadronic jet
+  idx = -5;
+  if (debug) {
+    cout << "Checking for full hadronic jet" << endl;
+  }
+
+  deltaR_min = 100;
+  for (UInt_t i = 0; i < n_trig_obj_; i++) {
+    if (debug) {
+      cout << "Trig full had. Id: " << trig_obj_id_[i] << endl;
+    }
+    if (trig_obj_id_[i] != kTrigobj_id_had_jet) {
+      continue;
+    }
+    Float_t cdeltaR = delta_R(trig_obj_eta_[i], trig_obj_phi_[i],       \
+                              jet.Eta(), jet.Phi());
+    if (debug) {
+      cout << "DeltaR: " << cdeltaR << endl;
+    }
+    if (cdeltaR < deltaR_min) {
+      deltaR_min = cdeltaR;
+      idx = i;
+    }
+  }
+  if (deltaR_min > kTrigobj_deltaRmin) {
+    idx = -5;
+  }
+  if (debug) {
+    cout << "Found trig obj as full hadronic jet: (negative value means not found) " <<\
+      idx << endl;
   }
   return idx;
 }
