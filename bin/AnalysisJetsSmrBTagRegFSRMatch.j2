@@ -621,7 +621,7 @@ void DataContainer::fill_histogram(TTree* tree, \
                                    std::vector<TH1F*> plots, TTree* out_tree) {
   ULong64_t how_many;
   if (debug) {
-    how_many = 1000;
+    how_many = 100000;
   } else {
     how_many = tree->GetEntries();
   }
