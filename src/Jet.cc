@@ -92,6 +92,8 @@ int   Jet::pileupJetIdFullId()                     const { return puJetIdFullId_
 float Jet::bRegCorr() const  { return bRegCorr_; }
 float Jet::bRegRes()  const  { return bRegRes_; }
 
+double Jet::rho()     const  { return rho_; }
+
 
 bool  Jet::pileupJetIdFullId(const std::string & wp) const
 { 
@@ -135,6 +137,7 @@ void Jet::pileupJetIdFullId(const int & id)                           { puJetIdF
 void Jet::bRegCorr(const float & bRegCorr)                            { bRegCorr_ = bRegCorr; }
 void Jet::bRegRes(const float & bRegRes)                              { bRegRes_  = bRegRes; }
 
+void Jet::rho(const double & rho)                                      { rho_  = rho; }
 
 
 int Jet::removeParton(const int & i)

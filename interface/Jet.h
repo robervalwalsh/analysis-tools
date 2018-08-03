@@ -100,6 +100,9 @@ namespace analysis {
             float bRegCorr() const;
             float bRegRes()  const;
             
+            /// Rho
+            double rho() const;
+            
             /// pointer to the FSR jet
             Jet * fsrJet();
             
@@ -165,6 +168,9 @@ namespace analysis {
             /// b-jet regression
             void bRegCorr(const float &);
             void bRegRes(const float &);
+            
+            /// Rho
+            void rho(const double &);
             
             
             /// associate partons to the jet
@@ -235,6 +241,9 @@ namespace analysis {
             /// b-jet regression
             float bRegCorr_;
             float bRegRes_;
+            
+            /// Fixedgridrho (for JER)
+            double rho_;
             
             /// final state radiation
             Jet * fsr_;
