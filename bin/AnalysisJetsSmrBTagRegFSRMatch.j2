@@ -257,6 +257,7 @@ class DataContainer {
   Float_t trig_obj_pt_[kLen];
   Float_t trig_obj_eta_[kLen];
   Float_t trig_obj_phi_[kLen];
+  Float_t rho_jec_;
   
   // Extra values to put in the new tree
   UInt_t matches_;
@@ -302,7 +303,7 @@ Smearing::method DataContainer::smearing(const TVector3& jet, const TVector3& ge
   JME::JetParameters parameters;
   parameters.setJetPt(jet.Pt());
   parameters.setJetEta(jet.Eta());
-  parameters.setRho((jet.Pt() - genjet.Pt())/jet.Pt());
+  parameters.setRho(rho_jec_);
   Float_t sigmajer = resolution.getResolution(parameters);
   Float_t sjer = resolution_sf.getScaleFactor(parameters);
   if ((2*jet.DeltaR(genjet) < radius) && \
@@ -380,6 +381,7 @@ int DataContainer::SetTreeBranches(TTree * t) {
   t->SetBranchAddress("TrigObj_pt", trig_obj_pt_);
   t->SetBranchAddress("TrigObj_eta", trig_obj_eta_);
   t->SetBranchAddress("TrigObj_phi", trig_obj_phi_);
+  t->SetBranchAddress("fixedGridRhoFastjetAll", &rho_jec_);
   return 0;
 }
 
@@ -435,6 +437,7 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("TrigObj_pt", trig_obj_pt_, "TrigObj_pt[nTrigObj]/F");
   t->Branch("TrigObj_eta", trig_obj_eta_, "TrigObj_eta[nTrigObj]/F");
   t->Branch("TrigObj_phi", trig_obj_phi_, "TrigObj_phi[nTrigObj]/F");
+  t->Branch("fixedGridRhoFastjetAll", &rho_jec_, "fixedGridRhoFastjetAll/F");
 
   // new data
   t->Branch("nMatches", &matches_, "nMatches/i");
