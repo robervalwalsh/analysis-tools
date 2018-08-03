@@ -83,6 +83,7 @@ const Float_t kTrigobj_pt = 100;
 const Float_t kTrigobj_eta = 2.3;
 const Float_t kTrigobj_deltaRmin = 0.3;
 const Int_t kTrigobj_id_had_jet = 580;
+const Int_t kTrigobj_filter_bits = 3;
 
 
 bool check_distance_enough(const TLorentzVector &a, const TLorentzVector &b) {
@@ -260,6 +261,7 @@ class DataContainer {
   Float_t trig_obj_phi_[kLen];
   Float_t trig_obj_l1pt_[kLen];
   Float_t trig_obj_l2pt_[kLen];
+  Int_t trig_obj_filter_bits_[kLen];
   Float_t rho_jec_;
   
   // Extra values to put in the new tree
@@ -387,6 +389,7 @@ int DataContainer::SetTreeBranches(TTree * t) {
   t->SetBranchAddress("TrigObj_l1pt", trig_obj_l1pt_);
   t->SetBranchAddress("TrigObj_l2pt", trig_obj_l2pt_);
   t->SetBranchAddress("fixedGridRhoFastjetAll", &rho_jec_);
+  t->SetBranchAddress("TrigObj_filterBits", trig_obj_filter_bits_);
   return 0;
 }
 
@@ -445,6 +448,7 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("TrigObj_l1pt", trig_obj_l1pt_, "TrigObj_l1pt[nTrigObj]/F");
   t->Branch("TrigObj_l2pt", trig_obj_l2pt_, "TrigObj_l2pt[nTrigObj]/F");
   t->Branch("fixedGridRhoFastjetAll", &rho_jec_, "fixedGridRhoFastjetAll/F");
+  t->Branch("TrigObj_filterBits", trig_obj_filter_bits_, "TrigObj_filterBits[nTrigObj]/I");
 
   // new data
   t->Branch("nMatches", &matches_, "nMatches/i");
@@ -816,7 +820,7 @@ void DataContainer::fill_histogram(TTree* tree, \
     if (debug) {
       cout << "Weight before multiplication for 0.512: " << weigth << endl;
     }
-    weigth *= 0.512; // this is 0.8**3, to simulate btag efficiency
+    weigth *= 0.64; // this is 0.8**2, to simulate online btag efficiency
     mass_ = -(bjets[0] - bjets[1]).M();
     matches_ = matched;
     for (unsigned int k = 0; k < corrected_jet.size(); k++) {
@@ -911,36 +915,22 @@ Int_t DataContainer::match_trigger_object(const Jet& jet) {
   if (idx < 0) {
     return idx;
   }
-  
-  UInt_t l1trig = 0;
   if (debug) {
     cout << "Checking level 1 trigger" << endl;
   }
-  for (UInt_t i = 0; i < n_trig_obj_; i++) {
-    if (trig_obj_l1pt_[i] >= kTrigobj_pt) {
-      l1trig++;
+  if (trig_obj_l1pt_[idx] < kTrigobj_pt) {
+    if (debug) {
+      cout << "L1 trig failed." << endl;
     }
-  }
-  if (debug) {
-    cout << "Found l1: " << l1trig << endl;
-  }
-  if (l1trig < 2) {
     return -3;
-  }
-  
+  }  
   if (debug) {
     cout << "Checking level 2 trigger" << endl;
   }
-  UInt_t l2trig = 0;
-  for (UInt_t i = 0; i < n_trig_obj_; i++) {
-    if (trig_obj_l2pt_[i] >= kTrigobj_pt) {
-      l2trig++;
+  if (trig_obj_l2pt_[idx] < kTrigobj_pt) {
+    if (debug) {
+      cout << "L2 trig failed." << endl;
     }
-  }
-  if (debug) {
-    cout << "Found l2: " << l2trig << endl;
-  }
-  if (l2trig < 2) {
     return -4;
   }
 
@@ -953,12 +943,14 @@ Int_t DataContainer::match_trigger_object(const Jet& jet) {
   deltaR_min = 100;
   for (UInt_t i = 0; i < n_trig_obj_; i++) {
     if (debug) {
-      cout << "Trig full had. Id: " << trig_obj_id_[i] << endl;
+      cout << "Trig full had. Id: " << trig_obj_id_[i] <<\
+        "\t and filter_bits: " << trig_obj_filter_bits_[i] << endl;
     }
-    if (trig_obj_id_[i] != kTrigobj_id_had_jet) {
+    if (trig_obj_id_[i] != kTrigobj_id_had_jet || \
+        trig_obj_filter_bits_[i] != kTrigobj_filter_bits) {
       continue;
     }
-    Float_t cdeltaR = delta_R(trig_obj_eta_[i], trig_obj_phi_[i],       \
+    Float_t cdeltaR = delta_R(trig_obj_eta_[i], trig_obj_phi_[i], \
                               jet.Eta(), jet.Phi());
     if (debug) {
       cout << "DeltaR: " << cdeltaR << endl;
