@@ -793,7 +793,12 @@ void DataContainer::fill_histogram(TTree* tree, \
         }
       }
     }
+    
 
+    if (debug) {
+      cout << "Weight before multiplication for 0.512: " << weigth << endl;
+    }
+    weigth *= 0.512; // this is 0.8**3, to simulate btag efficiency
     mass_ = -(bjets[0] - bjets[1]).M();
     matches_ = matched;
     for (unsigned int k = 0; k < corrected_jet.size(); k++) {
@@ -804,7 +809,8 @@ void DataContainer::fill_histogram(TTree* tree, \
       reordering_[k] = corrected_jet[k].Idx();
     }
     cout << "\033[0;32mFilling with m = " << mass_ << \
-      " and pt = " << bjets[0].Pt() << "\033[0m" << endl;
+      " and pt = " << bjets[0].Pt() << ". Weigth of this event: " << weigth \
+         << "\033[0m" << endl;
     Int_t appo_elc = 0;
     appo_elc += jet_n_electrons[bjets[0].Idx()];
     appo_elc += jet_n_electrons[bjets[1].Idx()];
@@ -877,9 +883,9 @@ Int_t DataContainer::match_trigger_object(const Jet& jet) {
     }
   }
   if (deltaR_min > kTrigobj_deltaRmin && trovato) {
-    return -2;
+    idx = -2;
   } else if (deltaR_min > kTrigobj_deltaRmin && !trovato) {
-    return -1;
+    idx = -1;
   }
   if (debug) {
     cout << "Exited from loop. Found: (-1 means not found) " << idx << endl;
@@ -892,13 +898,18 @@ void DataContainer::apply_btag_sf() {
   if (debug) {
     cout << "Using scale factors for btagging" << endl;
   }
-  for (auto it = corrected_jet.begin(); it != corrected_jet.end(); it++) {
-    Double_t sf = reader.eval(BTagEntry::FLAV_B, it->Eta(), it->Pt(), 0);
-    if (debug) {
-      cout << "sf: " << sf << endl;
+  UInt_t btagged = 0;
+  for (auto it = corrected_jet.begin(); it != corrected_jet.end() && btagged < 3; it++) {
+    if (btag_deep_[it->Idx()] > deepcsv_cut) {
+      Double_t appo = reader.eval(BTagEntry::FLAV_B, it->Eta(), it->Pt(), 0);
+      weigth *= appo;
+      btagged++;
+      if (debug) {
+        cout << "Retrieved sf: " << appo << "\nWeigth after this step: " << \
+          weigth << endl;
+      }
     }
-    it->SetPtEtaPhiM((it->Pt())*sf, it->Eta(), it->Phi(), it->M());
-  }
+  }  
 }
 
 
