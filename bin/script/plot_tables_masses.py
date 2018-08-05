@@ -1,17 +1,22 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
+
 import pylab
 import numpy
+import os
 
 lep = ["chr", "lep"]
-trig = ["false", "true"]
 
 x_axis_names = ["Nothing", "Smearing", "B-Tag sf", "Reg", "FSR", "Trigger"]
 
+directory = "../output/tables/reordering/no_reord/"
 
 counter = 0
 for l in lep:
     counter += 1
-    filename350 = "350/" + "_".join([l, "350"]) + ".txt"
-    filename1200 = "1200/" + "_".join([l, "1200"]) + ".txt"
+    filename350 = os.path.join(directory, "350/" + "_".join([l, "350"]) + ".txt")
+    filename1200 = os.path.join(directory, "1200/" + "_".join([l, "1200"]) + ".txt")
     m1, m2, m3 = pylab.loadtxt(filename350, unpack=True)
     n1, n2, n3 = pylab.loadtxt(filename1200, unpack=True)
     totale350 = m1 + m2 + m3
@@ -51,5 +56,7 @@ for l in lep:
     else:
         titolo = "Non leptonic"
     pylab.title(titolo)
+    pylab.savefig(os.path.join(directory, l + ".pdf"))
+    
         
 pylab.show()
