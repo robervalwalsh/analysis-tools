@@ -29,6 +29,7 @@
 #include "TMath.h"
 #include "TCanvas.h"
 #include "TRandom3.h"
+#include "TChain.h"
 
 #include "JetMETCorrections/Modules/interface/JetResolution.h"
 #include "Analysis/Tools/interface/BTagCalibrationStandalone.h"
@@ -70,7 +71,6 @@ const bool corrections_after = true;
 
 const CorrectionLevel correction_level = CorrectionLevel::{{ cl }};
 const bool apply_trigger_cut = {{ trig }};
-const string file("{{ filename }}");
 const UInt_t highx = {{ highx }};
 const UInt_t bins = {{ bins }};
 const Float_t soft_jet_distance = 0.8;
@@ -1044,15 +1044,22 @@ void DataContainer::apply_fsr_correction() {
 }
 
 
+void get_chain_files(TChain* chain) {
+  {% for file in filenames %}
+    chain->Add("{{ basedir }}{{ file }}");{% endfor %}
+}
+
+
 int main(int argc, char* argv[]) {
   TH1::SetDefaultSumw2();  // proper treatment of errors when scaling histograms
-  TFile nano(file.c_str(), "old");
   if (argc != 2) {
     cerr << "\033[0;31mPlease give the name of the file where you want to" <<
       "put the output as an argument. Aborting.\033[0m" << endl;
     return -1;
   }
-  if (nano.IsZombie()) {
+  TChain chain("Events");
+  get_chain_files(&chain);
+  if (chain.IsZombie()) {
     cerr << "Error opening input file! Aborting." << endl;
     return -2;
   }
@@ -1062,10 +1069,9 @@ int main(int argc, char* argv[]) {
       "the file does not exist. Aborting." << endl;
     return -3;
   }
-  TTree* tree = reinterpret_cast<TTree*>(nano.Get("Events"));
   TTree output_tree("output_tree", "Histograms and data for H->bb decay");
   DataContainer container;
-  container.SetTreeBranches(tree);
+  container.SetTreeBranches(&chain);
   container.CreateTree(&output_tree);
   TH1F mass_histo_chromo_0_match("mass_histo_chromo_0_match", \
                       "Invariant mass of bb jets", bins, 0, highx);
@@ -1099,7 +1105,7 @@ int main(int argc, char* argv[]) {
   histos.push_back(&reg_res_chromo);
   histos.push_back(&reg_res_lepton);
 
-  container.fill_histogram(tree, histos, &output_tree);
+  container.fill_histogram(&chain, histos, &output_tree);
   output.cd();
   mass_histo_chromo_0_match.SetLineColor(kPink);
   mass_histo_chromo_0_match.SetLineColor(kBlue);
@@ -1122,6 +1128,5 @@ int main(int argc, char* argv[]) {
   }
   mass_histo_sum.Write();
   output_tree.Write();
-  nano.Close();
   return 0;
 }
