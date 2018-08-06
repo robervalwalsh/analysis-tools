@@ -94,6 +94,32 @@ float Jet::bRegRes()  const  { return bRegRes_; }
 
 double Jet::rho()     const  { return rho_; }
 
+double Jet::btagSFsys(std::shared_ptr<BTagCalibrationReader> reader, const std::string & systype, const std::string & flavalgo) const
+{
+   double sf = 1;
+   
+   if ( reader == nullptr ) return sf;
+   
+   if ( this->flavour(flavalgo) == 5 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_B,    fabs(this->eta()), this->pt() ); 
+   if ( this->flavour(flavalgo) == 4 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_C,    fabs(this->eta()), this->pt() ); 
+   if ( this->flavour(flavalgo) == 0 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_UDSG, fabs(this->eta()), this->pt() );
+   
+   return sf;
+}
+
+double Jet::btagSF(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo) const
+{
+   return this -> btagSFsys(reader,"central",flavalgo);
+}
+double Jet::btagSFup(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo) const
+{
+   return this -> btagSFsys(reader,"up",flavalgo);
+}
+double Jet::btagSFdown(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo) const
+{
+   return this -> btagSFsys(reader,"down",flavalgo);
+}
+
 
 bool  Jet::pileupJetIdFullId(const std::string & wp) const
 { 
