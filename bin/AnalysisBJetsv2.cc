@@ -33,6 +33,10 @@ int main(int argc, char * argv[])
    float btagmin = btagMin(btagwp_);
    
    // b-tag scale factors
+   // inputs from the config file test/analysis_bjetsv2.cfg
+   // btagalgo_ = "deepcsv";
+   // btagsf_   = "../data/DeepCSV_94XSF_V3_B_F.csv";
+   // btagwp_   = "tight";
    auto bsf_reader = analysis.btagCalibration(btagalgo_, btagsf_, btagwp_);
    
    // Physics Objects Collections
@@ -58,15 +62,16 @@ int main(int argc, char * argv[])
          
          ++nbjets;
          
-         // b-tag scale factors
-         double jet_bscalefactor = jet.btagSF(bsf_reader); // OR jet.btagSF(analysis.btagCalibration()); 
-         double jet_bscalefactorup = jet.btagSFup(analysis.btagCalibration()); 
+         // b-tag scale factors central, up and down
+         double jet_bscalefactor   = jet.btagSF(bsf_reader); // OR jet.btagSF(analysis.btagCalibration()); 
+         double jet_bscalefactorup = jet.btagSFup(bsf_reader); 
+         double jet_bscalefactorup = jet.btagSFdown(bsf_reader); 
      
          std::cout << "    Jet #" << j << ": ";
          std::cout << "pT  = "     << jet.pt()      << ", ";
          std::cout << "eta = "     << jet.eta()     << ", ";
          std::cout << "flavour = " << jet.flavour() << ", ";
-         std::cout << "btag = "    << jet.btag()    << " with scale factor = " <<  jet_bscalefactor << "  up: " << jet_bscalefactorup << std::endl;
+         std::cout << "btag = "    << jet.btag()    << " with scale factor = " <<  jet_bscalefactor << std::endl;
       }
       
       std::cout << "===================" << std::endl;
