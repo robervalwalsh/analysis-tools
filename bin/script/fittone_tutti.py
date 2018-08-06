@@ -2,11 +2,12 @@
 # -*- coding:utf-8 -*-
 
 from ROOT import TH1F, TFile, TMath, TF1, TH1F, TCanvas
-import numpy
+# from scipy.stats import crystalball as _crys
 
+import numpy
 import os
 
-directory = '../output/hists/jets/reordering/reord_'
+directory = '../output/hists/jets/stats_'
 
 matches = [0, 1, 2]
 lep = ["lep", "chr"]
@@ -22,7 +23,7 @@ mass_points = ["350", ]
 
 limits = {
     "120": [60, 150, 120],
-    "350": [250, 380, 350],
+    "350": [180, 440, 330],
     "1200": [900, 1400, 1200],
     }
 
@@ -33,21 +34,31 @@ draw = True
 def funVoigt(x, par):
     return TMath.Voigt(x[0] - par[0], par[1], par[2])
 
+
 def doubleGauss(x, par):
     norm = numpy.pi*(par[1] + par[2])**2/2
+    if norm == 0:
+        return 10**20
     if (x[0] < par[0]):
         return TMath.Gaus(x[0], par[0], par[1], False)/(norm**0.5)
     else:
         return TMath.Gaus(x[0], par[0], par[2], False)/(norm**0.5)
 
+    
 def weibull(x, par):
     if (par[0] <= 0 or x[0] < 0):
         return 0
     else:
         return par[1]/par[0]*(x[0]/par[0])**(par[1] - 1)*TMath.Exp(-(x[0]/par[0])**par[1])
+
     
 def gaussian(x, par):
     return TMath.Gaus(x[0], par[0], par[1], True)
+
+
+def crystalball(x, par):
+    return _crys((x - par[0])/par[1], par[2], par[3])
+
     
 def prendi_parametri(funzione):
     params = list()
@@ -72,8 +83,11 @@ for mass in mass_points:
     print("Mass point: " + mass)
     for l in lep:
         cur_dir = directory + mass
-        output_filename = os.path.join("../output/tables/schifo/",
+        output_filename = os.path.join("../output/tables/stats_after/",
                                        "_".join(["fit", l, mass]) + ".txt")
+        print("\n\n\n\n\n")
+        print(output_filename)
+        print("\n\n\n\n")
         out_file = open(output_filename, "w")
         out_file.write("# media (2 match)\t\t\t sigma(2 match)\t\t\tmedia (tutti)\t\t\tsigma (tutti)")
         for c in correction_level:
@@ -95,28 +109,33 @@ for mass in mass_points:
             else:
                 lc = "chromo"
                 filter_string = "!(Leptonic_event)"
-
             # funzione = TF1("voigt", funVoigt, limits[mass][0], limits[mass][1], 3)
             # funzione = TF1("gaus1", gaussian, limits[mass][0], limits[mass][1], 2)
             funzione = TF1("gaus1", doubleGauss, limits[mass][0], limits[mass][1], 3)
+            funzione_test = TF1("gaus2", doubleGauss, limits[mass][0], limits[mass][1], 3)
             # funzione = TF1("gaus1", weibull, limits[mass][0], limits[mass][1], 2)
-            funzione.SetParameters(limits[mass][2], 30, 30)
-            funzione.SetParLimits(1, 0, 100)
-            funzione.SetParLimits(2, 0, 100)
+            # funzione = TF1("gaus1", crystalball, limits[mass][0], limits[mass][1], 4)
+            # funzione.SetParameters(limits[mass][2], 50, 50)
+            # funzione.SetParLimits(1, 0, 100)
+            # funzione.SetParLimits(2, 0, 100)
             max_x = 1.1*limits[mass][1]
             min_x = 0.9*limits[mass][0]
             bins = 60
             binsize = (max_x - min_x)/bins
+            funzione_test.SetParameters(limits[mass][2], 30, 30)
+            histo = TH1F("histo", "Fittone", bins, min_x, max_x)
+            canvases[i].cd()
+            tree.Draw("Mass>>histo", " && ".join(["nMatches==2", filter_string]), "norm")
+            histo.Scale(1./binsize)
+            histo.Fit(funzione_test, "RLME", "", limits[mass][0], limits[mass][1])
+            params, errors = prendi_parametri(funzione_test)
+            print(params)
+            funzione.SetParameters(*params)
             fit_2_match = tree.UnbinnedFit(
                 "gaus1", "Mass",
                 " && ".join(["nMatches==2", limit_string, filter_string]), "RLME")
-            if draw:
-                histo = TH1F("histo", "Fittone", bins, min_x, max_x)
-                canvases[i].cd()
-                tree.Draw("Mass>>histo", "nMatches==2", "norm")
-                histo.Scale(1./binsize)
-                funzione.DrawClone("same")
             params, errors = prendi_parametri(funzione)
+            funzione.DrawClone("same")
             scrivi_parametri(params, errors, out_file)
             fit_2_match = tree.UnbinnedFit(
                 "gaus1", "Mass", " && ".join([limit_string, filter_string]), "RLME")
