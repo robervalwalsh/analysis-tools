@@ -70,9 +70,9 @@ int main(int argc, char * argv[])
          
          // b-tag scale factors
          double jet_bscalefactor;
-         if ( jet.flavour("Hadron") == 5 ) jet_bscalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_B,    jet.eta(), jet.pt() ); 
-         if ( jet.flavour("Hadron") == 4 ) jet_bscalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_C,    jet.eta(), jet.pt() ); 
-         if ( jet.flavour("Hadron") == 0 ) jet_bscalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, jet.eta(), jet.pt() ); 
+         if ( jet.flavour("Hadron") == 5 ) jet_bscalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_B,    fabs(jet.eta()), jet.pt() ); 
+         if ( jet.flavour("Hadron") == 4 ) jet_bscalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_C,    fabs(jet.eta()), jet.pt() ); 
+         if ( jet.flavour("Hadron") == 0 ) jet_bscalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, fabs(jet.eta()), jet.pt() ); 
      
          std::cout << "    Jet #" << j << ": ";
          std::cout << "pT  = "     << jet.pt()      << ", ";
