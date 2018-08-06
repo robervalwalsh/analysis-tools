@@ -28,6 +28,7 @@
 #include "Analysis/Tools/interface/Candidate.h"
 #include "Analysis/Tools/interface/Muon.h"
 #include "Analysis/Tools/interface/GenParticle.h"
+#include "Analysis/Tools/interface/BTagCalibrationStandalone.h"
 //
 // class declaration
 //
@@ -102,6 +103,12 @@ namespace analysis {
             
             /// Rho
             double rho() const;
+            
+            /// btag SF
+            double btagSF(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo = "Hadron") const;
+            double btagSFup(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo = "Hadron") const;
+            double btagSFdown(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo = "Hadron") const;
+            double btagSFsys(std::shared_ptr<BTagCalibrationReader> reader, const std::string & systype = "central", const std::string & flavalgo = "Hadron") const;
             
             /// pointer to the FSR jet
             Jet * fsrJet();

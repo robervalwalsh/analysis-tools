@@ -494,6 +494,48 @@ void triggerNames(std::string &trueTriggerNames,const char *myTriggerNames, TTre
 	
 }
 */
+      
+std::shared_ptr<BTagCalibrationReader> Analysis::btagCalibration(const std::string & tagger,
+                                const std::string & filename,
+                                const std::string & wp,
+                                const std::string & sysType,
+                                const std::vector<std::string> & otherSysTypes)
+{
+   std::string wps = wp;
+   std::transform(wps.begin(), wps.end(), wps.begin(), ::tolower);
+   
+   BTagEntry::OperatingPoint op = BTagEntry::OP_MEDIUM;
+   if ( wps == "loose" )    op = BTagEntry::OP_LOOSE;
+   if ( wps == "medium" )   op = BTagEntry::OP_MEDIUM;
+   if ( wps == "tight" )    op = BTagEntry::OP_TIGHT;
+   if ( wps == "reshape" )  op = BTagEntry::OP_RESHAPING;
+   
+   btagcalib_     = std::shared_ptr<BTagCalibration>      ( new BTagCalibration(tagger,filename));
+   btagcalibread_ = std::shared_ptr<BTagCalibrationReader>( new BTagCalibrationReader(op,sysType,otherSysTypes) );
+   
+   
+   btagcalibread_ -> load(*btagcalib_,             // calibration instance
+                     BTagEntry::FLAV_B,           // btag flavour - B
+                     "comb");                     // measurement type   
+   
+   btagcalibread_ -> load(*btagcalib_,             // calibration instance
+                     BTagEntry::FLAV_C,           // btag flavour - C
+                     "comb");                     // measurement type   
+   
+   btagcalibread_ -> load(*btagcalib_,             // calibration instance
+                     BTagEntry::FLAV_UDSG,        // btag flavour - UDSG
+                     "incl");                     // measurement type   
+   
+   
+   return btagcalibread_;
+   
+}
+      
+
+std::shared_ptr<BTagCalibrationReader> Analysis::btagCalibration()
+{
+   return btagcalibread_;
+}
 
 std::string Analysis::fileName()
 {
