@@ -32,7 +32,7 @@ int main(int argc, char * argv[])
    
    // b-tag scale factors
    BTagCalibration calib(btagalgo_, btagsf_ );
-   BTagCalibrationReader reader(BTagEntry::OP_LOOSE,   // operating point
+   BTagCalibrationReader reader(BTagEntry::OP_TIGHT,   // operating point
                                 "central",             // central sys type
                                 {"up", "down"});       // other sys types
    reader.load(calib,             // calibration instance
