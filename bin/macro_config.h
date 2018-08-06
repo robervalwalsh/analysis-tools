@@ -60,6 +60,9 @@ int l1tjetsrefnmin_;
 std::vector<float> l1tjetsrefptmin_;
 std::vector<float> l1tjetsrefetamax_;
 
+// btag SF csv file
+std::string btagsf_;
+
 
 // muons
 
@@ -145,6 +148,7 @@ int macro_config(int argc, char * argv[])
          ("runMax",po::value <int> (&runmax_)->default_value(-1), "Minimum run number")
          ("output",po::value <std::string> (&outputRoot_)->default_value("histograms.root"),"Output root file")
          ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
+         ("btagSF",po::value <std::string> (&btagsf_)->default_value("DeepCSV.csv"),"b-tagging scale factor in CSV format")
 //      
          ("nJetsMin",po::value <int> (&njetsmin_)->default_value(0),"Minimum number of jets")
          ("nJetsMax",po::value <int> (&njetsmax_)->default_value(100),"Maximum number of jets")
