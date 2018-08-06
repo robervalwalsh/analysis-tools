@@ -35,23 +35,31 @@ Jet::Jet() : Candidate()
 {
    extendedFlavour_ = "?";
    btagAlgo_ = "btag_csvivf";
+   fsr_ = nullptr;
+   muon_ = nullptr;
+   uncorrJetp4_ = p4_;
 }
 Jet::Jet(const float & pt, const float & eta, const float & phi, const float & e) : Candidate(pt,eta,phi,e,0.) 
 {
    extendedFlavour_ = "?";
    btagAlgo_ = "btag_csvivf";
+   fsr_ = nullptr;
+   muon_ = nullptr;
+   uncorrJetp4_ = p4_;
+   
 }
+
 Jet::~Jet()
 {
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
 }
 
-
 //
 // member functions
 //
 // Gets
+bool  Jet::isPuppi()                               const { return isPuppi_;    } 
 float Jet::btag()                                  const { return btags_.at(btagAlgo_);    }                   
 float Jet::btag(const std::string & algo)          const { return btags_.at(algo);         }                   
 int   Jet::flavour()                               const { return flavour_.at("Hadron");   }                   
@@ -70,16 +78,22 @@ float Jet::JerSfUp()                               const { return jerSFUp_; }
 
 float Jet::neutralHadronFraction()                 const { return nHadFrac_; }
 float Jet::neutralEmFraction()                     const { return nEmFrac_;  }
-int   Jet::neutralMultiplicity()                   const { return nMult_;    }
+float Jet::neutralMultiplicity()                   const { return nMult_;    }
 float Jet::chargedHadronFraction()                 const { return cHadFrac_; }
 float Jet::chargedEmFraction()                     const { return cEmFrac_;  }
-int   Jet::chargedMultiplicity()                   const { return cMult_;    }
+float Jet::chargedMultiplicity()                   const { return cMult_;    }
 float Jet::muonFraction()                          const { return muFrac_;   }
-int   Jet::constituents()                          const { return nConst_;   }
+float Jet::constituents()                          const { return nConst_;   }
 
 float Jet::qgLikelihood()                          const { return qgLikelihood_; }
 float Jet::pileupJetIdFullDiscriminant()           const { return puJetIdFullDisc_; }
 int   Jet::pileupJetIdFullId()                     const { return puJetIdFullId_; }
+
+float Jet::bRegCorr() const  { return bRegCorr_; }
+float Jet::bRegRes()  const  { return bRegRes_; }
+
+double Jet::rho()     const  { return rho_; }
+
 
 bool  Jet::pileupJetIdFullId(const std::string & wp) const
 { 
@@ -100,6 +114,7 @@ bool  Jet::pileupJetIdFullId(const std::string & wp) const
 
 
 // Sets                                                             
+void Jet::isPuppi  (const bool & ispuppi)                             { isPuppi_  = ispuppi; } 
 void Jet::btag     (const float & btag)                               { btag_    = btag; } 
 void Jet::btag     (const std::string & algo, const float & btag)     { btags_[algo]  = btag; } 
 void Jet::flavour  (const int   & flav)                               { flavour_["Hadron"] = flav; } 
@@ -118,6 +133,12 @@ void Jet::JerSfUp(const float & jerSfUp)                              { jerSFUp_
 void Jet::qgLikelihood(const float & discr)                           { qgLikelihood_ = discr; }
 void Jet::pileupJetIdFullDiscriminant(const float & discr)            { puJetIdFullDisc_ = discr; }
 void Jet::pileupJetIdFullId(const int & id)                           { puJetIdFullId_ = id; }
+
+void Jet::bRegCorr(const float & bRegCorr)                            { bRegCorr_ = bRegCorr; }
+void Jet::bRegRes(const float & bRegRes)                              { bRegRes_  = bRegRes; }
+
+void Jet::rho(const double & rho)                                      { rho_  = rho; }
+
 
 int Jet::removeParton(const int & i)
 {
@@ -152,7 +173,53 @@ int Jet::removeParton(const int & i)
    
 }
 
-// ------------ methods  ------------
+// ------------ methods  -----------
+void Jet::addFSR(Jet* j)
+{
+   if ( j == nullptr ) return;
+   if ( fsr_ != nullptr )
+   {
+      std::cout << "FSR jet will not be added because FSR already exists" << std::endl;
+      return;
+   }
+   fsr_ = j;
+   p4_ = p4_ + fsr_->p4();
+}
+
+void Jet::rmFSR()
+{
+   p4_ = uncorrJetp4_;
+   fsr_ = nullptr;
+}
+
+Jet * Jet::fsrJet()
+{
+   return fsr_;
+}
+
+void Jet::addMuon(Muon* m)
+{
+   if ( m == nullptr ) return;
+   if ( muon_ != nullptr )
+   {
+      std::cout << "A muon is already associated to this jet" << std::endl;
+      return;
+   }
+   muon_ = m;
+}
+
+void Jet::rmMuon()
+{
+   muon_ = nullptr;
+}
+
+Muon * Jet::muon()
+{
+   return muon_;
+}
+
+
+
 void Jet::associatePartons(const std::vector< std::shared_ptr<GenParticle> > & particles, const float & dRmax, const float & ptMin,  const bool & pythia8 )
 {
    int flavour = abs(this->flavour());
@@ -202,26 +269,80 @@ void Jet::id      (const float & nHadFrac,
                    const float & cMult   ,
                    const float & muFrac  )
 {
-   // Jet ID
-   // Update: https://twiki.cern.ch/twiki/bin/view/CMS/JetID?rev=95#Recommendations_for_13_TeV_data
-   int nM = (int)round(nMult);
-   int cM = (int)round(cMult);
-   int numConst = nM + cM;
-   if ( fabs(p4_.Eta()) <= 2.7 )
+   float nM;
+   float cM;
+   float numConst;
+   if ( isPuppi_ )
    {
-      idloose_ = ((nHadFrac<0.99 && nEmFrac<0.99 && numConst>1) && ((abs(p4_.Eta())<=2.4 && cHadFrac>0 && cM>0 && cEmFrac<0.99) || fabs(p4_.Eta())>2.4) && fabs(p4_.Eta())<=2.7);
-      idtight_ = ((nHadFrac<0.90 && nEmFrac<0.90 && numConst>1) && ((abs(p4_.Eta())<=2.4 && cHadFrac>0 && cM>0 && cEmFrac<0.99) || fabs(p4_.Eta())>2.4) && fabs(p4_.Eta())<=2.7);
-   }
-   else if ( fabs(p4_.Eta()) > 2.7 && fabs(p4_.Eta()) <= 3. )
-   {
-      idloose_ = (nEmFrac<0.90 && nM>2);
-      idtight_ = (nEmFrac<0.90 && nM>2);
+      nM = nMult;
+      cM = cMult;
+      numConst = nM + cM;
    }
    else
    {
-      idloose_ = (nEmFrac<0.90 && nM>10);
-      idtight_ = (nEmFrac<0.90 && nM>10);
+      nM = round(nMult);
+      cM = round(cMult);
+      numConst = round(nM + cM);
    }
+   nHadFrac_ = nHadFrac;
+   nEmFrac_  = nEmFrac;
+   nMult_    = nM;
+   cHadFrac_ = cHadFrac;
+   cEmFrac_  = cEmFrac;
+   cMult_    = cM;
+   muFrac_   = muFrac;
+   nConst_   = numConst;
+
+   // Jet ID 2017 - only for AK4CHS (slimmedJets)
+   // https://twiki.cern.ch/twiki/bin/view/CMS/JetID13TeVRun2017?rev=6
+   if ( fabs(p4_.Eta()) <= 2.7 )
+   {
+      idloose_ = false;
+      idtight_ = ((nHadFrac<0.90 && nEmFrac<0.90 && numConst>1) && ((abs(p4_.Eta())<=2.4 && cHadFrac>0 && cM>0 ) || fabs(p4_.Eta())>2.4) && fabs(p4_.Eta())<=2.7);
+   }
+   else if ( fabs(p4_.Eta()) > 2.7 && fabs(p4_.Eta()) <= 3. )
+   {
+      idloose_ = false;
+      if ( isPuppi_ )
+      {
+         idtight_ = (nHadFrac<0.99);
+      }
+      else
+      {
+         idtight_ = (nEmFrac>0.02 && nEmFrac<0.90 && nM>2);
+      }
+   }
+   else
+   {
+      idloose_ = false;
+      if ( isPuppi_ )
+      {
+         idtight_ = (nHadFrac>0.02 && nEmFrac<0.90 && nM>10);
+      }
+      else
+      {
+         idtight_ = (nHadFrac>0.02 && nEmFrac<0.90 && nM>2 && nM<15);
+      }
+   }
+   
+   
+//    // Jet ID 2016
+//    // https://twiki.cern.ch/twiki/bin/view/CMS/JetID?rev=95#Recommendations_for_13_TeV_data
+//    if ( fabs(p4_.Eta()) <= 2.7 )
+//    {
+//       idloose_ = ((nHadFrac<0.99 && nEmFrac<0.99 && numConst>1) && ((abs(p4_.Eta())<=2.4 && cHadFrac>0 && cM>0 && cEmFrac<0.99) || fabs(p4_.Eta())>2.4) && fabs(p4_.Eta())<=2.7);
+//       idtight_ = ((nHadFrac<0.90 && nEmFrac<0.90 && numConst>1) && ((abs(p4_.Eta())<=2.4 && cHadFrac>0 && cM>0 && cEmFrac<0.99) || fabs(p4_.Eta())>2.4) && fabs(p4_.Eta())<=2.7);
+//    }
+//    else if ( fabs(p4_.Eta()) > 2.7 && fabs(p4_.Eta()) <= 3. )
+//    {
+//       idloose_ = (nEmFrac<0.90 && nM>2);
+//       idtight_ = (nEmFrac<0.90 && nM>2);
+//    }
+//    else
+//    {
+//       idloose_ = (nEmFrac<0.90 && nM>10);
+//       idtight_ = (nEmFrac<0.90 && nM>10);
+//    }
    
 //    if ( tag_ == "JetIdOld" )
 //    {
@@ -237,13 +358,4 @@ void Jet::id      (const float & nHadFrac,
 //       }
 //    }
    
-   nHadFrac_ = nHadFrac;
-   nEmFrac_  = nEmFrac;
-   nMult_    = nM;
-   cHadFrac_ = cHadFrac;
-   cEmFrac_  = cEmFrac;
-   cMult_    = cM;
-   muFrac_   = muFrac;
-   nConst_   = numConst;
-
 }

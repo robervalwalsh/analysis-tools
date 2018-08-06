@@ -80,6 +80,7 @@ namespace analysis {
             float cEmFrac_ [max_];
             float cMult_   [max_];
             float muFrac_  [max_];
+            float puppi_   [max_];
             bool  idLoose_ [max_];
             bool  idTight_ [max_];
             float jecUnc_  [max_];
@@ -91,7 +92,17 @@ namespace analysis {
             float puJetIdFullDisc_ [max_];
             int   puJetIdFullId_ [max_];
             
+            float bRegCorr_ [max_];
+            float bRegRes_  [max_];
+            
             bool isSimpleJet_;
+            bool hasPuppiInfo_;
+            bool hasQGLikelihood_;
+            bool hasBRegCorr_;
+            bool hasBRegRes_;
+            
+            bool hasRho_;
+            double rho_;
 
          private:
 
@@ -294,6 +305,58 @@ namespace analysis {
 
       };
                   
+      // Specialization for RecoMuon
+      template <>
+      class PhysicsObjectTree<RecoMuon> : public PhysicsObjectTreeBase<RecoMuon> {
+         public:
+            PhysicsObjectTree();
+            PhysicsObjectTree(TChain * tree, const std::string & name);
+           ~PhysicsObjectTree();
+
+            Collection<RecoMuon> collection();
+
+            // ----------member data ---------------------------
+         protected:
+
+         private:
+
+      };  
+
+      // Specialization for RecoTrack
+      template <>
+      class PhysicsObjectTree<RecoTrack> : public PhysicsObjectTreeBase<RecoTrack> {
+         public:
+            PhysicsObjectTree();
+            PhysicsObjectTree(TChain * tree, const std::string & name);
+           ~PhysicsObjectTree();
+
+            Collection<RecoTrack> collection();
+
+            // ----------member data ---------------------------
+         protected:
+            float chi2_[max_];
+            float ndof_[max_];
+            float d0_[max_];
+            float dxy_[max_];
+            int   nLostMuHits_[max_];
+            int   nBadMuHits_[max_];
+            int   nValMuHits_[max_];
+            int   nValTrackerHits_[max_];
+            int   nValStripTECHits_[max_];
+            int   nValStripTIBHits_[max_];
+            int   nValStripTIDHits_[max_];
+            int   nValStripTOBHits_[max_];
+            int   muStationsWithValHits_[max_];
+            int   muStationsWithBadHits_[max_];
+            int   inMuStationWithValHits_[max_];
+            int   outMuStationWithValHits_[max_];
+            std::map<TrackQuality,bool*> mqual_;
+            bool  qual_[10][max_];
+
+
+         private:
+
+      };  
    }
 }
 

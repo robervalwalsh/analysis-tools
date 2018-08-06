@@ -40,9 +40,11 @@ namespace analysis {
             /// default constructor
             Candidate();
             /// constructor from 4-momentum information
-            Candidate(const float & pt, const float & eta, const float & phi, const float & e, const float & q = 0);
+            Candidate(const float & pt, const float & eta, const float & phi, const float & e, const float & q);
             /// constructor from 3-momentum information
             Candidate(const float & px, const float & py, const float & pz);
+            /// constructor from 3-momentum and charge information
+            Candidate(const float & px, const float & py, const float & pz, const float & q);
             /// destructor
            virtual ~Candidate();
             

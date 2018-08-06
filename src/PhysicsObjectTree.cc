@@ -73,6 +73,12 @@ Collection<Candidate>  PhysicsObjectTree<Candidate>::collection()
 PhysicsObjectTree<Jet>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<Jet>(tree, name)
 {
    isSimpleJet_ = false;
+   hasPuppiInfo_ = false;
+   hasQGLikelihood_ = false;
+   hasBRegCorr_ = false;
+   hasBRegRes_ = false;
+   hasRho_ = false;
+   
 //   tree_  -> SetBranchAddress( "btag_csvivf", btag_    );
    int algos = 0;
    for ( auto & branch : branches_ )
@@ -109,9 +115,13 @@ PhysicsObjectTree<Jet>::PhysicsObjectTree(TChain * tree, const std::string & nam
       tree_  -> SetBranchAddress( "jerSFUp", jerSFUp_);
       tree_  -> SetBranchAddress( "jerResolution", jerResolution_);
       std::vector<std::string>::iterator it;
-      it = std::find(branches_.begin(),branches_.end(),"qgLikelihood")            ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , qgLikelihood_ );
+      it = std::find(branches_.begin(),branches_.end(),"qgLikelihood")            ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , qgLikelihood_ ); hasQGLikelihood_ = true; }
       it = std::find(branches_.begin(),branches_.end(),"puJetIdFullDiscriminant") ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , puJetIdFullDisc_ );
       it = std::find(branches_.begin(),branches_.end(),"puJetIdFullId")           ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , puJetIdFullId_ );
+      it = std::find(branches_.begin(),branches_.end(),"id_puppi")                ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , puppi_ )       ; hasPuppiInfo_ = true; }
+      it = std::find(branches_.begin(),branches_.end(),"bjetRegCorr")             ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , bRegCorr_ )    ; hasBRegCorr_  = true; }
+      it = std::find(branches_.begin(),branches_.end(),"bjetRegRes")              ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , bRegRes_ )     ; hasBRegRes_   = true; }
+      it = std::find(branches_.begin(),branches_.end(),"Rho")                     ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , &rho_ )        ; hasRho_       = true; }
    }
    else
    {
@@ -127,6 +137,10 @@ PhysicsObjectTree<Jet>::~PhysicsObjectTree() {}
 // Member functions
 Collection<Jet>  PhysicsObjectTree<Jet>::collection()
 {
+//    std::string treename = (std::string)tree_->GetName();
+//    std::size_t foundPuppi = treename.find("Puppi");
+//    bool ispuppi = (foundPuppi != std::string::npos);
+   
    std::vector<Jet> jets;
    for ( int i = 0 ; i < n_ ; ++i )
    {
@@ -150,9 +164,19 @@ Collection<Jet>  PhysicsObjectTree<Jet>::collection()
       jet.JerSf(jerSF_[i]);
       jet.JerSfUp(jerSFUp_[i]);
       jet.JerSfDown(jerSFDown_[i]);
-      jet.qgLikelihood(qgLikelihood_[i]);
+      if ( hasQGLikelihood_ ) jet.qgLikelihood(qgLikelihood_[i]);
+      else                    jet.qgLikelihood(-10.);
       jet.pileupJetIdFullDiscriminant(puJetIdFullDisc_[i]);
       jet.pileupJetIdFullId(puJetIdFullId_[i]);
+      if ( hasPuppiInfo_ ) jet.isPuppi(puppi_[i]>0);
+      else                 jet.isPuppi(false);
+      if ( hasBRegCorr_ )  jet.bRegCorr(bRegCorr_[i]);
+      else                 jet.bRegCorr(1);
+      if ( hasBRegRes_  )  jet.bRegRes (bRegRes_[i]);
+      else                 jet.bRegRes(1);
+      if ( hasRho_ )       jet.rho(rho_);
+      else                 jet.rho(-1);
+      
       jets.push_back(jet);
    }
    Collection<Jet> jetCollection(jets, name_);
@@ -431,6 +455,124 @@ Collection<L1TJet>  PhysicsObjectTree<L1TJet>::collection()
    return jetCollection;
 }
 
+// RecoMuon
+// Constructors and destructor
+PhysicsObjectTree<RecoMuon>::PhysicsObjectTree() : PhysicsObjectTreeBase<RecoMuon>()
+{
+}
+PhysicsObjectTree<RecoMuon>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<RecoMuon>(tree, name)
+{
+}
+PhysicsObjectTree<RecoMuon>::~PhysicsObjectTree() {}
+
+// Member functions
+Collection<RecoMuon>  PhysicsObjectTree<RecoMuon>::collection()
+{
+   std::vector<RecoMuon> candidates;
+   for ( int i = 0 ; i < n_ ; ++i )
+   {
+      RecoMuon cand(pt_[i], eta_[i], phi_[i], e_[i], q_[i]);
+      candidates.push_back(cand);
+   }
+   Collection<RecoMuon> RecoMuonCollection(candidates, name_);
+   return RecoMuonCollection;
+
+}
+
+// RecoTrack
+// Constructors and destructor
+PhysicsObjectTree<RecoTrack>::PhysicsObjectTree() : PhysicsObjectTreeBase<RecoTrack>()
+{
+}
+PhysicsObjectTree<RecoTrack>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<RecoTrack>(tree, name)
+{
+   std::vector<std::string>::iterator it;
+   it = std::find(branches_.begin(),branches_.end(),"chi2"                             ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , chi2_                    );
+   it = std::find(branches_.begin(),branches_.end(),"ndof"                             ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , ndof_                    );
+   it = std::find(branches_.begin(),branches_.end(),"d0"                               ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , d0_                      );
+   it = std::find(branches_.begin(),branches_.end(),"dxy"                              ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , dxy_                     );
+   it = std::find(branches_.begin(),branches_.end(),"numberOfLostMuonHits"             ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , nLostMuHits_             );
+   it = std::find(branches_.begin(),branches_.end(),"numberOfBadMuonHits"              ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , nBadMuHits_              );
+   it = std::find(branches_.begin(),branches_.end(),"numberOfValidMuonHits"            ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , nValMuHits_              );
+   it = std::find(branches_.begin(),branches_.end(),"numberOfValidTrackerHits"         ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , nValTrackerHits_         );
+   it = std::find(branches_.begin(),branches_.end(),"numberOfValidStripTECHits"        ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , nValStripTECHits_        );
+   it = std::find(branches_.begin(),branches_.end(),"numberOfValidStripTIBHits"        ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , nValStripTIBHits_        );
+   it = std::find(branches_.begin(),branches_.end(),"numberOfValidStripTIDHits"        ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , nValStripTIDHits_        );
+   it = std::find(branches_.begin(),branches_.end(),"numberOfValidStripTOBHits"        ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , nValStripTOBHits_        );
+   it = std::find(branches_.begin(),branches_.end(),"muonStationsWithValidHits"        ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , muStationsWithValHits_   );
+   it = std::find(branches_.begin(),branches_.end(),"muonStationsWithBadHits"          ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , muStationsWithBadHits_   );
+   it = std::find(branches_.begin(),branches_.end(),"innermostMuonStationWithValidHits") ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , inMuStationWithValHits_  );
+   it = std::find(branches_.begin(),branches_.end(),"outermostMuonStationWithValidHits") ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , outMuStationWithValHits_ );
+   
+   mqual_[undefQuality       ]  = qual_[0];
+   mqual_[loose              ]  = qual_[1];
+   mqual_[tight              ]  = qual_[2];
+   mqual_[highPurity         ]  = qual_[3];
+   mqual_[confirmed          ]  = qual_[4];
+   mqual_[goodIterative      ]  = qual_[5];
+   mqual_[looseSetWithPV     ]  = qual_[6];
+   mqual_[highPuritySetWithPV]  = qual_[7];
+   mqual_[discarded          ]  = qual_[8];
+   mqual_[qualitySize        ]  = qual_[9];
+   
+   it = std::find(branches_.begin(),branches_.end(),"quality_undefQuality"       ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , mqual_[TrackQuality::undefQuality       ] );
+   it = std::find(branches_.begin(),branches_.end(),"quality_loose"              ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , mqual_[TrackQuality::loose              ] );
+   it = std::find(branches_.begin(),branches_.end(),"quality_tight"              ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , mqual_[TrackQuality::tight              ] );
+   it = std::find(branches_.begin(),branches_.end(),"quality_highPurity"         ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , mqual_[TrackQuality::highPurity         ] );
+   it = std::find(branches_.begin(),branches_.end(),"quality_confirmed"          ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , mqual_[TrackQuality::confirmed          ] );
+   it = std::find(branches_.begin(),branches_.end(),"quality_goodIterative"      ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , mqual_[TrackQuality::goodIterative      ] );
+   it = std::find(branches_.begin(),branches_.end(),"quality_looseSetWithPV"     ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , mqual_[TrackQuality::looseSetWithPV     ] );
+   it = std::find(branches_.begin(),branches_.end(),"quality_highPuritySetWithPV") ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , mqual_[TrackQuality::highPuritySetWithPV] );
+   it = std::find(branches_.begin(),branches_.end(),"quality_discarded"          ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , mqual_[TrackQuality::discarded          ] );
+   it = std::find(branches_.begin(),branches_.end(),"quality_qualitySize"        ) ;  if ( it != branches_.end() ) tree_  -> SetBranchAddress( (*it).c_str() , mqual_[TrackQuality::qualitySize        ] );
+   
+
+
+}
+PhysicsObjectTree<RecoTrack>::~PhysicsObjectTree() {}
+
+// Member functions
+Collection<RecoTrack>  PhysicsObjectTree<RecoTrack>::collection()
+{
+//   std::cout << " nnnnn = " << n_ << "   " << chi2_ << std::endl;
+
+   std::vector<RecoTrack> trks;
+   for ( int i = 0 ; i < n_ ; ++i )
+   {
+      RecoTrack trk(px_[i], py_[i], px_[i], q_[i]);
+      trk.chi2(chi2_ [i]);
+      trk.ndof(ndof_ [i]);
+      trk.d0  (d0_   [i]);
+      trk.dxy (dxy_  [i]);
+      trk.numberOfLostMuonHits             (nLostMuHits_            [i]) ;
+      trk.numberOfBadMuonHits              (nBadMuHits_             [i]) ;
+      trk.numberOfValidMuonHits            (nValMuHits_             [i]) ;
+      trk.numberOfValidTrackerHits         (nValTrackerHits_        [i]) ;
+      trk.numberOfValidStripTECHits        (nValStripTECHits_       [i]) ;
+      trk.numberOfValidStripTIBHits        (nValStripTIBHits_       [i]) ;
+      trk.numberOfValidStripTIDHits        (nValStripTIDHits_       [i]) ;
+      trk.numberOfValidStripTOBHits        (nValStripTOBHits_       [i]) ;
+      trk.muonStationsWithValidHits        (muStationsWithValHits_  [i]) ;
+      trk.muonStationsWithBadHits          (muStationsWithBadHits_  [i]) ;
+      trk.innermostMuonStationWithValidHits(inMuStationWithValHits_ [i]) ;
+      trk.outermostMuonStationWithValidHits(outMuStationWithValHits_[i]) ;
+      trk.quality(undefQuality       ,mqual_[TrackQuality::undefQuality       ][i]);
+      trk.quality(loose              ,mqual_[TrackQuality::loose              ][i]);
+      trk.quality(tight              ,mqual_[TrackQuality::tight              ][i]);
+      trk.quality(highPurity         ,mqual_[TrackQuality::highPurity         ][i]);
+      trk.quality(confirmed          ,mqual_[TrackQuality::confirmed          ][i]);
+      trk.quality(goodIterative      ,mqual_[TrackQuality::goodIterative      ][i]);
+      trk.quality(looseSetWithPV     ,mqual_[TrackQuality::looseSetWithPV     ][i]);
+      trk.quality(highPuritySetWithPV,mqual_[TrackQuality::highPuritySetWithPV][i]);
+      trk.quality(discarded          ,mqual_[TrackQuality::discarded          ][i]);
+      trk.quality(qualitySize        ,mqual_[TrackQuality::qualitySize        ][i]);
+      
+      trks.push_back(trk);
+   }
+   Collection<RecoTrack> RecoTrackCollection(trks, name_);
+   return RecoTrackCollection;
+
+}
 
 
 // ======================================
@@ -445,3 +587,5 @@ template class PhysicsObjectTree<GenParticle>;
 template class PhysicsObjectTree<GenJet>;
 template class PhysicsObjectTree<L1TMuon>;
 template class PhysicsObjectTree<L1TJet>;
+template class PhysicsObjectTree<RecoMuon>;
+template class PhysicsObjectTree<RecoTrack>;
