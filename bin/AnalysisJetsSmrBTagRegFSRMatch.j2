@@ -75,6 +75,7 @@ const UInt_t highx = {{ highx }};
 const UInt_t bins = {{ bins }};
 const Float_t soft_jet_distance = 0.8;
 const Int_t pdgBId = 5;
+const Int_t pdgCId = 4;
 const Int_t heavyHiggs = 36;
 const Float_t gen_part_deltarcut = 0.3;
 const Int_t kPuId = 4;
@@ -284,7 +285,7 @@ class DataContainer {
 };
 
 /**
- * @danger I am using the old data table because I did not find the new one.
+ * @brief Constructor that opens btag scalefactor file.
  */
 DataContainer::DataContainer() : resolution("tables/Fall17_25nsV1_MC_PtResolution_AK4PFchs.txt"), \
                                  resolution_sf("tables/Fall17_25nsV1_MC_SF_AK4PFchs.txt") , \
@@ -632,7 +633,7 @@ void DataContainer::fill_histogram(TTree* tree, \
                                    std::vector<TH1F*> plots, TTree* out_tree) {
   ULong64_t how_many;
   if (debug) {
-    how_many = 100000;
+    how_many = 10000;
   } else {
     how_many = tree->GetEntries();
   }
@@ -769,7 +770,10 @@ void DataContainer::fill_histogram(TTree* tree, \
     if (TMath::Abs(bjets[0].Eta() - bjets[1].Eta()) > 1.5) {
       continue;
     }
-
+    if (debug) {
+      cout << "Distance was enough" << endl;
+    }
+    
     unsigned int matched = 0;
     for (unsigned int i = 0; i < 2; i++) {
       match_jet_with_part(bjets[i]);
@@ -976,14 +980,28 @@ void DataContainer::apply_btag_sf() {
     cout << "Using scale factors for btagging" << endl;
   }
   UInt_t btagged = 0;
+  
   for (auto it = corrected_jet.begin(); it != corrected_jet.end() && btagged < 3; it++) {
     if (btag_deep_[it->Idx()] > deepcsv_cut) {
-      Double_t appo = reader.eval(BTagEntry::FLAV_B, it->Eta(), it->Pt(), 0);
-      weigth *= appo;
-      btagged++;
+      BTagEntry::JetFlavor flavour;
+      if (TMath::Abs(genjet_parton_flavour_[it->Idx()]) == pdgBId) {
+        flavour = BTagEntry::FLAV_B;
+      } else if (TMath::Abs(genjet_parton_flavour_[it->Idx()]) == pdgCId) {
+        flavour = BTagEntry::FLAV_C;
+      } else {
+        flavour = BTagEntry::FLAV_UDSG;
+      }
       if (debug) {
-        cout << "Retrieved sf: " << appo << "\nWeigth after this step: " << \
-          weigth << endl;
+        cout << "Btag sf. Jet marked as: (b=0, c=1, other=2)" << flavour << endl;
+      }
+      if (flavour != BTagEntry::FLAV_UDSG) {
+        Double_t appo = reader.eval(flavour, it->Eta(), it->Pt(), 0);
+        weigth *= appo;
+        btagged++;
+        if (debug) {
+          cout << "Retrieved sf: " << appo << "\nWeigth after this step: " << \
+            weigth << endl;
+        }
       }
     }
   }  
