@@ -97,10 +97,11 @@ float dphimin_;
 float ptimbalmax_;
 
 std::string btagalgo_;
+std::string btagwp_;
 float btagwploose_;
 float btagwpmedium_;
 float btagwptight_;
-float btagwp_;
+//float btagwp_;
 float nonbtagwp_;
 
 
@@ -211,11 +212,12 @@ int macro_config(int argc, char * argv[])
          ("triggerObjectsMuons", po::value<std::vector<std::string> >(&triggerObjectsMuons_)->multitoken(),"Trigger objects for muons")
 //      
          ("btagAlgorithm",po::value <std::string> (&btagalgo_)->default_value("csvivf"),"BTag algorithm")
+         ("btagWorkingPoint",po::value <std::string> (&btagwp_)->default_value("tight"),"BTag working point")
          ("btagWPLoose",po::value <float> (&btagwploose_)->default_value(0.46),"BTag working point LOOSE")
          ("btagWPMedium",po::value <float> (&btagwpmedium_)->default_value(0.84),"BTag working point MEDIUM")
          ("btagWPTight",po::value <float> (&btagwptight_)->default_value(0.92),"BTag working point TIGHT")
 //         
-         ("btagWP",po::value <float> (&btagwp_)->default_value(0.8484),"Btag working point")
+//         ("btagWP",po::value <float> (&btagwp_)->default_value(0.8484),"Btag working point")
          ("nonbtagWP",po::value <float> (&nonbtagwp_)->default_value(0.46),"non-Btag working point")
          
 //
@@ -309,6 +311,8 @@ int macro_config(int argc, char * argv[])
             std::cout << "Config Error *** Muon maximum |eta| were not defined or the definition does not match the minimum number of muons" <<std::endl;
             return -1;
          }
+         std::transform(btagalgo_.begin(), btagalgo_.end(), btagalgo_.begin(), ::tolower);
+         std::transform(btagwp_.begin(), btagwp_.end(), btagwp_.begin(), ::tolower);
          
          
       }
