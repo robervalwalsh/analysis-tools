@@ -63,7 +63,8 @@ const unsigned int kLen = 100;
 const Float_t deepcsv_cut = 0.4941;
 const Float_t b_tagging_efficiency = 0.99;
 const Int_t kTight = 2;
-const array<Float_t, 3> pt_cut{ {100, 100, 40} };
+const array<Float_t, 3> pt_cut_had{ {100, 100, 40} };
+const array<Float_t, 3> pt_cut_lep{ {40, 40, 30} };
 const array<Float_t, 3> eta_cut{ {2.2, 2.2, 2.2} };
 const Float_t lepton_in_jet_pt_cut = 12;
 const bool debug = false;
@@ -80,10 +81,12 @@ const Int_t heavyHiggs = 36;
 const Float_t gen_part_deltarcut = 0.3;
 const Int_t kPuId = 4;
 const Int_t kTrigobj_jet_id = 1;
-const Float_t kTrigobj_pt = 100;
+const Float_t kTrigobj_pt_had = 100;
+const Float_t kTrigobj_pt_lep = 40;
 const Float_t kTrigobj_eta = 2.3;
 const Float_t kTrigobj_deltaRmin = 0.3;
 const Int_t kTrigobj_id_had_jet = 580;
+const Int_t kTrigobj_id_lep_jet = 530;
 const Int_t kTrigobj_filter_bits = 3;
 
 
@@ -202,8 +205,21 @@ class DataContainer {
    * It will reject the match if it is further than kTrigobj_deltaRmin
    * @returns The index of matched trigObj. -1 if no is found and trigger is not fired. -2 if trigger is fired but no particle found.
    */
-  Int_t match_trigger_object(const Jet& jet);
+  Int_t match_trigger_object(Bool_t leptonic, const Jet& jet);
 
+
+
+  /**
+   * Returns the idx_th cut for the pt for both leptonic and non leptonic cases
+   */
+  inline Float_t right_pt_cut(Bool_t leptonic, UInt_t idx) {
+    return leptonic ? pt_cut_lep[idx] : pt_cut_had[idx];
+  }
+
+  inline Float_t smaller_pt_cut(UInt_t idx) {
+    return (pt_cut_lep[idx] < pt_cut_had[idx]) ? pt_cut_lep[idx] : pt_cut_had[idx];
+  }
+  
   
  private:
   JME::JetResolution resolution;
@@ -232,7 +248,8 @@ class DataContainer {
   Float_t genjet_pt_[kLen];
   Float_t genjet_eta_[kLen];
   Float_t genjet_phi_[kLen];
-  Bool_t trigger_path;
+  Bool_t trigger_path_had;
+  Bool_t trigger_path_lep;
   UInt_t ngenpart_;
   Int_t genjet_parton_flavour_[kLen];
   Int_t genpart_genpart_idxmother_[kLen];
@@ -361,7 +378,8 @@ int DataContainer::SetTreeBranches(TTree * t) {
   t->SetBranchAddress("GenJet_eta", genjet_eta_);
   t->SetBranchAddress("GenJet_phi", genjet_phi_);
   t->SetBranchAddress("Jet_bRegRes", jet_b_reg_res_);
-  t->SetBranchAddress("HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33", &trigger_path);
+  t->SetBranchAddress("HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33", &trigger_path_had);
+  t->SetBranchAddress("HLT_Mu12_DoublePFJets40MaxDeta1p6_DoubleCaloBTagCSV_p33", &trigger_path_lep);
   t->SetBranchAddress("nGenPart", &ngenpart_);
   t->SetBranchAddress("GenJet_partonFlavour", genjet_parton_flavour_);
   t->SetBranchAddress("GenPart_genPartIdxMother", genpart_genpart_idxmother_);
@@ -418,8 +436,10 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("GenJet_eta", genjet_eta_, "GenJet_eta[nGenJet]/F");
   t->Branch("GenJet_phi", genjet_phi_, "GenJet_phi[nGenJet]/F");
   t->Branch("Jet_bRegRes", jet_b_reg_res_, "Jet_bRegRes[nJet]/F");
-  t->Branch("HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33", &trigger_path, \
+  t->Branch("HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33", &trigger_path_had, \
             "HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33/O");
+  t->Branch("HLT_Mu12_DoublePFJets40MaxDeta1p6_DoubleCaloBTagCSV_p33", &trigger_path_lep,
+            "HLT_Mu12_DoublePFJets40MaxDeta1p6_DoubleCaloBTagCSV_p33/O");
   t->Branch("nGenPart", &ngenpart_, "nGenPart/i");
   t->Branch("GenJet_partonFlavour", genjet_parton_flavour_, "GenJet_partonFlavour[nGenJet]/I");
   t->Branch("GenPart_genPartIdxMother", genpart_genpart_idxmother_, "GenPart_genPartIdxMother[nGenPart]/i");
@@ -646,10 +666,11 @@ void DataContainer::fill_histogram(TTree* tree, \
       }
       if (debug) {
         for (UInt_t i = 0; i < n_trig_obj_; i++) {
-          cout << "Trigid: " << trig_obj_id_[i] << "\tTrigger path: " << trigger_path << endl;
+          cout << "Trigid: " << trig_obj_id_[i] << "\tTrigger path had: " << trigger_path_had \
+               << "\ttrigger path lep: " << trigger_path_lep << endl;
         }
       }
-      if (!trigger_path) {
+      if (!trigger_path_lep && !trigger_path_had) {
         continue;
       }
     }
@@ -678,6 +699,7 @@ void DataContainer::fill_histogram(TTree* tree, \
     // Now check btags
     unsigned int btaggati = 0;
     vector<Jet> bjets;
+    leptonic = false;
     if (debug) {
       cout << "Starting btagging check" << endl;
     }
@@ -697,7 +719,7 @@ void DataContainer::fill_histogram(TTree* tree, \
         cout << "Pileup id: " << jet_puId_[it->Idx()] << endl;
       }
       // First i check if we are already with a too small pt.
-      if (it->Pt() < pt_cut[pt_cut.size() - 1]) {
+      if (it->Pt() < right_pt_cut(false, 2) && it->Pt() < right_pt_cut(true, 2)) {
         break;
       }
       if ((jet_id_[it->Idx()] & kTight) == 0) {
@@ -721,6 +743,12 @@ void DataContainer::fill_histogram(TTree* tree, \
           }
           continue;
         }
+        // We are rejecting all jets with one electron in the jet
+        if (debug) {
+          cout << "We are rejecting all jets with one electron." << endl;
+        }
+        continue;
+        leptonic = true;  // this line is never executed
       }
       if (jet_n_muons[it->Idx()] != 0) {
         if (debug) {
@@ -735,6 +763,11 @@ void DataContainer::fill_histogram(TTree* tree, \
           }
           continue;
         }
+        // the event is marked as leptonic only if there is a lepton in the
+        // 2 leading jets
+        if (btaggati < 2) {
+          leptonic = true;
+        }
       }
       // Look at pt only if it is btagged
       if (btag_deep_[it->Idx()] > deepcsv_cut) {
@@ -742,7 +775,7 @@ void DataContainer::fill_histogram(TTree* tree, \
         if (TMath::Abs(it->Eta()) > eta_cut[btaggati]) {
           continue;
         } else {
-          if (it->Pt() < pt_cut[btaggati])
+          if (it->Pt() < smaller_pt_cut(btaggati))
             continue;
         }
         btaggati++;
@@ -755,7 +788,40 @@ void DataContainer::fill_histogram(TTree* tree, \
     if (btaggati < 3) {
       continue;
     }
+    if (debug) {
+      cout << "This event is marked as leptonic: " << leptonic \
+           << " now i check for real pt cut" << endl;
+    }
+    Bool_t successs = true;
+    for (UInt_t i = 0; i < 2; i++) {
+      if (bjets[i].Pt() < right_pt_cut(leptonic, i)) {
+        successs = false;
+      }
+    }
+    if (!successs) {
+      continue;
+    }
     
+    // At least one of the 2 trigger paths must be true. If the trigger_path does not
+    // match the right type of the event we reject that.
+    if (apply_trigger_cut) {
+      if (!(trigger_path_had && trigger_path_lep)) {
+        if (debug) {
+          cout << "Not both triggers are active. Let's check " << \
+            "if the right one is fired" << endl;
+        }
+        if (trigger_path_had && leptonic) {
+          continue;
+        }
+        if (trigger_path_lep && (!leptonic)) {
+          continue;
+        }
+      }
+    }
+
+    if (debug) {
+      cout << "I check if the distance is enough" << endl;
+    }
     // Now i check if the couples jets are distant enough
     bool success = true;
     for (auto it = bjets.begin(); it != bjets.end(); it++) {
@@ -790,8 +856,8 @@ void DataContainer::fill_histogram(TTree* tree, \
 
     if (apply_trigger_cut) {
       Int_t appo1, appo2;
-      appo1 = match_trigger_object(bjets[0]);
-      appo2 = match_trigger_object(bjets[1]);
+      appo1 = match_trigger_object(leptonic, bjets[0]);
+      appo2 = match_trigger_object(leptonic, bjets[1]);
       if (debug) {
         cout << "Matching trigg" << endl;
       }
@@ -837,25 +903,9 @@ void DataContainer::fill_histogram(TTree* tree, \
     cout << "\033[0;32mFilling with m = " << mass_ << \
       " and pt = " << bjets[0].Pt() << ". Weigth of this event: " << weigth \
          << "\033[0m" << endl;
-    Int_t appo_elc = 0;
-    appo_elc += jet_n_electrons[bjets[0].Idx()];
-    appo_elc += jet_n_electrons[bjets[1].Idx()];
-    Int_t appo_muon = 0;
-    appo_muon += jet_n_muons[bjets[0].Idx()];
-    appo_muon += jet_n_muons[bjets[1].Idx()];
-    if (appo_elc != 0 || appo_muon != 0) {
-      leptonic = true;
-    } else {
-      leptonic = false;
-    }
     out_tree->Fill();
-
-    if (debug) {
-      cout << "Leptons in the event: electron " <<              \
-        appo_elc << "\tmuons: " << appo_muon << endl;
-    }
     
-    if (appo_elc != 0 || appo_muon != 0) {
+    if (leptonic) {
       plots[matched + 3]->Fill(mass_, weigth);      
       plots[7]->Fill(bjets[0].Pt(), weigth);
       plots[9]->Fill(jet_b_reg_res_[bjets[0].Idx()], weigth);
@@ -873,13 +923,16 @@ inline Float_t delta_R(const Float_t eta1, const Float_t phi1, \
 }
 
 
-Int_t DataContainer::match_trigger_object(const Jet& jet) {
+Int_t DataContainer::match_trigger_object(Bool_t leptonic, const Jet& jet) {
 
   Float_t deltaR_min = 100;
   Int_t idx = -1;
   bool trovato = false;
+  Float_t pt_cut = leptonic ? kTrigobj_pt_lep : kTrigobj_pt_had;
+  Int_t trig_id = leptonic ? kTrigobj_id_lep_jet : kTrigobj_id_had_jet;
   if (debug) {
-    cout << "Trying to match trigger objects." << endl;
+    cout << "Trying to match trigger objects. Is this jet leptonic? " << \
+      leptonic << endl;
   }
   for (UInt_t i = 0; i < n_trig_obj_; i++) {
     if (debug) {
@@ -891,7 +944,7 @@ Int_t DataContainer::match_trigger_object(const Jet& jet) {
     if (trig_obj_id_[i] != kTrigobj_jet_id) {
       continue;
     }
-    if (trig_obj_pt_[i] < kTrigobj_pt) {
+    if (trig_obj_pt_[i] < pt_cut) {
       continue;
     }
     if (TMath::Abs(trig_obj_eta_[i]) > kTrigobj_eta) {
@@ -922,7 +975,7 @@ Int_t DataContainer::match_trigger_object(const Jet& jet) {
   if (debug) {
     cout << "Checking level 1 trigger" << endl;
   }
-  if (trig_obj_l1pt_[idx] < kTrigobj_pt) {
+  if (trig_obj_l1pt_[idx] < pt_cut) {
     if (debug) {
       cout << "L1 trig failed." << endl;
     }
@@ -931,7 +984,7 @@ Int_t DataContainer::match_trigger_object(const Jet& jet) {
   if (debug) {
     cout << "Checking level 2 trigger" << endl;
   }
-  if (trig_obj_l2pt_[idx] < kTrigobj_pt) {
+  if (trig_obj_l2pt_[idx] < pt_cut) {
     if (debug) {
       cout << "L2 trig failed." << endl;
     }
@@ -950,7 +1003,7 @@ Int_t DataContainer::match_trigger_object(const Jet& jet) {
       cout << "Trig full had. Id: " << trig_obj_id_[i] <<\
         "\t and filter_bits: " << trig_obj_filter_bits_[i] << endl;
     }
-    if (trig_obj_id_[i] != kTrigobj_id_had_jet || \
+    if (trig_obj_id_[i] != trig_id || \
         trig_obj_filter_bits_[i] != kTrigobj_filter_bits) {
       continue;
     }
@@ -1053,7 +1106,9 @@ void DataContainer::apply_fsr_correction() {
       cout << "Best candidate had pt: " << best->Pt() << " R distance: " \
            << appo.DeltaR(*best) << endl;
     }
-    if ((appo + *best).Pt() > pt_cut[pt_cut.size() - 1]) {
+    Float_t minimum = leptonic ? pt_cut_lep[pt_cut_lep.size() - 1] : \
+      pt_cut_had[pt_cut_had.size() - 1];
+    if ((appo + *best).Pt() > minimum) {
       appo += *best;
       corrected_jet[i].SetPtEtaPhiM(appo.Pt(), appo.Eta(), appo.Phi(), appo.M());
     }
