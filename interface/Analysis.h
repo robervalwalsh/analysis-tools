@@ -40,6 +40,7 @@
 
 #include "Analysis/Tools/interface/PhysicsObjectTree.h"
 #include "Analysis/Tools/interface/Collection.h"
+#include "Analysis/Tools/interface/BTagCalibrationStandalone.h"
 
 //
 // class declaration
@@ -144,6 +145,14 @@ namespace analysis {
             void  btagEfficienciesAlgo(const std::string & );
             void  btagEfficienciesFlavour(const std::string & );
             
+            std::shared_ptr<BTagCalibrationReader> btagCalibration(const std::string & tagger,
+                                 const std::string & filename,
+                                 const std::string & wp,
+                                 const std::string & sysType="central",
+                                 const std::vector<std::string> & otherSysTypes={"up", "down"});
+            
+            
+            std::shared_ptr<BTagCalibrationReader> btagCalibration();
             
             float scaleLuminosity(const float & lumi);  // in pb-1
 
@@ -163,6 +172,9 @@ namespace analysis {
             std::map<std::string,TH2F *> h2_btageff_;
             std::string btageff_flavour_;
             std::string btageff_algo_;
+            
+            std::shared_ptr<BTagCalibration> btagcalib_;
+            std::shared_ptr<BTagCalibrationReader> btagcalibread_;
 
 
             std::map<std::string, double> xsections_;
