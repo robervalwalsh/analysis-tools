@@ -26,7 +26,7 @@ int main(int argc, char * argv[])
    TH1::SetDefaultSumw2();  // proper treatment of errors when scaling histograms
    
    // Cuts
-   float btagmin[3] = { btagwp_, btagwp_, btagwp_};
+   float btagmin[3] = { btagwptight_, btagwptight_, btagwptight_};
    
    // Input files list
    Analysis analysis(inputlist_);
