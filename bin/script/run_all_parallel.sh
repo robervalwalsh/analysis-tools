@@ -13,7 +13,7 @@ for i in ${RANGE[@]} ; do
     for corr in ${CORRECTION_LEVELS[@]} ; do
         if ! [[ -f ${OUT_FILE} ]] ; then
             OUT_FILE="${OUTPUT_DIR}/${corr}.root"
-            ${MASSPOINTS[i]}_${corr} ${OUT_FILE} & > /dev/null
+            ${MASSPOINTS[i]}_${corr} ${OUT_FILE} > /dev/null &
         else
             echo -e "\033[0;31mFile already exists. Not overwriting. ${OUT_FILE}\033[0m"
         fi
