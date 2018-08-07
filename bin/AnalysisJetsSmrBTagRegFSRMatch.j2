@@ -43,8 +43,12 @@ using std::array;
 using std::cerr;
 using std::vector;
 
+{% if not bkg %}
 enum class CorrectionLevel { nothing, only_smearing, smearing_btag, \
                              smearing_btag_regression, smearing_btag_regression_fsr };
+{% else %}
+enum class CorrectionLevel { nothing, regression, regression_fsr };
+{% endif %}
 namespace Smearing {
   enum class method {scaling, stochastic};
 }
@@ -57,10 +61,10 @@ enum class Match {
 };
 
 
-
 const Float_t rcone(0.4);
 const unsigned int kLen = 100;
-const Float_t deepcsv_cut = 0.4941;
+const Float_t deepcsv_cut_tight = 0.4941;
+const Float_t deepcsv_cut_loose = 0.1522;
 const Float_t b_tagging_efficiency = 0.99;
 const Int_t kTight = 2;
 const array<Float_t, 3> pt_cut_had{ {100, 100, 40} };
@@ -173,7 +177,7 @@ class DataContainer {
   void apply_jet_reg_sf(UInt_t index);
 
   /**
-   * @brief Looks for all jets with btag_deep > deepcsv_cut and checks if there are
+   * @brief Looks for all jets with btag_deep > deepcsv_cut_tight and checks if there are
    * very close light flavour jets. If yes, it adds the closest TLorentzVector of the
    * soft jet to the original one. (which is saved in corrected_jet[i])
    */
@@ -220,6 +224,15 @@ class DataContainer {
     return (pt_cut_lep[idx] < pt_cut_had[idx]) ? pt_cut_lep[idx] : pt_cut_had[idx];
   }
   
+  inline Bool_t compare_with_right_deepcsv(UInt_t idx{% if bkg %}, UInt_t btagged{% endif %}) {
+    {% if bkg %}
+    return (btagged < 2) ? btag_deep_[idx] > deepcsv_cut_tight  \
+      : btag_deep_[idx] < deepcsv_cut_loose;
+    {% else %}
+    return (btag_deep_[idx] > deepcsv_cut_tight);
+    {% endif %}
+  }
+
   
  private:
   JME::JetResolution resolution;
@@ -243,13 +256,16 @@ class DataContainer {
   Float_t jet_b_reg_corr[kLen];
   Int_t jet_n_electrons[kLen];
   Int_t jet_n_muons[kLen];
+  {% if not bkg %}
   Int_t jet_genjet_idx_[kLen];
   UInt_t n_gen_jet_;
   Float_t genjet_pt_[kLen];
   Float_t genjet_eta_[kLen];
   Float_t genjet_phi_[kLen];
+  {% endif %}
   Bool_t trigger_path_had;
   Bool_t trigger_path_lep;
+  {% if not bkg %}
   UInt_t ngenpart_;
   Int_t genjet_parton_flavour_[kLen];
   Int_t genpart_genpart_idxmother_[kLen];
@@ -258,6 +274,7 @@ class DataContainer {
   Float_t genpart_phi_[kLen];
   Float_t genpart_mass_[kLen];
   Int_t genpart_pdgid_[kLen];
+  {% endif %}
   Float_t jet_b_reg_res_[kLen];
   Int_t jet_puId_[kLen];
   // 
@@ -283,13 +300,14 @@ class DataContainer {
   Float_t rho_jec_;
   
   // Extra values to put in the new tree
-  UInt_t matches_;
   Float_t mass_;
   Float_t new_pt_[kLen];
   Float_t new_eta_[kLen];
   Float_t new_phi_[kLen];
   Float_t new_mass_[kLen];
   Bool_t leptonic;
+  {% if not bkg %}
+  UInt_t matches_;
   Bool_t first_bjet_matched;
   Bool_t second_bjet_matched;
   /**
@@ -299,6 +317,7 @@ class DataContainer {
    * in third position and the corrected_jet #3 was in second position.
    */
   UInt_t reordering_[kLen];
+  {% endif %}
 };
 
 /**
@@ -372,14 +391,17 @@ int DataContainer::SetTreeBranches(TTree * t) {
   t->SetBranchAddress("Jet_bRegCorr", jet_b_reg_corr);
   t->SetBranchAddress("Jet_nElectrons", &jet_n_electrons);
   t->SetBranchAddress("Jet_nMuons", &jet_n_muons);
+  {% if not bkg %}
   t->SetBranchAddress("Jet_genJetIdx", jet_genjet_idx_);
   t->SetBranchAddress("nGenJet", &n_gen_jet_);
   t->SetBranchAddress("GenJet_pt", genjet_pt_);
   t->SetBranchAddress("GenJet_eta", genjet_eta_);
   t->SetBranchAddress("GenJet_phi", genjet_phi_);
+  {% endif %}
   t->SetBranchAddress("Jet_bRegRes", jet_b_reg_res_);
   t->SetBranchAddress("HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33", &trigger_path_had);
   t->SetBranchAddress("HLT_Mu12_DoublePFJets40MaxDeta1p6_DoubleCaloBTagCSV_p33", &trigger_path_lep);
+  {% if not bkg %}
   t->SetBranchAddress("nGenPart", &ngenpart_);
   t->SetBranchAddress("GenJet_partonFlavour", genjet_parton_flavour_);
   t->SetBranchAddress("GenPart_genPartIdxMother", genpart_genpart_idxmother_);
@@ -388,6 +410,7 @@ int DataContainer::SetTreeBranches(TTree * t) {
   t->SetBranchAddress("GenPart_phi", genpart_phi_);
   t->SetBranchAddress("GenPart_mass", genpart_mass_);
   t->SetBranchAddress("GenPart_pdgId", genpart_pdgid_);
+  {% endif %}
   t->SetBranchAddress("Jet_puId", jet_puId_);
   t->SetBranchAddress("Jet_electronIdx1", &jet_electron_idx1);
   t->SetBranchAddress("nElectron", &n_electron);
@@ -430,16 +453,19 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("Jet_bRegCorr", jet_b_reg_corr, "Jet_bRegCorr[nJet]/F");
   t->Branch("Jet_nElectrons", &jet_n_electrons, "Jet_nElectrons/I");
   t->Branch("Jet_nMuons", &jet_n_muons, "Jet_nMuons/F");
+  {% if not bkg %}
   t->Branch("Jet_genJetIdx", jet_genjet_idx_, "Jet_genJetIdx[nJet]/I");
   t->Branch("nGenJet", &n_gen_jet_, "nGenJet/i");
   t->Branch("GenJet_pt", genjet_pt_, "GenJet_pt[nGenJet]/F");
   t->Branch("GenJet_eta", genjet_eta_, "GenJet_eta[nGenJet]/F");
   t->Branch("GenJet_phi", genjet_phi_, "GenJet_phi[nGenJet]/F");
+  {% endif %}
   t->Branch("Jet_bRegRes", jet_b_reg_res_, "Jet_bRegRes[nJet]/F");
   t->Branch("HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33", &trigger_path_had, \
             "HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33/O");
   t->Branch("HLT_Mu12_DoublePFJets40MaxDeta1p6_DoubleCaloBTagCSV_p33", &trigger_path_lep,
             "HLT_Mu12_DoublePFJets40MaxDeta1p6_DoubleCaloBTagCSV_p33/O");
+  {% if not bkg %}
   t->Branch("nGenPart", &ngenpart_, "nGenPart/i");
   t->Branch("GenJet_partonFlavour", genjet_parton_flavour_, "GenJet_partonFlavour[nGenJet]/I");
   t->Branch("GenPart_genPartIdxMother", genpart_genpart_idxmother_, "GenPart_genPartIdxMother[nGenPart]/i");
@@ -448,6 +474,7 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("GenPart_phi", genpart_phi_, "GenPart_phi[nGenPart]/F");
   t->Branch("GenPart_mass", genpart_mass_, "GenPart_mass[nGenPart]/F");
   t->Branch("GenPart_pdgId", genpart_pdgid_, "GenPart_pdgId[nGenPart]/F");
+  {% endif %}
   t->Branch("Jet_puId", jet_puId_, "Jet_puId[nJet]/I");
   t->Branch("Jet_electronIdx1", jet_electron_idx1, "Jet_electronIdx1/I");
   t->Branch("nElectron", &n_electron, "nElectron/i");
@@ -472,20 +499,23 @@ void DataContainer::CreateTree(TTree* t) {
   t->Branch("TrigObj_filterBits", trig_obj_filter_bits_, "TrigObj_filterBits[nTrigObj]/I");
 
   // new data
-  t->Branch("nMatches", &matches_, "nMatches/i");
   t->Branch("Mass", &mass_, "Mass/F");
   t->Branch("Jet_newPt", new_pt_, "Jet_newPt[nJet]/F");
   t->Branch("Jet_newEta", new_eta_, "Jet_newEta[nJet]/F");
   t->Branch("Jet_newPhi", new_phi_, "Jet_newPhi[nJet]/F");
   t->Branch("Jet_newMass", new_mass_, "Jet_newMass[nJet]/F");
+  {% if not bkg %}
+  t->Branch("nMatches", &matches_, "nMatches/i");
   t->Branch("Jet_newOriginalOrder", reordering_, "Jet_newOriginalOrder[nJet]/i");
   t->Branch("BjetMatched1", &first_bjet_matched, "BjetMatched1/O");
   t->Branch("BjetMatched2", &second_bjet_matched, "BjetMatched2/O");
+  {% endif %}
 }
 // suggested regex
 // t->SetBranchAddress(\"\([a-zA-Z_0-9]*\)\", \([&]*[a-zA-Z_0-9]*\));
 
 
+{% if not bkg %}
 /**
  * Modifies current_jet[i] smearing the pt.
  */
@@ -501,6 +531,7 @@ void DataContainer::smear_current_data(UInt_t i) {
     cout << "smeared value: "  << appo << endl;
   }
 }
+{% endif %}
 
 void DataContainer::apply_all_corrections(CorrectionLevel lev) {
   if (!corrections_after) {
@@ -510,6 +541,22 @@ void DataContainer::apply_all_corrections(CorrectionLevel lev) {
   }
   switch (lev) {
   case CorrectionLevel::nothing: break;
+    {% if bkg %}
+  case CorrectionLevel::regression:
+    for (unsigned int i = 0; i < njet_; i++) {
+      apply_jet_reg_sf(i);
+    }
+    sort_by_Pt();
+    break;
+  case CorrectionLevel::regression_fsr:
+    for (unsigned int i = 0; i < njet_; i++) {
+      apply_jet_reg_sf(i);
+    }
+    sort_by_Pt();
+    apply_fsr_correction();
+    sort_by_Pt();
+    break;
+    {% else %}
   case CorrectionLevel::only_smearing:
     for (unsigned int i = 0; i < njet_; i++) {
       smear_current_data(i);
@@ -550,6 +597,7 @@ void DataContainer::apply_all_corrections(CorrectionLevel lev) {
     apply_fsr_correction();
     sort_by_Pt();
     break;
+    {% endif %}
   }
 }
 
@@ -575,6 +623,8 @@ bool DataContainer::get_real_pt(Int_t index, Float_t *pt) {
 }
 
 
+
+{% if not bkg %}
 /* 
  * Loops over genpart with id equal to b or bbar and select the closest one
  * Then reconstructs the original particle
@@ -621,8 +671,9 @@ void DataContainer::match_jet_with_part(Jet& jet) {
     jet.SetMatch(Match::no_match);
   }
 }
+{% endif %}
 
-
+{% if not bkg %}
 Match DataContainer::match_genpart(UInt_t i) {
   if (debug) {
     cout << "Mother index of genpart: " << genpart_genpart_idxmother_[i] \
@@ -646,7 +697,7 @@ Match DataContainer::match_genpart(UInt_t i) {
     }
   }
 }
-
+{% endif %}
 
 
 void DataContainer::fill_histogram(TTree* tree, \
@@ -770,7 +821,7 @@ void DataContainer::fill_histogram(TTree* tree, \
         }
       }
       // Look at pt only if it is btagged
-      if (btag_deep_[it->Idx()] > deepcsv_cut) {
+      if (compare_with_right_deepcsv(it->Idx(){% if bkg %}, btaggati {% endif %})) {
         // cuts on eta and pt
         if (TMath::Abs(it->Eta()) > eta_cut[btaggati]) {
           continue;
@@ -783,7 +834,8 @@ void DataContainer::fill_histogram(TTree* tree, \
       }
     }
     if (debug) {
-      cout << "btagged: " << btaggati << endl;
+      cout << "btagged (with bkg it can be misleading. Counter counts bbnb, so btagged = 3 " \
+           << "means that there are bb nb): " << btaggati << endl;
     }
     if (btaggati < 3) {
       continue;
@@ -839,7 +891,8 @@ void DataContainer::fill_histogram(TTree* tree, \
     if (debug) {
       cout << "Distance was enough" << endl;
     }
-    
+
+    {% if not bkg %}
     unsigned int matched = 0;
     for (unsigned int i = 0; i < 2; i++) {
       match_jet_with_part(bjets[i]);
@@ -853,6 +906,7 @@ void DataContainer::fill_histogram(TTree* tree, \
     if (debug) {
       cout << "Matched as higgs daughter " << matched << " jets" << endl;
     }
+    {% endif %}
 
     if (apply_trigger_cut) {
       Int_t appo1, appo2;
@@ -870,8 +924,10 @@ void DataContainer::fill_histogram(TTree* tree, \
       if (debug) {
         cout << "Trigger passed." << endl;
       }
+      {% if not bkg %}
       first_bjet_matched = (appo1 != -2);
       second_bjet_matched = (appo2 != -2);
+      {% endif %}
     }
 
     if (corrections_after) {
@@ -886,27 +942,49 @@ void DataContainer::fill_histogram(TTree* tree, \
       }
     }
     
-
+    {% if not bkg %}
     if (debug) {
       cout << "Weight before multiplication for 0.512: " << weigth << endl;
     }
     weigth *= 0.64; // this is 0.8**2, to simulate online btag efficiency
+    {% endif %}
     mass_ = -(bjets[0] - bjets[1]).M();
+    {% if not bkg %}
     matches_ = matched;
+    {% endif %}
     for (unsigned int k = 0; k < corrected_jet.size(); k++) {
       new_pt_[k] = corrected_jet[k].Pt();
       new_eta_[k] = corrected_jet[k].Eta();
       new_phi_[k] = corrected_jet[k].Phi();
       new_mass_[k] = corrected_jet[k].M();
+      {% if not bkg %}
       reordering_[k] = corrected_jet[k].Idx();
+      {% endif %}
     }
     cout << "\033[0;32mFilling with m = " << mass_ << \
       " and pt = " << bjets[0].Pt() << ". Weigth of this event: " << weigth \
          << "\033[0m" << endl;
+    {% if bkg %}
+    if (debug) {
+      cout << "Weigth should be 1 for every event in bkg study: " << weigth \
+           << endl;
+    }
+    {% endif %}
     out_tree->Fill();
-    
+
+    {% if bkg %}
     if (leptonic) {
-      plots[matched + 3]->Fill(mass_, weigth);      
+      plots[0]->Fill(mass_, weigth);
+      plots[2]->Fill(bjets[0].Pt(), weigth);
+      plots[4]->Fill(jet_b_reg_res_[bjets[0].Idx()], weigth);
+    } else {
+      plots[1]->Fill(mass_, weigth);
+      plots[3]->Fill(bjets[0].Pt(), weigth);
+      plots[5]->Fill(jet_b_reg_res_[bjets[0].Idx()], weigth);
+    }
+    {% else %}
+    if (leptonic) {
+      plots[matched + 3]->Fill(mass_, weigth);
       plots[7]->Fill(bjets[0].Pt(), weigth);
       plots[9]->Fill(jet_b_reg_res_[bjets[0].Idx()], weigth);
     } else {
@@ -914,6 +992,7 @@ void DataContainer::fill_histogram(TTree* tree, \
       plots[6]->Fill(bjets[0].Pt(), weigth);
       plots[8]->Fill(jet_b_reg_res_[bjets[0].Idx()], weigth);
     }
+    {% endif %}
   }
 }
 
@@ -986,6 +1065,7 @@ Int_t DataContainer::match_trigger_object(Bool_t leptonic, const Jet& jet) {
   }
   if (trig_obj_l2pt_[idx] < pt_cut) {
     if (debug) {
+      cout << "L2 trig pt: " << trig_obj_l2pt_[idx] << endl;
       cout << "L2 trig failed." << endl;
     }
     return -4;
@@ -1027,7 +1107,7 @@ Int_t DataContainer::match_trigger_object(Bool_t leptonic, const Jet& jet) {
   return idx;
 }
 
-
+{% if not bkg %}
 void DataContainer::apply_btag_sf() {
   if (debug) {
     cout << "Using scale factors for btagging" << endl;
@@ -1035,7 +1115,7 @@ void DataContainer::apply_btag_sf() {
   UInt_t btagged = 0;
   
   for (auto it = corrected_jet.begin(); it != corrected_jet.end() && btagged < 3; it++) {
-    if (btag_deep_[it->Idx()] > deepcsv_cut) {
+    if (btag_deep_[it->Idx()] > deepcsv_cut_tight) {
       BTagEntry::JetFlavor flavour;
       if (TMath::Abs(genjet_parton_flavour_[it->Idx()]) == pdgBId) {
         flavour = BTagEntry::FLAV_B;
@@ -1059,6 +1139,7 @@ void DataContainer::apply_btag_sf() {
     }
   }  
 }
+{% endif %}
 
 
 void DataContainer::apply_jet_reg_sf(UInt_t i) {
@@ -1081,7 +1162,7 @@ void DataContainer::apply_fsr_correction() {
     return;
   }
   for (UInt_t i = 0; i < njet_; i++) {
-    if (btag_deep_[corrected_jet[i].Idx()] > deepcsv_cut) {
+    if (btag_deep_[corrected_jet[i].Idx()] > deepcsv_cut_tight) {
       bjets.push_back(std::make_tuple(corrected_jet[i], i));
     } else {
       softjets.push_back(corrected_jet[i]);
@@ -1146,6 +1227,15 @@ int main(int argc, char* argv[]) {
   DataContainer container;
   container.SetTreeBranches(&chain);
   container.CreateTree(&output_tree);
+  {% if bkg %}
+  TH1F mass_histo_chromo("mass_histo_chromo",                           \
+                         "Invariant mass of bb jets (NL)", bins, 0, highx);
+  TH1F mass_histo_lepton("mass_histo_lepton",                           \
+                         "Invariant mass of bb jets (L)", bins, 0, highx);
+  std::vector<TH1F*> histos;
+  histos.push_back(&mass_histo_chromo);
+  histos.push_back(&mass_histo_lepton);
+  {% else %}
   TH1F mass_histo_chromo_0_match("mass_histo_chromo_0_match", \
                       "Invariant mass of bb jets", bins, 0, highx);
   TH1F mass_histo_lepton_0_match("mass_histo_lepton_0_match", \
@@ -1158,14 +1248,6 @@ int main(int argc, char* argv[]) {
                                  "Invariant mass of bb jets", bins, 0, highx);
   TH1F mass_histo_lepton_2_match("mass_histo_lepton_2_match",           \
                          "Invariant mass of bb jets", bins, 0, highx);
-  TH1F pt_spectrum_chromo("pt_spectrum_chromo", \
-                          "Pt spectrum for chromo events", bins, 0, highx);
-  TH1F pt_spectrum_lepton("pt_spectrum_lepton", \
-                          "Pt spectrum for lepton events", bins, 0, highx);
-  TH1F reg_res_chromo("reg_res_chromo", "RegRes for non lepton events", \
-                      bins, 0, 1);
-  TH1F reg_res_lepton("reg_res_lepton", "RegRes for lepton events", \
-                      bins, 0, 1);
   std::vector<TH1F*> histos;
   histos.push_back(&mass_histo_chromo_0_match);
   histos.push_back(&mass_histo_chromo_1_match);
@@ -1173,19 +1255,32 @@ int main(int argc, char* argv[]) {
   histos.push_back(&mass_histo_lepton_0_match);
   histos.push_back(&mass_histo_lepton_1_match);
   histos.push_back(&mass_histo_lepton_2_match);
+  {% endif %}
+  TH1F pt_spectrum_chromo("pt_spectrum_chromo",                         \
+                          "Pt spectrum for chromo events", bins, 0, highx);
+  TH1F pt_spectrum_lepton("pt_spectrum_lepton", \
+                          "Pt spectrum for lepton events", bins, 0, highx);
+  TH1F reg_res_chromo("reg_res_chromo", "RegRes for non lepton events", \
+                      bins, 0, 1);
+  TH1F reg_res_lepton("reg_res_lepton", "RegRes for lepton events",     \
+                      bins, 0, 1);
   histos.push_back(&pt_spectrum_chromo);
   histos.push_back(&pt_spectrum_lepton);
   histos.push_back(&reg_res_chromo);
   histos.push_back(&reg_res_lepton);
 
+
   container.fill_histogram(&chain, histos, &output_tree);
   output.cd();
+  {% if bkg %}
+
+  {% else %}
   mass_histo_chromo_0_match.SetLineColor(kPink);
-  mass_histo_chromo_0_match.SetLineColor(kBlue);
-  mass_histo_chromo_0_match.SetLineColor(kGreen);
+  mass_histo_chromo_1_match.SetLineColor(kBlue);
+  mass_histo_chromo_2_match.SetLineColor(kGreen);
   mass_histo_lepton_0_match.SetLineColor(kRed);
-  mass_histo_lepton_0_match.SetLineColor(kOrange);
-  mass_histo_lepton_0_match.SetLineColor(kYellow);
+  mass_histo_lepton_1_match.SetLineColor(kOrange);
+  mass_histo_lepton_2_match.SetLineColor(kYellow);
   TH1F mass_histo_sum(mass_histo_chromo_0_match);
   mass_histo_sum.Add(&mass_histo_chromo_1_match, 1.);
   mass_histo_sum.Add(&mass_histo_chromo_2_match, 1.);
@@ -1195,11 +1290,14 @@ int main(int argc, char* argv[]) {
   mass_histo_sum.SetLineColor(kBlack);
   cout << "Entries in total histo: " <<        \
     mass_histo_sum.GetEntries() << endl;
-  
+  {% endif %}
   for (auto it : histos) {
     it->Write();
   }
+  {% if not bkg %}
   mass_histo_sum.Write();
+  {% endif %}
+  
   output_tree.Write();
   return 0;
 }

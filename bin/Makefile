@@ -20,3 +20,5 @@ all: _tmp/src/%.cc
 run_all:
 	./script/run_all_parallel.sh
 
+run_bkg:
+	./script/run_all_bkg.sh
