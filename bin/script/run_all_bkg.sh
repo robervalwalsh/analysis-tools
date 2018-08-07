@@ -7,13 +7,15 @@ hash -r
 for corr in ${CORRECTION_LEVELS[@]} ; do
     OUTPUT_DIR="$OUTPUT_DIR_BASE/test"
     mkdir -p ${OUTPUT_DIR}
-    EXECUTABLE="bkg_${corr}"
-    OUT_FILE="${OUTPUT_DIR}/${corr}.root"
-    if ! [[ -f ${OUT_FILE} ]] ; then
-        $EXECUTABLE ${OUT_FILE} > /dev/null &
-    else
-        echo -e "\033[0;31mFile already exists. Not overwriting. ${OUT_FILE}\033[0m"
-    fi
+    for i in $(seq 0 22) ; do 
+        EXECUTABLE="bkg_${corr}_${i}"
+        OUT_FILE="${OUTPUT_DIR}/${corr}_${i}.root"
+        if ! [[ -f ${OUT_FILE} ]] ; then
+            $EXECUTABLE ${OUT_FILE} > /dev/null &
+        else
+            echo -e "\033[0;31mFile already exists. Not overwriting. ${OUT_FILE}\033[0m"
+        fi
+    done
 done
 
 wait
