@@ -38,6 +38,8 @@ Jet::Jet() : Candidate()
    fsr_ = nullptr;
    muon_ = nullptr;
    uncorrJetp4_ = p4_;
+   genjet_ = nullptr;
+   
 }
 Jet::Jet(const float & pt, const float & eta, const float & phi, const float & e) : Candidate(pt,eta,phi,e,0.) 
 {
@@ -46,6 +48,7 @@ Jet::Jet(const float & pt, const float & eta, const float & phi, const float & e
    fsr_ = nullptr;
    muon_ = nullptr;
    uncorrJetp4_ = p4_;
+   genjet_ = nullptr;
    
 }
 
@@ -93,6 +96,8 @@ float Jet::bRegCorr() const  { return bRegCorr_; }
 float Jet::bRegRes()  const  { return bRegRes_; }
 
 double Jet::rho()     const  { return rho_; }
+
+GenJet * Jet::generatedJet() const { return genjet_; }
 
 double Jet::btagSFsys(std::shared_ptr<BTagCalibrationReader> reader, const std::string & systype, const std::string & flavalgo) const
 {
@@ -164,6 +169,8 @@ void Jet::bRegCorr(const float & bRegCorr)                            { bRegCorr
 void Jet::bRegRes(const float & bRegRes)                              { bRegRes_  = bRegRes; }
 
 void Jet::rho(const double & rho)                                      { rho_  = rho; }
+
+void Jet::generatedJet(GenJet * genjet)                                { genjet_ = genjet; }
 
 
 int Jet::removeParton(const int & i)

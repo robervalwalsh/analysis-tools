@@ -28,6 +28,7 @@
 #include "Analysis/Tools/interface/Candidate.h"
 #include "Analysis/Tools/interface/Muon.h"
 #include "Analysis/Tools/interface/GenParticle.h"
+#include "Analysis/Tools/interface/GenJet.h"
 #include "Analysis/Tools/interface/BTagCalibrationStandalone.h"
 //
 // class declaration
@@ -115,6 +116,9 @@ namespace analysis {
             
             /// pointer to the muon
             Muon * muon();
+            
+            /// Pointer to GenJet
+            GenJet * generatedJet() const;
                
             // Sets
             /// sets the isPuppi value
@@ -194,6 +198,9 @@ namespace analysis {
             /// remove muon association to the jet
             void rmMuon();
             
+            /// GenJet matching
+            void generatedJet(GenJet *);
+            
             
          protected:
             // ----------member data ---------------------------
@@ -256,6 +263,9 @@ namespace analysis {
             Jet * fsr_;
             /// 4-momentum before FSR correction
             TLorentzVector uncorrJetp4_;
+            
+            /// generated jet
+            GenJet * genjet_;
             
             /// muon in jet
             Muon * muon_;
