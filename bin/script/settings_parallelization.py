@@ -65,7 +65,7 @@ mass_points_signal = [{'mass': "120",
 
 
 
-allfiles = ["180731_085953/0000/" + line.rstrip("\n")
+allfiles = ["180807_163631/0000/" + line.rstrip("\n")
             for line in open("script/data_files.txt", "r")]
 
 
