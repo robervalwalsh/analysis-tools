@@ -973,7 +973,7 @@ void DataContainer::fill_histogram(TTree* tree, \
     out_tree->Fill();
 
     {% if bkg %}
-    if (leptonic) {
+    if (!leptonic) {
       plots[0]->Fill(mass_, weigth);
       plots[2]->Fill(bjets[0].Pt(), weigth);
       plots[4]->Fill(jet_b_reg_res_[bjets[0].Idx()], weigth);
