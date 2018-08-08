@@ -19,6 +19,7 @@ if ( $#argv == 4 ) then
 endif
 
 if ( $#argv == 5 ) then
+   set config = $4
    set json = $5
 endif
 
