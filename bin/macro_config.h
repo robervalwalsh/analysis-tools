@@ -128,6 +128,7 @@ std::string l1tjetsCol_;
 std::string l1tmuonsCol_; 
 std::string triggerCol_;
 std::string genParticleCol_;
+std::string genjetsCol_;
 std::string triggerObjDir_;
 
 int macro_config(int argc, char * argv[])
@@ -233,6 +234,7 @@ int macro_config(int argc, char * argv[])
          ("l1tJetsCollection",po::value <std::string> (&l1tjetsCol_)->default_value("l1tJets"),"Name of the L1T jets collection")
          ("l1tMuonsCollection",po::value <std::string> (&l1tmuonsCol_)->default_value("l1tMuons"),"Name of the L1T muons collection")
          ("genParticleCollection",po::value <std::string> (&genParticleCol_)->default_value("prunedGenParticles"),"Name of the gen particle collection")
+         ("genjetsCollection",po::value <std::string> (&genjetsCol_)->default_value("slimmedGenJets"),"Name of the gen jets collection")
 
          ("triggerResultsCollection",po::value <std::string> (&triggerCol_)->default_value("TriggerResults"),"Name of the trigger results collection")
          ("triggerObjectsDirectory",po::value <std::string> (&triggerObjDir_)->default_value("slimmedPatTrigger"),"Name of the trigger objects directory")
