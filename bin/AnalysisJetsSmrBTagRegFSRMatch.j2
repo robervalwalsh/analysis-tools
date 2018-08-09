@@ -711,7 +711,7 @@ void DataContainer::fill_histogram(TTree* tree, \
 
   for (ULong64_t event = 0; event < how_many; event++) {
     tree->GetEntry(event);
-    if (apply_trigger_cut) {
+    if ({% if bkg %}true{% else %}apply_trigger_cut{% endif %}) {
       if (debug) {
         cout << "Printing a lot of stuff for trigger for debug." << endl;
       }
