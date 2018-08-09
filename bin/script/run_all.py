@@ -5,6 +5,7 @@
 from settings_parallelization import correction_level_bkg, correction_level_signal, \
     mass_points_signal, bkg_files, split_list
 from subprocess import Popen, STDOUT
+from time import sleep
 
 import os
 import sys
@@ -23,9 +24,26 @@ if sys.argv[1] == "bkg":
             for lista, i in zip(split_list(params['filenames'], 10), range(0, 10000)):
                 tmp_output_file = output_file + "_" + str(i) + ".root"
                 veralista = [os.path.join(params['basedir'], l) for l in lista ]
-                process_list.append(
+                if params['era'] == 'C':
                     Popen([executable, tmp_output_file] + veralista,
-                          stdout=DEVNULL, stderr=STDOUT))
+                          stdout=DEVNULL, stderr=STDOUT)
+            print("Now I wait a bit")
+            sleep(20)
+    print("All process launched.")
+    appo = [p.wait() for p in process_list]
+    print("All process exited. Now i merge the result")
+    for params in bkg_files:
+        for cl in correction_level_bkg:
+            output_file = "_".join([params['mass'], params['era'], cl[0], cl[1]])
+            output_file = os.path.join(output_dir, output_file)
+            to_merge = list()
+            for i in range(0, len(split_list(params['filenames'], 10))):
+                to_merge.append(output_file + "_" + str(i) + ".root")
+            output_file += ".root"
+            Popen(["hadd", output_file] + to_merge)
+            # Now we can clean using rm but maybe later.
+    print("Merged")
+            
 elif sys.argv[1] == "signal":
     output_dir = "output/hists/jets/mannaggia"
     for params in mass_points_signal:
@@ -37,7 +55,7 @@ elif sys.argv[1] == "signal":
             process_list.append(
                 Popen([executable, output_file] + veralista,
                       stdout=DEVNULL, stderr=STDOUT))
+    print("All process launched.")
+    appo = [p.wait() for p in process_list]
+    print("All process exited.")
 
-print("All process launched.")
-appo = [p.wait() for p in process_list]
-print("All process exited.")
