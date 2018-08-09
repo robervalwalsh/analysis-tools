@@ -4,7 +4,7 @@
 from jinja2 import FileSystemLoader, Environment
 
 from settings_parallelization import correction_level_bkg, correction_level_signal, \
-    mass_points_signal, ranges, bkg_files
+    mass_points_signal, bkg_files, split_list
 
 import os
 import sys
@@ -33,10 +33,21 @@ else:
             f = open(os.path.join("_tmp/src", filename), "w")
             f.write(out_text)
             f.close()
-    for params, i in zip(bkg_files, ranges):
+        # f = open(os.path.join("_tmp/input", "_".join(["signal", params['mass']])), "w")
+        # for fileeee in params['filenames']:
+        #     f.write(os.path.join(params['basedir'], fileeee))
+        #     f.write("\n")
+        
+    for params in bkg_files:
         for cl in correction_level_bkg:
             out_text = template.render(cl=cl[0], trig=cl[1], bkg=True, **params)
-            filename = "_".join([params['mass'], cl[0], cl[1], str(i)]) + ".cc"
+            filename = "_".join([params['mass'], cl[0], cl[1]]) + ".cc"
             f = open(os.path.join("_tmp/src", filename), "w")
             f.write(out_text)
             f.close()
+        # for lista, i in zip(split_list(params['filenames'], 10), range(0, 10000)):
+        #     fileparams = "_".join([params['mass'], params['era'], str(i)])
+        #     f = open(os.path.join("_tmp/input", fileparams), "w")
+        #     for fff in lista:
+        #         f.write(os.path.join(params['basedir'], fff))
+        #         f.write("\n")

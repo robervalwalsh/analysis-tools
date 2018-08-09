@@ -18,7 +18,7 @@ all: _tmp/src/%.cc
 	scram b -k -j25
 
 run_all:
-	./script/run_all_parallel.sh
+	./script/run_all.py signal
 
 run_bkg:
-	./script/run_all_bkg.sh
+	./script/run_all.py bkg

@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 
+from os import listdir
 
 correction_level_signal = [("nothing", "false"),
                     ("only_smearing", "false"),
@@ -19,64 +20,66 @@ correction_level_bkg = [
 mass_points_signal = [{'mass': "120",
                 'highx': 400,
                 'bins': 20,
-                'basedir': "/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC/Fall17/nano_94X_mc_2017_fall17-v1/SUSYGluGluToBBHToBB_NarrowWidth_M-120_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/",
-                'filenames': ["180730_145111/0000/nano_2.root",
-                              "180730_145111/0000/nano_5.root",
-                              "180730_145111/0000/nano_1-1.root",
-                              "180730_145111/0000/nano_1-2.root",
-                              "180730_145111/0000/nano_1-3.root",
-                              "180730_145111/0000/nano_1-4.root",
-                              "180730_145111/0000/nano_1-5.root",
-                              "180730_145111/0000/nano_1-6.root",
-                              "180730_145111/0000/nano_1-7.root",
-                              "180730_145111/0000/nano_1-8.root",
-                ]},
+                'basedir': "/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC/Fall17/nano_94X_mc_2017_fall17-v1/SUSYGluGluToBBHToBB_NarrowWidth_M-120_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/180730_145111/0000",
+                'filenames': listdir("/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC/Fall17/nano_94X_mc_2017_fall17-v1/SUSYGluGluToBBHToBB_NarrowWidth_M-120_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/180730_145111/0000")},
                {'mass': "350",
                 'highx': 800,
                 'bins': 50,
-                'basedir': "/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC/Fall17/nano_94X_mc_2017_fall17-v1/SUSYGluGluToBBHToBB_NarrowWidth_M-350_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/",
-                'filenames': ["180730_145049/0000/nano_2.root",
-                              "180730_145049/0000/nano_3.root",
-                              "180730_145049/0000/nano_4.root"
-                              "180730_145049/0000/nano_5.root",
-                              "180730_145049/0000/nano_6.root",
-                              "180730_145049/0000/nano_7.root",
-                              "180730_145049/0000/nano_8.root",
-                              "180730_145049/0000/nano_9.root",
-                              "180730_145049/0000/nano_10.root",
-                              "180730_145049/0000/nano_11.root",
-                ]},
+                'basedir': "/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC/Fall17/nano_94X_mc_2017_fall17-v1/SUSYGluGluToBBHToBB_NarrowWidth_M-350_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/180730_145049/0000/",
+                'filenames': listdir("/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC/Fall17/nano_94X_mc_2017_fall17-v1/SUSYGluGluToBBHToBB_NarrowWidth_M-350_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/180730_145049/0000/")},
                {'mass': "1200",
                 'highx': 1600,
                 'bins': 50,
-                'basedir': "/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC/Fall17/nano_94X_mc_2017_fall17-v1/SUSYGluGluToBBHToBB_NarrowWidth_M-1200_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/",
-                'filenames': ["180730_145131/0000/nano_3.root",
-                              "180730_145131/0000/nano_4.root",
-                              "180730_145131/0000/nano_7.root",
-                              "180730_145131/0000/nano_9.root",
-                              "180730_145131/0000/nano_10.root",
-                              "180730_145131/0000/nano_11.root",
-                              "180730_145131/0000/nano_12.root",
-                              "180730_145131/0000/nano_13.root",
-                              "180730_145131/0000/nano_14.root",
-                              "180730_145131/0000/nano_15.root",
-                ]}
+                'basedir':"/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC/Fall17/nano_94X_mc_2017_fall17-v1/SUSYGluGluToBBHToBB_NarrowWidth_M-1200_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/180730_145131/0000/",
+                'filenames': listdir("/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC/Fall17/nano_94X_mc_2017_fall17-v1/SUSYGluGluToBBHToBB_NarrowWidth_M-1200_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/180730_145131/0000/")}
 ]
 
 
 
-allfiles = ["180807_163631/0000/" + line.rstrip("\n")
-            for line in open("script/data_files.txt", "r")]
-
-
+files_eras = [
+    {
+        'filenames': listdir("/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/DATA/Run2017/nano_94X_2017_rereco31Mar18-v1/BTagCSV/Run2017C-31Mar2018-v1/180807_163631/0000/"),
+        'basedir': "/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/DATA/Run2017/nano_94X_2017_rereco31Mar18-v1/BTagCSV/Run2017C-31Mar2018-v1/180807_163631/0000/",
+        'era': 'C',
+    },
+    {
+        'filenames': listdir("/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/DATA/Run2017/nano_94X_2017_rereco31Mar18-v1/BTagCSV/Run2017D-31Mar2018-v1/180807_163703/0000/"),
+        'basedir': "/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/DATA/Run2017/nano_94X_2017_rereco31Mar18-v1/BTagCSV/Run2017D-31Mar2018-v1/180807_163703/0000/",
+        'era': 'D',
+    },
+    {
+        'filenames': listdir("/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/DATA/Run2017/nano_94X_2017_rereco31Mar18-v1/BTagCSV/Run2017E-31Mar2018-v1/180807_163732/0000"),
+        'basedir': "/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/DATA/Run2017/nano_94X_2017_rereco31Mar18-v1/BTagCSV/Run2017E-31Mar2018-v1/180807_163732/0000",
+        'era': 'E',
+    },
+    {
+        'filenames': listdir("/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/DATA/Run2017/nano_94X_2017_rereco31Mar18-v1/BTagCSV/Run2017F-31Mar2018-v1/180807_163804/0000"),
+        'basedir': "/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/DATA/Run2017/nano_94X_2017_rereco31Mar18-v1/BTagCSV/Run2017F-31Mar2018-v1/180807_163804/0000",
+        'era': 'F',
+    }
+]
 
 size = 10
-ranges = range(0, len(allfiles)/size)
-bkg_files = [{
-    'mass': 'bkg',
-    'highx': 800,
-    'bins': 100,
-    'basedir': "/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/DATA/Run2017/nano_94X_2017_rereco31Mar18-v1/BTagCSV/Run2017C-31Mar2018-v1/",
-    'filenames': allfiles[size*i:size*(i+1)],
-    } for i in ranges
+
+def split_list(arr, size):
+     arrs = []
+     while len(arr) > size:
+         pice = arr[:size]
+         arrs.append(pice)
+         arr   = arr[size:]
+     arrs.append(arr)
+     return arrs
+
+
+
+bkg_files = [
+    {
+        'mass': 'bkg',
+        'highx': 800,
+        'bins': 100,
+        'filenames': params['filenames'],
+        'era': params['era'],
+        'basedir': params['basedir'],
+    }
+    for params in files_eras
 ]

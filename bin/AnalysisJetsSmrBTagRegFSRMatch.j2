@@ -1198,21 +1198,22 @@ void DataContainer::apply_fsr_correction() {
 }
 
 
-void get_chain_files(TChain* chain) {
-  {% for file in filenames %}
-    chain->Add("{{ basedir }}{{ file }}");{% endfor %}
+void get_chain_files(TChain* chain, int argc, char* argv[]) {
+  for (int i = 2; i < argc; i++) {
+    chain->Add(argv[i]);
+  }
 }
 
 
 int main(int argc, char* argv[]) {
   TH1::SetDefaultSumw2();  // proper treatment of errors when scaling histograms
-  if (argc != 2) {
+  if (argc < 3) {
     cerr << "\033[0;31mPlease give the name of the file where you want to" <<
       "put the output as an argument. Aborting.\033[0m" << endl;
     return -1;
   }
   TChain chain("Events");
-  get_chain_files(&chain);
+  get_chain_files(&chain, argc, argv);
   if (chain.IsZombie()) {
     cerr << "Error opening input file! Aborting." << endl;
     return -2;
