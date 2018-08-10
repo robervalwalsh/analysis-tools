@@ -15,7 +15,7 @@ DEVNULL = open(os.devnull, "wb")
 process_list = list()
 
 if sys.argv[1] == "bkg":
-    output_dir = "output/hists/bkg/second"
+    output_dir = "output/hists/bkg/third"
     bins = 100
     highx = 800
     
@@ -28,7 +28,7 @@ if sys.argv[1] == "bkg":
                 tmp_output_file = output_file + "_" + str(i) + ".root"
                 veralista = [os.path.join(params['basedir'], l) for l in lista ]
                 process_list.append(Popen([executable, tmp_output_file,
-                                           bins, highx] + veralista,
+                                           str(bins), str(highx)] + veralista,
                                           stdout=DEVNULL, stderr=STDOUT))
             print("Now I wait a bit")
             sleep(20)
@@ -51,13 +51,13 @@ elif sys.argv[1] == "signal":
     output_dir = "output/hists/jets/last"
     for params in mass_points_signal:
         for cl in correction_level_signal:
-            executable = "_".join([params['mass'], cl[0], cl[1]])
+            executable = "_".join(["sig", cl[0], cl[1]])
             output_file = "_".join([params['mass'], cl[0], cl[1]]) + ".root"
             output_file = os.path.join(output_dir, output_file)
             veralista = [os.path.join(params['basedir'], l) for l in params['filenames']]
             process_list.append(
-                Popen([executable, output_file, params['bins'],
-                       params['highx']] + veralista,
+                Popen([executable, output_file, str(params['bins']),
+                       str(params['highx'])] + veralista,
                       stdout=DEVNULL, stderr=STDOUT))
     print("All process launched.")
     appo = [p.wait() for p in process_list]

@@ -11,3 +11,6 @@ bin/params/*
 bin/tables/DeepCSV_94XSF_V3_B_F.csv
 bin/BuildFile.xml
 .tramp_history
+*.root
+bin/script/TMVA/dataset/*
+bin/script/TMVA/trainmc.py
