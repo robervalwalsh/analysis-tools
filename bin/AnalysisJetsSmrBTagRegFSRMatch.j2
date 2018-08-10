@@ -88,10 +88,10 @@ const Int_t kTrigobj_jet_id = 1;
 const Float_t kTrigobj_pt_had = 100;
 const Float_t kTrigobj_pt_lep = 40;
 const Float_t kTrigobj_eta = 2.3;
-const Float_t kTrigobj_deltaRmin = 0.3;
+const Float_t kTrigobj_deltaRmin = 0.5;
 const Int_t kTrigobj_id_had_jet = 580;
 const Int_t kTrigobj_id_lep_jet = 530;
-const Int_t kTrigobj_filter_bits = 3;
+const Int_t kTrigobj_filter_bits = 1;
 
 
 bool check_distance_enough(const TLorentzVector &a, const TLorentzVector &b) {
@@ -1063,6 +1063,7 @@ Int_t DataContainer::match_trigger_object(Bool_t leptonic, const Jet& jet) {
   if (debug) {
     cout << "Checking level 2 trigger" << endl;
   }
+  
   if (trig_obj_l2pt_[idx] < pt_cut) {
     if (debug) {
       cout << "L2 trig pt: " << trig_obj_l2pt_[idx] << endl;
@@ -1084,7 +1085,7 @@ Int_t DataContainer::match_trigger_object(Bool_t leptonic, const Jet& jet) {
         "\t and filter_bits: " << trig_obj_filter_bits_[i] << endl;
     }
     if (trig_obj_id_[i] != trig_id || \
-        trig_obj_filter_bits_[i] != kTrigobj_filter_bits) {
+        (trig_obj_filter_bits_[i] & kTrigobj_filter_bits) == 0) {
       continue;
     }
     Float_t cdeltaR = delta_R(trig_obj_eta_[i], trig_obj_phi_[i], \
