@@ -76,8 +76,6 @@ const bool corrections_after = true;
 
 const CorrectionLevel correction_level = CorrectionLevel::{{ cl }};
 const bool apply_trigger_cut = {{ trig }};
-const UInt_t highx = {{ highx }};
-const UInt_t bins = {{ bins }};
 const Float_t soft_jet_distance = 0.8;
 const Int_t pdgBId = 5;
 const Int_t pdgCId = 4;
@@ -1200,7 +1198,7 @@ void DataContainer::apply_fsr_correction() {
 
 
 void get_chain_files(TChain* chain, int argc, char* argv[]) {
-  for (int i = 2; i < argc; i++) {
+  for (int i = 4; i < argc; i++) {
     chain->Add(argv[i]);
   }
 }
@@ -1229,6 +1227,8 @@ int main(int argc, char* argv[]) {
   DataContainer container;
   container.SetTreeBranches(&chain);
   container.CreateTree(&output_tree);
+  UInt_t bins = std::stoi(argv[2]);
+  UInt_t highx = std::stoi(argv[3]);
   {% if bkg %}
   TH1F mass_histo_chromo("mass_histo_chromo",                           \
                          "Invariant mass of bb jets (NL)", bins, 0, highx);

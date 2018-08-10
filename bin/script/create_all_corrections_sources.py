@@ -29,14 +29,10 @@ else:
     for params in mass_points_signal:
         for cl in correction_level_signal:
             out_text = template.render(cl=cl[0], trig=cl[1], bkg=False, **params)
-            filename = "_".join([params['mass'], cl[0], cl[1]]) + ".cc"
+            filename = "_".join(["sig", cl[0], cl[1]]) + ".cc"
             f = open(os.path.join("_tmp/src", filename), "w")
             f.write(out_text)
             f.close()
-        # f = open(os.path.join("_tmp/input", "_".join(["signal", params['mass']])), "w")
-        # for fileeee in params['filenames']:
-        #     f.write(os.path.join(params['basedir'], fileeee))
-        #     f.write("\n")
         
     for params in bkg_files:
         for cl in correction_level_bkg:
@@ -45,9 +41,3 @@ else:
             f = open(os.path.join("_tmp/src", filename), "w")
             f.write(out_text)
             f.close()
-        # for lista, i in zip(split_list(params['filenames'], 10), range(0, 10000)):
-        #     fileparams = "_".join([params['mass'], params['era'], str(i)])
-        #     f = open(os.path.join("_tmp/input", fileparams), "w")
-        #     for fff in lista:
-        #         f.write(os.path.join(params['basedir'], fff))
-        #         f.write("\n")

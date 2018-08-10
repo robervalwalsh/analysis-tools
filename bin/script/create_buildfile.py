@@ -7,15 +7,13 @@ from settings_parallelization import correction_level_bkg, correction_level_sign
 
 
 mass_points = ["120", "350", "1200"]
-eras = ["C", "D", "E", "F"]
 
 template_loader = FileSystemLoader(searchpath='./')
 template_env = Environment(loader=template_loader)
 
 names = list()
-for mass in mass_points:
-    for c in correction_level_signal:
-        names.append("_".join([mass, c[0], c[1]]))
+for c in correction_level_signal:
+    names.append("_".join(["sig", c[0], c[1]]))
 names_bkg = list()
 for c in correction_level_bkg:
     names_bkg.append("_".join(["bkg", c[0], c[1]]))
