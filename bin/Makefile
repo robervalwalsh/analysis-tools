@@ -22,3 +22,6 @@ run_all:
 
 run_bkg:
 	./script/run_all.py bkg
+
+merge_bkg:
+	./script/run_all.py bkg merge

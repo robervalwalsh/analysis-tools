@@ -1,0 +1,4 @@
+# -*- coding:utf-8 -*-
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+cmsenv
+{{ executable }} {% for arg in arg_list %}{{ arg }} {% endfor %}
