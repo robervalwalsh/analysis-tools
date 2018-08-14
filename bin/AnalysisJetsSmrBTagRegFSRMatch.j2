@@ -982,7 +982,7 @@ void DataContainer::fill_histogram(TTree* tree, \
     {% endif %}
     
     {% if not blind %}
-    out_tree->Fill();    
+    out_tree->Fill();
     {% if data %}
     if (!leptonic) {
       plots[0]->Fill(mass_, weigth);
@@ -1005,6 +1005,8 @@ void DataContainer::fill_histogram(TTree* tree, \
     }
     {% endif %}
     {% else %}
+    mass_ = 100;  // I put the mass at a fixed value to blind myself
+    out_tree->Fill();
     if (leptonic) {
       plots[1]->Fill(100, 1);
     } else {
