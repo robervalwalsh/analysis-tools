@@ -1,0 +1,18 @@
+
+imax 1   number of channels
+jmax *   number of backgrounds
+kmax *   number of nuisance parameters
+-----------------
+# change to the number of observed events in the signal region of your analysis
+observation {{ obs }}
+-----------------
+shapes * * {{ file_name }} $PROCESS $PROCESS_$SYSTEMATIC
+shapes data_obs * {{ file_name }} bbnb_Mbb
+-----------------
+bin                        bbHTo4b    bbHTo4b
+process                    MC_bbb_Mbb    bbnb_Mbb
+process                       0          1
+rate                         -1         -1
+-----------------------------
+# just consider luminosity uncertainty to normalisation, in 2017 it was 2.3%
+CMS_lumi_13TeV              lnN   1.023   -

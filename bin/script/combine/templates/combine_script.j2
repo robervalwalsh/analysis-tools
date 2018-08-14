@@ -1,0 +1,8 @@
+#!/bin/bash
+# -*- coding:utf-8 -*-
+
+{% for ll in file_list %}
+  echo "{{ ll.correction }} {{ ll.mass }}"
+  cd {{ out_dir }}/{{ ll.correction }}
+  combine -M AsymptoticLimits --rMin=-20 --rMax=20 -n Hbb -m {{ ll.mass }} {{ ll.file }}
+{% endfor %}
