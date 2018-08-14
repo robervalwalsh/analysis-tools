@@ -14,3 +14,4 @@ bin/BuildFile.xml
 *.root
 bin/script/TMVA/dataset/*
 bin/script/TMVA/trainmc.py
+bin/script/TMVA/exe.sh*

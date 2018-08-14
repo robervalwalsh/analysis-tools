@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from ROOT import TMVA, TFile, TTree, TCut
+from ROOT import TMVA, TFile, TTree, TCut, TChain
 
 output_filename = "bdt_output.root"
 input_signal_filename = "signal.root"
-input_bkg_filename = "bkg.root"
+input_bkg_filename = ["C.root", "D.root", "E.root", "F.root"]
 
 
-
-variables_f = ['Jet_newPt[0]', 'Jet_newPt[1]', "Jet_newPt[2]",'Jet_newEta[0]', 'Jet_newEta[1]', 'Jet_newEta[2]', 'Jet_newPhi[0]', 'Jet_newPhi[1]', 'Jet_newPhi[1]', "Jet_btagDeepB[0]", 'Jet_btagDeepB[1]', 'Jet_btagDeepB[2]']
+variables_f = ['Jet_newPt[0]', 'Jet_newPt[1]', "Jet_newPt[2]",
+               'Jet_newEta[0]', 'Jet_newEta[1]', 'Jet_newEta[2]',
+               'Jet_newPhi[0]', 'Jet_newPhi[1]', 'Jet_newPhi[2]',
+               "Jet_newEta[0] - Jet_newEta[1]", "Jet_newPhi[0]", "Jet_newPhi[1]",
+               "Jet_btagDeepB[0]", 'Jet_btagDeepB[1]', 'Jet_btagDeepB[2]']
 variables_ui = list()  # ["Jet_nElectrons", "Jet_nMuons"]
 variables_i = ["Jet_puId", ]
 
@@ -24,13 +27,13 @@ if signal_tree.IsZombie():
     raise RuntimeError("Error opening signal_tree")
 
 
-input_bkg_file = TFile(input_bkg_filename, "read")
-if input_bkg_file.IsZombie():
-    raise RuntimeError("Error opening bkg file " + input_bkg_filename)
 
-bkg_tree = input_bkg_file.Get("output_tree")
+bkg_tree = TChain("output_tree")
 if bkg_tree.IsZombie():
-    raise RuntimeError("Error opening bkg_tree")
+    raise RuntimeError("Error opening bkg file " + input_bkg_filename)
+for f in input_bkg_filename:
+    bkg_tree.Add("bkg/" + f)
+
 
 output_file = TFile(output_filename, "recreate")
 if output_file.IsZombie():
@@ -54,9 +57,11 @@ dataloader.AddBackgroundTree(bkg_tree, 1.)
 cut_no_nan_deep = "!(Jet_btagDeepB != Jet_btagDeepB)"
 cut_leptonic = "Leptonic_event"
 
-cuts = TCut(" && ".join([cut_leptonic, cut_no_nan_deep]))
+bkg_cuts = TCut(" && ".join([cut_leptonic, cut_no_nan_deep]))
+# sig_cuts = TCut(" && ".join([cut_leptonic, cut_no_nan_deep, "(nMatches == 2)"]))
+sig_cuts = bkg_cuts
 
-dataloader.PrepareTrainingAndTestTree(cuts, cuts, "")
+dataloader.PrepareTrainingAndTestTree(sig_cuts, bkg_cuts, "")
 
 factory.BookMethod(dataloader, TMVA.Types.kBDT, "BDT", "")
 
