@@ -10,7 +10,7 @@ from jinja2 import FileSystemLoader, Environment
 template_loader = FileSystemLoader(searchpath='./script/templates')
 template_env = Environment(loader=template_loader)
 template_exec = template_env.get_template("exe.j2")
-template_submit = template_env.get_template("htc_sub.j2")
+# template_submit = template_env.get_template("htc_sub.j2")
 
 import os
 import sys
