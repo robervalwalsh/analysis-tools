@@ -12,7 +12,7 @@
 #include "TMath.h"
 
 
-const int prescale = 11;
+const int prescale = 7;
 const UInt_t kLen = 100;
 
 UInt_t run_;
@@ -133,17 +133,16 @@ int main(int argc, char* argv[]) {
   array<TFile*, prescale> out_files;
   array<TTree*, prescale> out_trees;
   TChain old_tree("output_tree");
-  old_tree.Add("output/links/C.root");
-  old_tree.Add("output/links/D.root");
-  old_tree.Add("output/links/E.root");
-  old_tree.Add("output/links/F.root");
+  string correction = "nothing_false";
+  old_tree.Add((string("output/hists/bkg/fourth/bkg_*_") + correction + string(".root")).c_str());
   SetTreeBranches(&old_tree);
   int counter = 0;
   for (Int_t i = 0; i < prescale; i++) {
-    out_files[i] = new TFile((string("output/split/bkg/") + std::to_string(counter) + string(".root")).c_str(), "recreate");
+    out_files[i] = new TFile((string("output/split/bkg/") + correction + string("_") + std::to_string(counter) + string(".root")).c_str(), "recreate");
     out_trees[i] = old_tree.CloneTree(0);
     counter++;
   }
+  cout << "Total entries to process: " << old_tree.GetEntries() << endl;
   for (Long64_t i = 0; i < old_tree.GetEntries(); i++) {
     old_tree.GetEntry(i);
     Int_t appo = TMath::Floor(randomone.Uniform(prescale));
