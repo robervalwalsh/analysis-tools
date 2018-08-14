@@ -15,13 +15,19 @@ test: BuildFile.xml AnalysisJetsSmrBTagRegFSRMatch.j2
 	scram b
 
 all: _tmp/src/%.cc
-	scram b -k -j25
+	scram b -k -j5
 
 run_all:
-	./script/run_all.py signal
+	./script/run_all.py mc
 
 run_bkg:
 	./script/run_all.py bkg
 
 merge_bkg:
 	./script/run_all.py bkg merge
+
+run_sig:
+	./script/run_all.py sig
+
+merge_sig:
+	./script/run_all.py sig merge

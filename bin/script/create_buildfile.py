@@ -13,16 +13,17 @@ template_env = Environment(loader=template_loader)
 
 names = list()
 for c in correction_level_signal:
-    names.append("_".join(["sig", c[0], c[1]]))
+    names.append("_".join(["mc", c[0], c[1]]))
 names_bkg = list()
 for c in correction_level_bkg:
     names_bkg.append("_".join(["bkg", c[0], c[1]]))
-
+names_sig = list()
+for c in correction_level_bkg:
+    names_sig.append("_".join(["sig", c[0], c[1]]))
+    
 template = template_env.get_template("BuildFile.j2")
-out_text = template.render(names=names, names_bkg=names_bkg)
+out_text = template.render(names=(names + names_bkg + names_sig))
 f = open("BuildFile.xml", "w")
 f.write(out_text)
 f.close()
-
-
 
