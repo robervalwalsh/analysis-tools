@@ -57,7 +57,7 @@ int main(int argc, char * argv[]){
 		("mode,M", value<std::string>()->default_value("all"),"Mode. Can be: tanBeta/sigmaBR/all depending on what kind of limits you would like to compute")
 		("output_file,o", value<std::string>()->default_value(""),"Output file name. Will be conbined with default 'Hbb.limits'")
 	    ("input_file,i", value<std::string>()->default_value(cmsswBase + "/src/Analysis/MssmHbb/datacards/Hbb.limits"),"Input file with outputs of the Combination tool - Hbb.limits")
-		("benchmark,b",value<std::string>()->default_value(cmsswBase + "/src/Analysis/Tools/macros/mhmodp_mu200_13TeV.root"),"Input root file with benchmark scenario")
+		("benchmark,b",value<std::string>()->default_value(cmsswBase + "/src/Analysis/Tools/data/mhmodp_mu200_13TeV.root"),"Input root file with benchmark scenario")
 //		("yMin", value<double>()->default_value(5e-01),"YMin")
 //		("yMax", value<double>()->default_value(1000),"YMax")
 //		("xMax", value<double>()->default_value(-150),"XMax")
