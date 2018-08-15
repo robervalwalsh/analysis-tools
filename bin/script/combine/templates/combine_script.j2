@@ -6,3 +6,9 @@
   cd {{ out_dir }}/{{ ll.lep }}/{{ ll.correction }}
   combine -M AsymptoticLimits --rMin=-20 --rMax=20 -n Hbb -m {{ ll.mass }} {{ ll.file }}
 {% endfor %}
+
+
+{% for d in directories %}
+  cd {{ d }}
+  PlotLimit -i HbbLimits -M sigmaBR
+{% endfor %}

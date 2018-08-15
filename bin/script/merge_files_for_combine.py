@@ -31,9 +31,17 @@ eras = ["C", "D", "E", "F"]
 mass_points = ["120", "350", "1200"]
 limits = {
     "120": (0, 900, 40),
-    "350": (0, 1000, 50),
-    "1200": (0, 2000, 80),
+    "350": (0, 1000, 120),
+    "1200": (0, 2000, 90),
 }
+
+
+def name_of_lep(l):
+    if l:
+        return "lep"
+    else:
+        return "chr"
+
 
 directory_bkg = "../output/hists/bkg/fourth"
 directory_splitted_bkg = "../output/split/bkg/"
@@ -88,8 +96,31 @@ for mass in mass_points:
             output_file.write(out_text)
             list_of_datacards.append({'mass': mass, 'file': output_filename, 'correction': cb, 'lep': output_file_name_appo})
 
-out_text = template_script.render(file_list=list_of_datacards, out_dir=os.path.join(out_dir, "out"))
+
+
+list_of_directories = [os.path.join(
+    os.path.join(
+        os.path.join(out_dir, "out"),
+    name_of_lep(l)), c) for c in correction_level_bkg for l in lep]
+out_text = template_script.render(
+    file_list=list_of_datacards,
+    out_dir=os.path.join(out_dir, "out"),
+    directories=list_of_directories)
 out_filename = os.path.join(output_script_filedir, "run_combine_all.sh")
 out_file = open(out_filename, "w")
 out_file.write(out_text)
 os.chmod(out_filename, 0755)
+
+
+for c in correction_level_bkg:
+    for l in lep:
+        cur_dir = os.path.join(out_dir, "out")
+        ll = name_of_lep(l)
+        cur_dir = os.path.join(cur_dir, ll)
+        cur_dir = os.path.join(cur_dir, c)
+        out_filename = "HbbLimits"
+        out_filename = os.path.join(cur_dir, out_filename)
+        out_file = open(out_filename, "w")
+        for m in mass_points:
+            out_file.write(
+                "higgsCombineHbb.AsymptoticLimits.mH" + m + ".root\n")
