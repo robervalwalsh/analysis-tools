@@ -1,8 +1,6 @@
 #include "Analysis/Tools/interface/HttStylesNew.h"
 #include "Analysis/Tools/macros/CMS_lumi.C"
-#include "Analysis/Tools/src/PlotTanBetaLimit.C"
-//#include "Analysis/MssmHbb/macros/signal/mssm_xs_tools.h"
-//#include "Analysis/MssmHbb/macros/signal/mssm_xs_tools.C"
+#include "Analysis/Tools/interface/PlotTanBetaLimit.h"
 
 #include "TString.h"
 #include "TFile.h"
