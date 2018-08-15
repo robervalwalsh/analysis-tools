@@ -1,4 +1,4 @@
-#include "Analysis/Tools/macros/HttStylesNew.cc"
+#include "Analysis/Tools/interface/HttStylesNew.h"
 #include "Analysis/Tools/macros/CMS_lumi.C"
 #include "Analysis/Tools/macros/mssm_xs_tools.h"
 #include "Analysis/Tools/macros/mssm_xs_tools.C"
