@@ -1,5 +1,5 @@
 #include "Analysis/Tools/interface/HttStylesNew.h"
-#include "Analysis/Tools/macros/CMS_lumi.C"
+#include "Analysis/Tools/interface/CMS_lumi.h"
 #include "Analysis/Tools/interface/mssm_xs_tools.h"
 //#include "Analysis/Tools/src/mssm_xs_tools.cc"
 

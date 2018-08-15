@@ -1,3 +1,8 @@
+#ifndef Analysis_Tools_CMS_lumi_h
+#define Analysis_Tools_CMS_lumi_h 1
+
+
+
 #include "TPad.h"
 #include "TLatex.h"
 #include "TLine.h"
@@ -37,3 +42,6 @@ TString lumi_7TeV  = "5.1 fb^{-1}";
 bool drawLogo      = false;
 
 void CMS_lumi( TPad* pad, int iPeriod=3, int iPosX=10 );
+
+
+#endif

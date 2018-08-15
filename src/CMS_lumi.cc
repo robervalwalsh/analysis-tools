@@ -1,7 +1,4 @@
-#ifndef ANALYSIS_MSSMHBB_SRC_CMS_LUMI_C_
-#define ANALYSIS_MSSMHBB_SRC_CMS_LUMI_C_
-
-#include "CMS_lumi.h"
+#include "Analysis/Tools/interface/CMS_lumi.h"
 //#include "TASImage.h"
 
 void 
@@ -161,4 +158,3 @@ CMS_lumi( TPad* pad, int iPeriod, int iPosX )
   return;
 }
 
-#endif
