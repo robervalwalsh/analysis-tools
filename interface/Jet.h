@@ -64,6 +64,8 @@ namespace analysis {
             bool  idLoose()                     const;
             /// returns if jet has id tight working point
             bool  idTight()                     const;
+            /// returns if jet has a given working point
+            bool  id(const std::string & wp = "tight" )  const;
             /// returns the jet energy correction uncertainty
             float jecUncert()                   const;
             /// returns the vector containing flavours inside the jet
