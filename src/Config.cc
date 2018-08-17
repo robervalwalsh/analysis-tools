@@ -67,7 +67,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("jetsPtMax", po::value<std::vector<float> >(&jetsptmax_)->multitoken(),"Maximum pt of the jets")
          ("jetsEtaMax", po::value<std::vector<float> >(&jetsetamax_)->multitoken(),"Maximum |eta| of the jets")
          ("jetsBtagMin", po::value<std::vector<float> >(&jetsbtagmin_)->multitoken(),"Minimum btag of the jets; if < 0 -> reverse btag")
-         ("jetsId",po::value <std::string> (&jetsid_)->default_value("TIGHT"),"Jets id criteria for all jets")
+         ("jetsId",po::value <std::string> (&jetsid_)->default_value("tight"),"Jets id criteria for all jets")
+         ("jetsPuId",po::value <std::string> (&jetspuid_)->default_value("loose"),"Jets pileup id criteria for all jets")
          ("l1tJetsNMin",po::value <int> (&l1tjetsnmin_)->default_value(0),"Minimum number of L1T jets")
          ("l1tJetsPtMin", po::value<std::vector<float> >(&l1tjetsptmin_)->multitoken(),"Mimium pt of the L1T jets")
          ("l1tJetsEtaMax", po::value<std::vector<float> >(&l1tjetsetamax_)->multitoken(),"Maximum |eta| of the L1T jets")
@@ -123,7 +124,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("prescaleWeight",po::value <bool> (&psweight_)->default_value(false),"Flag for weighting histograms with prescale")
          ("prescaleNormalisation",po::value <float> (&psnorm_)->default_value(1.),"Normalisation factor of prescale weight")
          ("triggerEmulation",po::value <bool> (&trigemul_)->default_value(false),"Flag for using trigger emulation")
-         ("jetsCollection",po::value <std::string> (&jetsCol_)->default_value("slimmedJets"),"Name of the jets collection")
+         ("jetsCollection",po::value <std::string> (&jetsCol_)->default_value(""),"Name of the jets collection")
          ("muonsCollection",po::value <std::string> (&muonsCol_)->default_value("slimmedMuons"),"Name of the muons collection")
          ("l1tJetsCollection",po::value <std::string> (&l1tjetsCol_)->default_value("l1tJets"),"Name of the L1T jets collection")
          ("l1tMuonsCollection",po::value <std::string> (&l1tmuonsCol_)->default_value("l1tMuons"),"Name of the L1T muons collection")
@@ -164,7 +165,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
 
          }
          po::notify(vm);
-         boost::algorithm::to_upper(jetsid_);
+         boost::algorithm::to_lower(jetsid_);
          std::transform(btagalgo_.begin(), btagalgo_.end(), btagalgo_.begin(), ::tolower);
          std::transform(btagwp_.begin(), btagwp_.end(), btagwp_.begin(), ::tolower);
          

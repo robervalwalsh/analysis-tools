@@ -114,6 +114,7 @@ namespace analysis {
             std::vector<float> jetsetamax_;
             std::vector<float> jetsbtagmin_;
             std::string jetsid_;
+            std::string jetspuid_;
 
             int l1tjetsnmin_;
             std::vector<float> l1tjetsptmin_;
