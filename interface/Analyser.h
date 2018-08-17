@@ -63,6 +63,8 @@ namespace analysis {
          protected:
             std::shared_ptr<Analysis> analysis_;
             std::shared_ptr<Config> config_;
+            
+            std::vector<Jet*> selectedJets_;
          
          private:
                
@@ -76,6 +78,9 @@ namespace analysis {
             // Gets
             std::shared_ptr<Analysis> analysis();
             std::shared_ptr<Config>   config();
+            std::vector<Jet*> selectedJets();
+            
+            float btag(const Jet & , const std::string & );
          
             // Sets
             void jets(const std::string &);

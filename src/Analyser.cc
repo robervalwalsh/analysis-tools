@@ -115,14 +115,72 @@ void Analyser::end()
 
 bool Analyser::event(const int & i)
 {
+   bool goodEvent = true;
    analysis_->event(i);
+   
+   if ( config_->runmin_ > 0 && analysis_->run() < config_->runmin_ ) return false;
+   if ( config_->runmax_ > 0 && analysis_->run() > config_->runmax_ ) return false;
+   
    if (! config_->isMC_ )
    {
       if (!analysis_->selectJson() ) return false; // To use only goodJSonFiles
    }
    if ( ! analysis_->triggerResult(config_->hltPath_) ) return false;
    
-   return true;
+   
+   if ( config_->jetsCol_ != "" )
+   {
+      // jet kinematics and btag
+      std::map<std::string,bool> isGood;
+      for ( int j = 0; j < config_->njetsmin_ ; ++j )
+      {
+         isGood[Form("pt%d",j)]    = true; 
+         isGood[Form("eta%d",j)]   = true; 
+         isGood[Form("btag%d",j)]  = true; 
+         for ( int k = j+1; k < config_->njetsmin_ && j < config_->njetsmin_; ++k )
+         {
+            isGood[Form("dr%d%d",j,k)]   = true;
+            isGood[Form("deta%d%d",j,k)] = true;
+         }
+      }
+
+      if ( config_->triggerObjects_.size() > 0 )
+      {
+         analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjects_,0.3);
+      }
+      auto slimmedJets = analysis_->collection<Jet>("Jets");
+      selectedJets_.clear();
+      for ( int j = 0 ; j < slimmedJets->size() ; ++j )
+      {
+         if ( slimmedJets->at(j).id(config_->jetsid_) && slimmedJets->at(j).pileupJetIdFullId(config_->jetspuid_) ) selectedJets_.push_back(&slimmedJets->at(j));
+      }
+      if ( (int)selectedJets_.size() < config_->njetsmin_ ) return false;
+      
+      // kinematic and btag selection
+      for ( int j = 0 ; j < config_->njetsmin_ ; ++j )
+      {
+         if ( selectedJets_[j] -> pt() < config_->jetsptmin_[j]                       && !(config_->jetsptmin_[j] < 0) )   isGood[Form("pt%d",j)]       = false;
+         if ( fabs(selectedJets_[j] -> eta()) > config_->jetsetamax_[j]               && !(config_->jetsetamax_[j] < 0) )  isGood[Form("eta%d",j)]      = false;
+         if ( btag(*selectedJets_[j],config_->btagalgo_) < config_->jetsbtagmin_[j]   && !(config_->jetsbtagmin_[j] < 0) ) isGood[Form("btag%d",j)]     = false;
+         // delta R between jets
+         for ( int k = j+1; k < config_->njetsmin_ && j < config_->njetsmin_; ++k )
+            if ( selectedJets_[j]->deltaR(*selectedJets_[k]) < config_->drmin_ )                                            isGood[Form("dr%d%d",j,k)]   = false;
+      }
+      if ( config_->njetsmin_ > 1 )
+         if ( fabs(selectedJets_[0]->eta() - selectedJets_[1]->eta()) > config_->detamax_ && !(config_->detamax_ < 0) )     isGood[Form("deta%d%d",0,1)] = false;
+      
+      for ( auto & ok : isGood )
+         goodEvent = ( goodEvent && ok.second );
+      
+      if ( ! goodEvent ) return false;
+
+   }
+
+   
+   
+   
+      
+   return goodEvent;
    
 }
 
@@ -158,5 +216,14 @@ std::shared_ptr<Config> Analyser::config()
 }
 
 
-
+float Analyser::btag(const Jet & jet, const std::string & algo)
+{
+   float btag;
+   if ( config_->btagalgo_ == "csvivf" || config_->btagalgo_ == "csv" )   {      btag = jet.btag("btag_csvivf");   }
+   else if ( config_->btagalgo_ == "deepcsv" )                            {      btag = jet.btag("btag_deepb") + jet.btag("btag_deepbb");   }
+   else if ( config_->btagalgo_ == "deepbvsall" )                         {      btag = jet.btag("btag_deepbvsall");   }
+   else                                                                   {      btag = -9999;   }
+   
+   return btag;
+}
 
