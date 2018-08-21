@@ -98,7 +98,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("ptImbalanceMax",po::value <float> (&ptimbalmax_)->default_value(1000.),"Maximum relative imbalance between two candidates")
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
-         ("hltPath",po::value <std::string> (&hltPath_),"HLT path name")
+         ("hltPath",po::value <std::string> (&hltPath_)->default_value(""),"HLT path name")
          ("l1Seed",po::value <std::string> (&l1Seed_)->default_value(""),"L1 seed name")
          ("hltPathReference",po::value <std::string> (&hltPathRef_),"HLT path name for reference trigger for trigger efficiency")
          ("l1SeedReference",po::value <std::string> (&l1SeedRef_)->default_value(""),"L1 seed name for reference trigger")
