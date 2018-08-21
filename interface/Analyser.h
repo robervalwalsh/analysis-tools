@@ -65,15 +65,13 @@ namespace analysis {
             std::shared_ptr<Config> config_;
             
             std::vector<Jet*> selectedJets_;
+            TH1s h1_;
+            TH2s h2_;
          
          private:
                
             std::shared_ptr<TFile> hout_;
             
-            TH1s h1_;
-            TH2s h2_;
-            
-         
          public:
             // Gets
             std::shared_ptr<Analysis> analysis();
@@ -91,6 +89,10 @@ namespace analysis {
             virtual void analyse();
             void end();
             virtual bool event(const int &);
+            virtual bool jetSelection();
+            virtual bool bjetSelection();
+            virtual bool muonSelection();
+            virtual bool onlineJetMatching();
             virtual void histograms(const std::string &, const int & n = 1);
                
 

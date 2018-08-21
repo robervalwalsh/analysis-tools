@@ -66,6 +66,13 @@ Analyser::Analyser(int argc, char * argv[])
          analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
       }
    }
+   if ( config_->triggerObjectsJets_.size() > 0 && config_->triggerObjDir_ != "" )
+   {
+      for ( auto & obj : config_->triggerObjectsJets_ )
+      {
+         analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
+      }
+   }
    // JSON for data   
    if( !config_->isMC_ && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
    
@@ -128,56 +135,11 @@ bool Analyser::event(const int & i)
    if ( ! analysis_->triggerResult(config_->hltPath_) ) return false;
    
    
-   if ( config_->jetsCol_ != "" )
-   {
-      // jet kinematics and btag
-      std::map<std::string,bool> isGood;
-      for ( int j = 0; j < config_->njetsmin_ ; ++j )
-      {
-         isGood[Form("pt%d",j)]    = true; 
-         isGood[Form("eta%d",j)]   = true; 
-         isGood[Form("btag%d",j)]  = true; 
-         for ( int k = j+1; k < config_->njetsmin_ && j < config_->njetsmin_; ++k )
-         {
-            isGood[Form("dr%d%d",j,k)]   = true;
-            isGood[Form("deta%d%d",j,k)] = true;
-         }
-      }
-
-      if ( config_->triggerObjects_.size() > 0 )
-      {
-         analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjects_,0.3);
-      }
-      auto slimmedJets = analysis_->collection<Jet>("Jets");
-      selectedJets_.clear();
-      for ( int j = 0 ; j < slimmedJets->size() ; ++j )
-      {
-         if ( slimmedJets->at(j).id(config_->jetsid_) && slimmedJets->at(j).pileupJetIdFullId(config_->jetspuid_) ) selectedJets_.push_back(&slimmedJets->at(j));
-      }
-      if ( (int)selectedJets_.size() < config_->njetsmin_ ) return false;
-      
-      // kinematic and btag selection
-      for ( int j = 0 ; j < config_->njetsmin_ ; ++j )
-      {
-         if ( selectedJets_[j] -> pt() < config_->jetsptmin_[j]                       && !(config_->jetsptmin_[j] < 0) )   isGood[Form("pt%d",j)]       = false;
-         if ( fabs(selectedJets_[j] -> eta()) > config_->jetsetamax_[j]               && !(config_->jetsetamax_[j] < 0) )  isGood[Form("eta%d",j)]      = false;
-         if ( btag(*selectedJets_[j],config_->btagalgo_) < config_->jetsbtagmin_[j]   && !(config_->jetsbtagmin_[j] < 0) ) isGood[Form("btag%d",j)]     = false;
-         // delta R between jets
-         for ( int k = j+1; k < config_->njetsmin_ && j < config_->njetsmin_; ++k )
-            if ( selectedJets_[j]->deltaR(*selectedJets_[k]) < config_->drmin_ )                                            isGood[Form("dr%d%d",j,k)]   = false;
-      }
-      if ( config_->njetsmin_ > 1 )
-         if ( fabs(selectedJets_[0]->eta() - selectedJets_[1]->eta()) > config_->detamax_ && !(config_->detamax_ < 0) )     isGood[Form("deta%d%d",0,1)] = false;
-      
-      for ( auto & ok : isGood )
-         goodEvent = ( goodEvent && ok.second );
-      
-      if ( ! goodEvent ) return false;
-
-   }
-
+   if ( ! jetSelection() ) return false;
    
+   if ( ! bjetSelection() ) return false;
    
+   if ( ! onlineJetMatching() ) return false;
    
       
    return goodEvent;
@@ -190,13 +152,14 @@ void Analyser::histograms(const std::string & obj, const int & n)
    {
       for ( int j = 0; j < n; ++j )
       {
-         h1_[Form("pt_jet%d",j)]       = new TH1F(Form("pt_jet%d",j)     , "" ,100 , 0   , 1000  );
-         h1_[Form("eta_jet%d",j)]      = new TH1F(Form("eta_jet%d",j)    , "" , 60 , -3, 3 );
-         h1_[Form("btag_jet%d",j)]     = new TH1F(Form("btag_jet%d",j)   , "" , 100 , 0, 1 );
+         h1_[Form("pt_jet%d",j+1)]       = new TH1F(Form("pt_jet%d",j+1)     , "" ,100 , 0   , 1000  );
+         h1_[Form("eta_jet%d",j+1)]      = new TH1F(Form("eta_jet%d",j+1)    , "" , 60 , -3, 3 );
+         h1_[Form("btag_jet%d",j+1)]     = new TH1F(Form("btag_jet%d",j+1)   , "" , 100 , 0, 1 );
          for ( int k = j+1; k < n && j < n; ++k )
          {
-            h1_[Form("dr_jet%d%d",j,k)]     = new TH1F(Form("dr_jet%d%d",j,k)     , "" , 50 , 0, 5 );
-            h1_[Form("deta_jet%d%d",j,k)]   = new TH1F(Form("deta_jet%d%d",j,k)   , "" ,100 , 0,10 );
+            h1_[Form("dr_jet%d%d",j+1,k+1)]     = new TH1F(Form("dr_jet%d%d",j+1,k+1)     , "" , 50 , 0, 5 );
+            h1_[Form("deta_jet%d%d",j+1,k+1)]   = new TH1F(Form("deta_jet%d%d",j+1,k+1)   , "" ,100 , 0,10 );
+            h1_[Form("m_jet%d%d",j+1,k+1)]      = new TH1F(Form("m_jet%d%d",j+1,k+1)      , "" ,300 , 0,3000 );
          }
       }
       
@@ -227,3 +190,123 @@ float Analyser::btag(const Jet & jet, const std::string & algo)
    return btag;
 }
 
+bool Analyser::jetSelection()
+{
+   bool isgood = true;
+   
+   if ( config_->jetsCol_ != "" )
+   {
+      // jet kinematics and btag
+      std::map<std::string,bool> isOk;
+      for ( int j = 0; j < config_->njetsmin_ ; ++j )
+      {
+         isOk[Form("pt%d",j)]    = true; 
+         isOk[Form("eta%d",j)]   = true; 
+         for ( int k = j+1; k < config_->njetsmin_ && j < config_->njetsmin_; ++k )
+         {
+            isOk[Form("dr%d%d",j,k)]   = true;
+            isOk[Form("deta%d%d",j,k)] = true;
+         }
+      }
+
+      if ( config_->triggerObjectsJets_.size() > 0 )
+      {
+         analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets_,0.3);
+      }
+      auto slimmedJets = analysis_->collection<Jet>("Jets");
+      selectedJets_.clear();
+      for ( int j = 0 ; j < slimmedJets->size() ; ++j )
+      {
+         if ( slimmedJets->at(j).id(config_->jetsid_) && slimmedJets->at(j).pileupJetIdFullId(config_->jetspuid_) ) selectedJets_.push_back(&slimmedJets->at(j));
+      }
+      if ( (int)selectedJets_.size() < config_->njetsmin_ ) return false;
+      
+      // kinematic and btag selection
+      for ( int j = 0 ; j < config_->njetsmin_ ; ++j )
+      {
+         if ( selectedJets_[j] -> pt() < config_->jetsptmin_[j]                       && !(config_->jetsptmin_[j] < 0) )   isOk[Form("pt%d",j)]       = false;
+         if ( fabs(selectedJets_[j] -> eta()) > config_->jetsetamax_[j]               && !(config_->jetsetamax_[j] < 0) )  isOk[Form("eta%d",j)]      = false;
+         // delta R between jets
+         for ( int k = j+1; k < config_->njetsmin_ && j < config_->njetsmin_; ++k )
+            if ( selectedJets_[j]->deltaR(*selectedJets_[k]) < config_->drmin_ )                                            isOk[Form("dr%d%d",j,k)]   = false;
+      }
+      if ( config_->njetsmin_ > 1 )
+         if ( fabs(selectedJets_[0]->eta() - selectedJets_[1]->eta()) > config_->detamax_ && !(config_->detamax_ < 0) )     isOk[Form("deta%d%d",0,1)] = false;
+      
+      for ( auto & ok : isOk )
+         isgood = ( isgood && ok.second );
+      
+      if ( ! isgood ) return false;
+
+   }
+   
+   
+   return isgood;
+}
+
+bool Analyser::bjetSelection()
+{
+   bool isgood = true;
+   
+   if ( selectedJets_.size() == 0 ) isgood = (isgood && jetSelection());
+   
+   if ( !isgood || (int)selectedJets_.size() < config_->nbjetsmin_ ) return false;
+   
+   if ( config_->jetsCol_ != "" )
+   {
+      // jet kinematics and btag
+      std::map<std::string,bool> isOk;
+      for ( int j = 0; j < config_->nbjetsmin_ ; ++j )
+      {
+         isOk[Form("btag%d",j)]  = true; 
+      }
+
+      // kinematic and btag selection
+      for ( int j = 0 ; j < config_->nbjetsmin_ ; ++j )
+      {
+         if ( btag(*selectedJets_[j],config_->btagalgo_) < config_->jetsbtagmin_[j]   && !(config_->jetsbtagmin_[j] < 0) ) isOk[Form("btag%d",j)]     = false;
+      }
+      
+      for ( auto & ok : isOk )
+         isgood = ( isgood && ok.second );
+      
+      if ( ! isgood ) return false;
+
+   }
+   
+   return isgood;
+}
+
+
+
+bool Analyser::muonSelection()
+{
+   bool isgood = true;
+   
+   if ( config_->muonsCol_ != "" )
+   {
+   }
+   
+   return isgood;
+}
+
+bool Analyser::onlineJetMatching()
+{
+   bool isgood = true;
+   
+   if ( config_->triggerObjectsJetsMatches_ < 0 || config_->triggerObjectsJets_.size() == 0 ) return isgood;
+   
+   if ( selectedJets_.size() == 0 ) isgood = (isgood && jetSelection());
+   if ( !isgood || (int)selectedJets_.size() < config_->triggerObjectsJetsMatches_ ) return false;
+   
+   for ( int j = 0; j < config_->triggerObjectsJetsMatches_; ++j )  // 
+   {
+      Jet * jet = selectedJets_[j];
+      for ( size_t io = 0; io < config_->triggerObjectsJets_.size() ; ++io )
+      {       
+         if ( ! jet->matched(config_->triggerObjectsJets_[io]) ) return false;
+      }
+   }
+   
+   return isgood;
+}
