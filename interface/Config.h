@@ -167,6 +167,7 @@ namespace analysis {
             float btagwptight_;
             //float btagwp_;
             float nonbtagwp_;
+            int nonbtagjet_;
 
 
             std::string hltPath_;
@@ -182,6 +183,7 @@ namespace analysis {
             std::vector<std::string> hltPaths2_;
             std::string hltPathsLogic2_;
             std::vector<std::string> triggerObjectsJets_;
+            int triggerObjectsJetsMatches_;
             std::vector<std::string> triggerObjectsMuons_;
 
             // ntuples collections
