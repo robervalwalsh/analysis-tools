@@ -89,9 +89,12 @@ namespace analysis {
             virtual void analyse();
             void end();
             virtual bool event(const int &);
-            virtual bool jetSelection();
-            virtual bool bjetSelection();
-            virtual bool muonSelection();
+            virtual bool analysisWithJets();
+            virtual bool selectionTrigger();
+            virtual bool selectionJet();
+            virtual bool selectionJetId();
+            virtual bool selectionBJet();
+            virtual bool selectionMuon();
             virtual bool onlineJetMatching();
             virtual void histograms(const std::string &, const int & n = 1);
                
