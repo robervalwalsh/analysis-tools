@@ -87,13 +87,16 @@ namespace analysis {
             
             // Actions
             virtual void analyse();
-            void end();
+            virtual void end();
             virtual bool event(const int &);
             virtual bool analysisWithJets();
             virtual bool selectionTrigger();
             virtual bool selectionJet();
+            virtual bool selectionJet(const int &);
             virtual bool selectionJetId();
             virtual bool selectionBJet();
+            virtual bool selectionBJet(const int &);
+            virtual bool selectionNonBJet(const int &);
             virtual bool selectionMuon();
             virtual bool onlineJetMatching();
             virtual void histograms(const std::string &, const int & n = 1);

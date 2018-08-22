@@ -132,23 +132,6 @@ bool Analyser::event(const int & i)
    {
       if (!analysis_->selectJson() ) return false; // To use only goodJSonFiles
    }
-   if ( ! selectionTrigger() ) return false;
-   h1_["cutflow"] -> Fill(0);
-      
-   if ( analysisWithJets() )
-   {
-      if ( ! selectionJetId() ) return false;
-      h1_["cutflow"] -> Fill(1);
-      
-      if ( ! selectionJet() ) return false;
-      h1_["cutflow"] -> Fill(2);
-      
-      if ( ! selectionBJet() ) return false;
-      h1_["cutflow"] -> Fill(3);
-      
-      if ( ! onlineJetMatching() ) return false;
-      h1_["cutflow"] -> Fill(4);
-   }
       
    return goodEvent;
    
@@ -204,25 +187,30 @@ bool Analyser::selectionJet()
 {
    bool isgood = true;
    
-   // jet kinematics and btag
+   // jet kinematics
    std::map<std::string,bool> isOk;
    for ( int j = 0; j < config_->njetsmin_ ; ++j )
    {
-      isOk[Form("pt%d",j)]    = true; 
-      isOk[Form("eta%d",j)]   = true; 
+      if ( ! selectionJet(j+1) ) return false;
    }
+   return isgood;
+}
 
+bool Analyser::selectionJet(const int & r)
+{
+   bool isgood = true;
+   int j = r-1;
+   
+   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJetId());
+   if ( !isgood || (int)selectedJets_.size() < r ) return false;
+   
    // kinematic selection
-   for ( int j = 0 ; j < config_->njetsmin_ ; ++j )
-   {
-      if ( selectedJets_[j] -> pt() < config_->jetsptmin_[j]           && !(config_->jetsptmin_[j] < 0) )   isOk[Form("pt%d",j)]       = false;
-      if ( fabs(selectedJets_[j] -> eta()) > config_->jetsetamax_[j]   && !(config_->jetsetamax_[j] < 0) )  isOk[Form("eta%d",j)]      = false;
-   }
-   for ( auto & ok : isOk )
-      isgood = ( isgood && ok.second );
+   if ( selectedJets_[j] -> pt() < config_->jetsptmin_[j]           && !(config_->jetsptmin_[j] < 0) )   return false;
+   if ( fabs(selectedJets_[j] -> eta()) > config_->jetsetamax_[j]   && !(config_->jetsetamax_[j] < 0) )  return false;
    
    return isgood;
 }
+
 
 bool Analyser::selectionJetId()
 {
@@ -258,37 +246,41 @@ bool Analyser::analysisWithJets()
 bool Analyser::selectionBJet()
 {
    bool isgood = true;
-   
-   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJet());
-   
-   if ( !isgood || (int)selectedJets_.size() < config_->nbjetsmin_ ) return false;
-   
-   if ( config_->jetsCol_ != "" )
+   // jet btag
+   for ( int j = 0; j < config_->nbjetsmin_ ; ++j )
    {
-      // jet kinematics and btag
-      std::map<std::string,bool> isOk;
-      for ( int j = 0; j < config_->nbjetsmin_ ; ++j )
-      {
-         isOk[Form("btag%d",j)]  = true; 
-      }
-
-      // kinematic and btag selection
-      for ( int j = 0 ; j < config_->nbjetsmin_ ; ++j )
-      {
-         if ( btag(*selectedJets_[j],config_->btagalgo_) < config_->jetsbtagmin_[j]   && !(config_->jetsbtagmin_[j] < 0) ) isOk[Form("btag%d",j)]     = false;
-      }
-      
-      for ( auto & ok : isOk )
-         isgood = ( isgood && ok.second );
-      
-      if ( ! isgood ) return false;
-
+      if ( ! selectionBJet(j+1) ) return false;
    }
+   return isgood;
+}
+
+bool Analyser::selectionBJet(const int & r )
+{
+   bool isgood = true;
+   int j = r-1;
+   if ( config_->jetsbtagmin_[j] < 0 ) return true;
+   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJetId());
+   if ( !isgood || (int)selectedJets_.size() < r ) return false;
+   
+   // jet  btag
+   isgood = ( btag(*selectedJets_[j],config_->btagalgo_) > config_->jetsbtagmin_[j] );
    
    return isgood;
 }
 
-
+bool Analyser::selectionNonBJet(const int & r )
+{
+   bool isgood = true;
+   int j = r-1;
+   if ( config_->jetsbtagmin_[j] < 0 ) return true;
+   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJetId());
+   if ( !isgood || (int)selectedJets_.size() < r ) return false;
+   
+   // jet  non btag
+   isgood = ( btag(*selectedJets_[j],config_->btagalgo_) < config_->nonbtagwp_ );
+   
+   return isgood;
+}
 
 bool Analyser::selectionMuon()
 {
