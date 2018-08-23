@@ -99,6 +99,7 @@ namespace analysis {
             virtual bool selectionNonBJet(const int &);
             virtual bool selectionMuon();
             virtual bool onlineJetMatching();
+            virtual bool onlineBJetMatching();
             virtual void histograms(const std::string &, const int & n = 1);
                
 

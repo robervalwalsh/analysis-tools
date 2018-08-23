@@ -73,6 +73,13 @@ Analyser::Analyser(int argc, char * argv[])
          analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
       }
    }
+   if ( config_->triggerObjectsBJets_.size() > 0 && config_->triggerObjDir_ != "" )
+   {
+      for ( auto & obj : config_->triggerObjectsBJets_ )
+      {
+         analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
+      }
+   }
    // JSON for data   
    if( !config_->isMC_ && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
    
@@ -239,6 +246,10 @@ bool Analyser::analysisWithJets()
    {
       analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets_,0.3);
    }
+   if ( config_->triggerObjectsBJets_.size() > 0 )
+   {
+      analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsBJets_,0.3);
+   }
    
    return isgood;
 }
@@ -313,6 +324,29 @@ bool Analyser::onlineJetMatching()
    
    return isgood;
 }
+
+bool Analyser::onlineBJetMatching()
+{
+   bool isgood = true;
+   
+   if ( config_->triggerObjectsBJetsMatches_ < 0 || config_->triggerObjectsBJets_.size() == 0 ) return isgood;
+   
+   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJet());
+   if ( !isgood || (int)selectedJets_.size() < config_->triggerObjectsBJetsMatches_ ) return false;
+   
+   for ( int j = 0; j < config_->triggerObjectsBJetsMatches_; ++j )  // 
+   {
+      Jet * jet = selectedJets_[j];
+      for ( size_t io = 0; io < config_->triggerObjectsBJets_.size() ; ++io )
+      {       
+         if ( ! jet->matched(config_->triggerObjectsBJets_[io]) ) return false;
+      }
+   }
+   
+   return isgood;
+}
+
+
 
 bool Analyser::selectionTrigger()
 {
