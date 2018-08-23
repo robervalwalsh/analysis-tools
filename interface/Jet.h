@@ -163,13 +163,22 @@ namespace analysis {
             void muonFraction(const float & muFrac);
             
             /// calculates the jet id
+//             void id(const float & nHadFrac,
+//                     const float & nEmFrac ,
+//                     const float & nMult   ,
+//                     const float & cHadFrac,
+//                     const float & cEmFrac ,
+//                     const float & cMult   ,
+//                     const float & muFrac  );
+            
             void id(const float & nHadFrac,
                     const float & nEmFrac ,
                     const float & nMult   ,
                     const float & cHadFrac,
                     const float & cEmFrac ,
                     const float & cMult   ,
-                    const float & muFrac  );
+                    const float & muFrac  ,
+                    const float & puppi   );
             
             /// quark-gluon separation
             void qgLikelihood(const float & discr);

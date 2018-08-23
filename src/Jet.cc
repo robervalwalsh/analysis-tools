@@ -313,8 +313,11 @@ void Jet::id      (const float & nHadFrac,
                    const float & cHadFrac,
                    const float & cEmFrac ,
                    const float & cMult   ,
-                   const float & muFrac  )
+                   const float & muFrac  ,
+                   const float & puppi   )
 {
+   this -> isPuppi(puppi>0);
+   
    float nM;
    float cM;
    float numConst;
@@ -355,7 +358,7 @@ void Jet::id      (const float & nHadFrac,
       }
       else
       {
-         idtight_ = (nEmFrac>0.02 && nEmFrac<0.90 && nM>2);
+         idtight_ = (nEmFrac>0.02 && nEmFrac<0.99 && nM>2);
       }
    }
    else
@@ -367,8 +370,9 @@ void Jet::id      (const float & nHadFrac,
       }
       else
       {
-         idtight_ = (nHadFrac>0.02 && nEmFrac<0.90 && nM>2 && nM<15);
+         idtight_ = (nHadFrac>0.02 && nEmFrac<0.90 && nM>10);
       }
+
    }
    
    
