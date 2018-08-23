@@ -1,5 +1,5 @@
-#ifndef mssm_xs_tools_h
-#define mssm_xs_tools_h
+#ifndef Analysis_Tools_mssm_xs_tools_h
+#define Analysis_Tools_mssm_xs_tools_h
 
 #include <map>
 #include <cmath>

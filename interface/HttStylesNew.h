@@ -1,5 +1,5 @@
-#ifndef ANALYSIS_MSSMHBB_MACROS_HTTSTYLESNEW_CC_
-#define ANALYSIS_MSSMHBB_MACROS_HTTSTYLESNEW_CC_
+#ifndef Analysis_Tools_HttStylesNew_h
+#define Analysis_Tools_HttStylesNew_h 1
 
 #include <TH1.h>
 #include <TPad.h>

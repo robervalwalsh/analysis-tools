@@ -68,7 +68,7 @@ float Jet::btag(const std::string & algo)          const { return btags_.at(algo
 int   Jet::flavour()                               const { return flavour_.at("Hadron");   }                   
 int   Jet::flavour(const std::string & definition) const { return flavour_.at(definition); }                   
 bool  Jet::idLoose()                               const { return idloose_;                }                   
-bool  Jet::idTight()                               const { return idtight_;                }         
+bool  Jet::idTight()                               const { return idtight_;                }
 float Jet::jecUncert()                             const { return jecUnc_;                 }                   
 std::vector<int> Jet::flavours()                   const { return flavours_;               }
 std::vector< std::shared_ptr<GenParticle> >\
@@ -96,6 +96,18 @@ float Jet::bRegCorr() const  { return bRegCorr_; }
 float Jet::bRegRes()  const  { return bRegRes_; }
 
 double Jet::rho()     const  { return rho_; }
+
+
+bool  Jet::id(const std::string & wp)              const
+{
+   bool id = false;
+   if ( wp == "none"  ) id = true;
+   if ( wp == "tight" ) id = idtight_;
+   if ( wp == "loose" ) id = idloose_;
+   
+   return id;                
+}         
+
 
 GenJet * Jet::generatedJet() const { return genjet_; }
 
@@ -136,6 +148,7 @@ bool  Jet::pileupJetIdFullId(const std::string & wp) const
       std::cout << "                        All jets are accepted." << std::endl;
       return true;
    }
+   if ( wplow == "none" ) return true;
    if ( wplow == "loose"  && (puJetIdFullId_ & (1 << 2)) ) return true;
    if ( wplow == "medium" && (puJetIdFullId_ & (1 << 1)) ) return true;
    if ( wplow == "tight"  && (puJetIdFullId_ & (1 << 0)) ) return true;
@@ -300,8 +313,11 @@ void Jet::id      (const float & nHadFrac,
                    const float & cHadFrac,
                    const float & cEmFrac ,
                    const float & cMult   ,
-                   const float & muFrac  )
+                   const float & muFrac  ,
+                   const float & puppi   )
 {
+   this -> isPuppi(puppi>0);
+   
    float nM;
    float cM;
    float numConst;
@@ -342,7 +358,7 @@ void Jet::id      (const float & nHadFrac,
       }
       else
       {
-         idtight_ = (nEmFrac>0.02 && nEmFrac<0.90 && nM>2);
+         idtight_ = (nEmFrac>0.02 && nEmFrac<0.99 && nM>2);
       }
    }
    else
@@ -354,8 +370,9 @@ void Jet::id      (const float & nHadFrac,
       }
       else
       {
-         idtight_ = (nHadFrac>0.02 && nEmFrac<0.90 && nM>2 && nM<15);
+         idtight_ = (nHadFrac>0.02 && nEmFrac<0.90 && nM>10);
       }
+
    }
    
    

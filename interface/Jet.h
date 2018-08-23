@@ -64,6 +64,8 @@ namespace analysis {
             bool  idLoose()                     const;
             /// returns if jet has id tight working point
             bool  idTight()                     const;
+            /// returns if jet has a given working point
+            bool  id(const std::string & wp = "tight" )  const;
             /// returns the jet energy correction uncertainty
             float jecUncert()                   const;
             /// returns the vector containing flavours inside the jet
@@ -161,13 +163,22 @@ namespace analysis {
             void muonFraction(const float & muFrac);
             
             /// calculates the jet id
+//             void id(const float & nHadFrac,
+//                     const float & nEmFrac ,
+//                     const float & nMult   ,
+//                     const float & cHadFrac,
+//                     const float & cEmFrac ,
+//                     const float & cMult   ,
+//                     const float & muFrac  );
+            
             void id(const float & nHadFrac,
                     const float & nEmFrac ,
                     const float & nMult   ,
                     const float & cHadFrac,
                     const float & cEmFrac ,
                     const float & cMult   ,
-                    const float & muFrac  );
+                    const float & muFrac  ,
+                    const float & puppi   );
             
             /// quark-gluon separation
             void qgLikelihood(const float & discr);

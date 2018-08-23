@@ -153,13 +153,29 @@ Collection<Jet>  PhysicsObjectTree<Jet>::collection()
       jet.flavour("Parton",partflavour_[i]);
       jet.flavour("Physics",physflavour_[i]);
       jet.jecUncert(jecUnc_[i]);
-      jet.id(nHadFrac_[i],
-             nEmFrac_[i] ,
-             nMult_[i]   ,
-             cHadFrac_[i],
-             cEmFrac_[i] ,
-             cMult_[i]   ,
-             muFrac_[i]  );
+      // for jet ID depends on Puppi!!!
+      if ( hasPuppiInfo_ )
+      {
+         jet.id(nHadFrac_[i],
+                nEmFrac_[i] ,
+                nMult_[i]   ,
+                cHadFrac_[i],
+                cEmFrac_[i] ,
+                cMult_[i]   ,
+                muFrac_[i]  ,
+                puppi_[i]   );
+      }
+      else
+      {
+         jet.id(nHadFrac_[i],
+                nEmFrac_[i] ,
+                nMult_[i]   ,
+                cHadFrac_[i],
+                cEmFrac_[i] ,
+                cMult_[i]   ,
+                muFrac_[i]  ,
+                -1.        );
+      }
       jet.JerResolution(jerResolution_[i]);
       jet.JerSf(jerSF_[i]);
       jet.JerSfUp(jerSFUp_[i]);
@@ -168,8 +184,6 @@ Collection<Jet>  PhysicsObjectTree<Jet>::collection()
       else                    jet.qgLikelihood(-10.);
       jet.pileupJetIdFullDiscriminant(puJetIdFullDisc_[i]);
       jet.pileupJetIdFullId(puJetIdFullId_[i]);
-      if ( hasPuppiInfo_ ) jet.isPuppi(puppi_[i]>0);
-      else                 jet.isPuppi(false);
       if ( hasBRegCorr_ )  jet.bRegCorr(bRegCorr_[i]);
       else                 jet.bRegCorr(1);
       if ( hasBRegRes_  )  jet.bRegRes (bRegRes_[i]);
