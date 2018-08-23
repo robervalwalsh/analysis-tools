@@ -183,7 +183,9 @@ namespace analysis {
             std::vector<std::string> hltPaths2_;
             std::string hltPathsLogic2_;
             std::vector<std::string> triggerObjectsJets_;
+            std::vector<std::string> triggerObjectsBJets_;
             int triggerObjectsJetsMatches_;
+            int triggerObjectsBJetsMatches_;
             std::vector<std::string> triggerObjectsMuons_;
 
             // ntuples collections
