@@ -86,9 +86,6 @@ Analyser::Analyser(int argc, char * argv[])
    // output file
    if ( config_->outputRoot_ != "" )
    {
-      std::string sr = "SR";
-      if ( ! config_->signalRegion() ) sr = "CR";
-      boost::algorithm::replace_last(config_->outputRoot_, ".root", "_"+sr+".root"); 
       hout_= std::shared_ptr<TFile>(new TFile(config_->outputRoot_.c_str(),"recreate"));
    }
 }
