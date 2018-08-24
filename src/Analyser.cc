@@ -129,14 +129,11 @@ bool Analyser::event(const int & i)
    bool goodEvent = true;
    analysis_->event(i);
    
+   if (! config_->isMC() ) goodEvent = analysis_->selectJson();
+      
    if ( config_->runmin_ > 0 && analysis_->run() < config_->runmin_ ) return false;
    if ( config_->runmax_ > 0 && analysis_->run() > config_->runmax_ ) return false;
    
-   if (! config_->isMC() )
-   {
-      if (!analysis_->selectJson() ) return false; // To use only goodJSonFiles
-   }
-      
    return goodEvent;
    
 }
