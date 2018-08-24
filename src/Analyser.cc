@@ -213,6 +213,36 @@ bool Analyser::selectionJet(const int & r)
 }
 
 
+bool Analyser::selectionJetDeta(const int & j1, const int & j2, const float & delta)
+{
+   if ( (int)selectedJets_.size() < j1 || (int)selectedJets_.size() < j2 )
+   {
+      std::cout << "-e- Analyser::selectionJetDeta(): at least one of the jets does not exist" << std::endl;
+      return false;
+   }
+   if ( delta > 0 )
+      return ( fabs(selectedJets_[j1-1]->eta() - selectedJets_[j2-1]->eta()) < fabs(delta) );
+   else
+      return ( fabs(selectedJets_[j1-1]->eta() - selectedJets_[j2-1]->eta()) > fabs(delta) );
+      
+}
+
+bool Analyser::selectionJetDr(const int & j1, const int & j2, const float & delta)
+{
+   if ( (int)selectedJets_.size() < j1 || (int)selectedJets_.size() < j2 )
+   {
+      std::cout << "-e- Analyser::selectionJetDr(): at least one of the jets does not exist" << std::endl;
+      return false;
+   }
+   
+   if ( delta > 0 )
+      return ( selectedJets_[j1-1]->deltaR(*selectedJets_[j2-1]) < fabs(delta) ) ;
+   else
+      return ( selectedJets_[j1-1]->deltaR(*selectedJets_[j2-1]) > fabs(delta) );
+}
+
+
+
 bool Analyser::selectionJetId()
 {
    bool isgood = true;
@@ -358,3 +388,41 @@ bool Analyser::selectionTrigger()
    return isgood;
 }
 
+void Analyser::fillJetHistograms()
+{
+   int n = config_->nJetsMin();
+   
+   for ( int j = 0; j < n; ++j )
+   {
+      h1_[Form("pt_jet%d",j+1)] -> Fill(selectedJets_[j]->pt());
+      h1_[Form("eta_jet%d",j+1)] -> Fill(selectedJets_[j]->eta());
+      h1_[Form("btag_jet%d",j+1)] -> Fill(btag(*selectedJets_[j],config_->btagalgo_));
+      for ( int k = j+1; k < n && j < n; ++k )
+      {
+         float deltaR = selectedJets_[j]->deltaR(*selectedJets_[k]);
+         h1_[Form("dr_jet%d%d",j+1,k+1)]    -> Fill(deltaR);
+         float deltaEta = fabs(selectedJets_[j]->eta() - selectedJets_[k]->eta());
+         h1_[Form("deta_jet%d%d",j+1,k+1)]  -> Fill(deltaEta);
+         float m = (selectedJets_[j]->p4()+selectedJets_[k]->p4()).M();
+         if ( !config_->signalRegion() )
+         {
+            h1_[Form("m_jet%d%d",j+1,k+1)]  -> Fill(m);
+         }
+      }
+   }
+   
+   
+}
+
+TH1s Analyser::H1Fs() { return h1_; }
+
+TH1F * Analyser::H1F(const std::string & hname)
+{
+   if ( h1_.find(hname) == h1_.end() ) 
+   {
+      std::cout << "-e- Analyser::H1F(const std::string & hname) -> no histogram with hname = " << hname << std::endl;
+      return nullptr;
+   }
+   
+   return h1_[hname];
+}

@@ -83,6 +83,11 @@ namespace analysis {
             void triggerResults(const std::string &);
             void triggerObjects(const std::string &,const std::string &);
             
+            // Gets
+            TH1s H1Fs();
+            TH1F * H1F(const std::string &);
+
+            
             // Actions
             virtual void analyse();
             virtual void end();
@@ -91,6 +96,8 @@ namespace analysis {
             virtual bool selectionTrigger();
             virtual bool selectionJet();
             virtual bool selectionJet(const int &);
+            virtual bool selectionJetDeta(const int &, const int &, const float &);
+            virtual bool selectionJetDr(const int &, const int &, const float &);
             virtual bool selectionJetId();
             virtual bool selectionBJet();
             virtual bool selectionBJet(const int &);
@@ -99,6 +106,7 @@ namespace analysis {
             virtual bool onlineJetMatching();
             virtual bool onlineBJetMatching();
             virtual void histograms(const std::string &, const int & n = 1);
+            virtual void fillJetHistograms();
                
 
       };
