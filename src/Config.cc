@@ -71,7 +71,6 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("jetsCollection",po::value <std::string> (&jetsCol_)->default_value(""),"Name of the jets collection")
          ("nJetsMin",po::value <int> (&njetsmin_)->default_value(0),"Minimum number of jets")
          ("nJetsMax",po::value <int> (&njetsmax_)->default_value(-1),"Maximum number of jets")
-         ("nBJetsMin",po::value <int> (&nbjetsmin_)->default_value(0),"Minimum number of btgaged jets")
          ("jetsPtMin", po::value<std::vector<float> >(&jetsptmin_)->multitoken(),"Mimium pt of the jets")
          ("jetsPtMax", po::value<std::vector<float> >(&jetsptmax_)->multitoken(),"Maximum pt of the jets")
          ("jetsEtaMax", po::value<std::vector<float> >(&jetsetamax_)->multitoken(),"Maximum |eta| of the jets")
@@ -82,6 +81,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
 
       // btagging
       opt_cfg_.add_options()
+         ("nBJetsMin",po::value <int> (&nbjetsmin_)->default_value(0),"Minimum number of btgaged jets")
          ("btagSF",po::value <std::string> (&btagsf_)->default_value("DeepCSV.csv"),"b-tagging scale factor in CSV format")
          ("btagAlgorithm",po::value <std::string> (&btagalgo_)->default_value("csvivf"),"BTag algorithm")
          ("btagWorkingPoint",po::value <std::string> (&btagwp_)->default_value("tight"),"BTag working point")
@@ -219,3 +219,24 @@ void Config::loadOptions()
    
    
 }
+
+// analysis info
+std::string        Config::ntuplesList()     const { return inputlist_; }
+int                Config::nEventsMax()      const { return nevtmax_; }
+bool               Config::isMC()            const { return isMC_; }
+bool               Config::signalRegion()    const { return signalregion_; }
+
+// analysis control
+bool               Config::override()        const { return override_; }
+
+// jets
+std::string        Config::jetsCollection()    const { return jetsCol_; }
+int                Config::nJetsMin()          const { return njetsmin_; }
+int                Config::nJetsMax()          const { return njetsmax_; }
+std::vector<float> Config::jetsPtMin()         const { return jetsptmin_; }
+std::vector<float> Config::jetsPtMax()         const { return jetsptmax_; }
+std::vector<float> Config::jetsEtaMax()        const { return jetsetamax_; }
+std::string        Config::jetsId()            const { return jetsid_; }
+std::string        Config::jetsPuId()          const { return jetspuid_; }
+std::string        Config::l1tJetsCollection() const { return l1tjetsCol_; } 
+

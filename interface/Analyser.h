@@ -47,8 +47,6 @@ namespace analysis {
 
       class Analyser {
          
-         friend class Config; 
-         
          public:
             /// constructors
 //            Analyser(const std::string & inputFilelist, const std::string & evtinfo = "MssmHbb/Events/EventInfo");

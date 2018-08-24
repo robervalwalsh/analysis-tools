@@ -69,45 +69,72 @@ namespace analysis {
             po::options_description opt_cmd_;
             po::options_description opt_cfg_;
             
+         // analysis control
+            std::string inputlist_;
+            int nevtmax_;
+            bool isMC_;
+            bool signalregion_;
+            bool override_;
+
+
+         // jets
+            std::string jetsCol_; 
+            int njetsmin_;
+            int njetsmax_;
+            std::vector<float> jetsptmin_;
+            std::vector<float> jetsptmax_;
+            std::vector<float> jetsetamax_;
+            std::string jetsid_;
+            std::string jetspuid_;
+            std::string l1tjetsCol_; 
+
+
+                        
          private:
                
          public:
             // configuration variables - some basic ones out in the private section and make set/get methods
             std::string cfg_;
          
-         // analysis info
-            std::string inputlist_;
+         // gets (to replace the public variables)
+         // analysis control
+            std::string ntuplesList() const;
+            int  nEventsMax() const;
+            bool isMC() const;
+            bool signalRegion() const;
+            bool override() const;
+            
+         // jets
+            std::string jetsCollection() const;
+            int nJetsMin() const;
+            int nJetsMax() const;
+            std::vector<float> jetsPtMin() const;
+            std::vector<float> jetsPtMax() const;
+            std::vector<float> jetsEtaMax() const;
+            std::string jetsId() const;
+            std::string jetsPuId() const;
+            std::string l1tJetsCollection() const; 
+            
+            
+         // ========================
+         
+         // analysis control
             std::string treePath_;
-            int nevtmax_;
             int nlumis_;
             int runmin_;
             int runmax_;
             std::string outputRoot_;
             std::string json_;
-            bool isMC_;
-            bool signalregion_;
             
-         // analysis control
-            bool override_;
 
             //
             float trgmatchdrmax_;
 
 
-            // jets
-
-            int njetsmin_;
-            int njetsmax_;
-            int nbjetsmin_;
-            std::vector<float> jetsptmin_;
-            std::vector<float> jetsptmax_;
-            std::vector<float> jetsetamax_;
-            std::vector<float> jetsbtagmin_;
-            std::string jetsid_;
-            std::string jetspuid_;
-
             // btag SF csv file
             std::string btagsf_;
+            int nbjetsmin_;
+            std::vector<float> jetsbtagmin_;
 
 
             // muons
@@ -161,9 +188,7 @@ namespace analysis {
             int triggerObjectsL1MuonsMatches_;
 
             // ntuples collections
-            std::string jetsCol_; 
             std::string muonsCol_; 
-            std::string l1tjetsCol_; 
             std::string l1tmuonsCol_; 
             std::string triggerCol_;
             std::string genParticleCol_;

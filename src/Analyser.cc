@@ -52,10 +52,10 @@ Analyser::Analyser(int argc, char * argv[])
 {
    config_   = std::make_shared<Config>(argc,argv);
    
-   analysis_ = std::make_shared<Analysis>(config_->inputlist_);
+   analysis_ = std::make_shared<Analysis>(config_->ntuplesList());
    
    // Jets
-   if ( config_->jetsCol_ != "" )       analysis_->addTree<Jet> ("Jets",config_->jetsCol_);
+   if ( config_->jetsCollection() != "" )       analysis_->addTree<Jet> ("Jets",config_->jetsCollection());
    // Trigger path info
    if ( config_->triggerCol_ != "" )    analysis_->triggerResults(config_->triggerCol_);
    // Trigger objects
@@ -81,13 +81,13 @@ Analyser::Analyser(int argc, char * argv[])
       }
    }
    // JSON for data   
-   if( !config_->isMC_ && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
+   if( !config_->isMC() && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
    
    // output file
    if ( config_->outputRoot_ != "" )
    {
       std::string sr = "SR";
-      if ( ! config_->signalregion_ ) sr = "CR";
+      if ( ! config_->signalRegion() ) sr = "CR";
       boost::algorithm::replace_last(config_->outputRoot_, ".root", "_"+sr+".root"); 
       hout_= std::shared_ptr<TFile>(new TFile(config_->outputRoot_.c_str(),"recreate"));
    }
@@ -135,7 +135,7 @@ bool Analyser::event(const int & i)
    if ( config_->runmin_ > 0 && analysis_->run() < config_->runmin_ ) return false;
    if ( config_->runmax_ > 0 && analysis_->run() > config_->runmax_ ) return false;
    
-   if (! config_->isMC_ )
+   if (! config_->isMC() )
    {
       if (!analysis_->selectJson() ) return false; // To use only goodJSonFiles
    }
@@ -196,7 +196,7 @@ bool Analyser::selectionJet()
    
    // jet kinematics
    std::map<std::string,bool> isOk;
-   for ( int j = 0; j < config_->njetsmin_ ; ++j )
+   for ( int j = 0; j < config_->nJetsMin() ; ++j )
    {
       if ( ! selectionJet(j+1) ) return false;
    }
@@ -212,8 +212,8 @@ bool Analyser::selectionJet(const int & r)
    if ( !isgood || (int)selectedJets_.size() < r ) return false;
    
    // kinematic selection
-   if ( selectedJets_[j] -> pt() < config_->jetsptmin_[j]           && !(config_->jetsptmin_[j] < 0) )   return false;
-   if ( fabs(selectedJets_[j] -> eta()) > config_->jetsetamax_[j]   && !(config_->jetsetamax_[j] < 0) )  return false;
+   if ( selectedJets_[j] -> pt() < config_->jetsPtMin()[j]           && !(config_->jetsPtMin()[j] < 0) )   return false;
+   if ( fabs(selectedJets_[j] -> eta()) > config_->jetsEtaMax()[j]   && !(config_->jetsEtaMax()[j] < 0) )  return false;
    
    return isgood;
 }
@@ -223,15 +223,15 @@ bool Analyser::selectionJetId()
 {
    bool isgood = true;
    
-   if ( config_->jetsCol_ != "" )
+   if ( config_->jetsCollection() != "" )
    {
       auto slimmedJets = analysis_->collection<Jet>("Jets");
       selectedJets_.clear();
       for ( int j = 0 ; j < slimmedJets->size() ; ++j )
       {
-         if ( slimmedJets->at(j).id(config_->jetsid_) && slimmedJets->at(j).pileupJetIdFullId(config_->jetspuid_) ) selectedJets_.push_back(&slimmedJets->at(j));
+         if ( slimmedJets->at(j).id(config_->jetsId()) && slimmedJets->at(j).pileupJetIdFullId(config_->jetsPuId()) ) selectedJets_.push_back(&slimmedJets->at(j));
       }
-      if ( (int)selectedJets_.size() < config_->njetsmin_ ) return false;
+      if ( (int)selectedJets_.size() < config_->nJetsMin() ) return false;
    }
    
    return isgood;
@@ -241,7 +241,7 @@ bool Analyser::analysisWithJets()
 {
    bool isgood = true;
    
-   if ( config_->jetsCol_ == "" ) return false;
+   if ( config_->jetsCollection() == "" ) return false;
    if ( config_->triggerObjectsJets_.size() > 0 )
    {
       analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets_,0.3);
