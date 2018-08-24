@@ -69,63 +69,72 @@ namespace analysis {
             po::options_description opt_cmd_;
             po::options_description opt_cfg_;
             
+         // analysis control
+            std::string inputlist_;
+            int nevtmax_;
+            bool isMC_;
+            bool signalregion_;
+            bool override_;
+
+
+         // jets
+            std::string jetsCol_; 
+            int njetsmin_;
+            int njetsmax_;
+            std::vector<float> jetsptmin_;
+            std::vector<float> jetsptmax_;
+            std::vector<float> jetsetamax_;
+            std::string jetsid_;
+            std::string jetspuid_;
+            std::string l1tjetsCol_; 
+
+
+                        
          private:
                
          public:
             // configuration variables - some basic ones out in the private section and make set/get methods
             std::string cfg_;
-
-            int nevtmax_;
+         
+         // gets (to replace the public variables)
+         // analysis control
+            std::string ntuplesList() const;
+            int  nEventsMax() const;
+            bool isMC() const;
+            bool signalRegion() const;
+            bool override() const;
+            
+         // jets
+            std::string jetsCollection() const;
+            int nJetsMin() const;
+            int nJetsMax() const;
+            std::vector<float> jetsPtMin() const;
+            std::vector<float> jetsPtMax() const;
+            std::vector<float> jetsEtaMax() const;
+            std::string jetsId() const;
+            std::string jetsPuId() const;
+            std::string l1tJetsCollection() const; 
+            
+            
+         // ========================
+         
+         // analysis control
+            std::string treePath_;
             int nlumis_;
             int runmin_;
             int runmax_;
-            bool isMC_;
-            bool signalregion_;
-            std::string inputlist_;
             std::string outputRoot_;
             std::string json_;
+            
 
             //
-            bool matchonoff_;
-            float matchonoffdrmax_;
-            bool matchonoffref_;
-            bool psweight_;
-            float psnorm_;
-            bool trigemul_;
+            float trgmatchdrmax_;
 
-
-            // triggerobjects emulation
-            int tonmin_[10];
-            std::vector<float> toptmin_[10];
-            std::vector<float> toetamax_[10];
-
-            int torefnmin_[10];
-            std::vector<float> torefptmin_[10];
-            std::vector<float> torefetamax_[10];
-
-
-            // jets
-
-            int njetsmin_;
-            int njetsmax_;
-            int nbjetsmin_;
-            std::vector<float> jetsptmin_;
-            std::vector<float> jetsptmax_;
-            std::vector<float> jetsetamax_;
-            std::vector<float> jetsbtagmin_;
-            std::string jetsid_;
-            std::string jetspuid_;
-
-            int l1tjetsnmin_;
-            std::vector<float> l1tjetsptmin_;
-            std::vector<float> l1tjetsetamax_;
-
-            int l1tjetsrefnmin_;
-            std::vector<float> l1tjetsrefptmin_;
-            std::vector<float> l1tjetsrefetamax_;
 
             // btag SF csv file
             std::string btagsf_;
+            int nbjetsmin_;
+            std::vector<float> jetsbtagmin_;
 
 
             // muons
@@ -135,14 +144,6 @@ namespace analysis {
             std::vector<float> muonsptmax_;
             std::vector<float> muonsetamax_;
             std::string muonsid_;
-
-            int l1tmuonsnmin_;
-            std::vector<float> l1tmuonsptmin_;
-            std::vector<float> l1tmuonsetamax_;
-
-            int l1tmuonsrefnmin_;
-            std::vector<float> l1tmuonsrefptmin_;
-            std::vector<float> l1tmuonsrefetamax_;
 
 
             // additional cuts of unidentified objects or for extra selections
@@ -172,25 +173,22 @@ namespace analysis {
 
             std::string hltPath_;
             std::string l1Seed_;
-            std::string hltPathRef_;
-            std::string l1SeedRef_;
             std::vector<std::string> triggerObjects_;
             std::vector<int> triggerObjectsMatches_;
             std::vector<int> triggerObjectsMatchesRank_;
-            std::vector<std::string> triggerObjectsRef_;
-            std::vector<std::string> hltPaths_;
-            std::string hltPathsLogic_;
-            std::vector<std::string> hltPaths2_;
-            std::string hltPathsLogic2_;
             std::vector<std::string> triggerObjectsJets_;
+            std::vector<std::string> triggerObjectsBJets_;
+            std::vector<std::string> triggerObjectsL1Jets_;
             int triggerObjectsJetsMatches_;
+            int triggerObjectsBJetsMatches_;
+            int triggerObjectsL1JetsMatches_;
             std::vector<std::string> triggerObjectsMuons_;
+            std::vector<std::string> triggerObjectsL1Muons_;
+            int triggerObjectsMuonsMatches_;
+            int triggerObjectsL1MuonsMatches_;
 
             // ntuples collections
-            std::string treePath_;
-            std::string jetsCol_; 
             std::string muonsCol_; 
-            std::string l1tjetsCol_; 
             std::string l1tmuonsCol_; 
             std::string triggerCol_;
             std::string genParticleCol_;
