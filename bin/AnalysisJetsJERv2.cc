@@ -10,7 +10,6 @@
 #include "TH1.h" 
 
 #include "Analysis/Tools/interface/Analysis.h"
-#include "Analysis/Tools/interface/JetResolution.h"
 
 #include "Analysis/Tools/bin/macro_config.h"
 
@@ -34,9 +33,8 @@ int main(int argc, char * argv[])
    analysis.addTree<GenJet> ("GenJets",genjetsCol_);
    
    // Jet energy resolution scale factors and pt resolution
-   JME::JetResolution resolution = JME::JetResolution(jerpt_);
-   JME::JetResolutionScaleFactor resolution_sf = JME::JetResolutionScaleFactor(jersf_);
-
+   auto jerinfo = analysis.jetResolutionInfo(jerpt_,jersf_);
+   
    // Analysis of events
    std::cout << "This analysis has " << analysis.size() << " events" << std::endl;
 //   for ( int i = 0 ; i < analysis.size() ; ++i )
@@ -47,25 +45,24 @@ int main(int argc, char * argv[])
       std::cout << "++++++    ENTRY  " << i;
       std::cout << std::endl;
       
-      analysis.match<Jet,GenJet>("Jets","GenJets",0.2);
-      
       // Jets
       auto jets = analysis.collection<Jet>("Jets");
       auto genjets = analysis.collection<GenJet>("GenJets");
-
+      
+      jets->addGenJets(genjets);  // if not defined -> jerMatch = false, smearing will be done using the stochastic method only
+      
       for ( int j = 0 ; j < jets->size() ; ++j )
       {
          Jet jet = jets->at(j);
-         auto * genjet = jet.matched("GenJets");
+         jet.jerInfo(*jerinfo,0.2); // this also performs matching to the added gen jets above, with delta R < 0.2 which is default and can be omitted
          
-         JME::JetParameters jetResPars = {{JME::Binning::JetPt, jet.pt()}, {JME::Binning::JetEta, jet.eta()}, {JME::Binning::Rho, jet.rho()}};
-         JME::JetParameters jetResSFPars = {{JME::Binning::JetEta, jet.eta()}, {JME::Binning::Rho, jet.rho()}};;
-     
+         
          std::cout << "    Jet #" << j << ": ";
          std::cout << "pT  = "     << jet.pt()      << ", ";
          std::cout << "eta = "     << jet.eta()     << ", ";
-         std::cout << "resolution = " << resolution.getResolution(jetResPars) << ", ";
-         std::cout << "JER SF  = "    << resolution_sf.getScaleFactor(jetResSFPars)  << ", " << genjet << std::endl;
+         std::cout << "resolution = " << jet.jerPtResolution() << ", ";
+         std::cout << "JER SF  = "    << jet.jerSF()  << ", match = " << jet.jerMatch() << " jer corr = " << jet.jerCorrection() << " + ";
+         std::cout << jet.jerCorrection("up") << " - " << jet.jerCorrection("down") << std::endl;
          
          
          

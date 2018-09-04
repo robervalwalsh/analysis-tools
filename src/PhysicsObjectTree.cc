@@ -176,10 +176,10 @@ Collection<Jet>  PhysicsObjectTree<Jet>::collection()
                 muFrac_[i]  ,
                 -1.        );
       }
-      jet.JerResolution(jerResolution_[i]);
-      jet.JerSf(jerSF_[i]);
-      jet.JerSfUp(jerSFUp_[i]);
-      jet.JerSfDown(jerSFDown_[i]);
+      jet.jerPtResolution(jerResolution_[i]);
+      jet.jerSF(jerSF_[i]);
+      jet.jerSFup(jerSFUp_[i]);
+      jet.jerSFdown(jerSFDown_[i]);
       if ( hasQGLikelihood_ ) jet.qgLikelihood(qgLikelihood_[i]);
       else                    jet.qgLikelihood(-10.);
       jet.pileupJetIdFullDiscriminant(puJetIdFullDisc_[i]);

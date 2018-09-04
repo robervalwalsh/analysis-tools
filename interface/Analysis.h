@@ -46,6 +46,8 @@
 // class declaration
 //
 
+using namespace JME;
+
 namespace analysis {
    namespace tools {
 
@@ -145,6 +147,8 @@ namespace analysis {
             void  btagEfficienciesAlgo(const std::string & );
             void  btagEfficienciesFlavour(const std::string & );
             
+            std::shared_ptr<JetResolutionInfo> jetResolutionInfo(const std::string &, const std::string & );
+            
             std::shared_ptr<BTagCalibrationReader> btagCalibration(const std::string & tagger,
                                  const std::string & filename,
                                  const std::string & wp,
@@ -175,6 +179,8 @@ namespace analysis {
             
             std::shared_ptr<BTagCalibration> btagcalib_;
             std::shared_ptr<BTagCalibrationReader> btagcalibread_;
+            
+            std::shared_ptr<JetResolutionInfo> jerinfo_;
 
 
             std::map<std::string, double> xsections_;

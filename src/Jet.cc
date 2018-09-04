@@ -20,7 +20,7 @@
  
 #include "Analysis/Tools/interface/Jet.h"
 
-
+#include "TRandom3.h"
 //
 // class declaration
 //
@@ -39,6 +39,7 @@ Jet::Jet() : Candidate()
    muon_ = nullptr;
    uncorrJetp4_ = p4_;
    genjet_ = nullptr;
+   jermatch_ = false;
    
 }
 Jet::Jet(const float & pt, const float & eta, const float & phi, const float & e) : Candidate(pt,eta,phi,e,0.) 
@@ -49,6 +50,8 @@ Jet::Jet(const float & pt, const float & eta, const float & phi, const float & e
    muon_ = nullptr;
    uncorrJetp4_ = p4_;
    genjet_ = nullptr;
+   jermatch_ = false;
+   
    
 }
 
@@ -74,11 +77,143 @@ std::vector<int> Jet::flavours()                   const { return flavours_;    
 std::vector< std::shared_ptr<GenParticle> >\
       Jet::partons()                               const { return partons_;        }
 std::string Jet::extendedFlavour()                 const { return extendedFlavour_; }
-float Jet::JerResolution()                         const { return jerResolution_;}
-float Jet::JerSf()                                 const { return jerSF_; }
-float Jet::JerSfDown()                             const { return jerSFDown_; }
-float Jet::JerSfUp()                               const { return jerSFUp_; }
+// float Jet::jerPtResolution()                       const { return jerptres_;}
+// float Jet::jerSF()                                 const { return jersf_; }
+// float Jet::jerSFdown()                             const { return jersfdown_; }
+// float Jet::jerSFup()                               const { return jersfup_; }
+float Jet::jerPtResolution()                       const { return jerPtResolution(jerinfo_.resolution);}
+float Jet::jerSF()                                 const { return jerSF(jerinfo_.scalefactor); }
+float Jet::jerSFdown()                             const { return jerSFdown(jerinfo_.scalefactor); }
+float Jet::jerSFup()                               const { return jerSFup(jerinfo_.scalefactor); }
+//
+float Jet::jerPtResolution(const JetResolution & jer) const 
+{
+   JetParameters pars = {{JME::Binning::JetPt, this->pt()}, {JME::Binning::JetEta, this->eta()}, {JME::Binning::Rho, this->rho()}};
+   float res = jer.getResolution(pars);
+   return res;
+}
+float Jet::jerSF(const JetResolutionScaleFactor & jersf) const
+{
+   JetParameters pars = {{JME::Binning::JetEta, this->eta()}};
+   float sf = jersf.getScaleFactor(pars);
+   return sf;
+}
+float Jet::jerSFdown(const JetResolutionScaleFactor & jersf) const
+{
+   JetParameters pars = {{JME::Binning::JetEta, this->eta()}};
+   float sf = jersf.getScaleFactor(pars,Variation::DOWN);
+   return sf;
+}
+float Jet::jerSFup(const JetResolutionScaleFactor & jersf) const
+{
+   JetParameters pars = {{JME::Binning::JetEta, this->eta()}};
+   float sf = jersf.getScaleFactor(pars,Variation::UP);
+   return sf;
+}
 
+bool Jet::jerMatch(const std::string & collection)
+{
+   float res = this->jerPtResolution();
+   jermatch_ = this->matched("GenJets"); // delta_R matching
+   jermatch_ = jermatch_ && (fabs(this->pt()-this->matched("GenJets")->pt()) < 3.*res*this->pt()); // delta pT
+   
+   return jermatch_;
+   
+}
+
+bool Jet::jerMatch(const float & drmin)
+{
+   float res = this->jerPtResolution();
+   
+   std::shared_ptr<GenJet> cand = nullptr;
+   std::shared_ptr<GenJet> nearcand = nullptr;
+   genjet_ = nullptr;
+   float minDeltaR = 100.;
+   for ( size_t i = 0; i < genjets_.size() ; ++i )
+   {
+      cand = genjets_.at(i);
+      if(this->deltaR(*cand) < minDeltaR)
+      {
+         minDeltaR = this->deltaR(*cand);
+         nearcand = cand;
+      }
+   }
+   if(minDeltaR < drmin) jermatch_ = true;
+   else                  return false;
+   
+   jermatch_ = jermatch_ && (fabs(this->pt()-nearcand->pt()) < 3.*res*this->pt()); // delta pT
+   
+   if (jermatch_) genjet_= nearcand;
+   
+   return jermatch_;
+   
+}
+
+
+bool Jet::jerMatch() const
+{
+   return jermatch_;
+}
+void Jet::jerCorrections()
+{
+   float c     = 1.;
+   float cup   = 1.;
+   float cdown = 1.;
+
+   float sf     = this->jerSF();
+   float sfup   = this->jerSFup();
+   float sfdown = this->jerSFdown();
+   
+   if ( jermatch_ )
+   {
+      c     += (sf-1)*((this->pt() - genjet_->pt())/this->pt());
+      cup   += (sfup-1)*((this->pt() - genjet_->pt())/this->pt());
+      cdown += (sfdown-1)*((this->pt() - genjet_->pt())/this->pt());
+   }
+   else
+   {
+      TRandom3 r(0);
+      float n = r.Gaus(0.,this->jerPtResolution());
+      c     += n*sqrt(std::max(sf*sf-1.,0.));
+      cup   += n*sqrt(std::max(sfup*sfup-1.,0.));
+      cdown += n*sqrt(std::max(sfdown*sfdown-1.,0.));
+   }
+   
+   jercorr_.nominal = c;
+   jercorr_.up = cup;
+   jercorr_.down = cdown;
+   
+}
+
+float Jet::jerCorrection(const std::string & var) const
+{
+   float corr = jercorr_.nominal;
+   std::string v = var;
+   std::transform(v.begin(), v.end(), v.begin(), ::tolower);
+   if ( v == "up"   ) corr = jercorr_.up;
+   if ( v == "down" ) corr = jercorr_.down;
+   
+   return corr;
+   
+}
+
+void Jet::jerInfo(const JetResolutionInfo & jerinfo, const std::string & collection)
+{
+   jerinfo_ = jerinfo;
+   jerMatch("GenJets");
+   jerCorrections();
+}
+      
+void Jet::jerInfo(const JetResolutionInfo & jerinfo, const float & drmin)
+{
+   jerinfo_ = jerinfo;
+   jerMatch(drmin);
+   jerCorrections();
+}
+      
+
+
+//
 float Jet::neutralHadronFraction()                 const { return nHadFrac_; }
 float Jet::neutralEmFraction()                     const { return nEmFrac_;  }
 float Jet::neutralMultiplicity()                   const { return nMult_;    }
@@ -109,7 +244,30 @@ bool  Jet::id(const std::string & wp)              const
 }         
 
 
-GenJet * Jet::generatedJet() const { return genjet_; }
+std::shared_ptr<GenJet> Jet::generatedJet() const { return genjet_; }
+
+// GenJet * Jet::generatedJet(const std::vector<GenJet*> & genjets, const float & deltaR)
+// {
+//    GenJet * cand = nullptr;
+//    GenJet * nearcand = nullptr;
+//    genjet_ = nullptr;
+//    float minDeltaR = 100.;
+//    for ( size_t j = 0; j < genjets.size() ; ++j )
+//    {
+//       cand = genjets.at(j);
+//       if(this->deltaR(*cand) < minDeltaR)
+//       {
+//          minDeltaR = this->deltaR(*cand);
+//          nearcand = cand;
+//       }
+//    }
+//    if(minDeltaR < deltaR)
+//    {
+//      genjet_ = nearcand;
+//    }
+//    
+//    return genjet_;
+// }
 
 double Jet::btagSFsys(std::shared_ptr<BTagCalibrationReader> reader, const std::string & systype, const std::string & flavalgo) const
 {
@@ -168,11 +326,12 @@ void Jet::idTight  (const bool  & tigh)                               { idtight_
 void Jet::jecUncert(const float & ju)                                 { jecUnc_  = ju; } 
 void Jet::addParton(const std::shared_ptr<GenParticle> & parton)      { partons_.push_back(parton);
                                                                         flavours_.push_back(parton->pdgId());  }
-void Jet::btagAlgo (const std::string & algo )                        { btagAlgo_ = algo; }                                                                        
-void Jet::JerResolution(const float & jerResolution)                  { jerResolution_ = jerResolution; }
-void Jet::JerSf(const float & jerSf)                                  { jerSF_ = jerSf; }
-void Jet::JerSfDown(const float & jerSfDown)                          { jerSFDown_ = jerSfDown; }
-void Jet::JerSfUp(const float & jerSfUp)                              { jerSFUp_ = jerSfUp; }
+void Jet::btagAlgo (const std::string & algo )                        { btagAlgo_ = algo; } 
+                                                                       
+void Jet::jerPtResolution(const float & res)                          { jerptres_ = res; }
+void Jet::jerSF(const float & sf)                                     { jersf_ = sf; }
+void Jet::jerSFdown(const float & sfd)                                { jersfdown_ = sfd; }
+void Jet::jerSFup(const float & sfu)                                  { jersfup_ = sfu; }
 
 void Jet::qgLikelihood(const float & discr)                           { qgLikelihood_ = discr; }
 void Jet::pileupJetIdFullDiscriminant(const float & discr)            { puJetIdFullDisc_ = discr; }
@@ -181,9 +340,9 @@ void Jet::pileupJetIdFullId(const int & id)                           { puJetIdF
 void Jet::bRegCorr(const float & bRegCorr)                            { bRegCorr_ = bRegCorr; }
 void Jet::bRegRes(const float & bRegRes)                              { bRegRes_  = bRegRes; }
 
-void Jet::rho(const double & rho)                                      { rho_  = rho; }
+void Jet::rho(const double & rho)                                     { rho_  = rho; }
 
-void Jet::generatedJet(GenJet * genjet)                                { genjet_ = genjet; }
+void Jet::generatedJet(std::shared_ptr<GenJet> genjet)                { genjet_ = genjet; }
 
 
 int Jet::removeParton(const int & i)
@@ -264,7 +423,10 @@ Muon * Jet::muon()
    return muon_;
 }
 
-
+void Jet::genJets(const std::vector< std::shared_ptr<GenJet> > & genjets)
+{
+   genjets_ = genjets;
+}
 
 void Jet::associatePartons(const std::vector< std::shared_ptr<GenParticle> > & particles, const float & dRmax, const float & ptMin,  const bool & pythia8 )
 {
