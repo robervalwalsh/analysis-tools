@@ -63,6 +63,10 @@ std::vector<float> l1tjetsrefetamax_;
 // btag SF csv file
 std::string btagsf_;
 
+// JER resolution and scale factors from txt file
+std::string jerpt_;
+std::string jersf_;
+
 
 // muons
 
@@ -151,6 +155,8 @@ int macro_config(int argc, char * argv[])
          ("output",po::value <std::string> (&outputRoot_)->default_value("histograms.root"),"Output root file")
          ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
          ("btagSF",po::value <std::string> (&btagsf_)->default_value("DeepCSV.csv"),"b-tagging scale factor in CSV format")
+         ("jerPT",po::value <std::string> (&jerpt_)->default_value("JERPT.txt"),"JER pt resolution in txt format")
+         ("jerSF",po::value <std::string> (&jersf_)->default_value("JERSF.txt"),"JER scale factor in txt format")
 //      
          ("nJetsMin",po::value <int> (&njetsmin_)->default_value(0),"Minimum number of jets")
          ("nJetsMax",po::value <int> (&njetsmax_)->default_value(100),"Maximum number of jets")
