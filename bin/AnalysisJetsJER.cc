@@ -34,12 +34,13 @@ int main(int argc, char * argv[])
    analysis.addTree<GenJet> ("GenJets",genjetsCol_);
    
    // Jet energy resolution scale factors and pt resolution
-   JME::JetResolution resolution = JME::JetResolution("/afs/desy.de/user/w/walsh/cms/analysis/cmssw/mssmhbb/2017/CMSSW_9_4_9/src/Analysis/Tools/data/Summer16_25nsV1_MC_PtResolution_AK4PFchs.txt");
-   JME::JetResolutionScaleFactor resolution_sf = JME::JetResolutionScaleFactor("/afs/desy.de/user/w/walsh/cms/analysis/cmssw/mssmhbb/2017/CMSSW_9_4_9/src/Analysis/Tools/data/Summer16_25nsV1_MC_SF_AK4PFchs.txt");
+   JME::JetResolution resolution = JME::JetResolution(jerpt_);
+   JME::JetResolutionScaleFactor resolution_sf = JME::JetResolutionScaleFactor(jersf_);
 
    // Analysis of events
    std::cout << "This analysis has " << analysis.size() << " events" << std::endl;
-   for ( int i = 0 ; i < analysis.size() ; ++i )
+//   for ( int i = 0 ; i < analysis.size() ; ++i )
+   for ( int i = 0 ; i < 10 ; ++i )
    {
       analysis.event(i);
       
