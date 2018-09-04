@@ -36,6 +36,8 @@
 // class declaration
 //
 
+
+
 using namespace JME;
 
 namespace analysis {
@@ -110,6 +112,7 @@ namespace analysis {
             
             /// JER matching
             bool jerMatch(const std::string &);
+            bool jerMatch(const float & drmin=0.2);
             bool jerMatch() const;
             
             void jerCorrections();
@@ -184,6 +187,7 @@ namespace analysis {
             void jerSFdown(const float &);
             
             void jerInfo(const JetResolutionInfo &, const std::string &);
+            void jerInfo(const JetResolutionInfo &, const float & drmin=0.2);
             
             /// add parton that gave rise to jet
             void addParton(const std::shared_ptr<GenParticle> &);
@@ -234,6 +238,9 @@ namespace analysis {
             /// associate partons to the jet
             void associatePartons(const std::vector< std::shared_ptr<GenParticle> > &, const float & dRmax = 0.5, const float & ptMin = 1., const bool & pythi8 = true );
 //            using Candidate::set; // in case needed to overload the function set
+            
+            /// gen jets
+            void genJets(const std::vector< std::shared_ptr<GenJet> > &);
             
             /// add a final state radiation jet, will modify the 4-momentum
             void addFSR(Jet*);
@@ -319,6 +326,10 @@ namespace analysis {
             
             /// generated jet
             GenJet * genjet_;
+            
+            /// collection of GenJets
+            std::vector< std::shared_ptr<GenJet> > genjets_;
+            
             
             /// muon in jet
             Muon * muon_;

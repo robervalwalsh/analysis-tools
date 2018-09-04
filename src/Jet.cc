@@ -121,6 +121,31 @@ bool Jet::jerMatch(const std::string & collection)
    
 }
 
+bool Jet::jerMatch(const float & drmin)
+{
+   float res = this->jerPtResolution();
+   
+   std::shared_ptr<GenJet> cand = nullptr;
+   std::shared_ptr<GenJet> nearcand = nullptr;
+   float minDeltaR = 100.;
+   for ( size_t i = 0; i < genjets_.size() ; ++i )
+   {
+      cand = genjets_.at(i);
+      if(this->deltaR(*cand) < minDeltaR)
+      {
+         minDeltaR = this->deltaR(*cand);
+         nearcand = cand;
+      }
+   }
+	
+   if(minDeltaR < drmin) jermatch_ = true;
+   jermatch_ = jermatch_ && (fabs(this->pt()-this->matched("GenJets")->pt()) < 3.*res*this->pt()); // delta pT
+   
+   return jermatch_;
+   
+}
+
+
 bool Jet::jerMatch() const
 {
    return jermatch_;
@@ -175,6 +200,15 @@ void Jet::jerInfo(const JetResolutionInfo & jerinfo, const std::string & collect
    jerCorrections();
 }
       
+void Jet::jerInfo(const JetResolutionInfo & jerinfo, const float & drmin)
+{
+   jerinfo_ = jerinfo;
+   jerMatch(drmin);
+   jerCorrections();
+}
+      
+
+
 //
 float Jet::neutralHadronFraction()                 const { return nHadFrac_; }
 float Jet::neutralEmFraction()                     const { return nEmFrac_;  }
@@ -385,7 +419,10 @@ Muon * Jet::muon()
    return muon_;
 }
 
-
+void Jet::genJets(const std::vector< std::shared_ptr<GenJet> > & genjets)
+{
+   genjets_ = genjets;
+}
 
 void Jet::associatePartons(const std::vector< std::shared_ptr<GenParticle> > & particles, const float & dRmax, const float & ptMin,  const bool & pythia8 )
 {
