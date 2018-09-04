@@ -127,6 +127,7 @@ bool Jet::jerMatch(const float & drmin)
    
    std::shared_ptr<GenJet> cand = nullptr;
    std::shared_ptr<GenJet> nearcand = nullptr;
+   genjet_ = nullptr;
    float minDeltaR = 100.;
    for ( size_t i = 0; i < genjets_.size() ; ++i )
    {
@@ -137,9 +138,12 @@ bool Jet::jerMatch(const float & drmin)
          nearcand = cand;
       }
    }
-	
    if(minDeltaR < drmin) jermatch_ = true;
-   jermatch_ = jermatch_ && (fabs(this->pt()-this->matched("GenJets")->pt()) < 3.*res*this->pt()); // delta pT
+   else                  return false;
+   
+   jermatch_ = jermatch_ && (fabs(this->pt()-nearcand->pt()) < 3.*res*this->pt()); // delta pT
+   
+   if (jermatch_) genjet_= nearcand;
    
    return jermatch_;
    
@@ -162,9 +166,9 @@ void Jet::jerCorrections()
    
    if ( jermatch_ )
    {
-      c     += (sf-1)*((this->pt() - this->matched("GenJets")->pt())/this->pt());
-      cup   += (sfup-1)*((this->pt() - this->matched("GenJets")->pt())/this->pt());
-      cdown += (sfdown-1)*((this->pt() - this->matched("GenJets")->pt())/this->pt());
+      c     += (sf-1)*((this->pt() - genjet_->pt())/this->pt());
+      cup   += (sfup-1)*((this->pt() - genjet_->pt())/this->pt());
+      cdown += (sfdown-1)*((this->pt() - genjet_->pt())/this->pt());
    }
    else
    {
@@ -240,30 +244,30 @@ bool  Jet::id(const std::string & wp)              const
 }         
 
 
-GenJet * Jet::generatedJet() const { return genjet_; }
+std::shared_ptr<GenJet> Jet::generatedJet() const { return genjet_; }
 
-GenJet * Jet::generatedJet(const std::vector<GenJet*> & genjets, const float & deltaR)
-{
-   GenJet * cand = nullptr;
-   GenJet * nearcand = nullptr;
-   genjet_ = nullptr;
-   float minDeltaR = 100.;
-   for ( size_t j = 0; j < genjets.size() ; ++j )
-   {
-      cand = genjets.at(j);
-      if(this->deltaR(*cand) < minDeltaR)
-      {
-         minDeltaR = this->deltaR(*cand);
-         nearcand = cand;
-      }
-   }
-   if(minDeltaR < deltaR)
-   {
-     genjet_ = nearcand;
-   }
-   
-   return genjet_;
-}
+// GenJet * Jet::generatedJet(const std::vector<GenJet*> & genjets, const float & deltaR)
+// {
+//    GenJet * cand = nullptr;
+//    GenJet * nearcand = nullptr;
+//    genjet_ = nullptr;
+//    float minDeltaR = 100.;
+//    for ( size_t j = 0; j < genjets.size() ; ++j )
+//    {
+//       cand = genjets.at(j);
+//       if(this->deltaR(*cand) < minDeltaR)
+//       {
+//          minDeltaR = this->deltaR(*cand);
+//          nearcand = cand;
+//       }
+//    }
+//    if(minDeltaR < deltaR)
+//    {
+//      genjet_ = nearcand;
+//    }
+//    
+//    return genjet_;
+// }
 
 double Jet::btagSFsys(std::shared_ptr<BTagCalibrationReader> reader, const std::string & systype, const std::string & flavalgo) const
 {
@@ -336,9 +340,9 @@ void Jet::pileupJetIdFullId(const int & id)                           { puJetIdF
 void Jet::bRegCorr(const float & bRegCorr)                            { bRegCorr_ = bRegCorr; }
 void Jet::bRegRes(const float & bRegRes)                              { bRegRes_  = bRegRes; }
 
-void Jet::rho(const double & rho)                                      { rho_  = rho; }
+void Jet::rho(const double & rho)                                     { rho_  = rho; }
 
-void Jet::generatedJet(GenJet * genjet)                                { genjet_ = genjet; }
+void Jet::generatedJet(std::shared_ptr<GenJet> genjet)                { genjet_ = genjet; }
 
 
 int Jet::removeParton(const int & i)

@@ -31,7 +31,9 @@
 #include "Analysis/Tools/interface/GenParticle.h"
 #include "Analysis/Tools/interface/GenJet.h"
 #include "Analysis/Tools/interface/BTagCalibrationStandalone.h"
-#include "Analysis/Tools/interface/JetResolution.h"
+#include "Analysis/Tools/interface/Utils.h"
+
+
 //
 // class declaration
 //
@@ -43,12 +45,6 @@ using namespace JME;
 namespace analysis {
    namespace tools {
       
-      struct JetResolutionInfo
-      {
-         JetResolution resolution;
-         JetResolutionScaleFactor scalefactor;
-      };      
-
       struct JERCorrections
       {
          float nominal;
@@ -155,8 +151,8 @@ namespace analysis {
             Muon * muon();
             
             /// Pointer to GenJet
-            GenJet * generatedJet() const;
-            GenJet * generatedJet(const std::vector<GenJet*> &, const float &);
+            std::shared_ptr<GenJet> generatedJet() const;
+//            GenJet * generatedJet(const std::vector<GenJet*> &, const float &);
                
             // Sets
             /// sets the isPuppi value
@@ -253,7 +249,7 @@ namespace analysis {
             void rmMuon();
             
             /// GenJet matching
-            void generatedJet(GenJet *);
+            void generatedJet(std::shared_ptr<GenJet>);
             
             
          protected:
@@ -325,7 +321,7 @@ namespace analysis {
             TLorentzVector uncorrJetp4_;
             
             /// generated jet
-            GenJet * genjet_;
+            std::shared_ptr<GenJet> genjet_;
             
             /// collection of GenJets
             std::vector< std::shared_ptr<GenJet> > genjets_;
