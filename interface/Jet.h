@@ -74,14 +74,14 @@ namespace analysis {
             std::string extendedFlavour()       const;
             /// returns the vector of pointers to the generated partons
             std::vector< std::shared_ptr<GenParticle> > partons() const;
-            /// returns jet energy resolution
-            float JerResolution() const;
+            /// returns jet pt resolution
+            float jerPtResolution() const;
             /// returns jet energy resolution SF
-            float JerSf() const;
+            float jerSF() const;
             /// returns jet energy resolution SF Down variation
-            float JerSfDown() const;
+            float jerSFdown() const;
             /// returns jet energy resolution SF Up variation
-            float JerSfUp() const;
+            float jerSFup() const;
             
             float neutralHadronFraction()  const ;
             float neutralEmFraction()      const ;
@@ -142,13 +142,13 @@ namespace analysis {
             /// sets the jet energy correction uncertainty
             void  jecUncert(const float &);
             /// sets jet energy resolution
-            void JerResolution(const float & jerResolution);
+            void jerPtResolution(const float &);
             /// sets jet energy resolution SF
-            void JerSf(const float & jerSf);
+            void jerSF(const float &);
             /// sets jet energy resolution SF Up variation
-            void JerSfUp(const float & jerSfUp);
+            void jerSFup(const float &);
             /// sets jet energy resolution SF Down variation
-            void JerSfDown(const float & jerSfDown);
+            void jerSFdown(const float &);
             /// add parton that gave rise to jet
             void addParton(const std::shared_ptr<GenParticle> &);
             /// remove parton from jet parton list
@@ -240,13 +240,13 @@ namespace analysis {
             /// jet energy correction uncertainty
             float jecUnc_;
             /// jet energy resolution SF
-            float jerSF_;
+            float jersf_;
             /// jet energy resolution SF Up variation
-            float jerSFUp_;
+            float jersfup_;
             /// jet energy resolution SF Down variation
-            float jerSFDown_;
+            float jersfdown_;
             /// jet energy resolution
-            float jerResolution_;
+            float jerptres_;
             
             /// jet id
             float nHadFrac_;

@@ -74,10 +74,10 @@ std::vector<int> Jet::flavours()                   const { return flavours_;    
 std::vector< std::shared_ptr<GenParticle> >\
       Jet::partons()                               const { return partons_;        }
 std::string Jet::extendedFlavour()                 const { return extendedFlavour_; }
-float Jet::JerResolution()                         const { return jerResolution_;}
-float Jet::JerSf()                                 const { return jerSF_; }
-float Jet::JerSfDown()                             const { return jerSFDown_; }
-float Jet::JerSfUp()                               const { return jerSFUp_; }
+float Jet::jerPtResolution()                       const { return jerptres_;}
+float Jet::jerSF()                                 const { return jersf_; }
+float Jet::jerSFdown()                             const { return jersfdown_; }
+float Jet::jerSFup()                               const { return jersfup_; }
 
 float Jet::neutralHadronFraction()                 const { return nHadFrac_; }
 float Jet::neutralEmFraction()                     const { return nEmFrac_;  }
@@ -168,11 +168,12 @@ void Jet::idTight  (const bool  & tigh)                               { idtight_
 void Jet::jecUncert(const float & ju)                                 { jecUnc_  = ju; } 
 void Jet::addParton(const std::shared_ptr<GenParticle> & parton)      { partons_.push_back(parton);
                                                                         flavours_.push_back(parton->pdgId());  }
-void Jet::btagAlgo (const std::string & algo )                        { btagAlgo_ = algo; }                                                                        
-void Jet::JerResolution(const float & jerResolution)                  { jerResolution_ = jerResolution; }
-void Jet::JerSf(const float & jerSf)                                  { jerSF_ = jerSf; }
-void Jet::JerSfDown(const float & jerSfDown)                          { jerSFDown_ = jerSfDown; }
-void Jet::JerSfUp(const float & jerSfUp)                              { jerSFUp_ = jerSfUp; }
+void Jet::btagAlgo (const std::string & algo )                        { btagAlgo_ = algo; } 
+                                                                       
+void Jet::jerPtResolution(const float & res)                          { jerptres_ = res; }
+void Jet::jerSF(const float & sf)                                     { jersf_ = sf; }
+void Jet::jerSFdown(const float & sfd)                                { jersfdown_ = sfd; }
+void Jet::jerSFup(const float & sfu)                                  { jersfup_ = sfu; }
 
 void Jet::qgLikelihood(const float & discr)                           { qgLikelihood_ = discr; }
 void Jet::pileupJetIdFullDiscriminant(const float & discr)            { puJetIdFullDisc_ = discr; }
