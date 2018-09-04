@@ -30,9 +30,12 @@
 #include "Analysis/Tools/interface/GenParticle.h"
 #include "Analysis/Tools/interface/GenJet.h"
 #include "Analysis/Tools/interface/BTagCalibrationStandalone.h"
+#include "Analysis/Tools/interface/JetResolution.h"
 //
 // class declaration
 //
+
+using namespace JME;
 
 namespace analysis {
    namespace tools {
@@ -76,12 +79,20 @@ namespace analysis {
             std::vector< std::shared_ptr<GenParticle> > partons() const;
             /// returns jet pt resolution
             float jerPtResolution() const;
+            /// returns jet pt resolution from text file
+            float jerPtResolution(const JetResolution &) const;
             /// returns jet energy resolution SF
             float jerSF() const;
+            /// returns jet energy resolution SF
+            float jerSF(const JetResolutionScaleFactor &) const;
             /// returns jet energy resolution SF Down variation
             float jerSFdown() const;
+            /// returns jet energy resolution SF Down variation
+            float jerSFdown(const JetResolutionScaleFactor &) const;
             /// returns jet energy resolution SF Up variation
             float jerSFup() const;
+            /// returns jet energy resolution SF Up variation
+            float jerSFup(const JetResolutionScaleFactor &) const;
             
             float neutralHadronFraction()  const ;
             float neutralEmFraction()      const ;

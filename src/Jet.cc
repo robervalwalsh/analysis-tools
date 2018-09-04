@@ -78,7 +78,33 @@ float Jet::jerPtResolution()                       const { return jerptres_;}
 float Jet::jerSF()                                 const { return jersf_; }
 float Jet::jerSFdown()                             const { return jersfdown_; }
 float Jet::jerSFup()                               const { return jersfup_; }
+//
+float Jet::jerPtResolution(const JetResolution & jer) const 
+{
+   JetParameters pars = {{JME::Binning::JetPt, this->pt()}, {JME::Binning::JetEta, this->eta()}, {JME::Binning::Rho, this->rho()}};
+   float res = jer.getResolution(pars);
+   return res;
+}
+float Jet::jerSF(const JetResolutionScaleFactor & jersf) const
+{
+   JetParameters pars = {{JME::Binning::JetEta, this->eta()}};
+   float sf = jersf.getScaleFactor(pars);
+   return sf;
+}
+float Jet::jerSFdown(const JetResolutionScaleFactor & jersf) const
+{
+   JetParameters pars = {{JME::Binning::JetEta, this->eta()}};
+   float sf = jersf.getScaleFactor(pars,Variation::DOWN);
+   return sf;
+}
+float Jet::jerSFup(const JetResolutionScaleFactor & jersf) const
+{
+   JetParameters pars = {{JME::Binning::JetEta, this->eta()}};
+   float sf = jersf.getScaleFactor(pars,Variation::UP);
+   return sf;
+}
 
+//
 float Jet::neutralHadronFraction()                 const { return nHadFrac_; }
 float Jet::neutralEmFraction()                     const { return nEmFrac_;  }
 float Jet::neutralMultiplicity()                   const { return nMult_;    }
