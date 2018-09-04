@@ -46,6 +46,7 @@ namespace analysis {
       template <> void Collection<Jet>::associatePartons( const std::shared_ptr<Collection<GenParticle> > & particles, const float & deltaR, const float & ptMin, const bool & pythia8  );
       template <> void Collection<Jet>::btagAlgo( const std::string & algo );
       template <> void Collection<Jet>::smearTo(const Collection<Jet> & collection, const double & n_sigma );
+      template <> void Collection<Jet>::addGenJets( const std::shared_ptr<Collection<GenJet> > & cands );
    }
 }
 //
@@ -121,6 +122,23 @@ void Collection<Jet>::btagAlgo(const std::string & algo  )
    for ( auto & jet : objects_ )
       jet.btagAlgo(algo);
 }
+
+
+template <class Object>
+void Collection<Object>::addGenJets(const std::shared_ptr<Collection<GenJet> > & cands)
+{
+}
+
+template <>
+void Collection<Jet>::addGenJets(const std::shared_ptr<Collection<GenJet> > & cands)
+{
+   if ( objects_.size() < 1 ) return;
+   std::vector< std::shared_ptr<GenJet> > vec = cands->vector();
+   for ( auto & jet : objects_ )
+      jet.genJets(vec);
+   
+}
+
 
 template <class Object>
 void Collection<Object>::associatePartons(const std::shared_ptr<Collection<GenParticle> > & particles, const float & deltaR, const float & ptMin, const bool & pythia8  )
