@@ -21,6 +21,7 @@
 
 // system include files
 #include <memory>
+#include <boost/any.hpp>
 //
 
 // 
@@ -39,6 +40,19 @@ using namespace JME;
 
 namespace analysis {
    namespace tools {
+      
+      struct JetResolutionInfo
+      {
+         JetResolution resolution;
+         JetResolutionScaleFactor scalefactor;
+      };      
+
+      struct JERCorrections
+      {
+         float nominal;
+         float up;
+         float down;
+      };
       
       class Jet : public Candidate {
          public:
@@ -94,6 +108,13 @@ namespace analysis {
             /// returns jet energy resolution SF Up variation
             float jerSFup(const JetResolutionScaleFactor &) const;
             
+            /// JER matching
+            bool jerMatch(const std::string &);
+            bool jerMatch() const;
+            
+            void jerCorrections();
+            float jerCorrection(const std::string & var = "nominal") const;
+            
             float neutralHadronFraction()  const ;
             float neutralEmFraction()      const ;
             float neutralMultiplicity()    const ;
@@ -132,6 +153,7 @@ namespace analysis {
             
             /// Pointer to GenJet
             GenJet * generatedJet() const;
+            GenJet * generatedJet(const std::vector<GenJet*> &, const float &);
                
             // Sets
             /// sets the isPuppi value
@@ -160,6 +182,9 @@ namespace analysis {
             void jerSFup(const float &);
             /// sets jet energy resolution SF Down variation
             void jerSFdown(const float &);
+            
+            void jerInfo(const JetResolutionInfo &, const std::string &);
+            
             /// add parton that gave rise to jet
             void addParton(const std::shared_ptr<GenParticle> &);
             /// remove parton from jet parton list
@@ -258,6 +283,12 @@ namespace analysis {
             float jersfdown_;
             /// jet energy resolution
             float jerptres_;
+            /// JER matching
+            bool jermatch_;
+            /// JER correction factor
+            JERCorrections jercorr_;
+            /// JER info
+            JetResolutionInfo jerinfo_;
             
             /// jet id
             float nHadFrac_;
