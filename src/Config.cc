@@ -36,7 +36,7 @@ Config::Config()
 {
 }
 
-
+// Main constructor
 Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configuration")
 {
    argc_ = argc;
@@ -93,8 +93,9 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
 
       // muons
       opt_cfg_.add_options()
-         ("muonsCollection",po::value <std::string> (&muonsCol_)->default_value("slimmedMuons"),"Name of the muons collection")      
-         ("nMuonsMin",po::value <int> (&nmuonsmin_)->default_value(0),"Minimum number of muons")
+         ("muonsCollection",po::value <std::string> (&muonsCol_)->default_value(""),"Name of the muons collection")      
+         ("nMuonsMin",po::value <int> (&nmuonsmin_)->default_value(0) ,"Minimum number of muons")
+         ("nMuonsMax",po::value <int> (&nmuonsmax_)->default_value(-1),"Maximum number of muons")
          ("muonsPtMin", po::value<std::vector<float> >(&muonsptmin_)->multitoken(),"Mimium pt of the muons")
          ("muonsPtMax", po::value<std::vector<float> >(&muonsptmax_)->multitoken(),"Maximum pt of the muons")
          ("muonsEtaMax", po::value<std::vector<float> >(&muonsetamax_)->multitoken(),"Maximum |eta| of the muons")
@@ -120,13 +121,13 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("triggerObjectsMuonsMatches", po::value<int> (&triggerObjectsMuonsMatches_)->default_value(-1),"Number of matches with trigger objects for muons")
          ("triggerObjectsL1MuonsMatches", po::value<int> (&triggerObjectsL1MuonsMatches_)->default_value(-1),"Number of matches with L1 trigger objects for muons")
          ("triggerMatchDeltaRMax",po::value <float> (&trgmatchdrmax_)->default_value(0.3),"DeltaR max for matching online-offline")
-         ("triggerResultsCollection",po::value <std::string> (&triggerCol_)->default_value("TriggerResults"),"Name of the trigger results collection")
+         ("triggerResultsCollection",po::value <std::string> (&triggerCol_)->default_value(""),"Name of the trigger results collection")
          ("triggerObjectsDirectory",po::value <std::string> (&triggerObjDir_)->default_value("slimmedPatTrigger"),"Name of the trigger objects directory");
 
       // generator level
       opt_cfg_.add_options()
-         ("genParticleCollection",po::value <std::string> (&genParticleCol_)->default_value("prunedGenParticles"),"Name of the gen particle collection")
-         ("genjetsCollection",po::value <std::string> (&genjetsCol_)->default_value("slimmedGenJets"),"Name of the gen jets collection");
+         ("genParticleCollection",po::value <std::string> (&genParticleCol_)->default_value(""),"Name of the gen particle collection")
+         ("genjetsCollection",po::value <std::string> (&genjetsCol_)->default_value(""),"Name of the gen jets collection");
             
          
       // others
@@ -239,4 +240,17 @@ std::vector<float> Config::jetsEtaMax()        const { return jetsetamax_; }
 std::string        Config::jetsId()            const { return jetsid_; }
 std::string        Config::jetsPuId()          const { return jetspuid_; }
 std::string        Config::l1tJetsCollection() const { return l1tjetsCol_; } 
+
+// muons
+std::string        Config::muonsCollection()    const { return muonsCol_; }
+int                Config::nMuonsMin()          const { return nmuonsmin_; }
+int                Config::nMuonsMax()          const { return nmuonsmax_; }
+std::vector<float> Config::muonsPtMin()         const { return muonsptmin_; }
+std::vector<float> Config::muonsPtMax()         const { return muonsptmax_; }
+std::vector<float> Config::muonsEtaMax()        const { return muonsetamax_; }
+std::string        Config::muonsId()            const { return muonsid_; }
+std::string        Config::l1tMuonsCollection() const { return l1tmuonsCol_; } 
+
+// trigger
+std::string        Config::triggerResults()    const { return triggerCol_; }
 
