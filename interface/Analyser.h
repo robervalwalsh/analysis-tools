@@ -69,6 +69,8 @@ namespace analysis {
             bool jetsanalysis_;
             bool muonsanalysis_;
             
+            int cutflow_;
+            
             TH1s h1_;
             TH2s h2_;
          
@@ -107,12 +109,16 @@ namespace analysis {
             virtual bool selectionJetDeta(const int &, const int &, const float &);
             virtual bool selectionJetDr(const int &, const int &, const float &);
             virtual bool selectionJetId();
+            virtual bool selectionJetPileupId();
+            virtual bool selectionNJets();
             virtual bool selectionBJet();
             virtual bool selectionBJet(const int &);
             virtual bool selectionNonBJet(const int &);
             virtual bool selectionMuon();
             virtual bool onlineJetMatching();
+            virtual bool onlineJetMatching(const int &);
             virtual bool onlineBJetMatching();
+            virtual bool onlineBJetMatching(const int &);
             virtual void histograms(const std::string &, const int & n = 1);
             virtual void fillJetHistograms();
             virtual void fillMuonHistograms();

@@ -52,6 +52,8 @@ Analyser::Analyser(int argc, char * argv[])
 {
    config_   = std::make_shared<Config>(argc,argv);
    analysis_ = std::make_shared<Analysis>(config_->ntuplesList());
+   
+   cutflow_ = 0;
 
    // Physics objects
    // Jets
@@ -78,6 +80,8 @@ Analyser::Analyser(int argc, char * argv[])
    {
       hout_= std::shared_ptr<TFile>(new TFile(config_->outputRoot_.c_str(),"recreate"));
    }
+   
+   h1_["cutflow"] = new TH1F(obj.c_str(),"", 30,0,30);
 }
 
 Analyser::~Analyser()
@@ -116,22 +120,29 @@ void Analyser::end()
 
 bool Analyser::event(const int & i)
 {
-   bool goodEvent = true;
+   bool ok = true;
    analysis_->event(i);
+   cutflow_ = 0;
    
    if ( config_->runmin_ > 0 && analysis_->run() < config_->runmin_ ) return false;
    if ( config_->runmax_ > 0 && analysis_->run() > config_->runmax_ ) return false;
    
-   if (! config_->isMC() ) goodEvent = analysis_->selectJson();
+   if (! config_->isMC() ) ok = analysis_->selectJson();
+   
+   if ( ok )
+   {
+      analysisWithJets();
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_);
+   ++cutflow_;
       
-   return goodEvent;
+   return ok;
    
 }
 
 void Analyser::histograms(const std::string & obj, const int & n)
 {
-   if ( obj == "cutflow" ) h1_[obj] = new TH1F(obj.c_str(),"", 20,0,20);
-   
    if ( obj == "jet" )
    {
       for ( int j = 0; j < n; ++j )
@@ -245,6 +256,7 @@ bool Analyser::selectionJetDr(const int & j1, const int & j2, const float & delt
 bool Analyser::analysisWithJets()
 {
    jets_.clear();
+   selectedJets_.clear();
    if ( ! jetsanalysis_ ) return false;
    
    analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets_,0.3);
@@ -252,6 +264,8 @@ bool Analyser::analysisWithJets()
 
    auto jets = analysis_->collection<Jet>("Jets");
    for ( int j = 0 ; j < jets->size() ; ++j )  jets_.push_back(&jets->at(j));
+   
+   selectedJets_ = jets_;
    
    return true;
 }
@@ -263,20 +277,65 @@ std::vector<Jet*> Analyser::jets()
 
 bool Analyser::selectionJetId()
 {
-   selectedJets_.clear();
    if ( ! jetsanalysis_ ) return false;
    
-   auto jets = analysis_->collection<Jet>("Jets");
-   for ( int j = 0 ; j < jets->size() ; ++j )
+   auto jet = std::begin(selectedJets_);
+   
+   while ( jet != std::end(selectedJets_) )
    {
-      if ( jets->at(j).id(config_->jetsId()) && jets->at(j).pileupJetIdFullId(config_->jetsPuId()) ) selectedJets_.push_back(&jets->at(j));
+      if ( ! (*jet)->id(config_->jetsId() ) )
+         jet = selectedJets_.erase(jet);
+      else
+         ++jet;
    }
-   if ( (int)selectedJets_.size() < config_->nJetsMin() ) return false;
+   
+   if ( selectedJets_.size() == 0 ) return false;
    
    return true;
 }
 
+bool Analyser::selectionJetPileupId()
+{
+   if ( ! jetsanalysis_ ) return false;
+   
+   auto jet = std::begin(selectedJets_);
+   
+   while ( jet != std::end(selectedJets_) )
+   {
+      if ( ! (*jet)->pileupJetIdFullId(config_->jetsPuId()) )
+         jet = selectedJets_.erase(jet);
+      else
+         ++jet;
+   }
+   
+   if ( selectedJets_.size() == 0 ) return false;
+   
+   return true;
 
+}
+
+bool Analyser::selectionNJets()
+{
+   return ((int)selectedJets_.size() >= config_->nJetsMin());
+   
+}
+
+
+
+
+// bool Analyser::selectionJetId()
+// {
+//    if ( ! jetsanalysis_ ) return false;
+//    
+//    for ( auto jet : selectedJets_ )
+//    {
+//       if ( jet->id(config_->jetsId()) && jet->pileupJetIdFullId(config_->jetsPuId()) ) selectedJets_.push_back(jet);
+//    }
+//    if ( (int)selectedJets_.size() < config_->nJetsMin() ) return false;
+//    
+//    return true;
+// }
+// 
 std::vector<Muon*> Analyser::selectedMuons()
 {
    return selectedMuons_;
@@ -335,53 +394,84 @@ bool Analyser::selectionMuon()
 
 bool Analyser::onlineJetMatching()
 {
-   bool isgood = true;
+   if ( config_->triggerObjectsJetsMatches_ < 0 ) return true;
    
-   if ( config_->triggerObjectsJetsMatches_ < 0 || config_->triggerObjectsJets_.size() == 0 ) return isgood;
-   
-   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJet());
-   if ( !isgood || (int)selectedJets_.size() < config_->triggerObjectsJetsMatches_ ) return false;
-   
-   for ( int j = 0; j < config_->triggerObjectsJetsMatches_; ++j )  // 
+   for ( int j = 0; j < config_->triggerObjectsJetsMatches_; ++j )
    {
-      Jet * jet = selectedJets_[j];
-      for ( size_t io = 0; io < config_->triggerObjectsJets_.size() ; ++io )
-      {       
-         if ( ! jet->matched(config_->triggerObjectsJets_[io]) ) return false;
-      }
+      if ( ! onlineJetMatching(j+1) ) return false; 
    }
    
-   return isgood;
+   return true;
 }
 
 bool Analyser::onlineBJetMatching()
 {
-   bool isgood = true;
+   if ( config_->triggerObjectsBJetsMatches_ < 0 ) return true;
    
-   if ( config_->triggerObjectsBJetsMatches_ < 0 || config_->triggerObjectsBJets_.size() == 0 ) return isgood;
-   
-   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJet());
-   if ( !isgood || (int)selectedJets_.size() < config_->triggerObjectsBJetsMatches_ ) return false;
-   
-   for ( int j = 0; j < config_->triggerObjectsBJetsMatches_; ++j )  // 
+   for ( int j = 0; j < config_->triggerObjectsBJetsMatches_; ++j )
    {
-      Jet * jet = selectedJets_[j];
-      for ( size_t io = 0; io < config_->triggerObjectsBJets_.size() ; ++io )
-      {       
-         if ( ! jet->matched(config_->triggerObjectsBJets_[io]) ) return false;
-      }
+      if ( ! onlineBJetMatching(j+1) ) return false; 
    }
    
-   return isgood;
+   return true;
+}
+
+
+
+bool Analyser::onlineJetMatching(const int & r)
+{
+   if ( config_->triggerObjectsJets_.size() == 0 ) return true; // there is nothing to match, so take everything
+   
+   if ( r > config_->nJetsMin() )
+   {
+      std::cout << "*Warning* Analyser::onlineJetMatching(): asking for matching of unselected jet. Returning false!" << std::endl;
+      return false;  // asking for a match beyond the selection, that's wrong, therefore false
+   }
+   if ( selectedJets_.size() == 0 )
+   {
+      std::cout << "*Warning* Analyser::onlineJetMatching(): selectedJets is empty. You must run selectionJetId() before. Returning false!" << std::endl;
+      return false;  // asking for a match beyond the selection, that's wrong, therefore false
+   }
+   
+   Jet * jet = selectedJets_[r-1];
+   for ( size_t io = 0; io < config_->triggerObjectsJets_.size() ; ++io )
+   {       
+      if ( ! jet->matched(config_->triggerObjectsJets_[io]) ) return false;
+   }
+   
+   return true;
+}
+
+
+bool Analyser::onlineBJetMatching(const int & r)
+{
+   if ( config_->triggerObjectsBJets_.size() == 0 ) return true; // there is nothing to match, so take everything
+   
+   if ( r > config_->nJetsMin() )
+   {
+      std::cout << "*Warning* Analyser::onlineBJetMatching(): asking for matching of unselected jet. Returning false!" << std::endl;
+      return false;  // asking for a match beyond the selection, that's wrong, therefore false
+   }
+   if ( selectedJets_.size() == 0 )
+   {
+      std::cout << "*Warning* Analyser::onlineBJetMatching(): selectedJets is empty. You must run selectionJetId() before. Returning false!" << std::endl;
+      return false;  // asking for a match beyond the selection, that's wrong, therefore false
+   }
+   
+   Jet * jet = selectedJets_[r-1];
+   for ( size_t io = 0; io < config_->triggerObjectsBJets_.size() ; ++io )
+   {       
+      if ( ! jet->matched(config_->triggerObjectsBJets_[io]) ) return false;
+   }
+   
+   return true;
 }
 
 
 
 bool Analyser::selectionTrigger()
 {
-   bool isgood = true;
-   
-   if ( config_->hltPath_ == "" ) return isgood;
+   if ( config_->hltPath_ == "" ) return true;
    
    if ( ! analysis_->triggerResult(config_->hltPath_) ) return false;
    
@@ -390,7 +480,7 @@ bool Analyser::selectionTrigger()
       if ( ! analysis_->triggerResult(config_->l1Seed_) ) return false;
    }
 
-   return isgood;
+   return true;
 }
 
 void Analyser::fillJetHistograms()
