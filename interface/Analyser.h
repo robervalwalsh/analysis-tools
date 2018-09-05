@@ -62,7 +62,13 @@ namespace analysis {
             std::shared_ptr<Analysis> analysis_;
             std::shared_ptr<Config> config_;
             
+            std::vector<Jet*> jets_;
             std::vector<Jet*> selectedJets_;
+            std::vector<Muon*> selectedMuons_;
+            
+            bool jetsanalysis_;
+            bool muonsanalysis_;
+            
             TH1s h1_;
             TH2s h2_;
          
@@ -75,6 +81,8 @@ namespace analysis {
             std::shared_ptr<Analysis> analysis();
             std::shared_ptr<Config>   config();
             std::vector<Jet*> selectedJets();
+            std::vector<Jet*> jets();
+            std::vector<Muon*> selectedMuons();
             
             float btag(const Jet & , const std::string & );
          
@@ -107,6 +115,8 @@ namespace analysis {
             virtual bool onlineBJetMatching();
             virtual void histograms(const std::string &, const int & n = 1);
             virtual void fillJetHistograms();
+            virtual void fillMuonHistograms();
+            int nEvents();
                
 
       };

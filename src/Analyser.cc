@@ -51,34 +51,24 @@ Analyser::Analyser()
 Analyser::Analyser(int argc, char * argv[])
 {
    config_   = std::make_shared<Config>(argc,argv);
-   
    analysis_ = std::make_shared<Analysis>(config_->ntuplesList());
-   
+
+   // Physics objects
    // Jets
-   if ( config_->jetsCollection() != "" )       analysis_->addTree<Jet> ("Jets",config_->jetsCollection());
-   // Trigger path info
-   if ( config_->triggerCol_ != "" )    analysis_->triggerResults(config_->triggerCol_);
+   jetsanalysis_  = ( analysis_->addTree<Jet> ("Jets",config_->jetsCollection()) != nullptr );
+   
+   // Muons
+   muonsanalysis_ = ( analysis_->addTree<Muon>("Muons",config_->muonsCollection()) != nullptr );
+   
+   // Trigger
+   // Trigger Results
+   analysis_->triggerResults(config_->triggerResults());
    // Trigger objects
-   if ( config_->triggerObjects_.size() > 0 && config_->triggerObjDir_ != "" )
+   if ( config_->triggerObjDir_ != "" )
    {
-      for ( auto & obj : config_->triggerObjects_ )
-      {
-         analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
-      }
-   }
-   if ( config_->triggerObjectsJets_.size() > 0 && config_->triggerObjDir_ != "" )
-   {
-      for ( auto & obj : config_->triggerObjectsJets_ )
-      {
-         analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
-      }
-   }
-   if ( config_->triggerObjectsBJets_.size() > 0 && config_->triggerObjDir_ != "" )
-   {
-      for ( auto & obj : config_->triggerObjectsBJets_ )
-      {
-         analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
-      }
+      for ( auto & obj : config_->triggerObjects_ )      analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
+      for ( auto & obj : config_->triggerObjectsJets_ )  analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
+      for ( auto & obj : config_->triggerObjectsBJets_ ) analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
    }
    // JSON for data   
    if( !config_->isMC() && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
@@ -129,35 +119,44 @@ bool Analyser::event(const int & i)
    bool goodEvent = true;
    analysis_->event(i);
    
-   if (! config_->isMC() ) goodEvent = analysis_->selectJson();
-      
    if ( config_->runmin_ > 0 && analysis_->run() < config_->runmin_ ) return false;
    if ( config_->runmax_ > 0 && analysis_->run() > config_->runmax_ ) return false;
    
+   if (! config_->isMC() ) goodEvent = analysis_->selectJson();
+      
    return goodEvent;
    
 }
 
 void Analyser::histograms(const std::string & obj, const int & n)
 {
+   if ( obj == "cutflow" ) h1_[obj] = new TH1F(obj.c_str(),"", 20,0,20);
+   
    if ( obj == "jet" )
    {
       for ( int j = 0; j < n; ++j )
       {
-         h1_[Form("pt_jet%d",j+1)]       = new TH1F(Form("pt_jet%d",j+1)     , "" ,100 , 0   , 1000  );
-         h1_[Form("eta_jet%d",j+1)]      = new TH1F(Form("eta_jet%d",j+1)    , "" , 60 , -3, 3 );
-         h1_[Form("btag_jet%d",j+1)]     = new TH1F(Form("btag_jet%d",j+1)   , "" , 100 , 0, 1 );
+         h1_[Form("pt_%s%d"  , obj.c_str(),j+1)]    = new TH1F(Form("pt_%s%d"  , obj.c_str(),j+1)   , "" ,100 , 0   , 1000  );
+         h1_[Form("eta_%s%d" , obj.c_str(),j+1)]    = new TH1F(Form("eta_%s%d" , obj.c_str(),j+1)   , "" , 60 , -3, 3 );
+         h1_[Form("btag_%s%d", obj.c_str(),j+1)]    = new TH1F(Form("btag_%s%d", obj.c_str(),j+1)   , "" , 100 , 0, 1 );
          for ( int k = j+1; k < n && j < n; ++k )
          {
-            h1_[Form("dr_jet%d%d",j+1,k+1)]     = new TH1F(Form("dr_jet%d%d",j+1,k+1)     , "" , 50 , 0, 5 );
-            h1_[Form("deta_jet%d%d",j+1,k+1)]   = new TH1F(Form("deta_jet%d%d",j+1,k+1)   , "" ,100 , 0,10 );
-            h1_[Form("m_jet%d%d",j+1,k+1)]      = new TH1F(Form("m_jet%d%d",j+1,k+1)      , "" ,300 , 0,3000 );
+            h1_[Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)]     = new TH1F(Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)   , "" , 50 , 0, 5 );
+            h1_[Form("deta_%s%d%d", obj.c_str(),j+1,k+1)]     = new TH1F(Form("deta_%s%d%d", obj.c_str(),j+1,k+1)   , "" ,100 , 0,10 );
+            h1_[Form("m_%s%d%d"   , obj.c_str(),j+1,k+1)]     = new TH1F(Form("m_%s%d%d   ", obj.c_str(),j+1,k+1)   , "" ,300 , 0,3000 );
          }
       }
       
    }
-   
-   h1_["cutflow"] = new TH1F("cutflow","", 20,0,20);
+   if ( obj == "muon" )
+   {
+      for ( int j = 0; j < n; ++j )
+      {
+         h1_[Form("pt_%s%d"  , obj.c_str(),j+1)]    = new TH1F(Form("pt_%s%d"  , obj.c_str(),j+1)   , "" ,100 , 0   , 1000  );
+         h1_[Form("eta_%s%d" , obj.c_str(),j+1)]    = new TH1F(Form("eta_%s%d" , obj.c_str(),j+1)   , "" , 60 , -3, 3 );
+      }
+      
+   }
    
 }
 
@@ -243,40 +242,46 @@ bool Analyser::selectionJetDr(const int & j1, const int & j2, const float & delt
 
 
 
-bool Analyser::selectionJetId()
-{
-   bool isgood = true;
-   
-   if ( config_->jetsCollection() != "" )
-   {
-      auto slimmedJets = analysis_->collection<Jet>("Jets");
-      selectedJets_.clear();
-      for ( int j = 0 ; j < slimmedJets->size() ; ++j )
-      {
-         if ( slimmedJets->at(j).id(config_->jetsId()) && slimmedJets->at(j).pileupJetIdFullId(config_->jetsPuId()) ) selectedJets_.push_back(&slimmedJets->at(j));
-      }
-      if ( (int)selectedJets_.size() < config_->nJetsMin() ) return false;
-   }
-   
-   return isgood;
-}
-
 bool Analyser::analysisWithJets()
 {
-   bool isgood = true;
+   jets_.clear();
+   if ( ! jetsanalysis_ ) return false;
    
-   if ( config_->jetsCollection() == "" ) return false;
-   if ( config_->triggerObjectsJets_.size() > 0 )
-   {
-      analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets_,0.3);
-   }
-   if ( config_->triggerObjectsBJets_.size() > 0 )
-   {
-      analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsBJets_,0.3);
-   }
+   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets_,0.3);
+   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsBJets_,0.3);
+
+   auto jets = analysis_->collection<Jet>("Jets");
+   for ( int j = 0 ; j < jets->size() ; ++j )  jets_.push_back(&jets->at(j));
    
-   return isgood;
+   return true;
 }
+
+std::vector<Jet*> Analyser::jets()
+{
+   return jets_;
+}
+
+bool Analyser::selectionJetId()
+{
+   selectedJets_.clear();
+   if ( ! jetsanalysis_ ) return false;
+   
+   auto jets = analysis_->collection<Jet>("Jets");
+   for ( int j = 0 ; j < jets->size() ; ++j )
+   {
+      if ( jets->at(j).id(config_->jetsId()) && jets->at(j).pileupJetIdFullId(config_->jetsPuId()) ) selectedJets_.push_back(&jets->at(j));
+   }
+   if ( (int)selectedJets_.size() < config_->nJetsMin() ) return false;
+   
+   return true;
+}
+
+
+std::vector<Muon*> Analyser::selectedMuons()
+{
+   return selectedMuons_;
+}
+
 
 bool Analyser::selectionBJet()
 {
@@ -321,7 +326,7 @@ bool Analyser::selectionMuon()
 {
    bool isgood = true;
    
-   if ( config_->muonsCol_ != "" )
+   if ( config_->muonsCollection() != "" )
    {
    }
    
@@ -414,6 +419,19 @@ void Analyser::fillJetHistograms()
    
 }
 
+void Analyser::fillMuonHistograms()
+{
+   int n = config_->nMuonsMin();
+   
+   for ( int j = 0; j < n; ++j )
+   {
+      h1_[Form("pt_muon%d",j+1)] -> Fill(selectedMuons_[j]->pt());
+      h1_[Form("eta_muon%d",j+1)] -> Fill(selectedMuons_[j]->eta());
+   }
+   
+}
+
+
 TH1s Analyser::H1Fs() { return h1_; }
 
 TH1F * Analyser::H1F(const std::string & hname)
@@ -425,4 +443,12 @@ TH1F * Analyser::H1F(const std::string & hname)
    }
    
    return h1_[hname];
+}
+
+
+int Analyser::nEvents()
+{
+   int maxevt = config_->nEventsMax();
+   if ( maxevt < 0 ) maxevt = analysis_->size();
+   return maxevt;
 }
