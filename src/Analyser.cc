@@ -81,7 +81,7 @@ Analyser::Analyser(int argc, char * argv[])
       hout_= std::shared_ptr<TFile>(new TFile(config_->outputRoot_.c_str(),"recreate"));
    }
    
-   h1_["cutflow"] = new TH1F(obj.c_str(),"", 30,0,30);
+   h1_["cutflow"] = new TH1F("cutflow","", 30,0,30);
 }
 
 Analyser::~Analyser()
@@ -471,8 +471,7 @@ bool Analyser::onlineBJetMatching(const int & r)
 
 bool Analyser::selectionTrigger()
 {
-   if ( config_->hltPath_ == "" ) return true;
-   
+   if ( config_->hltPath_ == "" ) return true;  // no impact in the cut flow
    if ( ! analysis_->triggerResult(config_->hltPath_) ) return false;
    
    if ( config_->l1Seed_ != "" )
