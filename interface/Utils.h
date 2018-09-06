@@ -65,7 +65,7 @@ namespace analysis {
          float loose;
          float medium;
          float tight;
-      }
+      };
       
    }
 }
