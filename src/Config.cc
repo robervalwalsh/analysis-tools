@@ -137,10 +137,11 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("ptMin", po::value<std::vector<float> >(&ptmin_)->multitoken(),"Mimium pt of an object")
          ("ptMax", po::value<std::vector<float> >(&ptmax_)->multitoken(),"Maximum pt of an object")
          ("etaMax", po::value<std::vector<float> >(&etamax_)->multitoken(),"Maximum |eta| of an object")
-         ("dRMin",po::value <float> (&drmin_)->default_value(0.),"Minimum delta R between candidates")
-         ("dRMax",po::value <float> (&drmax_)->default_value(0.),"Maximum delta R between candidates")
-         ("dEtaMax",po::value <float> (&detamax_)->default_value(10.),"Maximum delta eta between candidates")
-         ("dPhiMin",po::value <float> (&dphimin_)->default_value(0.),"Minimum delta phi between candidates")
+         ("dRMin",po::value <float> (&drmin_)->default_value(-1.),"Minimum delta R between candidates")
+         ("dRMax",po::value <float> (&drmax_)->default_value(-1.),"Maximum delta R between candidates")
+         ("dEtaMax",po::value <float> (&detamax_)->default_value(-1.),"Maximum delta eta between candidates")
+         ("dEtaMin",po::value <float> (&detamin_)->default_value(-1.),"Minimum delta eta between candidates")
+         ("dPhiMin",po::value <float> (&dphimin_)->default_value(-1.),"Minimum delta phi between candidates")
          ("ptImbalanceMax",po::value <float> (&ptimbalmax_)->default_value(1000.),"Maximum relative imbalance between two candidates");
       
       po::variables_map vm; 
