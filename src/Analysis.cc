@@ -172,7 +172,7 @@ void Analysis::treeInit_(const std::string & unique_name, const std::string & pa
 // =============== Method for Trigger Results=================
 // ===========================================================
 
-void Analysis::triggerResults(const std::string & path)
+bool Analysis::triggerResults(const std::string & path)
 {
    t_triggerResults_  = new TChain(path.c_str());
    int ok = t_triggerResults_ -> AddFileInfoList(fileList_);
@@ -180,7 +180,7 @@ void Analysis::triggerResults(const std::string & path)
    if ( ok == 0 )
    {
       std::cout << "tree does not exist" << std::endl;
-      return;
+      return false;
    }
    TObjArray * triggerBranches = t_triggerResults_ -> GetListOfBranches();
    for ( int i = 0 ; i < triggerBranches->GetEntries() ; ++i )
@@ -197,6 +197,7 @@ void Analysis::triggerResults(const std::string & path)
          t_triggerResults_ -> SetBranchAddress(branch.c_str(), &triggerResults_[branch]);
       }
    }
+   return true;
 }
 
 bool Analysis::triggerResult(const std::string & trig)
