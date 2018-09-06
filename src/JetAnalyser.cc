@@ -59,6 +59,24 @@ JetAnalyser::~JetAnalyser()
 //
 // ------------ method called for each event  ------------
 
+bool JetAnalyser::analysisWithJets()
+{
+   jets_.clear();
+   selectedJets_.clear();
+   if ( ! jetsanalysis_ ) return false;
+   
+   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets_,0.3);
+   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsBJets_,0.3);
+
+   auto jets = analysis_->collection<Jet>("Jets");
+   for ( int j = 0 ; j < jets->size() ; ++j )  jets_.push_back(std::make_shared<Jet>(jets->at(j)));
+   
+   selectedJets_ = jets_;
+   
+   return true;
+}
+
+
 void JetAnalyser::jets(const std::string & col)
 {
    analysis_->addTree<Jet> ("Jets",col);
@@ -70,14 +88,14 @@ void JetAnalyser::histograms(const std::string & obj, const int & n)
    {
       for ( int j = 0; j < n; ++j )
       {
-         h1_[Form("pt_%s%d"  , obj.c_str(),j+1)]    = make_shared<TH1F>(Form("pt_%s%d"  , obj.c_str(),j+1)   , "" ,100 , 0   , 1000  );
-         h1_[Form("eta_%s%d" , obj.c_str(),j+1)]    = make_shared<TH1F>(Form("eta_%s%d" , obj.c_str(),j+1)   , "" , 60 , -3, 3 );
-         h1_[Form("btag_%s%d", obj.c_str(),j+1)]    = make_shared<TH1F>(Form("btag_%s%d", obj.c_str(),j+1)   , "" , 100 , 0, 1 );
+         h1_[Form("pt_%s%d"  , obj.c_str(),j+1)]    = std::make_shared<TH1F>(Form("pt_%s%d"  , obj.c_str(),j+1)   , "" ,100 , 0   , 1000  );
+         h1_[Form("eta_%s%d" , obj.c_str(),j+1)]    = std::make_shared<TH1F>(Form("eta_%s%d" , obj.c_str(),j+1)   , "" , 60 , -3, 3 );
+         h1_[Form("btag_%s%d", obj.c_str(),j+1)]    = std::make_shared<TH1F>(Form("btag_%s%d", obj.c_str(),j+1)   , "" , 100 , 0, 1 );
          for ( int k = j+1; k < n && j < n; ++k )
          {
-            h1_[Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)]     = make_shared<TH1F>(Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)   , "" , 50 , 0, 5 );
-            h1_[Form("deta_%s%d%d", obj.c_str(),j+1,k+1)]     = make_shared<TH1F>(Form("deta_%s%d%d", obj.c_str(),j+1,k+1)   , "" ,100 , 0,10 );
-            h1_[Form("m_%s%d%d"   , obj.c_str(),j+1,k+1)]     = make_shared<TH1F>(Form("m_%s%d%d   ", obj.c_str(),j+1,k+1)   , "" ,300 , 0,3000 );
+            h1_[Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)]     = std::make_shared<TH1F>(Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)   , "" , 50 , 0, 5 );
+            h1_[Form("deta_%s%d%d", obj.c_str(),j+1,k+1)]     = std::make_shared<TH1F>(Form("deta_%s%d%d", obj.c_str(),j+1,k+1)   , "" ,100 , 0,10 );
+            h1_[Form("m_%s%d%d"   , obj.c_str(),j+1,k+1)]     = std::make_shared<TH1F>(Form("m_%s%d%d   ", obj.c_str(),j+1,k+1)   , "" ,300 , 0,3000 );
          }
       }
       
@@ -246,27 +264,17 @@ bool JetAnalyser::selectionJetDr(const int & j1, const int & j2)
    return ok;
 }
 
-bool JetAnalyser::analysisWithJets()
-{
-   jets_.clear();
-   selectedJets_.clear();
-   if ( ! jetsanalysis_ ) return false;
-   
-   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets_,0.3);
-   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsBJets_,0.3);
 
-   auto jets = analysis_->collection<Jet>("Jets");
-   for ( int j = 0 ; j < jets->size() ; ++j )  jets_.push_back(&jets->at(j));
-   
-   selectedJets_ = jets_;
-   
-   return true;
-}
-
-std::vector<Jet*> JetAnalyser::jets()
+std::vector< std::shared_ptr<Jet> > JetAnalyser::jets()
 {
    return jets_;
 }
+
+std::vector< std::shared_ptr<Jet> > JetAnalyser::selectedJets()
+{
+   return selectedJets_;
+}
+
 
 bool JetAnalyser::selectionJetId()
 {
@@ -439,7 +447,7 @@ bool JetAnalyser::onlineJetMatching(const int & r)
       return false;  // asking for a match beyond the selection, that's wrong, therefore false
    }
    
-   Jet * jet = selectedJets_[j];
+   std::shared_ptr<Jet> jet = selectedJets_[j];
    for ( size_t io = 0; io < config_->triggerObjectsJets_.size() ; ++io )
    {       
       if ( ! jet->matched(config_->triggerObjectsJets_[io]) ) return false;
@@ -472,7 +480,7 @@ bool JetAnalyser::onlineBJetMatching(const int & r)
       return false;  // asking for a match beyond the selection, that's wrong, therefore false
    }
    
-   Jet * jet = selectedJets_[j];
+   std::shared_ptr<Jet> jet = selectedJets_[j];
    for ( size_t io = 0; io < config_->triggerObjectsBJets_.size() ; ++io )
    {       
       if ( ! jet->matched(config_->triggerObjectsBJets_[io]) ) return false;
