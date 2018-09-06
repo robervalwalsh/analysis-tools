@@ -60,6 +60,12 @@ namespace analysis {
          JME::JetResolutionScaleFactor scalefactor;
       };      
 
+      struct ScaleFactor
+      {
+         float loose;
+         float medium;
+         float tight;
+      }
       
    }
 }
