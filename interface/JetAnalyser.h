@@ -48,9 +48,7 @@ namespace analysis {
             
             bool jetsanalysis_;
             
-            std::shared_ptr<BTagCalibrationReader> bsf_reader_lwp_;
-            std::shared_ptr<BTagCalibrationReader> bsf_reader_mwp_;
-            std::shared_ptr<BTagCalibrationReader> bsf_reader_twp_;
+            std::map<std::string, std::shared_ptr<BTagCalibrationReader> >bsf_reader_;
          
          private:
                
@@ -73,6 +71,7 @@ namespace analysis {
             virtual bool selectionJetPileupId();
             virtual bool selectionNJets();
             virtual bool selectionBJet(const int &);
+            virtual ScaleFactors btagSF(const int &, const std::string &);
             virtual bool selectionNonBJet(const int &);
             virtual bool onlineJetMatching(const int &);
             virtual bool onlineBJetMatching(const int &);

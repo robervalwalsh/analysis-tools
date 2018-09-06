@@ -42,9 +42,9 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
    
    if ( config_->btagsf_ != "" )
    {
-      bsf_reader_lwp_ = analysis_->btagCalibration(config_->btagalgo_, config_->btagsf_, "loose"); 
-      bsf_reader_mwp_ = analysis_->btagCalibration(config_->btagalgo_, config_->btagsf_, "medium");
-      bsf_reader_twp_ = analysis_->btagCalibration(config_->btagalgo_, config_->btagsf_, "tight");
+      bsf_reader_["loose"]  = analysis_->btagCalibration(config_->btagalgo_, config_->btagsf_, "loose"); 
+      bsf_reader_["medium"] = analysis_->btagCalibration(config_->btagalgo_, config_->btagsf_, "medium");
+      bsf_reader_["tight"]  = analysis_->btagCalibration(config_->btagalgo_, config_->btagsf_, "tight");
    }
    
    if ( config_->triggerObjDir_ != "" )
@@ -480,3 +480,13 @@ void JetAnalyser::fillJetHistograms()
    
 }
 
+ScaleFactors JetAnalyser::btagSF(const int & r, const std::string & wp)
+{
+   ScaleFactors sf;
+   int j = r-1;
+   sf.nominal = selectedJets_[j]->btagSF(bsf_reader_[wp]);
+   sf.up      = selectedJets_[j]->btagSFup(bsf_reader_[wp]);
+   sf.down    = selectedJets_[j]->btagSFdown(bsf_reader_[wp]);
+   
+   return sf;
+}
