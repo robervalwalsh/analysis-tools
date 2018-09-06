@@ -230,7 +230,7 @@ bool Analyser::selectionJet(const int & r)
    if ( fabs(selectedJets_[j] -> eta()) > config_->jetsEtaMax()[j]   && !(config_->jetsEtaMax()[j] < 0) )  return false;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Analyser::selectionJet%d",r));
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f and |eta| < %3.1f",r,config_->jetsPtMin()[j], config_->jetsEtaMax()[j] ));
    
    h1_["cutflow"] -> Fill(cutflow_);
    
@@ -256,14 +256,44 @@ bool Analyser::selectionJetDeta(const int & j1, const int & j2, const float & de
       if ( fabs(selectedJets_[j1-1]->eta() - selectedJets_[j2-1]->eta()) < fabs(delta) ) return false;
    }
 
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Analyser::selectionJetDeta%d%d",j1,j2));
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      if ( delta > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Deta(jet %d, jet %d) < %4.2f",j1,j2,fabs(delta)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Deta(jet %d, jet %d) > %4.2f",j1,j2,fabs(delta)));
+   }
+   
         
    h1_["cutflow"] -> Fill(cutflow_);
     
    return true;
    
 }
+bool Analyser::selectionJetDeta(const int & j1, const int & j2)
+{
+   bool ok = true;
+   if (config_->detamax_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetDeta(j1,j2,config_->detamax_);
+   }
+   
+   if (config_->detamin_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetDeta(j1,j2,-1*config_->detamin_);
+   }
+   return ok;
+   
+}
+
 
 bool Analyser::selectionJetDr(const int & j1, const int & j2, const float & delta)
 {
@@ -285,8 +315,13 @@ bool Analyser::selectionJetDr(const int & j1, const int & j2, const float & delt
    }
 
       
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Analyser::selectionJetDr%d%d",j1,j2));
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      if ( delta > 0 ) 
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DR(jet %d, jet %d) < %4.2f",j1,j2,fabs(delta)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DR(jet %d, jet %d) > %4.2f",j1,j2,fabs(delta)));
+   }
         
    h1_["cutflow"] -> Fill(cutflow_);
     
@@ -294,7 +329,28 @@ bool Analyser::selectionJetDr(const int & j1, const int & j2, const float & delt
    
 }
 
-
+bool Analyser::selectionJetDr(const int & j1, const int & j2)
+{
+   bool ok = true;
+   if (config_->drmax_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetDr(j1,j2,config_->drmax_);
+   }
+   
+   if (config_->drmin_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetDr(j1,j2,-1*config_->drmin_);
+   }
+   return ok;
+}
 
 bool Analyser::analysisWithJets()
 {
@@ -335,7 +391,7 @@ bool Analyser::selectionJetId()
    if ( selectedJets_.size() == 0 ) return false;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"Analyser::selectionJetId");
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JetId: %s",config_->jetsId().c_str()));
    
    h1_["cutflow"] -> Fill(cutflow_);
    
@@ -361,7 +417,7 @@ bool Analyser::selectionJetPileupId()
    if ( selectedJets_.size() == 0 ) return false;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"Analyser::selectionJetPileupId");
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JetPileupId: %s",config_->jetsPuId().c_str()));
    
    h1_["cutflow"] -> Fill(cutflow_);
    
@@ -376,7 +432,7 @@ bool Analyser::selectionNJets()
    if  ((int)selectedJets_.size() < config_->nJetsMin()) return false;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"Analyser::selectionNJets");
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("NJets >= %d",config_->nJetsMin()));
    
    h1_["cutflow"] -> Fill(cutflow_);
    
@@ -434,7 +490,7 @@ bool Analyser::selectionBJet(const int & r )
    if ( btag(*selectedJets_[j],config_->btagalgo_) < config_->jetsbtagmin_[j] ) return false;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Analyser::selectionBJet%d",r));
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: btag > %6.4f",r,config_->jetsbtagmin_[j]));
    
    h1_["cutflow"] -> Fill(cutflow_);
    
@@ -458,7 +514,7 @@ bool Analyser::selectionNonBJet(const int & r )
    if ( btag(*selectedJets_[j],config_->btagalgo_) > config_->nonbtagwp_ ) return false;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Analyser::selectionNonBJet%d",r));
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: btag < %6.4f",r,config_->nonbtagwp_));
    
    h1_["cutflow"] -> Fill(cutflow_);
    
@@ -527,7 +583,7 @@ bool Analyser::onlineJetMatching(const int & r)
    }
 
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Analyser::onlineJetMatching%d",r));
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JetTriggerMatch_%d",r));
       
    h1_["cutflow"] -> Fill(cutflow_);
    
@@ -560,7 +616,7 @@ bool Analyser::onlineBJetMatching(const int & r)
    }
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Analyser::onlineBJetMatching%d",r));
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("BTagTriggerMatch_%d",r));
    
    
    h1_["cutflow"] -> Fill(cutflow_);
@@ -577,7 +633,7 @@ bool Analyser::selectionTrigger()
    if ( ! analysis_->triggerResult(config_->l1Seed_)  ) return false;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"Analyser::selectionTrigger");
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"Trigger");
    
    h1_["cutflow"] -> Fill(cutflow_);
 
