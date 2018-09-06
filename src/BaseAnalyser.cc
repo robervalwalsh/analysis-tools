@@ -39,10 +39,10 @@ BaseAnalyser::BaseAnalyser()
 
 BaseAnalyser::BaseAnalyser(int argc, char * argv[])
 {
-   exe_ = std::string(argv[0]);
+   exe_ = string(argv[0]);
    
-   config_   = std::make_shared<Config>(argc,argv);
-   analysis_ = std::make_shared<Analysis>(config_->ntuplesList());
+   config_   = make_shared<Config>(argc,argv);
+   analysis_ = make_shared<Analysis>(config_->ntuplesList());
    
    // JSON for data   
    if( !config_->isMC() && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
@@ -50,13 +50,13 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    // output file
    if ( config_->outputRoot_ != "" )
    {
-      hout_= std::shared_ptr<TFile>(new TFile(config_->outputRoot_.c_str(),"recreate"));
+      hout_= make_shared<TFile>(config_->outputRoot_.c_str(),"recreate");
    }
    
-   h1_["cutflow"] = new TH1F("cutflow","", 50,0,50);
+   h1_["cutflow"] = make_shared<TH1F>("cutflow","", 50,0,50);
    if ( config_->isMC() )
    {
-      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" ) 
+      if ( string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" ) 
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"Generated events");
    }
    
@@ -90,14 +90,14 @@ BaseAnalyser::~BaseAnalyser()
 // ------------ method called for each event  ------------
 
 bool BaseAnalyser::event(const int & i) { return true; }
-void BaseAnalyser::histograms(const std::string & s, const int & i) { }
+void BaseAnalyser::histograms(const string & s, const int & i) { }
 
-std::shared_ptr<Analysis> BaseAnalyser::analysis()
+shared_ptr<Analysis> BaseAnalyser::analysis()
 {
    return analysis_;
 }
 
-std::shared_ptr<Config> BaseAnalyser::config()
+shared_ptr<Config> BaseAnalyser::config()
 {
    return config_;
 }
@@ -109,18 +109,18 @@ int BaseAnalyser::nEvents()
    return maxevt;
 }
 
-TH1F * BaseAnalyser::histogram(const std::string & hname)
+shared_ptr<TH1F> BaseAnalyser::histogram(const string & hname)
 {
    if ( h1_.find(hname) == h1_.end() ) 
    {
-      std::cout << "-e- BaseAnalyser::H1F(const std::string & hname) -> no histogram with hname = " << hname << std::endl;
+      std::cout << "-e- BaseAnalyser::H1F(const string & hname) -> no histogram with hname = " << hname << std::endl;
       return nullptr;
    }
    
    return h1_[hname];
 }
 
-TH1s BaseAnalyser::histograms()
+map<string, shared_ptr<TH1F> > BaseAnalyser::histograms()
 {
    return h1_;
 }
@@ -128,13 +128,13 @@ TH1s BaseAnalyser::histograms()
 
 void BaseAnalyser::cutflow()
 {
-   printf("+%s+\n", std::string(150,'-').c_str());
+   printf("+%s+\n", string(150,'-').c_str());
    printf("| %-88s |    %10s |   %16s |   %16s |\n","cut","n events","ratio wrt first","ratio wrt previous");
-   printf("+%s+\n", std::string(150,'-').c_str());
+   printf("+%s+\n", string(150,'-').c_str());
    int firstbin = -1;
    for ( int i = 1; i <= h1_["cutflow"] ->GetNbinsX(); ++i )
    {
-      std::string label = std::string(h1_["cutflow"]->GetXaxis()->GetBinLabel(i));
+      string label = string(h1_["cutflow"]->GetXaxis()->GetBinLabel(i));
       if ( label == "" ) continue;
       if ( firstbin < 0 ) firstbin = i;
       float n = h1_["cutflow"]->GetBinContent(i);
@@ -151,6 +151,6 @@ void BaseAnalyser::cutflow()
       }
       
    }
-   printf("+%s+\n", std::string(150,'-').c_str());
+   printf("+%s+\n", string(150,'-').c_str());
    
 }

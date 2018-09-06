@@ -70,14 +70,14 @@ void JetAnalyser::histograms(const std::string & obj, const int & n)
    {
       for ( int j = 0; j < n; ++j )
       {
-         h1_[Form("pt_%s%d"  , obj.c_str(),j+1)]    = new TH1F(Form("pt_%s%d"  , obj.c_str(),j+1)   , "" ,100 , 0   , 1000  );
-         h1_[Form("eta_%s%d" , obj.c_str(),j+1)]    = new TH1F(Form("eta_%s%d" , obj.c_str(),j+1)   , "" , 60 , -3, 3 );
-         h1_[Form("btag_%s%d", obj.c_str(),j+1)]    = new TH1F(Form("btag_%s%d", obj.c_str(),j+1)   , "" , 100 , 0, 1 );
+         h1_[Form("pt_%s%d"  , obj.c_str(),j+1)]    = make_shared<TH1F>(Form("pt_%s%d"  , obj.c_str(),j+1)   , "" ,100 , 0   , 1000  );
+         h1_[Form("eta_%s%d" , obj.c_str(),j+1)]    = make_shared<TH1F>(Form("eta_%s%d" , obj.c_str(),j+1)   , "" , 60 , -3, 3 );
+         h1_[Form("btag_%s%d", obj.c_str(),j+1)]    = make_shared<TH1F>(Form("btag_%s%d", obj.c_str(),j+1)   , "" , 100 , 0, 1 );
          for ( int k = j+1; k < n && j < n; ++k )
          {
-            h1_[Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)]     = new TH1F(Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)   , "" , 50 , 0, 5 );
-            h1_[Form("deta_%s%d%d", obj.c_str(),j+1,k+1)]     = new TH1F(Form("deta_%s%d%d", obj.c_str(),j+1,k+1)   , "" ,100 , 0,10 );
-            h1_[Form("m_%s%d%d"   , obj.c_str(),j+1,k+1)]     = new TH1F(Form("m_%s%d%d   ", obj.c_str(),j+1,k+1)   , "" ,300 , 0,3000 );
+            h1_[Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)]     = make_shared<TH1F>(Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)   , "" , 50 , 0, 5 );
+            h1_[Form("deta_%s%d%d", obj.c_str(),j+1,k+1)]     = make_shared<TH1F>(Form("deta_%s%d%d", obj.c_str(),j+1,k+1)   , "" ,100 , 0,10 );
+            h1_[Form("m_%s%d%d"   , obj.c_str(),j+1,k+1)]     = make_shared<TH1F>(Form("m_%s%d%d   ", obj.c_str(),j+1,k+1)   , "" ,300 , 0,3000 );
          }
       }
       
