@@ -6,16 +6,16 @@
 // Package:    Analysis/Tools
 // Class:      Analysis
 // 
-/**\class Analysis BaseAnalyser.cc Analysis/Tools/src/BaseAnalyser.cc
+/**\class BaseAnalyser BaseAnalyser.cc Analysis/Tools/src/BaseAnalyser.cc
 
- Description: [one line class summary]
+ Description: A base class for analyser
 
  Implementation:
      [Notes on implementation]
 */
 //
-// Original Author:  Roberval Walsh Bastos Rangel
-//         Created:  Mon, 20 Oct 2014 14:24:08 GMT
+// Original Author:  Roberval Walsh
+//         Created:  6 Sep 2018
 //
 //
 
