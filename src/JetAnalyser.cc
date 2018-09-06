@@ -114,19 +114,6 @@ float JetAnalyser::btag(const Jet & jet, const std::string & algo)
    return btag;
 }
 
-bool JetAnalyser::selectionJet()
-{
-   bool isgood = true;
-   
-   // jet kinematics
-   std::map<std::string,bool> isOk;
-   for ( int j = 0; j < config_->nJetsMin() ; ++j )
-   {
-      if ( ! selectionJet(j+1) ) return false;
-   }
-   return isgood;
-}
-
 bool JetAnalyser::selectionJet(const int & r)
 {
    ++cutflow_;
@@ -343,17 +330,6 @@ bool JetAnalyser::selectionNJets()
 }
 
 
-bool JetAnalyser::selectionBJet()
-{
-   bool isgood = true;
-   // jet btag
-   for ( int j = 0; j < config_->nbjetsmin_ ; ++j )
-   {
-      if ( ! selectionBJet(j+1) ) return false;
-   }
-   return isgood;
-}
-
 bool JetAnalyser::selectionBJet(const int & r )
 {
    int j = r-1;
@@ -401,32 +377,6 @@ bool JetAnalyser::selectionNonBJet(const int & r )
    
    return true;
 }
-
-
-bool JetAnalyser::onlineJetMatching()
-{
-   if ( config_->triggerObjectsJetsMatches_ < 0 ) return true;
-   
-   for ( int j = 0; j < config_->triggerObjectsJetsMatches_; ++j )
-   {
-      if ( ! onlineJetMatching(j+1) ) return false; 
-   }
-   
-   return true;
-}
-
-bool JetAnalyser::onlineBJetMatching()
-{
-   if ( config_->triggerObjectsBJetsMatches_ < 0 ) return true;
-   
-   for ( int j = 0; j < config_->triggerObjectsBJetsMatches_; ++j )
-   {
-      if ( ! onlineBJetMatching(j+1) ) return false; 
-   }
-   
-   return true;
-}
-
 
 
 bool JetAnalyser::onlineJetMatching(const int & r)

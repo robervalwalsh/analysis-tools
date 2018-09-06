@@ -43,16 +43,16 @@ namespace analysis {
            
             // ----------member data ---------------------------
          protected:
-            std::vector<Jet*> jets_;
-            std::vector<Jet*> selectedJets_;
+            std::vector< std::shared_ptr<Jet> > jets_;
+            std::vector< std::shared_ptr<Jet> > selectedJets_;
             
             bool jetsanalysis_;
          
          private:
                
          public:
-            std::vector<Jet*> selectedJets();
-            std::vector<Jet*> jets();
+            std::vector< std::shared_ptr<Jet> > selectedJets();
+            std::vector< std::shared_ptr<Jet> > jets();
             float btag(const Jet & , const std::string & );
          
             // Sets
@@ -60,7 +60,6 @@ namespace analysis {
             
             // Actions
             virtual bool analysisWithJets();
-            virtual bool selectionJet();
             virtual bool selectionJet(const int &);
             virtual bool selectionJetDeta(const int &, const int &, const float &);
             virtual bool selectionJetDeta(const int &, const int &);
@@ -69,12 +68,9 @@ namespace analysis {
             virtual bool selectionJetId();
             virtual bool selectionJetPileupId();
             virtual bool selectionNJets();
-            virtual bool selectionBJet();
             virtual bool selectionBJet(const int &);
             virtual bool selectionNonBJet(const int &);
-            virtual bool onlineJetMatching();
             virtual bool onlineJetMatching(const int &);
-            virtual bool onlineBJetMatching();
             virtual bool onlineBJetMatching(const int &);
             virtual void histograms(const std::string &, const int & n = 1);
             virtual void fillJetHistograms();
