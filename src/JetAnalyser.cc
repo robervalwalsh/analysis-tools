@@ -40,6 +40,13 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
    // Jets
    jetsanalysis_  = ( analysis_->addTree<Jet> ("Jets",config_->jetsCollection()) != nullptr );
    
+   if ( config_->btagsf_ != "" )
+   {
+      bsf_reader_lwp_ = analysis_->btagCalibration(config_->btagalgo_, config_->btagsf_, "loose"); 
+      bsf_reader_mwp_ = analysis_->btagCalibration(config_->btagalgo_, config_->btagsf_, "medium");
+      bsf_reader_twp_ = analysis_->btagCalibration(config_->btagalgo_, config_->btagsf_, "tight");
+   }
+   
    if ( config_->triggerObjDir_ != "" )
    {
       for ( auto & obj : config_->triggerObjectsJets_ )  analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));

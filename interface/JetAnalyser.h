@@ -47,6 +47,10 @@ namespace analysis {
             std::vector< std::shared_ptr<Jet> > selectedJets_;
             
             bool jetsanalysis_;
+            
+            std::shared_ptr<BTagCalibrationReader> bsf_reader_lwp_;
+            std::shared_ptr<BTagCalibrationReader> bsf_reader_mwp_;
+            std::shared_ptr<BTagCalibrationReader> bsf_reader_twp_;
          
          private:
                
