@@ -1,12 +1,12 @@
-#ifndef Analysis_Tools_Analyser_h
-#define Analysis_Tools_Analyser_h 1
+#ifndef Analysis_Tools_TriggerAnalyser_h
+#define Analysis_Tools_TriggerAnalyser_h 1
 
 // -*- C++ -*-
 //
 // Package:    Analysis/Tools
 // Class:      Analysis
 // 
-/**\class Analysis Analyser.cc Analysis/Tools/src/Analyser.cc
+/**\class Analysis TriggerAnalyser.cc Analysis/Tools/src/TriggerAnalyser.cc
 
  Description: [one line class summary]
 
@@ -24,10 +24,7 @@
 #include <vector>
 #include <string>
 // 
-// user include files
-#include "Analysis/Tools/interface/TriggerAnalyser.h"
-#include "Analysis/Tools/interface/JetAnalyser.h"
-
+#include "Analysis/Tools/interface/BaseAnalyser.h"
 //
 // class declaration
 //
@@ -35,31 +32,30 @@
 namespace analysis {
    namespace tools {
 
-      class Analyser : 
-            public analysis::tools::TriggerAnalyser,
-            public analysis::tools::JetAnalyser
-      {
+      class TriggerAnalyser  : virtual public analysis::tools::BaseAnalyser {
          
          public:
             /// constructors
-            Analyser();
-            Analyser(int argc, char * argv[]);
+            TriggerAnalyser();
+            TriggerAnalyser(int argc, char * argv[]);
             /// desctructor
-           ~Analyser();
+           ~TriggerAnalyser();
            
          
             // ----------member data ---------------------------
          protected:
+            bool triggeranalysis_;
          
          private:
-            
-         public:
-            // Actions
-            virtual bool event(const int &);
                
+         public:
+            
+            // Actions
+            virtual bool analysisWithTrigger();
+            virtual bool selectionTrigger();
 
       };
    }
 }
 
-#endif  // Analysis_Tools_Analyser_h
+#endif  // Analysis_Tools_TriggerAnalyser_h
