@@ -20,7 +20,6 @@
 #include <vector>
 // 
 // user include files
-#include "TString.h" 
 #include "Analysis/Tools/interface/BaseAnalyser.h"
 
 //
