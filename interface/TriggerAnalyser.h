@@ -53,6 +53,8 @@ namespace analysis {
             // Actions
             virtual bool analysisWithTrigger();
             virtual bool selectionTrigger();
+            virtual bool selectionHLT();
+            virtual bool selectionL1();
 
       };
    }

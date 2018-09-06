@@ -56,9 +56,19 @@ TriggerAnalyser::~TriggerAnalyser()
 
 bool TriggerAnalyser::selectionTrigger()
 {
+   bool hlt = selectionHLT();
+   bool l1  = selectionL1();
+   
+   return (hlt && l1);
+   
+}
+
+bool TriggerAnalyser::selectionHLT()
+{
    ++cutflow_;
    if ( ! analysis_->triggerResult(config_->hltPath_) ) return false;
-   if ( ! analysis_->triggerResult(config_->l1Seed_)  ) return false;
+   
+   if ( config_->hltPath_ == "" ) return true;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,(config_->hltPath_).c_str());
@@ -67,6 +77,22 @@ bool TriggerAnalyser::selectionTrigger()
 
    return true;
 }
+
+bool TriggerAnalyser::selectionL1()
+{
+   ++cutflow_;
+   if ( ! analysis_->triggerResult(config_->l1Seed_)  ) return false;
+   
+   if ( config_->l1Seed_ == "" ) return true;
+   
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,(config_->l1Seed_).c_str());
+   
+   h1_["cutflow"] -> Fill(cutflow_);
+
+   return true;
+}
+
 
 bool TriggerAnalyser::analysisWithTrigger()
 {
