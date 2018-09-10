@@ -62,7 +62,15 @@ namespace analysis {
             std::shared_ptr<Analysis> analysis_;
             std::shared_ptr<Config> config_;
             
+            std::vector<Jet*> jets_;
             std::vector<Jet*> selectedJets_;
+            std::vector<Muon*> selectedMuons_;
+            
+            bool jetsanalysis_;
+            bool muonsanalysis_;
+            
+            int cutflow_;
+            
             TH1s h1_;
             TH2s h2_;
          
@@ -75,6 +83,8 @@ namespace analysis {
             std::shared_ptr<Analysis> analysis();
             std::shared_ptr<Config>   config();
             std::vector<Jet*> selectedJets();
+            std::vector<Jet*> jets();
+            std::vector<Muon*> selectedMuons();
             
             float btag(const Jet & , const std::string & );
          
@@ -97,16 +107,24 @@ namespace analysis {
             virtual bool selectionJet();
             virtual bool selectionJet(const int &);
             virtual bool selectionJetDeta(const int &, const int &, const float &);
+            virtual bool selectionJetDeta(const int &, const int &);
             virtual bool selectionJetDr(const int &, const int &, const float &);
+            virtual bool selectionJetDr(const int &, const int &);
             virtual bool selectionJetId();
+            virtual bool selectionJetPileupId();
+            virtual bool selectionNJets();
             virtual bool selectionBJet();
             virtual bool selectionBJet(const int &);
             virtual bool selectionNonBJet(const int &);
             virtual bool selectionMuon();
             virtual bool onlineJetMatching();
+            virtual bool onlineJetMatching(const int &);
             virtual bool onlineBJetMatching();
+            virtual bool onlineBJetMatching(const int &);
             virtual void histograms(const std::string &, const int & n = 1);
             virtual void fillJetHistograms();
+            virtual void fillMuonHistograms();
+            int nEvents();
                
 
       };

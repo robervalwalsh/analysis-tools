@@ -88,6 +88,19 @@ namespace analysis {
             std::string jetspuid_;
             std::string l1tjetsCol_; 
 
+         // muons
+            std::string muonsCol_; 
+            int nmuonsmin_;
+            int nmuonsmax_;
+            std::vector<float> muonsptmin_;
+            std::vector<float> muonsptmax_;
+            std::vector<float> muonsetamax_;
+            std::string muonsid_;
+            std::string l1tmuonsCol_; 
+            
+         // trigger
+            std::string triggerCol_;
+
 
                         
          private:
@@ -115,6 +128,18 @@ namespace analysis {
             std::string jetsPuId() const;
             std::string l1tJetsCollection() const; 
             
+         // muons
+            std::string muonsCollection() const;
+            int nMuonsMin() const;
+            int nMuonsMax() const;
+            std::vector<float> muonsPtMin() const;
+            std::vector<float> muonsPtMax() const;
+            std::vector<float> muonsEtaMax() const;
+            std::string muonsId() const;
+            std::string l1tMuonsCollection() const; 
+            
+         // trigger
+            std::string triggerResults() const;
             
          // ========================
          
@@ -137,13 +162,6 @@ namespace analysis {
             std::vector<float> jetsbtagmin_;
 
 
-            // muons
-
-            int nmuonsmin_;
-            std::vector<float> muonsptmin_;
-            std::vector<float> muonsptmax_;
-            std::vector<float> muonsetamax_;
-            std::string muonsid_;
 
 
             // additional cuts of unidentified objects or for extra selections
@@ -157,6 +175,7 @@ namespace analysis {
             float drmin_;
             float drmax_;
             float detamax_;
+            float detamin_;
             float dphimin_;
 
             float ptimbalmax_;
@@ -188,9 +207,6 @@ namespace analysis {
             int triggerObjectsL1MuonsMatches_;
 
             // ntuples collections
-            std::string muonsCol_; 
-            std::string l1tmuonsCol_; 
-            std::string triggerCol_;
             std::string genParticleCol_;
             std::string genjetsCol_;
             std::string triggerObjDir_;

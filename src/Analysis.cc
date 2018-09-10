@@ -201,6 +201,7 @@ void Analysis::triggerResults(const std::string & path)
 
 bool Analysis::triggerResult(const std::string & trig)
 {
+   if ( trig == "" ) return true;
    if ( t_triggerResults_ == NULL ) return false;
    return triggerResults_[trig];
 }

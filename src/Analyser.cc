@@ -51,34 +51,26 @@ Analyser::Analyser()
 Analyser::Analyser(int argc, char * argv[])
 {
    config_   = std::make_shared<Config>(argc,argv);
-   
    analysis_ = std::make_shared<Analysis>(config_->ntuplesList());
    
+   cutflow_ = 0;
+
+   // Physics objects
    // Jets
-   if ( config_->jetsCollection() != "" )       analysis_->addTree<Jet> ("Jets",config_->jetsCollection());
-   // Trigger path info
-   if ( config_->triggerCol_ != "" )    analysis_->triggerResults(config_->triggerCol_);
+   jetsanalysis_  = ( analysis_->addTree<Jet> ("Jets",config_->jetsCollection()) != nullptr );
+   
+   // Muons
+   muonsanalysis_ = ( analysis_->addTree<Muon>("Muons",config_->muonsCollection()) != nullptr );
+   
+   // Trigger
+   // Trigger Results
+   analysis_->triggerResults(config_->triggerResults());
    // Trigger objects
-   if ( config_->triggerObjects_.size() > 0 && config_->triggerObjDir_ != "" )
+   if ( config_->triggerObjDir_ != "" )
    {
-      for ( auto & obj : config_->triggerObjects_ )
-      {
-         analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
-      }
-   }
-   if ( config_->triggerObjectsJets_.size() > 0 && config_->triggerObjDir_ != "" )
-   {
-      for ( auto & obj : config_->triggerObjectsJets_ )
-      {
-         analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
-      }
-   }
-   if ( config_->triggerObjectsBJets_.size() > 0 && config_->triggerObjDir_ != "" )
-   {
-      for ( auto & obj : config_->triggerObjectsBJets_ )
-      {
-         analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
-      }
+      for ( auto & obj : config_->triggerObjects_ )      analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
+      for ( auto & obj : config_->triggerObjectsJets_ )  analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
+      for ( auto & obj : config_->triggerObjectsBJets_ ) analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
    }
    // JSON for data   
    if( !config_->isMC() && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
@@ -88,6 +80,14 @@ Analyser::Analyser(int argc, char * argv[])
    {
       hout_= std::shared_ptr<TFile>(new TFile(config_->outputRoot_.c_str(),"recreate"));
    }
+   
+   h1_["cutflow"] = new TH1F("cutflow","", 30,0,30);
+   if ( config_->isMC() )
+   {
+      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" ) 
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"Generated events");
+   }
+   
 }
 
 Analyser::~Analyser()
@@ -126,15 +126,26 @@ void Analyser::end()
 
 bool Analyser::event(const int & i)
 {
-   bool goodEvent = true;
+   bool ok = true;
    analysis_->event(i);
+   cutflow_ = 0;
    
-   if (! config_->isMC() ) goodEvent = analysis_->selectJson();
-      
+   if ( config_->isMC() )
+   {
+      h1_["cutflow"] -> Fill(cutflow_);
+   }
+   
+   
    if ( config_->runmin_ > 0 && analysis_->run() < config_->runmin_ ) return false;
    if ( config_->runmax_ > 0 && analysis_->run() > config_->runmax_ ) return false;
    
-   return goodEvent;
+   if (! config_->isMC() ) ok = analysis_->selectJson();
+   
+   if ( ! ok ) return false;
+   
+   analysisWithJets();
+      
+   return ok;
    
 }
 
@@ -144,20 +155,27 @@ void Analyser::histograms(const std::string & obj, const int & n)
    {
       for ( int j = 0; j < n; ++j )
       {
-         h1_[Form("pt_jet%d",j+1)]       = new TH1F(Form("pt_jet%d",j+1)     , "" ,100 , 0   , 1000  );
-         h1_[Form("eta_jet%d",j+1)]      = new TH1F(Form("eta_jet%d",j+1)    , "" , 60 , -3, 3 );
-         h1_[Form("btag_jet%d",j+1)]     = new TH1F(Form("btag_jet%d",j+1)   , "" , 100 , 0, 1 );
+         h1_[Form("pt_%s%d"  , obj.c_str(),j+1)]    = new TH1F(Form("pt_%s%d"  , obj.c_str(),j+1)   , "" ,100 , 0   , 1000  );
+         h1_[Form("eta_%s%d" , obj.c_str(),j+1)]    = new TH1F(Form("eta_%s%d" , obj.c_str(),j+1)   , "" , 60 , -3, 3 );
+         h1_[Form("btag_%s%d", obj.c_str(),j+1)]    = new TH1F(Form("btag_%s%d", obj.c_str(),j+1)   , "" , 100 , 0, 1 );
          for ( int k = j+1; k < n && j < n; ++k )
          {
-            h1_[Form("dr_jet%d%d",j+1,k+1)]     = new TH1F(Form("dr_jet%d%d",j+1,k+1)     , "" , 50 , 0, 5 );
-            h1_[Form("deta_jet%d%d",j+1,k+1)]   = new TH1F(Form("deta_jet%d%d",j+1,k+1)   , "" ,100 , 0,10 );
-            h1_[Form("m_jet%d%d",j+1,k+1)]      = new TH1F(Form("m_jet%d%d",j+1,k+1)      , "" ,300 , 0,3000 );
+            h1_[Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)]     = new TH1F(Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)   , "" , 50 , 0, 5 );
+            h1_[Form("deta_%s%d%d", obj.c_str(),j+1,k+1)]     = new TH1F(Form("deta_%s%d%d", obj.c_str(),j+1,k+1)   , "" ,100 , 0,10 );
+            h1_[Form("m_%s%d%d"   , obj.c_str(),j+1,k+1)]     = new TH1F(Form("m_%s%d%d   ", obj.c_str(),j+1,k+1)   , "" ,300 , 0,3000 );
          }
       }
       
    }
-   
-   h1_["cutflow"] = new TH1F("cutflow","", 20,0,20);
+   if ( obj == "muon" )
+   {
+      for ( int j = 0; j < n; ++j )
+      {
+         h1_[Form("pt_%s%d"  , obj.c_str(),j+1)]    = new TH1F(Form("pt_%s%d"  , obj.c_str(),j+1)   , "" ,100 , 0   , 1000  );
+         h1_[Form("eta_%s%d" , obj.c_str(),j+1)]    = new TH1F(Form("eta_%s%d" , obj.c_str(),j+1)   , "" , 60 , -3, 3 );
+      }
+      
+   }
    
 }
 
@@ -199,6 +217,8 @@ bool Analyser::selectionJet()
 
 bool Analyser::selectionJet(const int & r)
 {
+   ++cutflow_;
+   
    bool isgood = true;
    int j = r-1;
    
@@ -209,26 +229,76 @@ bool Analyser::selectionJet(const int & r)
    if ( selectedJets_[j] -> pt() < config_->jetsPtMin()[j]           && !(config_->jetsPtMin()[j] < 0) )   return false;
    if ( fabs(selectedJets_[j] -> eta()) > config_->jetsEtaMax()[j]   && !(config_->jetsEtaMax()[j] < 0) )  return false;
    
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f and |eta| < %3.1f",r,config_->jetsPtMin()[j], config_->jetsEtaMax()[j] ));
+   
+   h1_["cutflow"] -> Fill(cutflow_);
+   
    return isgood;
 }
 
 
 bool Analyser::selectionJetDeta(const int & j1, const int & j2, const float & delta)
 {
+   ++cutflow_;
+   
    if ( (int)selectedJets_.size() < j1 || (int)selectedJets_.size() < j2 )
    {
-      std::cout << "-e- Analyser::selectionJetDeta(): at least one of the jets does not exist" << std::endl;
+      std::cout << "-errr- Analyser::selectionJetDeta(): you dont have enough selected jets. Will return false" << std::endl;
       return false;
    }
    if ( delta > 0 )
-      return ( fabs(selectedJets_[j1-1]->eta() - selectedJets_[j2-1]->eta()) < fabs(delta) );
+   {
+      if ( fabs(selectedJets_[j1-1]->eta() - selectedJets_[j2-1]->eta()) > fabs(delta) ) return false;
+   }
    else
-      return ( fabs(selectedJets_[j1-1]->eta() - selectedJets_[j2-1]->eta()) > fabs(delta) );
-      
+   {
+      if ( fabs(selectedJets_[j1-1]->eta() - selectedJets_[j2-1]->eta()) < fabs(delta) ) return false;
+   }
+
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      if ( delta > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Deta(jet %d, jet %d) < %4.2f",j1,j2,fabs(delta)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Deta(jet %d, jet %d) > %4.2f",j1,j2,fabs(delta)));
+   }
+   
+        
+   h1_["cutflow"] -> Fill(cutflow_);
+    
+   return true;
+   
 }
+bool Analyser::selectionJetDeta(const int & j1, const int & j2)
+{
+   bool ok = true;
+   if (config_->detamax_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetDeta(j1,j2,config_->detamax_);
+   }
+   
+   if (config_->detamin_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetDeta(j1,j2,-1*config_->detamin_);
+   }
+   return ok;
+   
+}
+
 
 bool Analyser::selectionJetDr(const int & j1, const int & j2, const float & delta)
 {
+   ++cutflow_;
+   
    if ( (int)selectedJets_.size() < j1 || (int)selectedJets_.size() < j2 )
    {
       std::cout << "-e- Analyser::selectionJetDr(): at least one of the jets does not exist" << std::endl;
@@ -236,47 +306,161 @@ bool Analyser::selectionJetDr(const int & j1, const int & j2, const float & delt
    }
    
    if ( delta > 0 )
-      return ( selectedJets_[j1-1]->deltaR(*selectedJets_[j2-1]) < fabs(delta) ) ;
+   {
+      if ( selectedJets_[j1-1]->deltaR(*selectedJets_[j2-1]) > fabs(delta) ) return false;
+   }
    else
-      return ( selectedJets_[j1-1]->deltaR(*selectedJets_[j2-1]) > fabs(delta) );
+   {
+      if ( selectedJets_[j1-1]->deltaR(*selectedJets_[j2-1]) < fabs(delta) ) return false;
+   }
+
+      
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      if ( delta > 0 ) 
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DR(jet %d, jet %d) < %4.2f",j1,j2,fabs(delta)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DR(jet %d, jet %d) > %4.2f",j1,j2,fabs(delta)));
+   }
+        
+   h1_["cutflow"] -> Fill(cutflow_);
+    
+   return true;
+   
 }
 
-
-
-bool Analyser::selectionJetId()
+bool Analyser::selectionJetDr(const int & j1, const int & j2)
 {
-   bool isgood = true;
-   
-   if ( config_->jetsCollection() != "" )
+   bool ok = true;
+   if (config_->drmax_ < 0 )
    {
-      auto slimmedJets = analysis_->collection<Jet>("Jets");
-      selectedJets_.clear();
-      for ( int j = 0 ; j < slimmedJets->size() ; ++j )
-      {
-         if ( slimmedJets->at(j).id(config_->jetsId()) && slimmedJets->at(j).pileupJetIdFullId(config_->jetsPuId()) ) selectedJets_.push_back(&slimmedJets->at(j));
-      }
-      if ( (int)selectedJets_.size() < config_->nJetsMin() ) return false;
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetDr(j1,j2,config_->drmax_);
    }
    
-   return isgood;
+   if (config_->drmin_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetDr(j1,j2,-1*config_->drmin_);
+   }
+   return ok;
 }
 
 bool Analyser::analysisWithJets()
 {
-   bool isgood = true;
+   jets_.clear();
+   selectedJets_.clear();
+   if ( ! jetsanalysis_ ) return false;
    
-   if ( config_->jetsCollection() == "" ) return false;
-   if ( config_->triggerObjectsJets_.size() > 0 )
-   {
-      analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets_,0.3);
-   }
-   if ( config_->triggerObjectsBJets_.size() > 0 )
-   {
-      analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsBJets_,0.3);
-   }
+   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets_,0.3);
+   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsBJets_,0.3);
+
+   auto jets = analysis_->collection<Jet>("Jets");
+   for ( int j = 0 ; j < jets->size() ; ++j )  jets_.push_back(&jets->at(j));
    
-   return isgood;
+   selectedJets_ = jets_;
+   
+   return true;
 }
+
+std::vector<Jet*> Analyser::jets()
+{
+   return jets_;
+}
+
+bool Analyser::selectionJetId()
+{
+   ++cutflow_;
+   
+   if ( ! jetsanalysis_ ) return false;
+   
+   auto jet = std::begin(selectedJets_);
+   while ( jet != std::end(selectedJets_) )
+   {
+      if ( ! (*jet)->id(config_->jetsId() ) )
+         jet = selectedJets_.erase(jet);
+      else
+         ++jet;
+   }
+   if ( selectedJets_.size() == 0 ) return false;
+   
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JetId: %s",config_->jetsId().c_str()));
+   
+   h1_["cutflow"] -> Fill(cutflow_);
+   
+   return true;
+}
+
+bool Analyser::selectionJetPileupId()
+{
+   ++cutflow_;
+   
+   if ( ! jetsanalysis_ ) return false;
+   
+   auto jet = std::begin(selectedJets_);
+   
+   while ( jet != std::end(selectedJets_) )
+   {
+      if ( ! (*jet)->pileupJetIdFullId(config_->jetsPuId()) )
+         jet = selectedJets_.erase(jet);
+      else
+         ++jet;
+   }
+   
+   if ( selectedJets_.size() == 0 ) return false;
+   
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JetPileupId: %s",config_->jetsPuId().c_str()));
+   
+   h1_["cutflow"] -> Fill(cutflow_);
+   
+   return true;
+
+}
+
+bool Analyser::selectionNJets()
+{
+   ++cutflow_;
+   
+   if  ((int)selectedJets_.size() < config_->nJetsMin()) return false;
+   
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("NJets >= %d",config_->nJetsMin()));
+   
+   h1_["cutflow"] -> Fill(cutflow_);
+   
+   return true;
+   
+}
+
+
+
+
+// bool Analyser::selectionJetId()
+// {
+//    if ( ! jetsanalysis_ ) return false;
+//    
+//    for ( auto jet : selectedJets_ )
+//    {
+//       if ( jet->id(config_->jetsId()) && jet->pileupJetIdFullId(config_->jetsPuId()) ) selectedJets_.push_back(jet);
+//    }
+//    if ( (int)selectedJets_.size() < config_->nJetsMin() ) return false;
+//    
+//    return true;
+// }
+// 
+std::vector<Muon*> Analyser::selectedMuons()
+{
+   return selectedMuons_;
+}
+
 
 bool Analyser::selectionBJet()
 {
@@ -291,37 +475,57 @@ bool Analyser::selectionBJet()
 
 bool Analyser::selectionBJet(const int & r )
 {
-   bool isgood = true;
    int j = r-1;
-   if ( config_->jetsbtagmin_[j] < 0 ) return true;
-   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJetId());
-   if ( !isgood || (int)selectedJets_.size() < r ) return false;
+   if ( config_->jetsbtagmin_[j] < 0 ) return true; // there is not selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  Analyser::selectionBJet(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
    
    // jet  btag
-   isgood = ( btag(*selectedJets_[j],config_->btagalgo_) > config_->jetsbtagmin_[j] );
+   if ( btag(*selectedJets_[j],config_->btagalgo_) < config_->jetsbtagmin_[j] ) return false;
    
-   return isgood;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: btag > %6.4f",r,config_->jetsbtagmin_[j]));
+   
+   h1_["cutflow"] -> Fill(cutflow_);
+   
+   return true;
 }
 
 bool Analyser::selectionNonBJet(const int & r )
 {
-   bool isgood = true;
    int j = r-1;
-   if ( config_->jetsbtagmin_[j] < 0 ) return true;
-   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJetId());
-   if ( !isgood || (int)selectedJets_.size() < r ) return false;
+   if ( config_->nonbtagwp_ < 0 || config_->jetsbtagmin_[j] < 0  ) return true; // there is not selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  Analyser::selectionBJet(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
    
    // jet  non btag
-   isgood = ( btag(*selectedJets_[j],config_->btagalgo_) < config_->nonbtagwp_ );
+   if ( btag(*selectedJets_[j],config_->btagalgo_) > config_->nonbtagwp_ ) return false;
    
-   return isgood;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: btag < %6.4f",r,config_->nonbtagwp_));
+   
+   h1_["cutflow"] -> Fill(cutflow_);
+   
+   return true;
 }
 
 bool Analyser::selectionMuon()
 {
    bool isgood = true;
    
-   if ( config_->muonsCol_ != "" )
+   if ( config_->muonsCollection() != "" )
    {
    }
    
@@ -330,62 +534,110 @@ bool Analyser::selectionMuon()
 
 bool Analyser::onlineJetMatching()
 {
-   bool isgood = true;
+   if ( config_->triggerObjectsJetsMatches_ < 0 ) return true;
    
-   if ( config_->triggerObjectsJetsMatches_ < 0 || config_->triggerObjectsJets_.size() == 0 ) return isgood;
-   
-   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJet());
-   if ( !isgood || (int)selectedJets_.size() < config_->triggerObjectsJetsMatches_ ) return false;
-   
-   for ( int j = 0; j < config_->triggerObjectsJetsMatches_; ++j )  // 
+   for ( int j = 0; j < config_->triggerObjectsJetsMatches_; ++j )
    {
-      Jet * jet = selectedJets_[j];
-      for ( size_t io = 0; io < config_->triggerObjectsJets_.size() ; ++io )
-      {       
-         if ( ! jet->matched(config_->triggerObjectsJets_[io]) ) return false;
-      }
+      if ( ! onlineJetMatching(j+1) ) return false; 
    }
    
-   return isgood;
+   return true;
 }
 
 bool Analyser::onlineBJetMatching()
 {
-   bool isgood = true;
+   if ( config_->triggerObjectsBJetsMatches_ < 0 ) return true;
    
-   if ( config_->triggerObjectsBJetsMatches_ < 0 || config_->triggerObjectsBJets_.size() == 0 ) return isgood;
-   
-   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJet());
-   if ( !isgood || (int)selectedJets_.size() < config_->triggerObjectsBJetsMatches_ ) return false;
-   
-   for ( int j = 0; j < config_->triggerObjectsBJetsMatches_; ++j )  // 
+   for ( int j = 0; j < config_->triggerObjectsBJetsMatches_; ++j )
    {
-      Jet * jet = selectedJets_[j];
-      for ( size_t io = 0; io < config_->triggerObjectsBJets_.size() ; ++io )
-      {       
-         if ( ! jet->matched(config_->triggerObjectsBJets_[io]) ) return false;
-      }
+      if ( ! onlineBJetMatching(j+1) ) return false; 
    }
    
-   return isgood;
+   return true;
+}
+
+
+
+bool Analyser::onlineJetMatching(const int & r)
+{
+   int j = r-1;
+   if ( config_->triggerObjectsJets_.size() == 0 ) return true;
+   
+   ++cutflow_;
+   
+   if ( r > config_->nJetsMin() )
+   {
+      std::cout << "*Warning* Analyser::onlineJetMatching(): asking for matching of unselected jet. Returning false!" << std::endl;
+      return false;  // asking for a match beyond the selection, that's wrong, therefore false
+   }
+   if ( selectedJets_.size() == 0 )
+   {
+      std::cout << "*Warning* Analyser::onlineJetMatching(): selectedJets is empty. Returning false!" << std::endl;
+      return false;  // asking for a match beyond the selection, that's wrong, therefore false
+   }
+   
+   Jet * jet = selectedJets_[j];
+   for ( size_t io = 0; io < config_->triggerObjectsJets_.size() ; ++io )
+   {       
+      if ( ! jet->matched(config_->triggerObjectsJets_[io]) ) return false;
+   }
+
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JetTriggerMatch_%d",r));
+      
+   h1_["cutflow"] -> Fill(cutflow_);
+   
+   return true;
+}
+
+
+bool Analyser::onlineBJetMatching(const int & r)
+{
+   int j = r-1;
+   if ( config_->triggerObjectsBJets_.size() == 0 ) return true;
+   
+   ++cutflow_;
+   
+   if ( r > config_->nJetsMin() )
+   {
+      std::cout << "*Warning* Analyser::onlineBJetMatching(): asking for matching of unselected jet. Returning false!" << std::endl;
+      return false;  // asking for a match beyond the selection, that's wrong, therefore false
+   }
+   if ( selectedJets_.size() == 0 )
+   {
+      std::cout << "*Warning* Analyser::onlineBJetMatching(): selectedJets is empty. You must run selectionJetId() before. Returning false!" << std::endl;
+      return false;  // asking for a match beyond the selection, that's wrong, therefore false
+   }
+   
+   Jet * jet = selectedJets_[j];
+   for ( size_t io = 0; io < config_->triggerObjectsBJets_.size() ; ++io )
+   {       
+      if ( ! jet->matched(config_->triggerObjectsBJets_[io]) ) return false;
+   }
+   
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("BTagTriggerMatch_%d",r));
+   
+   
+   h1_["cutflow"] -> Fill(cutflow_);
+   
+   return true;
 }
 
 
 
 bool Analyser::selectionTrigger()
 {
-   bool isgood = true;
-   
-   if ( config_->hltPath_ == "" ) return isgood;
-   
+   ++cutflow_;
    if ( ! analysis_->triggerResult(config_->hltPath_) ) return false;
+   if ( ! analysis_->triggerResult(config_->l1Seed_)  ) return false;
    
-   if ( config_->l1Seed_ != "" )
-   {
-      if ( ! analysis_->triggerResult(config_->l1Seed_) ) return false;
-   }
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"Trigger");
+   
+   h1_["cutflow"] -> Fill(cutflow_);
 
-   return isgood;
+   return true;
 }
 
 void Analyser::fillJetHistograms()
@@ -414,6 +666,19 @@ void Analyser::fillJetHistograms()
    
 }
 
+void Analyser::fillMuonHistograms()
+{
+   int n = config_->nMuonsMin();
+   
+   for ( int j = 0; j < n; ++j )
+   {
+      h1_[Form("pt_muon%d",j+1)] -> Fill(selectedMuons_[j]->pt());
+      h1_[Form("eta_muon%d",j+1)] -> Fill(selectedMuons_[j]->eta());
+   }
+   
+}
+
+
 TH1s Analyser::H1Fs() { return h1_; }
 
 TH1F * Analyser::H1F(const std::string & hname)
@@ -425,4 +690,12 @@ TH1F * Analyser::H1F(const std::string & hname)
    }
    
    return h1_[hname];
+}
+
+
+int Analyser::nEvents()
+{
+   int maxevt = config_->nEventsMax();
+   if ( maxevt < 0 ) maxevt = analysis_->size();
+   return maxevt;
 }
