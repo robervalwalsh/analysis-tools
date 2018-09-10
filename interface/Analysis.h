@@ -119,7 +119,7 @@ namespace analysis {
             double luminosity(const std::string & title);
 
             // Trigger results
-            void triggerResults(const std::string & path);
+            bool triggerResults(const std::string & path);
             bool triggerResult(const std::string & trig);
             int triggerPrescale(const std::string & trig);
             std::map<std::string,int> triggerPrescale(const std::vector<std::string> & trigs);
