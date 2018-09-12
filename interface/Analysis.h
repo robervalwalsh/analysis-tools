@@ -255,7 +255,7 @@ namespace analysis {
       template <class Object>
       std::shared_ptr< PhysicsObjectTree<Object> >  Analysis::addTree(const std::string & unique_name, const std::string & path)
       {
-         if ( path == "" ) return nullptr;
+         if ( path == "" || unique_name == "" ) return nullptr;
          this->treeInit_(unique_name,path);
          t_any_[unique_name] = std::shared_ptr< PhysicsObjectTree<Object> > ( new PhysicsObjectTree<Object>(tree_[unique_name], unique_name) );
          std::string type = boost::core::demangle(typeid(Object).name());
