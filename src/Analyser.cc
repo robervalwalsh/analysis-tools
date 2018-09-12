@@ -69,6 +69,7 @@ bool Analyser::event(const int & i)
    if ( ! ok ) return false;
    
    analysisWithJets();
+   analysisWithMuons();
       
    return ok;
    
