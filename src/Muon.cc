@@ -57,6 +57,7 @@ bool  Muon::isGlobalMuon()                         const { return isGlobalMuon_;
 bool  Muon::isTrackerMuon()                        const { return isTrackerMuon_;           }
 bool  Muon::isLooseMuon()                          const { return isLooseMuon_;             }
 bool  Muon::isMediumMuon()                         const { return isMediumMuon_;            }
+bool  Muon::isTightMuon()                          const { return isTightMuon_;             }
 
 // Inner tracker vars 
 float Muon::validFraction()                        const { return validFraction_;           }
@@ -75,6 +76,7 @@ void Muon::isGlobalMuon (const bool & isGlobalMuon)   { isGlobalMuon_  = isGloba
 void Muon::isTrackerMuon(const bool & isTrackerMuon)  { isTrackerMuon_ = isTrackerMuon;  }
 void Muon::isLooseMuon  (const bool & isLooseMuon)    { isLooseMuon_   = isLooseMuon;    }
 void Muon::isMediumMuon (const bool & isMediumMuon)   { isMediumMuon_  = isMediumMuon;   }
+void Muon::isTightMuon  (const bool & isTightMuon)    { isTightMuon_   = isTightMuon;    }
 
 void Muon::validFraction( const float & validFraction)                   { validFraction_        = validFraction ;       }
 void Muon::segmentCompatibility(const float & segmentCompatibility)      { segmentCompatibility_ = segmentCompatibility ;}
