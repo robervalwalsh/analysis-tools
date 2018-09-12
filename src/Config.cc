@@ -121,6 +121,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("triggerObjectsL3Muons", po::value<std::string> (&triggerObjectsL3Muons_)->default_value(""),"Trigger objects for L3 muons")
          ("triggerObjectsMuonsMatches", po::value<int> (&triggerObjectsMuonsMatches_)->default_value(-1),"Number of matches with trigger objects for muons")
          ("triggerObjectsL1MuonsMatches", po::value<int> (&triggerObjectsL1MuonsMatches_)->default_value(-1),"Number of matches with L1 trigger objects for muons")
+         ("triggerObjectsL3MuonsMatches", po::value<int> (&triggerObjectsL3MuonsMatches_)->default_value(-1),"Number of matches with L3 trigger objects for muons")
          ("triggerMatchDeltaRMax",po::value <float> (&trgmatchdrmax_)->default_value(0.3),"DeltaR max for matching online-offline")
          ("triggerResultsCollection",po::value <std::string> (&triggerCol_)->default_value(""),"Name of the trigger results collection")
          ("triggerObjectsDirectory",po::value <std::string> (&triggerObjDir_)->default_value("slimmedPatTrigger"),"Name of the trigger objects directory");
