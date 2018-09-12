@@ -34,7 +34,9 @@ Analyser::Analyser()
 }
 
 
-Analyser::Analyser(int argc, char * argv[]) : TriggerAnalyser(argc,argv), JetAnalyser(argc,argv)
+Analyser::Analyser(int argc, char * argv[]) : TriggerAnalyser(argc,argv),
+                                              JetAnalyser(argc,argv),
+                                              MuonAnalyser(argc,argv)
 {
 }
 
