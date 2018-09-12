@@ -58,6 +58,17 @@ bool  Muon::isTrackerMuon()                        const { return isTrackerMuon_
 bool  Muon::isLooseMuon()                          const { return isLooseMuon_;             }
 bool  Muon::isMediumMuon()                         const { return isMediumMuon_;            }
 bool  Muon::isTightMuon()                          const { return isTightMuon_;             }
+bool  Muon::id(const std::string & id ) const
+{
+   std::string lid = id;
+   std::transform(lid.begin(), lid.end(), lid.begin(), ::tolower);
+   if ( lid == "tight"  ) return isTightMuon_ ;
+   if ( lid == "medium" ) return isMediumMuon_;
+   if ( lid == "loose"  ) return isLooseMuon_ ;
+   
+   std::cout << "*** warning *** Muon::id -> id type " << id << " is invalid. Returning false!" << std::endl;
+   return false; 
+}
 
 // Inner tracker vars 
 float Muon::validFraction()                        const { return validFraction_;           }
