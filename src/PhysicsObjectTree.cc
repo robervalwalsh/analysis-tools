@@ -265,19 +265,27 @@ PhysicsObjectTree<Muon>::PhysicsObjectTree() : PhysicsObjectTreeBase<Muon>()
 }
 PhysicsObjectTree<Muon>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<Muon>(tree, name)
 {
-  tree_  -> SetBranchAddress ("isPFMuon"      , isPFMuon_     ) ;      
-  tree_  -> SetBranchAddress ("isGlobalMuon"  , isGlobalMuon_ ) ;  
-  tree_  -> SetBranchAddress ("isTrackerMuon" , isTrackerMuon_) ; 
-  tree_  -> SetBranchAddress ("isLooseMuon"   , isLooseMuon_  ) ;   
-  tree_  -> SetBranchAddress ("isMediumMuon"  , isMediumMuon_ ) ;  
-  tree_  -> SetBranchAddress ("isTightMuon"   , isTightMuon_ ) ;  
+   hasTightMuon_ = false;
+   tree_  -> SetBranchAddress ("isPFMuon"      , isPFMuon_     ) ;      
+   tree_  -> SetBranchAddress ("isGlobalMuon"  , isGlobalMuon_ ) ;  
+   tree_  -> SetBranchAddress ("isTrackerMuon" , isTrackerMuon_) ; 
+   tree_  -> SetBranchAddress ("isLooseMuon"   , isLooseMuon_  ) ;   
+   tree_  -> SetBranchAddress ("isMediumMuon"  , isMediumMuon_ ) ;  
+//   tree_  -> SetBranchAddress ("isTightMuon"   , isTightMuon_ ) ;  
 
-  tree_  -> SetBranchAddress ("validFraction" ,validFraction_ ) ;
-  tree_  -> SetBranchAddress ("segmentCompatibility" , segmentCompatibility_) ;
-  tree_  -> SetBranchAddress ("trkKink" , trkKink_) ;      
-  tree_  -> SetBranchAddress ("chi2LocalPos" ,chi2LocalPos_) ;
+   tree_  -> SetBranchAddress ("validFraction" ,validFraction_ ) ;
+   tree_  -> SetBranchAddress ("segmentCompatibility" , segmentCompatibility_) ;
+   tree_  -> SetBranchAddress ("trkKink" , trkKink_) ;      
+   tree_  -> SetBranchAddress ("chi2LocalPos" ,chi2LocalPos_) ;
 
-  tree_  -> SetBranchAddress ("normChi2" , normChi2_) ;
+   tree_  -> SetBranchAddress ("normChi2" , normChi2_) ;
+  
+   // to preserve backward compatibility with old ntuples
+   std::vector<std::string>::iterator it;
+   it = std::find(branches_.begin(),branches_.end(),"isTightMuon") ; if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , isTightMuon_ ); hasTightMuon_ = true; }
+  
+   if ( ! hasTightMuon_ ) std::cout << "*** warning *** PhysicsObjectTree<Muon> constructor: muon id tight is not available in this ntuple production, isIdTight -> false" << std::endl;
+  
 }
 PhysicsObjectTree<Muon>::~PhysicsObjectTree()
 {
@@ -293,8 +301,9 @@ Collection<Muon>  PhysicsObjectTree<Muon>::collection()
       muon.isGlobalMuon(isGlobalMuon_[i]) ;  
       muon.isTrackerMuon(isTrackerMuon_[i]) ; 
       muon.isLooseMuon(isLooseMuon_[i]) ;   
-      muon.isMediumMuon(isMediumMuon_[i]) ;  
-      muon.isTightMuon(isTightMuon_[i]) ;
+      muon.isMediumMuon(isMediumMuon_[i]) ;
+      if ( hasTightMuon_ ) muon.isTightMuon(isTightMuon_[i]) ;
+      else                 muon.isTightMuon(false) ;
 
       muon.validFraction(validFraction_[i]) ;
       muon.segmentCompatibility(segmentCompatibility_[i]) ;
