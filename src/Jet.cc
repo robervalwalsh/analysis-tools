@@ -294,13 +294,23 @@ double Jet::btagSF(std::shared_ptr<BTagCalibrationReader> reader, const std::str
 {
    return this -> btagSFsys(reader,"central",flavalgo);
 }
-double Jet::btagSFup(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo) const
+double Jet::btagSFup(std::shared_ptr<BTagCalibrationReader> reader, const float & nsig, const std::string & flavalgo) const
 {
-   return this -> btagSFsys(reader,"up",flavalgo);
+   double sf   = this -> btagSFsys(reader,"central",flavalgo);
+   double sfup = this -> btagSFsys(reader,"up",flavalgo);
+   double sig1 = fabs(sfup - sf);
+   sfup = sf+(nsig*sig1);
+   
+   return sfup;
 }
-double Jet::btagSFdown(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo) const
+double Jet::btagSFdown(std::shared_ptr<BTagCalibrationReader> reader, const float & nsig, const std::string & flavalgo) const
 {
-   return this -> btagSFsys(reader,"down",flavalgo);
+   double sf     = this -> btagSFsys(reader,"central",flavalgo);
+   double sfdown = this -> btagSFsys(reader,"down",flavalgo);
+   double sig1 = fabs(sfdown - sf);
+   sfdown = sf-(nsig*sig1);
+   
+   return sfdown;
 }
 
 
