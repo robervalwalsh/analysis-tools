@@ -185,13 +185,21 @@ void Jet::jerCorrections()
    
 }
 
-float Jet::jerCorrection(const std::string & var) const
+float Jet::jerCorrection(const std::string & var, const float & nsig ) const
 {
    float corr = jercorr_.nominal;
    std::string v = var;
    std::transform(v.begin(), v.end(), v.begin(), ::tolower);
-   if ( v == "up"   ) corr = jercorr_.up;
-   if ( v == "down" ) corr = jercorr_.down;
+   if ( v == "up"   )
+   {
+      corr = jercorr_.nominal + (fabs(jercorr_.nominal-jercorr_.up)*nsig);
+//      corr = jercorr_.up;
+   }
+   if ( v == "down" )
+   {
+      corr = jercorr_.nominal - (fabs(jercorr_.nominal-jercorr_.down)*nsig);      
+//      corr = jercorr_.down;
+   }
    
    return corr;
    

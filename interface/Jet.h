@@ -112,7 +112,7 @@ namespace analysis {
             bool jerMatch() const;
             
             void jerCorrections();
-            float jerCorrection(const std::string & var = "nominal") const;
+            float jerCorrection(const std::string & var = "nominal", const float & nsig = 1) const;
             
             float neutralHadronFraction()  const ;
             float neutralEmFraction()      const ;
