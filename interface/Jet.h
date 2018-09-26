@@ -112,7 +112,7 @@ namespace analysis {
             bool jerMatch() const;
             
             void jerCorrections();
-            float jerCorrection(const std::string & var = "nominal") const;
+            float jerCorrection(const std::string & var = "nominal", const float & nsig = 1) const;
             
             float neutralHadronFraction()  const ;
             float neutralEmFraction()      const ;
@@ -139,10 +139,10 @@ namespace analysis {
             double rho() const;
             
             /// btag SF
-            double btagSF(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo = "Hadron") const;
-            double btagSFup(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo = "Hadron") const;
-            double btagSFdown(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo = "Hadron") const;
-            double btagSFsys(std::shared_ptr<BTagCalibrationReader> reader, const std::string & systype = "central", const std::string & flavalgo = "Hadron") const;
+            double btagSF    (std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo = "Hadron") const;
+            double btagSFup  (std::shared_ptr<BTagCalibrationReader> reader, const float & nsig = 1, const std::string & flavalgo = "Hadron") const;
+            double btagSFdown(std::shared_ptr<BTagCalibrationReader> reader, const float & nsig = 1, const std::string & flavalgo = "Hadron") const;
+            double btagSFsys (std::shared_ptr<BTagCalibrationReader> reader, const std::string & systype  = "central", const std::string & flavalgo = "Hadron") const;
             
             /// pointer to the FSR jet
             Jet * fsrJet();
