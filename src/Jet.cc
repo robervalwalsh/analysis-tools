@@ -185,13 +185,21 @@ void Jet::jerCorrections()
    
 }
 
-float Jet::jerCorrection(const std::string & var) const
+float Jet::jerCorrection(const std::string & var, const float & nsig ) const
 {
    float corr = jercorr_.nominal;
    std::string v = var;
    std::transform(v.begin(), v.end(), v.begin(), ::tolower);
-   if ( v == "up"   ) corr = jercorr_.up;
-   if ( v == "down" ) corr = jercorr_.down;
+   if ( v == "up"   )
+   {
+      corr = jercorr_.nominal + (fabs(jercorr_.nominal-jercorr_.up)*nsig);
+//      corr = jercorr_.up;
+   }
+   if ( v == "down" )
+   {
+      corr = jercorr_.nominal - (fabs(jercorr_.nominal-jercorr_.down)*nsig);      
+//      corr = jercorr_.down;
+   }
    
    return corr;
    
@@ -286,13 +294,23 @@ double Jet::btagSF(std::shared_ptr<BTagCalibrationReader> reader, const std::str
 {
    return this -> btagSFsys(reader,"central",flavalgo);
 }
-double Jet::btagSFup(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo) const
+double Jet::btagSFup(std::shared_ptr<BTagCalibrationReader> reader, const float & nsig, const std::string & flavalgo) const
 {
-   return this -> btagSFsys(reader,"up",flavalgo);
+   double sf   = this -> btagSFsys(reader,"central",flavalgo);
+   double sfup = this -> btagSFsys(reader,"up",flavalgo);
+   double sig1 = fabs(sfup - sf);
+   sfup = sf+(nsig*sig1);
+   
+   return sfup;
 }
-double Jet::btagSFdown(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo) const
+double Jet::btagSFdown(std::shared_ptr<BTagCalibrationReader> reader, const float & nsig, const std::string & flavalgo) const
 {
-   return this -> btagSFsys(reader,"down",flavalgo);
+   double sf     = this -> btagSFsys(reader,"central",flavalgo);
+   double sfdown = this -> btagSFsys(reader,"down",flavalgo);
+   double sig1 = fabs(sfdown - sf);
+   sfdown = sf-(nsig*sig1);
+   
+   return sfdown;
 }
 
 
