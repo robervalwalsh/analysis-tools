@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import os
 import glob
+import re
 from argparse import ArgumentParser
 from shutil import copyfile, rmtree, move
 from time import sleep
@@ -19,6 +20,15 @@ def getConfigParameter( config, parameter ):
          if line.split()[0] == parameter:
             ntuples = line.split()[2]
    return ntuples
+
+
+def basenameConfigParameter( config, name ):
+   with open(config, "r") as f:
+      lines = f.readlines()
+   with open(config, "w") as f:
+      for line in lines:
+         f.write(re.sub(name, os.path.basename(name), line))
+
 
 # --- main code ---
 
@@ -73,9 +83,9 @@ if ntuples:
    pid = os.getpid()
    tmpdir = ".splitdir_" + str(pid)
    os.mkdir(tmpdir)
-   copyfile(ntuples, tmpdir+"/"+ntuples)
+   copyfile(ntuples, tmpdir+"/"+os.path.basename(ntuples))
    os.chdir(tmpdir)
-   splitcmd = "split.csh" + " " + str(args.nfiles) + " " + ntuples
+   splitcmd = "split.csh" + " " + str(args.nfiles) + " " + os.path.basename(ntuples)
    os.system(splitcmd)
    files = glob.glob('.*_x????.txt')
    files.sort()
@@ -87,15 +97,18 @@ if ntuples:
       exedir = maindir+"/"+jobid
       os.mkdir(exedir)
       # moving stuff to the proper directories
-      move(tmpdir+"/"+f,exedir+"/"+ntuples)
+      move(tmpdir+"/"+f,exedir+"/"+os.path.basename(ntuples))
       if json:
-         copyfile(json, exedir+"/"+json)
+         copyfile(json, exedir+"/"+os.path.basename(json))
       if config:
-         copyfile(config, exedir+"/"+config)
+         copyfile(config, exedir+"/"+os.path.basename(config))
       # make the submissions
       os.chdir(exedir)
       if config:
-         condorcmd = "condor_submit.csh" + " " + jobid + " " + args.exe + " " + config
+         # replace json and ntuples in the local exe config by their basenames
+         basenameConfigParameter(os.path.basename(config),ntuples)
+         basenameConfigParameter(os.path.basename(config),json)
+         condorcmd = "condor_submit.csh" + " " + jobid + " " + args.exe + " " + os.path.basename(config)
       else:
          condorcmd = "condor_submit.csh" + " " + jobid + " " + args.exe
       os.system(condorcmd)
