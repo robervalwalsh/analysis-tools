@@ -12,11 +12,10 @@ def getConfigParameter( config, parameter ):
    exist = False
    with open(config) as f:
       for line in f:
-         line = line.lstrip(' ')
-         line = line.rstrip('\n')
-         if len(line.split('=')) != 2 or line[0] == '#':
+         line = line.replace(" ","").strip()
+         if len(line) == 0:
             continue
-         if line.split("=")[0] == parameter:
+         if line[0] != '#' and  line.split("=")[0] == parameter:
             par = line.split("=")[1]
             exist = True
             p = [parameter,par]
