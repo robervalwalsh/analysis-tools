@@ -141,6 +141,13 @@ namespace analysis {
             int   pdgid_    [max_];
             int   status_   [max_];
             bool  higgs_dau_[max_];
+            int   indx_     [max_];
+            int   mo1_      [max_];
+            int   mo2_      [max_];
+            int   da1_      [max_];
+            int   da2_      [max_];
+            
+            bool gp_has_indx_;
 
          private:
 
