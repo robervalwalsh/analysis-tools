@@ -27,6 +27,8 @@
 // user include files
 #include "Analysis/Tools/interface/TriggerAnalyser.h"
 #include "Analysis/Tools/interface/JetAnalyser.h"
+#include "Analysis/Tools/interface/MuonAnalyser.h"
+
 
 //
 // class declaration
@@ -37,7 +39,9 @@ namespace analysis {
 
       class Analyser : 
             public analysis::tools::TriggerAnalyser,
-            public analysis::tools::JetAnalyser
+            public analysis::tools::JetAnalyser,
+            public analysis::tools::MuonAnalyser
+
       {
          
          public:

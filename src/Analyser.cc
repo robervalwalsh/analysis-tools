@@ -34,7 +34,10 @@ Analyser::Analyser()
 }
 
 
-Analyser::Analyser(int argc, char * argv[]) : TriggerAnalyser(argc,argv), JetAnalyser(argc,argv)
+Analyser::Analyser(int argc, char * argv[]) : TriggerAnalyser(argc,argv),
+                                              JetAnalyser(argc,argv),
+                                              MuonAnalyser(argc,argv)
+
 {
 }
 
@@ -67,6 +70,7 @@ bool Analyser::event(const int & i)
    if ( ! ok ) return false;
    
    analysisWithJets();
+   analysisWithMuons();
       
    return ok;
    

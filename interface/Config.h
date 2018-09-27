@@ -202,9 +202,11 @@ namespace analysis {
             int triggerObjectsBJetsMatches_;
             int triggerObjectsL1JetsMatches_;
             std::vector<std::string> triggerObjectsMuons_;
-            std::vector<std::string> triggerObjectsL1Muons_;
+            std::string triggerObjectsL1Muons_;
+            std::string triggerObjectsL3Muons_;
             int triggerObjectsMuonsMatches_;
             int triggerObjectsL1MuonsMatches_;
+            int triggerObjectsL3MuonsMatches_;
 
             // ntuples collections
             std::string genParticleCol_;
