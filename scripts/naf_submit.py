@@ -177,8 +177,8 @@ if ntuples:
          else:
             removeConfigParameter(os.path.basename(config),'json')
          # ntuples list
-         replaceConfigParameter(os.path.basename(config), 'ntuplesList', os.path.basename(ntuples))
          createConfigParameter(os.path.basename(config),'ntuplesList')
+         replaceConfigParameter(os.path.basename(config), 'ntuplesList', os.path.basename(ntuples))
          condorcmd = "condor_submit.csh" + " " + jobid + " " + args.exe + " " + os.path.basename(config)
       else:
          condorcmd = "condor_submit.csh" + " " + jobid + " " + args.exe
