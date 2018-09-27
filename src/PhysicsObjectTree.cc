@@ -202,9 +202,22 @@ Collection<Jet>  PhysicsObjectTree<Jet>::collection()
 // Constructors and destructor
 PhysicsObjectTree<GenParticle>::PhysicsObjectTree(TChain * tree, const std::string & name) : PhysicsObjectTreeBase<GenParticle>(tree, name)
 {
+   gp_has_indx_ = false;
+   
    tree_  -> SetBranchAddress( "pdg"   , pdgid_  );
    tree_  -> SetBranchAddress( "status", status_ );
    tree_  -> SetBranchAddress( "higgs_dau", higgs_dau_ );
+   
+  std::vector<std::string>::iterator it;
+  it = std::find(branches_.begin(),branches_.end(),"index")            ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , indx_ ); gp_has_indx_ = true; }
+  if ( gp_has_indx_ )
+  {
+     it = std::find(branches_.begin(),branches_.end(),"mother1")         ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , mo1_ ); }
+     it = std::find(branches_.begin(),branches_.end(),"mother2")         ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , mo2_ ); }
+     it = std::find(branches_.begin(),branches_.end(),"daughter1")       ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , da1_ ); }
+     it = std::find(branches_.begin(),branches_.end(),"daughter2")       ;  if ( it != branches_.end() ) { tree_  -> SetBranchAddress( (*it).c_str() , da2_ ); }
+  }
+   
 }
 PhysicsObjectTree<GenParticle>::~PhysicsObjectTree() {}
 
@@ -218,6 +231,14 @@ Collection<GenParticle>  PhysicsObjectTree<GenParticle>::collection()
       p.pdgId(pdgid_[i]);
       p.status(status_[i]);
       p.higgsDaughter(higgs_dau_[i]);
+      if ( gp_has_indx_ )
+      {
+         p.index(indx_[i]);
+         p.mother(1,mo1_[i]);
+         p.mother(2,mo2_[i]);
+         p.daughter(1,da1_[i]);
+         p.daughter(2,da2_[i]);
+      }
       particles.push_back(p);
    }
    Collection<GenParticle> genPartCollection(particles, name_);
