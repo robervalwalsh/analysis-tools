@@ -37,6 +37,12 @@ GenParticle::GenParticle() : Candidate()
 GenParticle::GenParticle(const float & pt, const float & eta, const float & phi, const float & e, const float & q) : 
       Candidate(pt,eta,phi,e,q) 
 {
+   indx_ = -1;
+   mo_[0] = -1;
+   mo_[1] = -1;
+   da_[0] = -1;
+   da_[1] = -1;
+   
 }
 GenParticle::~GenParticle()
 {
