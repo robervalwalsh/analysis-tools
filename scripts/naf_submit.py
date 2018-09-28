@@ -133,7 +133,7 @@ if json:
       quit()
       
 # directory where the jobs will be stored
-maindir = "Condor_"+args.exe
+maindir = "Condor_"+os.path.basename(args.exe)
 if config:
    maindir = maindir+"_"+ os.path.splitext(os.path.basename(config))[0]
 cwd = os.getcwd()
@@ -189,8 +189,10 @@ if ntuples:
 else:
    exedir = maindir+"/job_0000"
    os.mkdir(exedir)
+   if os.path.isfile(args.exe):
+      copyfile(args.exe, exedir+"/"+os.path.basename(args.exe))
    os.chdir(exedir)
-   condorcmd = "condor_submit.csh job_0000" + " " + args.exe
+   condorcmd = "condor_submit.csh job_0000" + " " + os.path.basename(args.exe)
    os.system(condorcmd)
    os.chdir(cwd)
          
