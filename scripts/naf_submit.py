@@ -145,12 +145,26 @@ os.mkdir(maindir)
 # splitting the file list
 if ntuples:
    pid = os.getpid()
-   tmpdir = ".splitdir_" + str(pid)
+   tmpdir = ".tmp_" + str(pid)
    os.mkdir(tmpdir)
    copyfile(ntuples, tmpdir+"/"+os.path.basename(ntuples))
+   if config:
+      copyfile(config, tmpdir+"/"+os.path.basename(config))
    os.chdir(tmpdir)
+   if config:
+      # replace json and ntuples in the local exe config by their basenames
+      if json:
+         createConfigParameter(os.path.basename(config),'json')
+         replaceConfigParameter(os.path.basename(config), 'json', os.path.basename(json))
+      else:
+         removeConfigParameter(os.path.basename(config),'json')
+      # ntuples list
+      createConfigParameter(os.path.basename(config),'ntuplesList')
+      replaceConfigParameter(os.path.basename(config), 'ntuplesList', os.path.basename(ntuples))
+   
    splitcmd = "split.csh" + " " + str(args.nfiles) + " " + os.path.basename(ntuples)
    os.system(splitcmd)
+   os.remove(os.path.basename(ntuples))  # not needed anymore after the splitting
    files = glob.glob('.*_x????.txt')
    files.sort()
    os.chdir(cwd)
@@ -165,22 +179,13 @@ if ntuples:
       if json:
          copyfile(json, exedir+"/"+os.path.basename(json))
       if config:
-         copyfile(config, exedir+"/"+os.path.basename(config))
-      # make the submissions
-      os.chdir(exedir)
-      if config:
-         # replace json and ntuples in the local exe config by their basenames
-         if json:
-            createConfigParameter(os.path.basename(config),'json')
-            replaceConfigParameter(os.path.basename(config), 'json', os.path.basename(json))
-         else:
-            removeConfigParameter(os.path.basename(config),'json')
-         # ntuples list
-         createConfigParameter(os.path.basename(config),'ntuplesList')
-         replaceConfigParameter(os.path.basename(config), 'ntuplesList', os.path.basename(ntuples))
+         copyfile(tmpdir+"/"+os.path.basename(config),exedir+"/"+os.path.basename(config))      
          condorcmd = "condor_submit.csh" + " " + jobid + " " + args.exe + " " + os.path.basename(config)
       else:
          condorcmd = "condor_submit.csh" + " " + jobid + " " + args.exe
+      # make the submissions
+      os.chdir(exedir)
+      print "Submitting ",jobid,"..."
       os.system(condorcmd)
       sleep(0.2)
       # back to original directory
@@ -199,6 +204,7 @@ else:
 # remove the temporary directory
 os.chdir(cwd)
 if ntuples: 
+   os.remove(tmpdir+"/"+os.path.basename(config))
    rmtree(tmpdir)
 
 
