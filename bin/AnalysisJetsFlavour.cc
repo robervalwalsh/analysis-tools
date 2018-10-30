@@ -24,7 +24,7 @@ int main(int argc, char * argv[])
    Analysis analysis(inputList);
    
    // Physics Objects Collections
-   analysis.addTree<Jet> ("Jets","MssmHbb/Events/slimmedJetsReapplyJEC");
+   analysis.addTree<Jet> ("Jets","MssmHbb/Events/selectedUpdatedPatJets");
    analysis.addTree<GenParticle> ("GenParticles","MssmHbb/Events/prunedGenParticles");
 
    
@@ -49,11 +49,11 @@ int main(int argc, char * argv[])
       {
          Jet jet = jets->at(j);
          if ( jet.pt() < 30 ) continue;
-//         std::cout << jet.btag() << "  " << jet.btag("btag_csvivf") << " pt = " <<  jet.pt() << std::endl;
-         if ( ( jet.extendedFlavour() == "cc" || jet.extendedFlavour() == "bb" ) && jets->size() > 4 )
+//         std::cout << jet.btag("btag_csvivf") << "  " << jet.btag("btag_csvivf") << " pt = " <<  jet.pt() << std::endl;
+//         if ( ( jet.extendedFlavour() == "cc" || jet.extendedFlavour() == "bb" ) && jets->size() > 4 )
          {
 //            std::cout << analysis.event() << "  " << analysis.lumiSection() << std::endl;
-//            std::cout << "Jet # " << j << " with flavour = " << jet.flavour() << " and extended flavour = " << jet.extendedFlavour() << "  btag = " << jet.btag("btag_csvivf") << ", " << jet.btag("btag_csvmva") << std::endl;
+            std::cout << "Jet # " << j << " with flavour = " << jet.flavour() << " and extended flavour = " << jet.extendedFlavour() << "  btag = " << jet.btag("btag_csvivf") << ", " << jet.btag("btag_csvmva") << std::endl;
          }
       }
       

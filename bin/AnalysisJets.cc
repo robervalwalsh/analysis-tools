@@ -50,7 +50,7 @@ int main(int argc, char * argv[])
          std::cout << "eta = "     << jet.eta()     << ", ";
          std::cout << "phi = "     << jet.phi()     << ", ";
          std::cout << "flavour = " << jet.flavour() << ", ";
-         std::cout << "btag = "    << jet.btag()    << std::endl;
+         std::cout << "btag = "    << jet.btag("btag_csvivf")    << std::endl;
          std::cout << "     quark-gluon likelihood = " << jet.qgLikelihood() << std::endl;
          std::cout << "     pileup jet id full discriminant = " << jet.pileupJetIdFullDiscriminant() << std::endl;
          std::cout << "     pileup jet id full id = " << jet.pileupJetIdFullId() << std::endl;
