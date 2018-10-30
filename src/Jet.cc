@@ -420,7 +420,7 @@ Jet * Jet::fsrJet()
    return fsr_;
 }
 
-void Jet::addMuon(Muon* m)
+void Jet::addMuon(const std::shared_ptr<Muon> m)
 {
    if ( m == nullptr ) return;
    if ( muon_ != nullptr )
@@ -436,7 +436,7 @@ void Jet::rmMuon()
    muon_ = nullptr;
 }
 
-Muon * Jet::muon()
+std::shared_ptr<Muon> Jet::muon() const
 {
    return muon_;
 }
