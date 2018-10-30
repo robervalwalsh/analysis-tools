@@ -16,6 +16,7 @@ Description: [one line class summary]
 // user include files
 #include "Analysis/Tools/interface/Composite.h"
 #include "Analysis/Tools/interface/Jet.h"
+#include "Analysis/Tools/interface/Muon.h"
 
 
 //
@@ -73,4 +74,5 @@ float Composite<A,B>::deltaEta() const
 template class Composite<Candidate,Candidate>;
 template class Composite<Jet,Jet>;
 template class Composite<Jet,Candidate>;
+template class Composite<Muon,Muon>;
 
