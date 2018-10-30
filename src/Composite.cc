@@ -15,6 +15,7 @@ Description: [one line class summary]
 //
 // user include files
 #include "Analysis/Tools/interface/Composite.h"
+#include "Analysis/Tools/interface/Jet.h"
 
 
 //
@@ -54,22 +55,22 @@ Composite<A,B>::~Composite()
 
 // Gets 
 template <class A, class B>
-float Composite<A,B>::deltaR()
+float Composite<A,B>::deltaR() const
 {
    return a_->deltaR(*b_);
 }
       
 template <class A, class B>
-float Composite<A,B>::deltaEta()
+float Composite<A,B>::deltaEta() const
 {
    return fabs(a_->eta()-b_->eta());
 }
 
+
 // ------------ methods  ------------
 
 
-template class Composite<Jet,Jet>;
 template class Composite<Candidate,Candidate>;
-template class Composite<Candidate,Jet>;
+template class Composite<Jet,Jet>;
 template class Composite<Jet,Candidate>;
 
