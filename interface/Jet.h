@@ -68,7 +68,7 @@ namespace analysis {
             /// returns if jet is Puppi
             bool  isPuppi()                     const;
             /// returns the btag value of btag_csvivf
-            float btag()                        const;
+//            float btag()                        const;
             /// returns the btag value of algorithm
             float btag(const std::string & )    const;
             /// returns the flavour with the Hadron definition (=0 for data)
