@@ -46,6 +46,9 @@ namespace analysis {
             std::vector< std::shared_ptr<Jet> > jets_;
             std::vector< std::shared_ptr<Jet> > selectedJets_;
             
+            // number of histogrammed jets
+            int n_hjets_;
+            
             bool jetsanalysis_;
             
             std::map<std::string, std::shared_ptr<BTagCalibrationReader> >bsf_reader_;
@@ -75,8 +78,8 @@ namespace analysis {
             virtual bool selectionNonBJet(const int &);
             virtual bool onlineJetMatching(const int &);
             virtual bool onlineBJetMatching(const int &);
-            virtual void histograms(const std::string &, const int & n = 1);
-            virtual void fillJetHistograms();
+            virtual void jetHistograms(const int & n = 1, const std::string & label = "x");
+            virtual void fillJetHistograms(const std::string & label = "x");
 
       };
    }

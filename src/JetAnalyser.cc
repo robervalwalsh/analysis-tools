@@ -54,7 +54,7 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
       for ( auto & obj : config_->triggerObjectsBJets_ ) analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
    }
    
-   histograms("jet",config_->nJetsMin());
+//   histograms("jet",config_->nJetsMin());
 }
 
 JetAnalyser::~JetAnalyser()
@@ -92,27 +92,25 @@ void JetAnalyser::jets(const std::string & col)
    analysis_->addTree<Jet> ("Jets",col);
 }
 
-void JetAnalyser::histograms(const std::string & obj, const int & n)
+void JetAnalyser::jetHistograms( const int & n, const std::string & label )
 {
-   if ( obj == "jet" )
+   n_hjets_ = n;
+   
+   for ( int j = 0; j < n; ++j )
    {
-      for ( int j = 0; j < n; ++j )
+      h1_[Form("pt_jet%d_%s"  , j+1,label.c_str())]    = std::make_shared<TH1F>(Form("pt_jet%d_%s"  , j+1,label.c_str())   , "" ,100 , 0   , 1000  );
+      h1_[Form("eta_jet%d_%s" , j+1,label.c_str())]    = std::make_shared<TH1F>(Form("eta_jet%d_%s" , j+1,label.c_str())   , "" , 60 , -3, 3 );
+      h1_[Form("phi_jet%d_%s" , j+1,label.c_str())]    = std::make_shared<TH1F>(Form("phi_jet%d_%s" , j+1,label.c_str())   , "" , 360 , -180, 180 );
+      h1_[Form("btag_jet%d_%s", j+1,label.c_str())]    = std::make_shared<TH1F>(Form("btag_jet%d_%s", j+1,label.c_str())   , "" , 100 , 0, 1 );
+      for ( int k = j+1; k < n && j < n; ++k )
       {
-         h1_[Form("pt_%s%d"  , obj.c_str(),j+1)]    = std::make_shared<TH1F>(Form("pt_%s%d"  , obj.c_str(),j+1)   , "" ,100 , 0   , 1000  );
-         h1_[Form("eta_%s%d" , obj.c_str(),j+1)]    = std::make_shared<TH1F>(Form("eta_%s%d" , obj.c_str(),j+1)   , "" , 60 , -3, 3 );
-         h1_[Form("phi_%s%d" , obj.c_str(),j+1)]    = std::make_shared<TH1F>(Form("phi_%s%d" , obj.c_str(),j+1)   , "" , 360 , -180, 180 );
-         h1_[Form("btag_%s%d", obj.c_str(),j+1)]    = std::make_shared<TH1F>(Form("btag_%s%d", obj.c_str(),j+1)   , "" , 100 , 0, 1 );
-         for ( int k = j+1; k < n && j < n; ++k )
-         {
-            h1_[Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)]     = std::make_shared<TH1F>(Form("dr_%s%d%d"  , obj.c_str(),j+1,k+1)   , "" , 50 , 0, 5 );
-            h1_[Form("deta_%s%d%d", obj.c_str(),j+1,k+1)]     = std::make_shared<TH1F>(Form("deta_%s%d%d", obj.c_str(),j+1,k+1)   , "" ,100 , 0,10 );
-            h1_[Form("pt_%s%d%d"  , obj.c_str(),j+1,k+1)]     = std::make_shared<TH1F>(Form("pt_%s%d%d"  , obj.c_str(),j+1,k+1)   , "" ,300 , 0,3000 );
-            h1_[Form("eta_%s%d%d" , obj.c_str(),j+1,k+1)]     = std::make_shared<TH1F>(Form("eta_%s%d%d" , obj.c_str(),j+1,k+1)   , "" ,200 , -10,10 );
-            h1_[Form("phi_%s%d%d" , obj.c_str(),j+1,k+1)]     = std::make_shared<TH1F>(Form("phi_%s%d%d" , obj.c_str(),j+1,k+1)   , "" ,360 , -180,180 );
-            h1_[Form("m_%s%d%d"   , obj.c_str(),j+1,k+1)]     = std::make_shared<TH1F>(Form("m_%s%d%d"   , obj.c_str(),j+1,k+1)   , "" ,300 , 0,3000 );
-         }
+         h1_[Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())]     = std::make_shared<TH1F>(Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())   , "" , 50 , 0, 5 );
+         h1_[Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())]     = std::make_shared<TH1F>(Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())   , "" ,100 , 0,10 );
+         h1_[Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str())]     = std::make_shared<TH1F>(Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str())   , "" ,300 , 0,3000 );
+         h1_[Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str())]     = std::make_shared<TH1F>(Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str())   , "" ,200 , -10,10 );
+         h1_[Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str())]     = std::make_shared<TH1F>(Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str())   , "" ,360 , -180,180 );
+         h1_[Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str())]     = std::make_shared<TH1F>(Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str())   , "" ,300 , 0,3000 );
       }
-      
    }
 }
 
@@ -459,29 +457,31 @@ bool JetAnalyser::onlineBJetMatching(const int & r)
    return true;
 }
 
-void JetAnalyser::fillJetHistograms()
+void JetAnalyser::fillJetHistograms(const std::string & label)
 {
-   int n = config_->nJetsMin();
+   int n = n_hjets_;
+   
+   if ( n > config_->nJetsMin() ) n = config_->nJetsMin();
    
    for ( int j = 0; j < n; ++j )
    {
-      h1_[Form("pt_jet%d",j+1)] -> Fill(selectedJets_[j]->pt());
-      h1_[Form("eta_jet%d",j+1)] -> Fill(selectedJets_[j]->eta());
-      h1_[Form("phi_jet%d",j+1)] -> Fill(selectedJets_[j]->phi()*180./acos(-1.));
-      h1_[Form("btag_jet%d",j+1)] -> Fill(btag(*selectedJets_[j],config_->btagalgo_));
+      h1_[Form("pt_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->pt());
+      h1_[Form("eta_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->eta());
+      h1_[Form("phi_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->phi()*180./acos(-1.));
+      h1_[Form("btag_jet%d_%s",j+1,label.c_str())] -> Fill(btag(*selectedJets_[j],config_->btagalgo_));
       for ( int k = j+1; k < n && j < n; ++k )
       {
          Composite<Jet,Jet> c_ij(*(selectedJets_[j]),*(selectedJets_[k]));
          
-         h1_[Form("dr_jet%d%d",j+1,k+1)]    -> Fill(c_ij.deltaR());
-         h1_[Form("deta_jet%d%d",j+1,k+1)]  -> Fill(c_ij.deltaEta());
+         h1_[Form("dr_jet%d%d_%s",j+1,k+1,label.c_str())]    -> Fill(c_ij.deltaR());
+         h1_[Form("deta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.deltaEta());
          
-         h1_[Form("pt_jet%d%d",j+1,k+1)]   -> Fill(c_ij.pt());
-         h1_[Form("eta_jet%d%d",j+1,k+1)]  -> Fill(c_ij.eta());
-         h1_[Form("phi_jet%d%d",j+1,k+1)]  -> Fill(c_ij.phi()*180./acos(-1.));
+         h1_[Form("pt_jet%d%d_%s",j+1,k+1,label.c_str())]   -> Fill(c_ij.pt());
+         h1_[Form("eta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.eta());
+         h1_[Form("phi_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.phi()*180./acos(-1.));
          if ( !config_->signalRegion() )
          {
-            h1_[Form("m_jet%d%d",j+1,k+1)]  -> Fill(c_ij.m());
+            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.m());
          }
       }
    }
