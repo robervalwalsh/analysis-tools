@@ -201,6 +201,7 @@ void Analysis::triggerResults(const std::string & path)
 
 bool Analysis::triggerResult(const std::string & trig)
 {
+   if ( trig == "" ) return true;
    if ( t_triggerResults_ == NULL ) return false;
    return triggerResults_[trig];
 }
@@ -494,6 +495,14 @@ void triggerNames(std::string &trueTriggerNames,const char *myTriggerNames, TTre
 	
 }
 */
+      
+std::shared_ptr<JetResolutionInfo> Analysis::jetResolutionInfo(const std::string & f_jer, const std::string & f_jersf)
+{
+   JetResolution res = JetResolution(f_jer);
+   JetResolutionScaleFactor sf = JetResolutionScaleFactor(f_jersf);
+   jerinfo_ = std::make_shared<JetResolutionInfo>(JetResolutionInfo{res,sf});
+   return jerinfo_;
+}
       
 std::shared_ptr<BTagCalibrationReader> Analysis::btagCalibration(const std::string & tagger,
                                 const std::string & filename,

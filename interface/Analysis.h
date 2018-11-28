@@ -46,6 +46,8 @@
 // class declaration
 //
 
+using namespace JME;
+
 namespace analysis {
    namespace tools {
 
@@ -145,6 +147,8 @@ namespace analysis {
             void  btagEfficienciesAlgo(const std::string & );
             void  btagEfficienciesFlavour(const std::string & );
             
+            std::shared_ptr<JetResolutionInfo> jetResolutionInfo(const std::string &, const std::string & );
+            
             std::shared_ptr<BTagCalibrationReader> btagCalibration(const std::string & tagger,
                                  const std::string & filename,
                                  const std::string & wp,
@@ -175,6 +179,8 @@ namespace analysis {
             
             std::shared_ptr<BTagCalibration> btagcalib_;
             std::shared_ptr<BTagCalibrationReader> btagcalibread_;
+            
+            std::shared_ptr<JetResolutionInfo> jerinfo_;
 
 
             std::map<std::string, double> xsections_;
@@ -249,6 +255,7 @@ namespace analysis {
       template <class Object>
       std::shared_ptr< PhysicsObjectTree<Object> >  Analysis::addTree(const std::string & unique_name, const std::string & path)
       {
+         if ( path == "" || unique_name == "" ) return nullptr;
          this->treeInit_(unique_name,path);
          t_any_[unique_name] = std::shared_ptr< PhysicsObjectTree<Object> > ( new PhysicsObjectTree<Object>(tree_[unique_name], unique_name) );
          std::string type = boost::core::demangle(typeid(Object).name());

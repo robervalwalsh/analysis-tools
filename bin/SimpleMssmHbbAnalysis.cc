@@ -180,16 +180,16 @@ int main(int argc, char * argv[])
          h1[Form("pt_%i",j)]   -> Fill(jet->pt());
          h1[Form("eta_%i",j)]  -> Fill(jet->eta());
          h1[Form("phi_%i",j)]  -> Fill(jet->phi());
-         h1[Form("btag_%i",j)] -> Fill(jet->btag());
+         h1[Form("btag_%i",j)] -> Fill(jet->btag("btag_csvivf"));
          
-         if ( j < 2 && jet->btag() < btagmin[j] )     goodEvent = false;
+         if ( j < 2 && jet->btag("btag_csvivf") < btagmin[j] )     goodEvent = false;
          if ( ! signalregion_ )
          {
-            if ( j == 2 && jet->btag() > nonbtagwp_ )    goodEvent = false; 
+            if ( j == 2 && jet->btag("btag_csvivf") > nonbtagwp_ )    goodEvent = false; 
          }
          else
          {
-            if ( j == 2 && jet->btag() < btagmin[j] ) goodEvent = false; 
+            if ( j == 2 && jet->btag("btag_csvivf") < btagmin[j] ) goodEvent = false; 
          }
       }
       
@@ -238,7 +238,7 @@ int main(int argc, char * argv[])
          h1[Form("pt_%i_csv",j)]   -> Fill(jet->pt());
          h1[Form("eta_%i_csv",j)]  -> Fill(jet->eta());
          h1[Form("phi_%i_csv",j)]  -> Fill(jet->phi());
-         h1[Form("btag_%i_csv",j)] -> Fill(jet->btag());
+         h1[Form("btag_%i_csv",j)] -> Fill(jet->btag("btag_csvivf"));
       }
       mbb = (selectedJets[0]->p4() + selectedJets[1]->p4()).M();
       if ( !signalregion_ )

@@ -96,7 +96,7 @@ int main(int argc, char * argv[])
          h1["h_jet_Pt"]      -> Fill(jet.pt());
          h1["h_jet_Eta"]     -> Fill(jet.eta());
          h1["h_jet_Phi"]     -> Fill(jet.phi());
-         h1["h_jet_Btag"]    -> Fill(jet.btag());
+         h1["h_jet_Btag"]    -> Fill(jet.btag("btag_csvivf"));
          h1["h_jet_Flavour"] -> Fill(jet.flavour());
          h1["h_jet_IdLoose"] -> Fill(jet.idLoose());
          h1["h_jet_IdTight"] -> Fill(jet.idTight());

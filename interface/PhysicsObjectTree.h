@@ -141,6 +141,13 @@ namespace analysis {
             int   pdgid_    [max_];
             int   status_   [max_];
             bool  higgs_dau_[max_];
+            int   indx_     [max_];
+            int   mo1_      [max_];
+            int   mo2_      [max_];
+            int   da1_      [max_];
+            int   da2_      [max_];
+            
+            bool gp_has_indx_;
 
          private:
 
@@ -188,6 +195,7 @@ namespace analysis {
            bool  isTrackerMuon_   [max_]; 
            bool  isLooseMuon_     [max_]; 
            bool  isMediumMuon_    [max_];
+           bool  isTightMuon_     [max_];
 
            float validFraction_          [max_];
            float segmentCompatibility_   [max_]; 
@@ -195,6 +203,9 @@ namespace analysis {
            float chi2LocalPos_           [max_];
 
            float normChi2_  [max_];
+           
+           bool hasTightMuon_;
+           
          private:
 
       };

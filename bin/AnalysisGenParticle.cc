@@ -27,13 +27,17 @@ int main(int argc, char * argv[])
    // Input files list
    Analysis analysis(inputlist_);
    
+   // btag
    // Physics Objects Collections
-   analysis.addTree<Jet> ("Jets",jetsCol_);
+   analysis.addTree<GenParticle> ("GenParticles",genParticleCol_);
 
-   
    // Analysis of events
    std::cout << "This analysis has " << analysis.size() << " events" << std::endl;
-   for ( int i = 0 ; i < analysis.size() ; ++i )
+   
+   int nevts = analysis.size();
+   if ( nevtmax_ > 0 ) nevts = nevtmax_;
+   
+   for ( int i = 0 ; i < nevts ; ++i )
    {
       analysis.event(i);
       
@@ -41,24 +45,26 @@ int main(int argc, char * argv[])
       std::cout << std::endl;
       
       // Jets
-      auto jets = analysis.collection<Jet>("Jets");
-      for ( int j = 0 ; j < jets->size() ; ++j )
+      auto genps = analysis.collection<GenParticle>("GenParticles");
+      
+      printf("| %10s | %10s | %10s | %10s | %10s | %10s | %10s |\n","index","pdg","status","mo1","mo2","da1","da2");
+      for ( int j = 0 ; j < genps->size() ; ++j )
       {
-         Jet jet = jets->at(j);
-         std::cout << "    Jet #" << j << ": ";
-         std::cout << "pT  = "     << jet.pt()      << ", ";
-         std::cout << "eta = "     << jet.eta()     << ", ";
-         std::cout << "phi = "     << jet.phi()     << ", ";
-         std::cout << "flavour = " << jet.flavour() << ", ";
-         std::cout << "btag = "    << jet.btag("btag_csvivf")    << std::endl;
-         std::cout << "     quark-gluon likelihood = " << jet.qgLikelihood() << std::endl;
-         std::cout << "     pileup jet id full discriminant = " << jet.pileupJetIdFullDiscriminant() << std::endl;
-         std::cout << "     pileup jet id full id = " << jet.pileupJetIdFullId() << std::endl;
+         GenParticle genp  = genps -> at(j);
          
+         int indx = genp.index();
+         int mo1 = genp.mother(1);
+         int mo2 = genp.mother(2);  
+         int da1 = genp.daughter(1);
+         int da2 = genp.daughter(2);  
+         int status = genp.status();
+         int pdg = genp.pdgId();
+         printf("| %10d | %10d | %10d | %10d | %10d | %10d | %10d |\n",indx,pdg,status,mo1,mo2,da1,da2);      
       }
+      
       std::cout << "===================" << std::endl;
+      
    }
    
 //    
 }
-

@@ -78,7 +78,8 @@ int main(int argc, char * argv[])
          std::cout << "pT  = "     << jet.pt()      << ", ";
          std::cout << "eta = "     << jet.eta()     << ", ";
          std::cout << "flavour = " << jet.flavour() << ", ";
-         std::cout << "btag = "    << jet.btag()    << " with scale factor = " <<  jet_bscalefactor << std::endl;
+         std::cout << "btag = "    << jet.btag("btag_deepb") + jet.btag("btag_deepbb");
+         std::cout << " with scale factor = " <<  jet_bscalefactor << std::endl;
       }
       
       std::cout << "===================" << std::endl;

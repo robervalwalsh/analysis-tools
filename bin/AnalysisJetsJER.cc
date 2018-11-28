@@ -10,6 +10,8 @@
 #include "TH1.h" 
 
 #include "Analysis/Tools/interface/Analysis.h"
+#include "Analysis/Tools/interface/JetResolution.h"
+
 #include "Analysis/Tools/bin/macro_config.h"
 
 using namespace std;
@@ -29,35 +31,50 @@ int main(int argc, char * argv[])
    
    // Physics Objects Collections
    analysis.addTree<Jet> ("Jets",jetsCol_);
-
+   analysis.addTree<GenJet> ("GenJets",genjetsCol_);
    
+   // Jet energy resolution scale factors and pt resolution
+   JME::JetResolution resolution = JME::JetResolution(jerpt_);
+   JME::JetResolutionScaleFactor resolution_sf = JME::JetResolutionScaleFactor(jersf_);
+
    // Analysis of events
    std::cout << "This analysis has " << analysis.size() << " events" << std::endl;
-   for ( int i = 0 ; i < analysis.size() ; ++i )
+//   for ( int i = 0 ; i < analysis.size() ; ++i )
+   for ( int i = 0 ; i < 10 ; ++i )
    {
       analysis.event(i);
       
       std::cout << "++++++    ENTRY  " << i;
       std::cout << std::endl;
       
+      analysis.match<Jet,GenJet>("Jets","GenJets",0.2);
+      
       // Jets
       auto jets = analysis.collection<Jet>("Jets");
+      auto genjets = analysis.collection<GenJet>("GenJets");
+
       for ( int j = 0 ; j < jets->size() ; ++j )
       {
          Jet jet = jets->at(j);
+         auto * genjet = jet.matched("GenJets");
+         
+         JME::JetParameters jetResPars = {{JME::Binning::JetPt, jet.pt()}, {JME::Binning::JetEta, jet.eta()}, {JME::Binning::Rho, jet.rho()}};
+         JME::JetParameters jetResSFPars = {{JME::Binning::JetEta, jet.eta()}, {JME::Binning::Rho, jet.rho()}};;
+     
          std::cout << "    Jet #" << j << ": ";
          std::cout << "pT  = "     << jet.pt()      << ", ";
          std::cout << "eta = "     << jet.eta()     << ", ";
-         std::cout << "phi = "     << jet.phi()     << ", ";
-         std::cout << "flavour = " << jet.flavour() << ", ";
-         std::cout << "btag = "    << jet.btag("btag_csvivf")    << std::endl;
-         std::cout << "     quark-gluon likelihood = " << jet.qgLikelihood() << std::endl;
-         std::cout << "     pileup jet id full discriminant = " << jet.pileupJetIdFullDiscriminant() << std::endl;
-         std::cout << "     pileup jet id full id = " << jet.pileupJetIdFullId() << std::endl;
+         std::cout << "resolution = " << resolution.getResolution(jetResPars) << ", ";
+         std::cout << "JER SF  = "    << resolution_sf.getScaleFactor(jetResSFPars)  << ", " << genjet << std::endl;
+         
+         
          
       }
+      
       std::cout << "===================" << std::endl;
+      
    }
+   
    
 //    
 }
