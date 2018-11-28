@@ -64,14 +64,15 @@ int main(int argc, char * argv[])
          
          // b-tag scale factors central, up and down
          double jet_bscalefactor     = jet.btagSF(bsf_reader); // OR jet.btagSF(analysis.btagCalibration()); 
-         double jet_bscalefactorup   = jet.btagSFup(bsf_reader); 
-         double jet_bscalefactordown = jet.btagSFdown(bsf_reader); 
+         double jet_bscalefactorup   = jet.btagSFup(bsf_reader,2); 
+         double jet_bscalefactordown = jet.btagSFdown(bsf_reader,2); 
      
          std::cout << "    Jet #" << j << ": ";
          std::cout << "pT  = "     << jet.pt()      << ", ";
          std::cout << "eta = "     << jet.eta()     << ", ";
          std::cout << "flavour = " << jet.flavour() << ", ";
-         std::cout << "btag = "    << jet.btag()    << " with scale factor = " <<  jet_bscalefactor << std::endl;
+         std::cout << "btag = "    << jet.btag("btag_deepb") + jet.btag("btag_deepbb")    << " with scale factor = " <<  jet_bscalefactor;
+         std::cout << " up  = " << jet_bscalefactorup << "  down = " << jet_bscalefactordown << std::endl;
       }
       
       std::cout << "===================" << std::endl;
