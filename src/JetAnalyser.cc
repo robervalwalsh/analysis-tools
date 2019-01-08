@@ -544,7 +544,11 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
          h1_[Form("pt_jet%d%d_%s",j+1,k+1,label.c_str())]   -> Fill(c_ij.pt());
          h1_[Form("eta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.eta());
          h1_[Form("phi_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.phi()*180./acos(-1.));
-         if ( !config_->signalRegion() )
+         if ( config_->blind() )
+         {
+            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(0);
+         }
+         else
          {
             h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.m());
          }
