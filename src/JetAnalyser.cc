@@ -214,6 +214,62 @@ bool JetAnalyser::selectionJetDeta(const int & j1, const int & j2)
    
 }
 
+bool JetAnalyser::selectionJetDphi(const int & j1, const int & j2, const float & delta)
+{
+   ++cutflow_;
+   
+   if ( (int)selectedJets_.size() < j1 || (int)selectedJets_.size() < j2 )
+   {
+      std::cout << "-errr- JetAnalyser::selectionJetDeta(): you dont have enough selected jets. Will return false" << std::endl;
+      return false;
+   }
+   if ( delta > 0 )
+   {
+      if ( fabs(selectedJets_[j1-1]->deltaPhi(*selectedJets_[j2-1])) > fabs(delta) ) return false;
+   }
+   else
+   {
+      if ( fabs(selectedJets_[j1-1]->deltaPhi(*selectedJets_[j2-1])) < fabs(delta) ) return false;
+   }
+
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      if ( delta > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Dphi(jet %d, jet %d) < %4.2f",j1,j2,fabs(delta)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Dphi(jet %d, jet %d) > %4.2f",j1,j2,fabs(delta)));
+   }
+   
+        
+   h1_["cutflow"] -> Fill(cutflow_);
+    
+   return true;
+   
+}
+bool JetAnalyser::selectionJetDphi(const int & j1, const int & j2)
+{
+   bool ok = true;
+   if (config_->dphimax_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetDphi(j1,j2,config_->dphimax_);
+   }
+   
+   if (config_->dphimin_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetDphi(j1,j2,-1*config_->dphimin_);
+   }
+   return ok;
+   
+}
+
 
 bool JetAnalyser::selectionJetDr(const int & j1, const int & j2, const float & delta)
 {
