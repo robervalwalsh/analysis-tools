@@ -137,8 +137,12 @@ bool JetAnalyser::selectionJet(const int & r)
    if ( !isgood || (int)selectedJets_.size() < r ) return false;
    
    // kinematic selection
-   if ( selectedJets_[j] -> pt() < config_->jetsPtMin()[j]           && !(config_->jetsPtMin()[j] < 0) )   return false;
-   if ( fabs(selectedJets_[j] -> eta()) > config_->jetsEtaMax()[j]   && !(config_->jetsEtaMax()[j] < 0) )  return false;
+   if ( selectedJets_[j] -> pt() < config_->jetsPtMin()[j]           && !(config_->jetsPtMin()[j] < 0) ) return false;
+   if ( fabs(selectedJets_[j] -> eta()) > config_->jetsEtaMax()[j]   && !(config_->jetsEtaMax()[j] < 0) ) return false;
+   if ( config_->jetsPtMax().size() > 0 )
+   {
+      if ( selectedJets_[j] -> pt() > config_->jetsPtMax()[j] && !(config_->jetsPtMax()[j] < config_->jetsPtMin()[j]) )   return false;
+   }
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f and |eta| < %3.1f",r,config_->jetsPtMin()[j], config_->jetsEtaMax()[j] ));
