@@ -144,6 +144,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("dEtaMax",po::value <float> (&detamax_)->default_value(-1.),"Maximum delta eta between candidates")
          ("dEtaMin",po::value <float> (&detamin_)->default_value(-1.),"Minimum delta eta between candidates")
          ("dPhiMin",po::value <float> (&dphimin_)->default_value(-1.),"Minimum delta phi between candidates")
+         ("dPhiMax",po::value <float> (&dphimax_)->default_value(-1.),"Maximum delta phi between candidates")
          ("ptImbalanceMax",po::value <float> (&ptimbalmax_)->default_value(1000.),"Maximum relative imbalance between two candidates");
       
       po::variables_map vm; 

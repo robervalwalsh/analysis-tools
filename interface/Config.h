@@ -177,6 +177,7 @@ namespace analysis {
             float detamax_;
             float detamin_;
             float dphimin_;
+            float dphimax_;
 
             float ptimbalmax_;
 
