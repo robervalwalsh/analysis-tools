@@ -74,6 +74,7 @@ namespace analysis {
             int nevtmax_;
             bool isMC_;
             bool signalregion_;
+            bool blind_;
             bool override_;
 
 
@@ -115,6 +116,7 @@ namespace analysis {
             int  nEventsMax() const;
             bool isMC() const;
             bool signalRegion() const;
+            bool blind() const;
             bool override() const;
             
          // jets

@@ -60,6 +60,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("output",po::value <std::string> (&outputRoot_)->default_value("histograms.root"),"Output root file")
          ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
+         ("blind",po::value <bool> (&blind_)->default_value(true),"Flag for blind analysis")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region");
 
       // analysis control
@@ -230,6 +231,7 @@ std::string        Config::ntuplesList()     const { return inputlist_; }
 int                Config::nEventsMax()      const { return nevtmax_; }
 bool               Config::isMC()            const { return isMC_; }
 bool               Config::signalRegion()    const { return signalregion_; }
+bool               Config::blind()           const { return blind_; }
 
 // analysis control
 bool               Config::override()        const { return override_; }
