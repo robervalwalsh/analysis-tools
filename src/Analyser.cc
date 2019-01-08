@@ -34,7 +34,8 @@ Analyser::Analyser()
 }
 
 
-Analyser::Analyser(int argc, char * argv[]) : TriggerAnalyser(argc,argv),
+Analyser::Analyser(int argc, char * argv[]) : BaseAnalyser(argc,argv),  // not sure the BaseAnalyser should be called here
+                                              TriggerAnalyser(argc,argv),
                                               JetAnalyser(argc,argv),
                                               MuonAnalyser(argc,argv)
 
