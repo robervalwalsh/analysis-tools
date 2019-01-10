@@ -44,6 +44,8 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    config_   = std::make_shared<Config>(argc,argv);
    analysis_ = std::make_shared<Analysis>(config_->ntuplesList());
    
+   seed_ = analysis_ ->seed(config_->seedFile());
+   
    // JSON for data   
    if( !config_->isMC() && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
    
@@ -154,3 +156,20 @@ void BaseAnalyser::cutflow()
    printf("+%s+\n", std::string(150,'-').c_str());
    
 }
+
+int  BaseAnalyser::seed()
+{
+   return seed_;
+}
+
+int  BaseAnalyser::seed(const std::string & f)
+{
+   seed_ = analysis_ ->seed(f);
+   return seed_;
+}
+
+void BaseAnalyser::seed(const int & seed)
+{
+   seed_ = seed;
+}
+
