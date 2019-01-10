@@ -52,7 +52,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
       // analysis info
       opt_cfg_.add_options()
          ("ntuplesList",po::value <std::string> (&inputlist_)->default_value("rootFileList.txt"),"File with list of ntuples")
-         ("collectionsTreePath",po::value <std::string> (&treePath_)->default_value("Events"),"Name of the tree path for the event collections.")
+         ("collectionsTreePath",po::value <std::string> (&treePath_)->default_value("Events"),"Name of the tree path for the event collections")
          ("nEventsMax",po::value <int> (&nevtmax_)->default_value(-1), "Maximum number of events")
          ("nLumiSections",po::value <int> (&nlumis_)->default_value(-1), "Number of lumi sections processed")
          ("runMin",po::value <int> (&runmin_)->default_value(-1), "Minimum run number")
@@ -61,7 +61,9 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
          ("blind",po::value <bool> (&blind_)->default_value(true),"Flag for blind analysis")
-         ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region");
+         ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
+         ("seed",po::value <int> (&seed_)->default_value(-1), "Seed value for random numbers")
+         ("seedFile",po::value <std::string> (&seedfile_)->default_value("no_seed.txt"),"File with seed value for random numbers");
 
       // analysis control
       opt_cfg_.add_options()
@@ -258,5 +260,8 @@ std::string        Config::muonsId()            const { return muonsid_; }
 std::string        Config::l1tMuonsCollection() const { return l1tmuonsCol_; } 
 
 // trigger
-std::string        Config::triggerResults()    const { return triggerCol_; }
+std::string        Config::triggerResults()     const { return triggerCol_; }
 
+// seed 
+std::string        Config::seedFile()           const { return seedfile_; }
+int                Config::seed()               const { return seed_;     }

@@ -76,6 +76,9 @@ namespace analysis {
             bool signalregion_;
             bool blind_;
             bool override_;
+            
+            int seed_;
+            std::string seedfile_;
 
 
          // jets
@@ -118,6 +121,9 @@ namespace analysis {
             bool signalRegion() const;
             bool blind() const;
             bool override() const;
+            
+            std::string seedFile() const;
+            int seed() const;
             
          // jets
             std::string jetsCollection() const;
