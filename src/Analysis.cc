@@ -553,3 +553,16 @@ std::string Analysis::fileName()
    return filename ;
 }
 
+
+int Analysis::seed(const std::string & name)
+{
+   int seed = 1;
+   std::ifstream f(name.c_str(),std::ios_base::in);
+   if ( ! f.good() )   return -1;
+   
+   f >> seed;
+   f.close();
+   if ( seed < 1 )     return -1;
+   
+   return seed;
+}

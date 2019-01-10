@@ -59,6 +59,9 @@ namespace analysis {
             // Info
             void tag(const std::string &);
             std::string tag();
+            
+            /// seed for random number generator read from a txt file given as a parameter
+            int seed(const std::string &);
 
             // Event
             int  numberEvents();
