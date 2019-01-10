@@ -28,9 +28,9 @@ int main(int argc, char * argv[])
    Analysis analysis(inputlist_);
    
    // Physics Objects Collections
-   analysis.addTree<Jet> ("Jets",jetsCol_);
+   analysis.addTree<Jet>  ("Jets" ,jetsCol_ );
+   analysis.addTree<Muon> ("Muons",muonsCol_);
 
-   
    // Analysis of events
    std::cout << "This analysis has " << analysis.size() << " events" << std::endl;
    for ( int i = 0 ; i < analysis.size() ; ++i )
@@ -41,24 +41,31 @@ int main(int argc, char * argv[])
       std::cout << std::endl;
       
       // Jets
-      auto jets = analysis.collection<Jet>("Jets");
+      auto jets  = analysis.collection<Jet>("Jets");
+      auto muons = analysis.collection<Muon>("Muons");
+      
+      if ( muons->size() < 1 ) continue;
+      if ( jets ->size() < 1 ) continue;
+      
+      std::shared_ptr<Muon> muon = std::make_shared<Muon>(muons->at(0));
+      
       for ( int j = 0 ; j < jets->size() ; ++j )
       {
-         Jet jet = jets->at(j);
-         std::cout << "    Jet #" << j << ": ";
-         std::cout << "pT  = "     << jet.pt()      << ", ";
-         std::cout << "eta = "     << jet.eta()     << ", ";
-         std::cout << "phi = "     << jet.phi()     << ", ";
-         std::cout << "flavour = " << jet.flavour() << ", ";
-         std::cout << "btag = "    << jet.btag("btag_csvivf")    << std::endl;
-         std::cout << "     quark-gluon likelihood = " << jet.qgLikelihood() << std::endl;
-         std::cout << "     pileup jet id full discriminant = " << jet.pileupJetIdFullDiscriminant() << std::endl;
-         std::cout << "     pileup jet id full id = " << jet.pileupJetIdFullId() << std::endl;
+         std::shared_ptr<Jet> jet = std::make_shared<Jet>(jets->at(j));
+         float deltaR = jet->deltaR(*muon);
          
+         if ( !jet->muon() && deltaR < 0.4 ) jet->addMuon(muon);
+         
+         if ( jet->muon() )
+         {
+            std::cout << "jet eta,phi = " << jet->eta() << ", " << jet->phi() << "     muon eta,phi = " << jet->muon()->eta() << ", " << jet->muon()->phi() << std::endl;
+         }
       }
+      
       std::cout << "===================" << std::endl;
+      
+      
    }
    
 //    
 }
-

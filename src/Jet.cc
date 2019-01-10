@@ -34,7 +34,7 @@ using namespace analysis::tools;
 Jet::Jet() : Candidate() 
 {
    extendedFlavour_ = "?";
-   btagAlgo_ = "btag_csvivf";
+   btagAlgo_ = "";
    fsr_ = nullptr;
    muon_ = nullptr;
    uncorrJetp4_ = p4_;
@@ -45,7 +45,7 @@ Jet::Jet() : Candidate()
 Jet::Jet(const float & pt, const float & eta, const float & phi, const float & e) : Candidate(pt,eta,phi,e,0.) 
 {
    extendedFlavour_ = "?";
-   btagAlgo_ = "btag_csvivf";
+   btagAlgo_ = "";
    fsr_ = nullptr;
    muon_ = nullptr;
    uncorrJetp4_ = p4_;
@@ -66,7 +66,7 @@ Jet::~Jet()
 //
 // Gets
 bool  Jet::isPuppi()                               const { return isPuppi_;    } 
-float Jet::btag()                                  const { return btags_.at(btagAlgo_);    }                   
+//float Jet::btag()                                  const { return btags_.at(btagAlgo_);    }                   
 float Jet::btag(const std::string & algo)          const { return btags_.at(algo);         }                   
 int   Jet::flavour()                               const { return flavour_.at("Hadron");   }                   
 int   Jet::flavour(const std::string & definition) const { return flavour_.at(definition); }                   
@@ -420,7 +420,7 @@ Jet * Jet::fsrJet()
    return fsr_;
 }
 
-void Jet::addMuon(Muon* m)
+void Jet::addMuon(const std::shared_ptr<Muon> m)
 {
    if ( m == nullptr ) return;
    if ( muon_ != nullptr )
@@ -436,7 +436,7 @@ void Jet::rmMuon()
    muon_ = nullptr;
 }
 
-Muon * Jet::muon()
+std::shared_ptr<Muon> Jet::muon() const
 {
    return muon_;
 }

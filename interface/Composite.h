@@ -24,7 +24,6 @@
 // 
 // user include files
 #include "Analysis/Tools/interface/Candidate.h"
-#include "Analysis/Tools/interface/Jet.h"
 //
 // class declaration
 //
@@ -46,9 +45,10 @@ namespace analysis {
            // Gets
            A * objecA();
            B * objecB();
-           float deltaR();
-           float deltaEta();
+           float deltaR() const;
+           float deltaEta() const ;
            
+           float btag(const std::string & ) const;
 
            // Sets
            void objectA(const A &);
