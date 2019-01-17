@@ -64,6 +64,7 @@ namespace analysis {
             // Actions
             virtual bool analysisWithMuons();
             virtual bool selectionMuon(const int &);
+//            virtual bool selectionMuon();
             virtual bool selectionMuonId();
             virtual bool selectionNMuons();
             virtual bool onlineMuonMatching();

@@ -57,8 +57,8 @@ int main(int argc, char * argv[])
       for ( int j = 0 ; j < jets->size() ; ++j )
       {
          Jet jet = jets->at(j);
-         if ( btagalgo_ != "deepcsv" ) continue;
-         if ( (jet.btag("btag_deepb") + jet.btag("btag_deepbb")) < btagmin ) continue;  // probing btag DeepCSV jets
+         if ( btagalgo_ != "deepflavour" ) continue;
+         if ( (jet.btag("btag_dfb") + jet.btag("btag_dfbb") + jet.btag("btag_dflepb")) < btagmin ) continue;  // probing btag DeepCSV jets
          
          ++nbjets;
          
@@ -71,7 +71,7 @@ int main(int argc, char * argv[])
          std::cout << "pT  = "     << jet.pt()      << ", ";
          std::cout << "eta = "     << jet.eta()     << ", ";
          std::cout << "flavour = " << jet.flavour() << ", ";
-         std::cout << "btag = "    << jet.btag("btag_deepb") + jet.btag("btag_deepbb")    << " with scale factor = " <<  jet_bscalefactor;
+         std::cout << "btag = "    << jet.btag("btag_dfb") + jet.btag("btag_dfbb") + jet.btag("btag_dflepb")    << " with scale factor = " <<  jet_bscalefactor;
          std::cout << " up  = " << jet_bscalefactorup << "  down = " << jet_bscalefactordown << std::endl;
       }
       

@@ -171,7 +171,8 @@ if ntuples:
 
    # loop over the splitted files, each will correspond to a job on the NAF
    for f in files:
-      jobid = "job_"+os.path.splitext(f)[0][-4:]
+      jobnum = os.path.splitext(f)[0][-4:]
+      jobid = "job_"+jobnum
       exedir = maindir+"/"+jobid
       os.mkdir(exedir)
       # moving stuff to the proper directories
@@ -185,6 +186,9 @@ if ntuples:
          condorcmd = "condor_submit.csh" + " " + jobid + " " + args.exe
       # make the submissions
       os.chdir(exedir)
+      jobf = open('./seed.txt', 'w+')
+      print >> jobf, int(jobnum)+1
+      jobf.close()
       print "Submitting ",jobid,"..."
       os.system(condorcmd)
       sleep(0.2)
@@ -197,6 +201,9 @@ else:
    if os.path.isfile(args.exe):
       copyfile(args.exe, exedir+"/"+os.path.basename(args.exe))
    os.chdir(exedir)
+   jobf = open('./seed.txt', 'w+')
+   print >> jobf, 1
+   jobf.close()
    condorcmd = "condor_submit.csh job_0000" + " " + os.path.basename(args.exe)
    os.system(condorcmd)
    os.chdir(cwd)

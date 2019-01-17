@@ -68,7 +68,7 @@ namespace analysis {
             /// returns if jet is Puppi
             bool  isPuppi()                     const;
             /// returns the btag value of btag_csvivf
-            float btag()                        const;
+//            float btag()                        const;
             /// returns the btag value of algorithm
             float btag(const std::string & )    const;
             /// returns the flavour with the Hadron definition (=0 for data)
@@ -148,7 +148,7 @@ namespace analysis {
             Jet * fsrJet();
             
             /// pointer to the muon
-            Muon * muon();
+            std::shared_ptr<Muon> muon() const;
             
             /// Pointer to GenJet
             std::shared_ptr<GenJet> generatedJet() const;
@@ -244,7 +244,7 @@ namespace analysis {
             void rmFSR();
             
             /// associate a muon to the jet
-            void addMuon(Muon*);
+            void addMuon(std::shared_ptr<Muon>);
             /// remove muon association to the jet
             void rmMuon();
             
@@ -328,7 +328,7 @@ namespace analysis {
             
             
             /// muon in jet
-            Muon * muon_;
+            std::shared_ptr<Muon> muon_;
             
             
          private:

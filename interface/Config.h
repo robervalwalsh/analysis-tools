@@ -74,7 +74,11 @@ namespace analysis {
             int nevtmax_;
             bool isMC_;
             bool signalregion_;
+            bool blind_;
             bool override_;
+            
+            int seed_;
+            std::string seedfile_;
 
 
          // jets
@@ -115,7 +119,11 @@ namespace analysis {
             int  nEventsMax() const;
             bool isMC() const;
             bool signalRegion() const;
+            bool blind() const;
             bool override() const;
+            
+            std::string seedFile() const;
+            int seed() const;
             
          // jets
             std::string jetsCollection() const;
@@ -177,6 +185,7 @@ namespace analysis {
             float detamax_;
             float detamin_;
             float dphimin_;
+            float dphimax_;
 
             float ptimbalmax_;
 
