@@ -96,6 +96,8 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
 {
    n_hjets_ = n;
    
+   h1_[Form("jet_hist_weight_%s",label.c_str())] = std::make_shared<TH1F>(Form("jet_hist_weight_%s",label.c_str()) , "" ,1 , 0. , 1. );
+   
    for ( int j = 0; j < n; ++j )
    {
       h1_[Form("pt_jet%d_%s"  , j+1,label.c_str())]    = std::make_shared<TH1F>(Form("pt_jet%d_%s"  , j+1,label.c_str())   , "" ,100 , 0   , 1000  );
@@ -523,35 +525,37 @@ bool JetAnalyser::onlineBJetMatching(const int & r)
    return true;
 }
 
-void JetAnalyser::fillJetHistograms(const std::string & label)
+void JetAnalyser::fillJetHistograms(const std::string & label, const float & weight)
 {
    int n = n_hjets_;
    
    if ( n > config_->nJetsMin() ) n = config_->nJetsMin();
    
+   h1_[Form("jet_hist_weight_%s",label.c_str())] -> Fill(0.,weight);
+   
    for ( int j = 0; j < n; ++j )
    {
-      h1_[Form("pt_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->pt());
-      h1_[Form("eta_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->eta());
-      h1_[Form("phi_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->phi()*180./acos(-1.));
-      h1_[Form("btag_jet%d_%s",j+1,label.c_str())] -> Fill(btag(*selectedJets_[j],config_->btagalgo_));
+      h1_[Form("pt_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight);
+      h1_[Form("eta_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->eta(),weight);
+      h1_[Form("phi_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->phi()*180./acos(-1.),weight);
+      h1_[Form("btag_jet%d_%s",j+1,label.c_str())] -> Fill(btag(*selectedJets_[j],config_->btagalgo_),weight);
       for ( int k = j+1; k < n && j < n; ++k )
       {
          Composite<Jet,Jet> c_ij(*(selectedJets_[j]),*(selectedJets_[k]));
          
-         h1_[Form("dr_jet%d%d_%s",j+1,k+1,label.c_str())]    -> Fill(c_ij.deltaR());
-         h1_[Form("deta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.deltaEta());
+         h1_[Form("dr_jet%d%d_%s",j+1,k+1,label.c_str())]    -> Fill(c_ij.deltaR(),weight);
+         h1_[Form("deta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.deltaEta(),weight);
          
-         h1_[Form("pt_jet%d%d_%s",j+1,k+1,label.c_str())]   -> Fill(c_ij.pt());
-         h1_[Form("eta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.eta());
-         h1_[Form("phi_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.phi()*180./acos(-1.));
+         h1_[Form("pt_jet%d%d_%s",j+1,k+1,label.c_str())]   -> Fill(c_ij.pt(),weight);
+         h1_[Form("eta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.eta(),weight);
+         h1_[Form("phi_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.phi()*180./acos(-1.),weight);
          if ( config_->blind() )
          {
-            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(0);
+            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(0.,weight);
          }
          else
          {
-            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.m());
+            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.m(),weight);
          }
       }
    }
