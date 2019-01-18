@@ -54,7 +54,7 @@ TriggerAnalyser::~TriggerAnalyser()
 // ------------ method called for each event  ------------
 
 
-bool TriggerAnalyser::selectionTrigger()
+bool TriggerAnalyser::selectionTrigger() // Maybe not use this, use selectionHLT and selectionL1
 {
    bool hlt = selectionHLT();
    bool l1  = selectionL1();
@@ -65,10 +65,10 @@ bool TriggerAnalyser::selectionTrigger()
 
 bool TriggerAnalyser::selectionHLT()
 {
+   if ( config_->hltPath_ == "" ) return true;
+   
    ++cutflow_;
    if ( ! analysis_->triggerResult(config_->hltPath_) ) return false;
-   
-   if ( config_->hltPath_ == "" ) return true;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,(config_->hltPath_).c_str());
@@ -80,10 +80,10 @@ bool TriggerAnalyser::selectionHLT()
 
 bool TriggerAnalyser::selectionL1()
 {
+   if ( config_->l1Seed_ == "" ) return true;
+   
    ++cutflow_;
    if ( ! analysis_->triggerResult(config_->l1Seed_)  ) return false;
-   
-   if ( config_->l1Seed_ == "" ) return true;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,(config_->l1Seed_).c_str());
