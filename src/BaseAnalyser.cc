@@ -150,6 +150,10 @@ void BaseAnalyser::cutflow()
       {
          printf("| %-88s |    %10.1f |   %16s |  %19s |\n",label.c_str(),n,"-","-");
       }
+      else if ( i == 2 )
+      {
+         printf("| %2d - %-83s |    %10.1f |   %16.4f |  %19s |\n",i-1,label.c_str(),n,rn1,"-");
+      }
       else
       {
          rni = h1_["cutflow"]-> GetBinContent(i)/h1_["cutflow"]->GetBinContent(i-1);
