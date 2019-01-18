@@ -146,12 +146,12 @@ void BaseAnalyser::cutflow()
       float rni = 0;
       if ( i == firstbin )
       {
-         printf("| %-88s |    %10.0f |   %16.4f |  %19s |\n",label.c_str(),n,rn1,"-");
+         printf("| %-88s |    %10.1f |   %16.4f |  %19s |\n",label.c_str(),n,rn1,"-");
       }
       else
       {
          rni = h1_["cutflow"]-> GetBinContent(i)/h1_["cutflow"]->GetBinContent(i-1);
-         printf("| %-88s |    %10.0f |   %16.4f |     %16.4f |\n",label.c_str(),n,rn1,rni);
+         printf("| %-88s |    %10.1f |   %16.4f |     %16.4f |\n",label.c_str(),n,rn1,rni);
       }
       
    }
