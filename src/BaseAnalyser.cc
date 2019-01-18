@@ -58,10 +58,12 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    }
    
    h1_["cutflow"] = std::make_shared<TH1F>("cutflow","", 50,0,50);
+      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" ) 
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(1,"Total events read");
    if ( config_->isMC() )
    {
-      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" ) 
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"Generated events");
+      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(2)) == "" ) 
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(2,"Generated weighted events");
    }
    
 }
@@ -133,25 +135,25 @@ std::map<std::string, std::shared_ptr<TH1F> > BaseAnalyser::histograms()
 void BaseAnalyser::cutflow()
 {
    printf("+%s+\n", std::string(150,'-').c_str());
-   printf("| %-88s |    %10s |   %16s |   %16s |\n","cut","n events","ratio wrt first","ratio wrt previous");
+   printf("| %-88s |    %10s |   %16s |   %16s |\n","workflow","n events","ratio wrt first","ratio wrt previous");
    printf("+%s+\n", std::string(150,'-').c_str());
-   int firstbin = -1;
+   int firstbin = 2;
    for ( int i = 1; i <= h1_["cutflow"] ->GetNbinsX(); ++i )
    {
       std::string label = std::string(h1_["cutflow"]->GetXaxis()->GetBinLabel(i));
       if ( label == "" ) continue;
-      if ( firstbin < 0 ) firstbin = i;
+//      if ( firstbin < 0 ) firstbin = i;
       float n = h1_["cutflow"]->GetBinContent(i);
       float rn1 = h1_["cutflow"]->GetBinContent(i)/h1_["cutflow"]->GetBinContent(firstbin);
       float rni = 0;
-      if ( i == firstbin )
+      if ( i == 1 )
       {
-         printf("| %-88s |    %10.1f |   %16.4f |  %19s |\n",label.c_str(),n,rn1,"-");
+         printf("| %-88s |    %10.1f |   %16s |  %19s |\n",label.c_str(),n,"-","-");
       }
       else
       {
          rni = h1_["cutflow"]-> GetBinContent(i)/h1_["cutflow"]->GetBinContent(i-1);
-         printf("| %-88s |    %10.1f |   %16.4f |     %16.4f |\n",label.c_str(),n,rn1,rni);
+         printf("| %2d - %-83s |    %10.1f |   %16.4f |     %16.4f |\n",i-1,label.c_str(),n,rn1,rni);
       }
       
    }
