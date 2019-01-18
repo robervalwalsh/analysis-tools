@@ -100,6 +100,7 @@ std::vector< std::shared_ptr<Muon> > MuonAnalyser::onlineMatchedMuons()
 
 
 
+// FIXME: need to pass label to the histograms
 void MuonAnalyser::muonHistograms(const std::string & obj, const int & n)
 {
    if ( obj == "muon" )
@@ -132,7 +133,7 @@ bool MuonAnalyser::selectionMuon(const int & r)
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Muon %d: pt > %5.1f and |eta| < %3.1f",r,config_->muonsPtMin()[j], config_->muonsEtaMax()[j] ));
    
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return isgood;
 }
@@ -158,7 +159,7 @@ bool MuonAnalyser::selectionMuonId()
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("MuonId: %s",config_->muonsId().c_str()));
    
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return true;
 }
@@ -172,7 +173,7 @@ bool MuonAnalyser::selectionNMuons()
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("NMuons >= %d",config_->nMuonsMin()));
    
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return true;
    
@@ -217,7 +218,7 @@ bool MuonAnalyser::onlineL1MuonMatching(const int & r)
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("L1MuonTriggerMatch_%d",r));
       
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return true;
 }
@@ -245,13 +246,13 @@ bool MuonAnalyser::onlineL3MuonMatching(const int & r)
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("L3MuonTriggerMatch_%d",r));
       
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return true;
 }
 
 
-
+// FIXME: need to pass label to the histograms
 void MuonAnalyser::fillMuonHistograms()
 {
    int n = config_->nMuonsMin();

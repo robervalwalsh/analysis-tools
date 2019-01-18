@@ -60,7 +60,7 @@ bool Analyser::event(const int & i)
    
    if ( config_->isMC() )
    {
-      h1_["cutflow"] -> Fill(cutflow_);
+      h1_["cutflow"] -> Fill(cutflow_,weight_);
    }
    
    if ( config_->runmin_ > 0 && analysis_->run() < config_->runmin_ ) return false;
