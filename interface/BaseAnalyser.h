@@ -66,6 +66,9 @@ namespace analysis {
             // seed value
             int seed_;
             
+            // event weight
+            float weight_;
+            
             // output root file
             std::shared_ptr<TFile> hout_;
             std::map<std::string, std::shared_ptr<TH1F> > h1_;
@@ -104,6 +107,10 @@ namespace analysis {
             int  seed();
             int  seed(const std::string &);
             void seed(const int &);
+            
+            /// event weight
+            float weight();
+            void weight(const float &);
 
       };
    }

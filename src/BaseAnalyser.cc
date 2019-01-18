@@ -46,6 +46,8 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    
    seed_ = analysis_ ->seed(config_->seedFile());
    
+   weight_ = 1.;
+   
    // JSON for data   
    if( !config_->isMC() && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
    
@@ -171,5 +173,15 @@ int  BaseAnalyser::seed(const std::string & f)
 void BaseAnalyser::seed(const int & seed)
 {
    seed_ = seed;
+}
+
+void  BaseAnalyser::weight(const float & w)
+{
+   weight_ = w;
+}
+
+float  BaseAnalyser::weight()
+{
+   return weight_;
 }
 
