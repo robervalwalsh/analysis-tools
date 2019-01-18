@@ -81,7 +81,7 @@ namespace analysis {
             virtual bool onlineJetMatching(const int &);
             virtual bool onlineBJetMatching(const int &);
             virtual void jetHistograms(const int & n = 1, const std::string & label = "x");
-            virtual void fillJetHistograms(const std::string & label = "x", const float & weight = 1.);
+            virtual void fillJetHistograms(const std::string & label = "x");
 
       };
    }

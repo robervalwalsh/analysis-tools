@@ -155,7 +155,7 @@ bool JetAnalyser::selectionJet(const int & r)
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f and |eta| < %3.1f",r,config_->jetsPtMin()[j], config_->jetsEtaMax()[j] ));
    }
    
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return isgood;
 }
@@ -188,7 +188,7 @@ bool JetAnalyser::selectionJetDeta(const int & j1, const int & j2, const float &
    }
    
         
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
     
    return true;
    
@@ -244,7 +244,7 @@ bool JetAnalyser::selectionJetDphi(const int & j1, const int & j2, const float &
    }
    
         
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
     
    return true;
    
@@ -302,7 +302,7 @@ bool JetAnalyser::selectionJetDr(const int & j1, const int & j2, const float & d
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DR(jet %d, jet %d) > %4.2f",j1,j2,fabs(delta)));
    }
         
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
     
    return true;
    
@@ -362,7 +362,7 @@ bool JetAnalyser::selectionJetId()
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JetId: %s",config_->jetsId().c_str()));
    
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return true;
 }
@@ -388,7 +388,7 @@ bool JetAnalyser::selectionJetPileupId()
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JetPileupId: %s",config_->jetsPuId().c_str()));
    
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return true;
 
@@ -403,7 +403,7 @@ bool JetAnalyser::selectionNJets()
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("NJets >= %d",config_->nJetsMin()));
    
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return true;
    
@@ -429,7 +429,7 @@ bool JetAnalyser::selectionBJet(const int & r )
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: btag > %6.4f",r,config_->jetsbtagmin_[j]));
    
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return true;
 }
@@ -453,7 +453,7 @@ bool JetAnalyser::selectionNonBJet(const int & r )
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: btag < %6.4f",r,config_->nonbtagwp_));
    
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return true;
 }
@@ -486,7 +486,7 @@ bool JetAnalyser::onlineJetMatching(const int & r)
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JetTriggerMatch_%d",r));
       
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return true;
 }
@@ -520,42 +520,42 @@ bool JetAnalyser::onlineBJetMatching(const int & r)
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("BTagTriggerMatch_%d",r));
    
    
-   h1_["cutflow"] -> Fill(cutflow_);
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return true;
 }
 
-void JetAnalyser::fillJetHistograms(const std::string & label, const float & weight)
+void JetAnalyser::fillJetHistograms(const std::string & label)
 {
    int n = n_hjets_;
    
    if ( n > config_->nJetsMin() ) n = config_->nJetsMin();
    
-   h1_[Form("jet_hist_weight_%s",label.c_str())] -> Fill(0.,weight);
+   h1_[Form("jet_hist_weight_%s",label.c_str())] -> Fill(0.,weight_);
    
    for ( int j = 0; j < n; ++j )
    {
-      h1_[Form("pt_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight);
-      h1_[Form("eta_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->eta(),weight);
-      h1_[Form("phi_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->phi()*180./acos(-1.),weight);
-      h1_[Form("btag_jet%d_%s",j+1,label.c_str())] -> Fill(btag(*selectedJets_[j],config_->btagalgo_),weight);
+      h1_[Form("pt_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
+      h1_[Form("eta_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->eta(),weight_);
+      h1_[Form("phi_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->phi()*180./acos(-1.),weight_);
+      h1_[Form("btag_jet%d_%s",j+1,label.c_str())] -> Fill(btag(*selectedJets_[j],config_->btagalgo_),weight_);
       for ( int k = j+1; k < n && j < n; ++k )
       {
          Composite<Jet,Jet> c_ij(*(selectedJets_[j]),*(selectedJets_[k]));
          
-         h1_[Form("dr_jet%d%d_%s",j+1,k+1,label.c_str())]    -> Fill(c_ij.deltaR(),weight);
-         h1_[Form("deta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.deltaEta(),weight);
+         h1_[Form("dr_jet%d%d_%s",j+1,k+1,label.c_str())]    -> Fill(c_ij.deltaR(),weight_);
+         h1_[Form("deta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.deltaEta(),weight_);
          
-         h1_[Form("pt_jet%d%d_%s",j+1,k+1,label.c_str())]   -> Fill(c_ij.pt(),weight);
-         h1_[Form("eta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.eta(),weight);
-         h1_[Form("phi_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.phi()*180./acos(-1.),weight);
+         h1_[Form("pt_jet%d%d_%s",j+1,k+1,label.c_str())]   -> Fill(c_ij.pt(),weight_);
+         h1_[Form("eta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.eta(),weight_);
+         h1_[Form("phi_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.phi()*180./acos(-1.),weight_);
          if ( config_->blind() )
          {
-            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(0.,weight);
+            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(0.,weight_);
          }
          else
          {
-            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.m(),weight);
+            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.m(),weight_);
          }
       }
    }
