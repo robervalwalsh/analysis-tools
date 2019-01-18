@@ -76,6 +76,7 @@ namespace analysis {
             bool signalregion_;
             bool blind_;
             bool override_;
+            bool nlo_;
             
             int seed_;
             std::string seedfile_;
@@ -121,6 +122,7 @@ namespace analysis {
             bool signalRegion() const;
             bool blind() const;
             bool override() const;
+            bool nlo() const;
             
             std::string seedFile() const;
             int seed() const;
