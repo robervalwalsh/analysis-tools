@@ -79,6 +79,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("jetsPtMax", po::value<std::vector<float> >(&jetsptmax_)->multitoken(),"Maximum pt of the jets")
          ("jetsEtaMax", po::value<std::vector<float> >(&jetsetamax_)->multitoken(),"Maximum |eta| of the jets")
          ("jetsBtagMin", po::value<std::vector<float> >(&jetsbtagmin_)->multitoken(),"Minimum btag of the jets; if < 0 -> reverse btag")
+         ("jetsBtagWP", po::value<std::vector<std::string> >(&jetsbtagwp_)->multitoken(),"Jets btag working point")
          ("jetsId",po::value <std::string> (&jetsid_)->default_value("tight"),"Jets id criteria for all jets")
          ("jetsPuId",po::value <std::string> (&jetspuid_)->default_value("loose"),"Jets pileup id criteria for all jets")
          ("jerPtRes",po::value <std::string> (&jerptres_)->default_value(""),"JER pT resolution file")
@@ -91,9 +92,9 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("btagSF",po::value <std::string> (&btagsf_)->default_value("DeepCSV.csv"),"b-tagging scale factor in CSV format")
          ("btagAlgorithm",po::value <std::string> (&btagalgo_)->default_value("csvivf"),"BTag algorithm")
          ("btagWorkingPoint",po::value <std::string> (&btagwp_)->default_value("tight"),"BTag working point")
-         ("btagWPLoose",po::value <float> (&btagwploose_)->default_value(0.46),"BTag working point LOOSE")
-         ("btagWPMedium",po::value <float> (&btagwpmedium_)->default_value(0.84),"BTag working point MEDIUM")
-         ("btagWPTight",po::value <float> (&btagwptight_)->default_value(0.92),"BTag working point TIGHT")
+         ("btagLoose",po::value <float> (&btagwploose_)->default_value(0.46),"BTag working point LOOSE")
+         ("btagMedium",po::value <float> (&btagwpmedium_)->default_value(0.84),"BTag working point MEDIUM")
+         ("btagTight",po::value <float> (&btagwptight_)->default_value(0.92),"BTag working point TIGHT")
          ("nonbtagWP",po::value <float> (&nonbtagwp_)->default_value(0.46),"non-Btag working point")
          ("nonbtagJet",po::value <int> (&nonbtagjet_)->default_value(-1),"non-Btag Jet");
 
@@ -254,7 +255,7 @@ std::string        Config::jetsPuId()          const { return jetspuid_; }
 std::string        Config::jerPtRes()          const { return jerptres_; }
 std::string        Config::jerSF()             const { return jersf_; }
 std::string        Config::l1tJetsCollection() const { return l1tjetsCol_; } 
-
+std::vector<std::string> Config::jetsBtagWP()  const { return jetsbtagwp_; }
 // muons
 std::string        Config::muonsCollection()    const { return muonsCol_; }
 int                Config::nMuonsMin()          const { return nmuonsmin_; }
@@ -274,3 +275,14 @@ std::string        Config::genJetsCollection()  const { return genjetsCol_; }
 // seed 
 std::string        Config::seedFile()           const { return seedfile_; }
 int                Config::seed()               const { return seed_;     }
+
+// btag
+float              Config::btagWP(const std::string & wp) const
+{
+   if ( wp == "loose"  ) return btagwploose_ ;
+   if ( wp == "medium" ) return btagwpmedium_;
+   if ( wp == "tight"  ) return btagwptight_ ;
+   
+   return -100.;
+}
+ 

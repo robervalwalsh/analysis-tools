@@ -96,6 +96,9 @@ namespace analysis {
             std::string jersf_;
             //
             std::string l1tjetsCol_; 
+            //
+            std::vector<std::string> jetsbtagwp_;
+
 
          // muons
             std::string muonsCol_; 
@@ -113,6 +116,11 @@ namespace analysis {
          // generator level collections
             std::string genjetsCol_;
 
+
+         // btag
+            float btagwploose_;
+            float btagwpmedium_;
+            float btagwptight_;
 
                         
          private:
@@ -146,6 +154,7 @@ namespace analysis {
             std::string jerPtRes() const;
             std::string jerSF() const;
             std::string l1tJetsCollection() const; 
+            std::vector<std::string> jetsBtagWP() const;
             
          // muons
             std::string muonsCollection() const;
@@ -162,6 +171,9 @@ namespace analysis {
             
          // generator level
             std::string genJetsCollection() const;
+            
+         // btag
+            float btagWP(const std::string &) const;
             
          // ========================
          
@@ -205,9 +217,6 @@ namespace analysis {
 
             std::string btagalgo_;
             std::string btagwp_;
-            float btagwploose_;
-            float btagwpmedium_;
-            float btagwptight_;
             //float btagwp_;
             float nonbtagwp_;
             int nonbtagjet_;
