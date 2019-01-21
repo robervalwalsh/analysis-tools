@@ -440,6 +440,9 @@ bool JetAnalyser::selectionBJet(const int & r )
    if ( config_->jetsbtagmin_[j] < 0 ) return true; // there is not selection here, so will not update the cutflow
    
    ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag > %6.4f",r,config_->btagalgo_.c_str(),config_->jetsbtagmin_[j]));
+   
    
    if ( r > config_->nbjetsmin_ ) 
    {
@@ -449,9 +452,6 @@ bool JetAnalyser::selectionBJet(const int & r )
    
    // jet  btag
    if ( btag(*selectedJets_[j],config_->btagalgo_) < config_->jetsbtagmin_[j] ) return false;
-   
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: btag > %6.4f",r,config_->jetsbtagmin_[j]));
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
