@@ -89,7 +89,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
       // btagging
       opt_cfg_.add_options()
          ("nBJetsMin",po::value <int> (&nbjetsmin_)->default_value(0),"Minimum number of btgaged jets")
-         ("btagSF",po::value <std::string> (&btagsf_)->default_value("DeepCSV.csv"),"b-tagging scale factor in CSV format")
+         ("btagSF",po::value <std::string> (&btagsf_)->default_value(""),"b-tagging scale factor in CSV format")
          ("btagAlgorithm",po::value <std::string> (&btagalgo_)->default_value("csvivf"),"BTag algorithm")
          ("btagWorkingPoint",po::value <std::string> (&btagwp_)->default_value("tight"),"BTag working point")
          ("btagLoose",po::value <float> (&btagwploose_)->default_value(0.46),"BTag working point LOOSE")
