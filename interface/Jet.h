@@ -184,6 +184,7 @@ namespace analysis {
             
             void jerInfo(const JetResolutionInfo &, const std::string &);
             void jerInfo(const JetResolutionInfo &, const float & drmin=0.2);
+            void applyJER(const JetResolutionInfo &, const float & drmin=0.2);
             
             /// add parton that gave rise to jet
             void addParton(const std::shared_ptr<GenParticle> &);
