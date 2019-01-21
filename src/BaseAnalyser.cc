@@ -57,7 +57,7 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
       hout_= std::make_shared<TFile>(config_->outputRoot_.c_str(),"recreate");
    }
    
-   h1_["cutflow"] = std::make_shared<TH1F>("cutflow","", 50,0,50);
+   h1_["cutflow"] = std::make_shared<TH1F>("cutflow","", 100,0,100);
       if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" ) 
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(1,"Total events read");
    if ( config_->isMC() )
