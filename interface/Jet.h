@@ -228,6 +228,8 @@ namespace analysis {
             void bRegCorr(const float &);
             void bRegRes(const float &);
             
+            void applyBjetRegression();
+            
             /// Rho
             void rho(const double &);
             

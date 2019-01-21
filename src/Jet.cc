@@ -166,9 +166,13 @@ void Jet::jerCorrections()
    
    if ( jermatch_ )
    {
-      c     += (sf-1)*((this->pt() - genjet_->pt())/this->pt());
-      cup   += (sfup-1)*((this->pt() - genjet_->pt())/this->pt());
-      cdown += (sfdown-1)*((this->pt() - genjet_->pt())/this->pt());
+//       c     += (sf-1)*((this->pt() - genjet_->pt())/this->pt());
+//       cup   += (sfup-1)*((this->pt() - genjet_->pt())/this->pt());
+//       cdown += (sfdown-1)*((this->pt() - genjet_->pt())/this->pt());
+      // to avoid problems with regression corrections, use "uncorrected" 
+      c     += (sf-1)*((this->pt() - genjet_->pt())/uncorrJetp4_.Pt());
+      cup   += (sfup-1)*((this->pt() - genjet_->pt())/uncorrJetp4_.Pt());
+      cdown += (sfdown-1)*((this->pt() - genjet_->pt())/uncorrJetp4_.Pt());
    }
    else
    {
@@ -247,6 +251,18 @@ int   Jet::pileupJetIdFullId()                     const { return puJetIdFullId_
 
 float Jet::bRegCorr() const  { return bRegCorr_; }
 float Jet::bRegRes()  const  { return bRegRes_; }
+
+void Jet::applyBjetRegression()
+{
+   float pt  = p4_.Pt()*this->bRegCorr();
+   float eta = p4_.Eta();
+   float phi = p4_.Phi();
+   float e   = p4_.E();
+   p4_.SetPtEtaPhiE(pt,eta,phi,e);
+}
+      
+
+
 
 double Jet::rho()     const  { return rho_; }
 
