@@ -268,6 +268,9 @@ std::string        Config::l1tMuonsCollection() const { return l1tmuonsCol_; }
 // trigger
 std::string        Config::triggerResults()     const { return triggerCol_; }
 
+// generator level
+std::string        Config::genJetsCollection()  const { return genjetsCol_; }
+
 // seed 
 std::string        Config::seedFile()           const { return seedfile_; }
 int                Config::seed()               const { return seed_;     }

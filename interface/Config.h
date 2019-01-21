@@ -110,6 +110,9 @@ namespace analysis {
          // trigger
             std::string triggerCol_;
 
+         // generator level collections
+            std::string genjetsCol_;
+
 
                         
          private:
@@ -156,6 +159,9 @@ namespace analysis {
             
          // trigger
             std::string triggerResults() const;
+            
+         // generator level
+            std::string genJetsCollection() const;
             
          // ========================
          
@@ -227,7 +233,6 @@ namespace analysis {
 
             // ntuples collections
             std::string genParticleCol_;
-            std::string genjetsCol_;
             std::string triggerObjDir_;
 
          protected:
