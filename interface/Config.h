@@ -98,6 +98,8 @@ namespace analysis {
             std::string l1tjetsCol_; 
             //
             std::vector<std::string> jetsbtagwp_;
+            
+            bool bregression_;
 
 
          // muons
@@ -155,6 +157,7 @@ namespace analysis {
             std::string jerSF() const;
             std::string l1tJetsCollection() const; 
             std::vector<std::string> jetsBtagWP() const;
+            bool bRegression() const;
             
          // muons
             std::string muonsCollection() const;
