@@ -81,6 +81,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("jetsBtagMin", po::value<std::vector<float> >(&jetsbtagmin_)->multitoken(),"Minimum btag of the jets; if < 0 -> reverse btag")
          ("jetsId",po::value <std::string> (&jetsid_)->default_value("tight"),"Jets id criteria for all jets")
          ("jetsPuId",po::value <std::string> (&jetspuid_)->default_value("loose"),"Jets pileup id criteria for all jets")
+         ("jerPtRes",po::value <std::string> (&jerptres_)->default_value(""),"JER pT resolution file")
+         ("jerSF",po::value <std::string> (&jersf_)->default_value(""),"JER SF file")
          ("l1tJetsCollection",po::value <std::string> (&l1tjetsCol_)->default_value("l1tJets"),"Name of the L1T jets collection");
 
       // btagging
@@ -249,6 +251,8 @@ std::vector<float> Config::jetsPtMax()         const { return jetsptmax_; }
 std::vector<float> Config::jetsEtaMax()        const { return jetsetamax_; }
 std::string        Config::jetsId()            const { return jetsid_; }
 std::string        Config::jetsPuId()          const { return jetspuid_; }
+std::string        Config::jerPtRes()          const { return jerptres_; }
+std::string        Config::jerSF()             const { return jersf_; }
 std::string        Config::l1tJetsCollection() const { return l1tjetsCol_; } 
 
 // muons

@@ -91,6 +91,10 @@ namespace analysis {
             std::vector<float> jetsetamax_;
             std::string jetsid_;
             std::string jetspuid_;
+            // JER resolution and scale factors from txt file
+            std::string jerptres_;
+            std::string jersf_;
+            //
             std::string l1tjetsCol_; 
 
          // muons
@@ -136,6 +140,8 @@ namespace analysis {
             std::vector<float> jetsEtaMax() const;
             std::string jetsId() const;
             std::string jetsPuId() const;
+            std::string jerPtRes() const;
+            std::string jerSF() const;
             std::string l1tJetsCollection() const; 
             
          // muons
