@@ -50,8 +50,12 @@ namespace analysis {
             int n_hjets_;
             
             bool jetsanalysis_;
+            bool genjetsanalysis_;
+            bool applyjer_;
             
             std::map<std::string, std::shared_ptr<BTagCalibrationReader> >bsf_reader_;
+            
+            std::shared_ptr<JetResolutionInfo> jerinfo_;
          
          private:
                
@@ -82,6 +86,7 @@ namespace analysis {
             virtual bool onlineBJetMatching(const int &);
             virtual void jetHistograms(const int & n = 1, const std::string & label = "x");
             virtual void fillJetHistograms(const std::string & label = "x");
+            virtual void actionApplyJER();
 
       };
    }

@@ -40,6 +40,9 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
    // Physics objects
    // Jets
    jetsanalysis_  = ( analysis_->addTree<Jet> ("Jets",config_->jetsCollection()) != nullptr );
+   genjetsanalysis_  = ( analysis_->addTree<GenJet> ("GenJets",config_->genJetsCollection()) != nullptr && config_->isMC() );
+   
+   applyjer_ = false;
    
    if ( config_->btagsf_ != "" )
    {
@@ -54,6 +57,12 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
       for ( auto & obj : config_->triggerObjectsBJets_ ) analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
    }
    
+   if ( config_->jerPtRes() != "" && config_->jerSF() != "" && genjetsanalysis_ ) // FIXME: check if files exist
+   {
+      jerinfo_ = analysis_->jetResolutionInfo(config_->jerPtRes(),config_->jerSF());
+      applyjer_ = ( jerinfo_ != nullptr );
+   }
+      
 //   histograms("jet",config_->nJetsMin());
 }
 
@@ -78,7 +87,25 @@ bool JetAnalyser::analysisWithJets()
    analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets_,0.3);
    analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsBJets_,0.3);
 
+   // std::shared_ptr< Collection<Jet> >
    auto jets = analysis_->collection<Jet>("Jets");
+   
+   if ( genjetsanalysis_ )
+   {
+      auto genjets = analysis_->collection<GenJet>("GenJets");
+      jets->addGenJets(genjets);
+//       for ( int j = 0 ; j < jets->size() ; ++j )
+//       {
+//          auto jet = std::make_shared<Jet>(jets->at(j));
+//          jet -> applyJER(*jerinfo_,0.2);
+//          jets_.push_back(jet);
+//       }
+   }
+//    else
+//    {
+//       for ( int j = 0 ; j < jets->size() ; ++j )  jets_.push_back(std::make_shared<Jet>(jets->at(j)));
+//    }
+   
    for ( int j = 0 ; j < jets->size() ; ++j )  jets_.push_back(std::make_shared<Jet>(jets->at(j)));
    
    selectedJets_ = jets_;
@@ -568,4 +595,23 @@ ScaleFactors JetAnalyser::btagSF(const int & r, const std::string & wp)
    sf.down    = selectedJets_[j]->btagSFdown(bsf_reader_[wp]);
    
    return sf;
+}
+
+
+void JetAnalyser::actionApplyJER()
+{
+   ++cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"Apply JER smearing");
+   
+   
+   if ( applyjer_ )
+   {
+      for ( auto & j : selectedJets_ )
+      {
+         j -> applyJER(*jerinfo_,0.2);
+      }
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
 }
