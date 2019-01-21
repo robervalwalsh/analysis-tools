@@ -309,9 +309,14 @@ double Jet::btagSFsys(std::shared_ptr<BTagCalibrationReader> reader, const std::
    
    if ( reader == nullptr ) return sf;
    
-   if ( this->flavour(flavalgo) == 5 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_B,    fabs(this->eta()), this->pt() ); 
-   if ( this->flavour(flavalgo) == 4 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_C,    fabs(this->eta()), this->pt() ); 
-   if ( this->flavour(flavalgo) == 0 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_UDSG, fabs(this->eta()), this->pt() );
+//    if ( this->flavour(flavalgo) == 5 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_B,    fabs(this->eta()), this->pt() ); 
+//    if ( this->flavour(flavalgo) == 4 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_C,    fabs(this->eta()), this->pt() ); 
+//    if ( this->flavour(flavalgo) == 0 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_UDSG, fabs(this->eta()), this->pt() );
+   
+// to avoid problems with other corrections   
+   if ( this->flavour(flavalgo) == 5 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_B,    fabs(uncorrJetp4_.Eta()), uncorrJetp4_.Pt() ); 
+   if ( this->flavour(flavalgo) == 4 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_C,    fabs(uncorrJetp4_.Eta()), uncorrJetp4_.Pt() ); 
+   if ( this->flavour(flavalgo) == 0 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_UDSG, fabs(uncorrJetp4_.Eta()), uncorrJetp4_.Pt() );
    
    return sf;
 }
