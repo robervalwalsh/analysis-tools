@@ -640,6 +640,8 @@ void JetAnalyser::actionApplyBtagSF(const int & r)
 
 void JetAnalyser::actionApplyBjetRegression()
 {
+   if ( ! config_->bRegression() ) return;
+   
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"*** Apply b jet energy regression");
