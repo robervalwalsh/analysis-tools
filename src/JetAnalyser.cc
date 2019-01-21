@@ -143,8 +143,9 @@ bool JetAnalyser::selectionJet(const int & r)
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f and |eta| < %3.1f",r,config_->jetsPtMin()[j], config_->jetsEtaMax()[j] ));
    }
    
-   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJetId());
-   if ( !isgood || (int)selectedJets_.size() < r ) return false;
+//   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJetId());
+//   if ( !isgood || (int)selectedJets_.size() < r ) return false;
+   if ( (int)selectedJets_.size() < r ) return false;
    
    // kinematic selection
    if ( selectedJets_[j] -> pt() < config_->jetsPtMin()[j]           && !(config_->jetsPtMin()[j] < 0) ) return false;
@@ -342,12 +343,11 @@ std::vector< std::shared_ptr<Jet> > JetAnalyser::selectedJets()
 
 bool JetAnalyser::selectionJetId()
 {
+   if ( ! jetsanalysis_ ) return false;
+   
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JetId: %s",config_->jetsId().c_str()));
-   
-   
-   if ( ! jetsanalysis_ ) return false;
    
    auto jet = std::begin(selectedJets_);
    while ( jet != std::end(selectedJets_) )
