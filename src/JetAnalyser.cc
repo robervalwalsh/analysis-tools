@@ -617,3 +617,19 @@ void JetAnalyser::actionApplyJER()
    h1_["cutflow"] -> Fill(cutflow_,weight_);
 }
 
+void JetAnalyser::actionApplyBtagSF(const int & r)
+{
+   if ( ! config_-> isMC() || config_->btagsf_ == "" ) return;  // will not apply btag SF
+   
+   int j = r-1;
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: btag SF applied (%s %s WP)",r,config_->btagalgo_.c_str(),config_->jetsBtagWP()[j].c_str()));
+   
+   float sf = this->btagSF(r,config_->jetsBtagWP()[j]).nominal;
+   
+   weight_ *= sf;
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+}
+

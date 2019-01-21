@@ -87,6 +87,7 @@ namespace analysis {
             virtual void jetHistograms(const int & n = 1, const std::string & label = "x");
             virtual void fillJetHistograms(const std::string & label = "x");
             virtual void actionApplyJER();
+            virtual void actionApplyBtagSF(const int &);
 
       };
    }
