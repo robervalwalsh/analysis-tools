@@ -630,6 +630,7 @@ void JetAnalyser::actionApplyJER()
 void JetAnalyser::actionApplyBtagSF(const int & r)
 {
    if ( ! config_-> isMC() || config_->btagsf_ == "" ) return;  // will not apply btag SF
+   if ( ! config_->signalRegion() && r == config_->nonBtagJet() ) return;
    
    int j = r-1;
    ++ cutflow_;
