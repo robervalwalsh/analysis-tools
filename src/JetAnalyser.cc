@@ -443,7 +443,7 @@ bool JetAnalyser::selectionBJet(const int & r )
    
    ++ cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag > %6.4f",r,config_->btagalgo_.c_str(),config_->btagWP(config_->jetsBtagWP()[j])));
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag > %6.4f (%s)",r,config_->btagalgo_.c_str(),config_->btagWP(config_->jetsBtagWP()[j]),config_->jetsBtagWP()[j].c_str()));
    
    if ( r > config_->nbjetsmin_ ) 
    {
@@ -474,14 +474,12 @@ bool JetAnalyser::selectionNonBJet(const int & r )
       std::cout << "* warning * -  JetAnalyser::selectionBJet(): given jet rank > nbjetsmin. Returning false! " << std::endl;
       return false;
    }
-   
   
    // jet  non btag
-//   if ( btag(*selectedJets_[j],config_->btagalgo_) > config_->nonbtagwp_ ) return false;
    if ( btag(*selectedJets_[j],config_->btagalgo_) > config_->btagWP(config_->nonBtagWP()) ) return false;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: btag < %6.4f",r,config_->btagWP(config_->nonBtagWP())));
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag < %6.4f (%s) [reverse btag]",r,config_->btagalgo_.c_str(),config_->btagWP(config_->nonBtagWP()),config_->nonBtagWP().c_str()));
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
