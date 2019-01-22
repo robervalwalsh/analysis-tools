@@ -15,11 +15,11 @@ int main(int argc, char * argv[])
    
    TFile f(rootfile,"old");
    
-   TH1F * h = (TH1F*) f.Get("cutflow");
+   TH1F * h = (TH1F*) f.Get("workflow");
    
    
    printf("+%s+\n", std::string(150,'-').c_str());
-   printf("| %-88s |    %10s |   %16s |   %16s |\n","cut","n events","ratio wrt first","ratio wrt previous");
+   printf("| %-88s |    %10s |   %16s |   %16s |\n",h->GetTitle(),"n events","ratio wrt first","ratio wrt previous");
    printf("+%s+\n", std::string(150,'-').c_str());
    int firstbin = 2;
    for ( int i = 1; i <= h ->GetNbinsX(); ++i )

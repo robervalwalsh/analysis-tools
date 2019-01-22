@@ -57,7 +57,7 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
       hout_= std::make_shared<TFile>(config_->outputRoot_.c_str(),"recreate");
    }
    
-   h1_["cutflow"] = std::make_shared<TH1F>("cutflow","", 100,0,100);
+   h1_["cutflow"] = std::make_shared<TH1F>("workflow",Form("Workflow #%d",config_->workflow()), 100,0,100);
       if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" ) 
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(1,"Total events read");
    if ( config_->isMC() )
@@ -135,7 +135,7 @@ std::map<std::string, std::shared_ptr<TH1F> > BaseAnalyser::histograms()
 void BaseAnalyser::cutflow()
 {
    printf("+%s+\n", std::string(150,'-').c_str());
-   printf("| %-88s |    %10s |   %16s |   %16s |\n","workflow","n events","ratio wrt first","ratio wrt previous");
+   printf("| %-88s |    %10s |   %16s |   %16s |\n",h1_["cutflow"] -> GetTitle(),"n events","ratio wrt first","ratio wrt previous");
    printf("+%s+\n", std::string(150,'-').c_str());
    int firstbin = 2;
    for ( int i = 1; i <= h1_["cutflow"] ->GetNbinsX(); ++i )
