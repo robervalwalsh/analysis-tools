@@ -97,8 +97,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("btagLoose",po::value <float> (&btagwploose_)->default_value(0.46),"BTag working point LOOSE")
          ("btagMedium",po::value <float> (&btagwpmedium_)->default_value(0.84),"BTag working point MEDIUM")
          ("btagTight",po::value <float> (&btagwptight_)->default_value(0.92),"BTag working point TIGHT")
-         ("nonbtagWP",po::value <float> (&nonbtagwp_)->default_value(0.46),"non-Btag working point")
-         ("nonbtagJet",po::value <int> (&nonbtagjet_)->default_value(-1),"non-Btag Jet");
+         ("nonBtagWP",po::value <std::string> (&nonbtagwp_)->default_value(""),"non-Btag working point")
+         ("nonBtagJet",po::value <int> (&nonbtagjet_)->default_value(-1),"non-Btag Jet");
 
       // muons
       opt_cfg_.add_options()
@@ -244,22 +244,24 @@ bool               Config::nlo()             const { return nlo_; }
 int                Config::workflow()        const { return workflow_; }
 
 // analysis control
-bool               Config::override()        const { return override_; }
+bool               Config::override()          const { return override_; }
 
 // jets
-std::string        Config::jetsCollection()    const { return jetsCol_; }
-int                Config::nJetsMin()          const { return njetsmin_; }
-int                Config::nJetsMax()          const { return njetsmax_; }
-std::vector<float> Config::jetsPtMin()         const { return jetsptmin_; }
-std::vector<float> Config::jetsPtMax()         const { return jetsptmax_; }
-std::vector<float> Config::jetsEtaMax()        const { return jetsetamax_; }
-std::string        Config::jetsId()            const { return jetsid_; }
-std::string        Config::jetsPuId()          const { return jetspuid_; }
-std::string        Config::jerPtRes()          const { return jerptres_; }
-std::string        Config::jerSF()             const { return jersf_; }
-std::string        Config::l1tJetsCollection() const { return l1tjetsCol_; } 
-std::vector<std::string> Config::jetsBtagWP()  const { return jetsbtagwp_; }
-bool               Config::bRegression()       const { return bregression_; }
+std::string        Config::jetsCollection()     const { return jetsCol_; }
+int                Config::nJetsMin()           const { return njetsmin_; }
+int                Config::nJetsMax()           const { return njetsmax_; }
+std::vector<float> Config::jetsPtMin()          const { return jetsptmin_; }
+std::vector<float> Config::jetsPtMax()          const { return jetsptmax_; }
+std::vector<float> Config::jetsEtaMax()         const { return jetsetamax_; }
+std::string        Config::jetsId()             const { return jetsid_; }
+std::string        Config::jetsPuId()           const { return jetspuid_; }
+std::string        Config::jerPtRes()           const { return jerptres_; }
+std::string        Config::jerSF()              const { return jersf_; }
+std::string        Config::l1tJetsCollection()  const { return l1tjetsCol_; } 
+std::vector<std::string> Config::jetsBtagWP()   const { return jetsbtagwp_; }
+bool               Config::bRegression()        const { return bregression_; }
+std::string        Config::nonBtagWP()          const { return nonbtagwp_; }
+int                Config::nonBtagJet()         const { return nonbtagjet_; }
 // muons
 std::string        Config::muonsCollection()    const { return muonsCol_; }
 int                Config::nMuonsMin()          const { return nmuonsmin_; }

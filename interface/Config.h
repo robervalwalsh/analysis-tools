@@ -99,6 +99,9 @@ namespace analysis {
             std::string l1tjetsCol_; 
             //
             std::vector<std::string> jetsbtagwp_;
+            std::string nonbtagwp_;
+            int nonbtagjet_;
+
             
             bool bregression_;
 
@@ -160,6 +163,8 @@ namespace analysis {
             std::string l1tJetsCollection() const; 
             std::vector<std::string> jetsBtagWP() const;
             bool bRegression() const;
+            std::string nonBtagWP()  const;
+            int   nonBtagJet() const;
             
          // muons
             std::string muonsCollection() const;
@@ -223,8 +228,6 @@ namespace analysis {
             std::string btagalgo_;
             std::string btagwp_;
             //float btagwp_;
-            float nonbtagwp_;
-            int nonbtagjet_;
 
 
             std::string hltPath_;
