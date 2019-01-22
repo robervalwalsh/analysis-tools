@@ -77,6 +77,7 @@ namespace analysis {
             bool blind_;
             bool override_;
             bool nlo_;
+            int workflow_;
             
             int seed_;
             std::string seedfile_;
@@ -140,6 +141,7 @@ namespace analysis {
             bool blind() const;
             bool override() const;
             bool nlo() const;
+            int  workflow() const;
             
             std::string seedFile() const;
             int seed() const;

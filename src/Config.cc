@@ -61,6 +61,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
          ("nlo",po::value <bool> (&nlo_)->default_value(false),"Flag for NLO samples")
+         ("workflow",po::value <int> (&workflow_)->default_value(1),"Workflow index defined by user")
          ("blind",po::value <bool> (&blind_)->default_value(true),"Flag for blind analysis")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
          ("seed",po::value <int> (&seed_)->default_value(-1), "Seed value for random numbers")
@@ -240,6 +241,7 @@ bool               Config::isMC()            const { return isMC_; }
 bool               Config::signalRegion()    const { return signalregion_; }
 bool               Config::blind()           const { return blind_; }
 bool               Config::nlo()             const { return nlo_; }
+int                Config::workflow()        const { return workflow_; }
 
 // analysis control
 bool               Config::override()        const { return override_; }
