@@ -127,27 +127,27 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
    
    n_hjets_ = n;
    
-   h1_[Form("jet_hist_weight_%s",label.c_str())] = std::make_shared<TH1F>(Form("jet_hist_weight_%s",label.c_str()) , "" ,1 , 0. , 1. );
+   h1_[Form("jet_hist_weight_%s",label.c_str())] = std::make_shared<TH1F>(Form("jet_hist_weight_%s",label.c_str()) , Form("jet_hist_weight_%s",label.c_str()) ,1 , 0. , 1. );
    
    for ( int j = 0; j < n; ++j )
    {
-      h1_[Form("pt_jet%d_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_%s"  , j+1,label.c_str())   , "" ,100 , 0   , 1000  );
-      h1_[Form("eta_jet%d_%s" , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d_%s" , j+1,label.c_str())   , "" , 60 , -3, 3 );
-      h1_[Form("phi_jet%d_%s" , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d_%s" , j+1,label.c_str())   , "" , 360 , -180, 180 );
-      h1_[Form("btag_jet%d_%s", j+1,label.c_str())]  = std::make_shared<TH1F>(Form("btag_jet%d_%s", j+1,label.c_str())   , "" , 100 , 0, 1 );
+      h1_[Form("pt_jet%d_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d"  , j+1) , Form("pt_jet%d_%s"  , j+1,label.c_str()) ,100 , 0   , 1000  );
+      h1_[Form("eta_jet%d_%s" , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d" , j+1) , Form("eta_jet%d_%s" , j+1,label.c_str()) , 60 , -3, 3 );
+      h1_[Form("phi_jet%d_%s" , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d" , j+1) , Form("phi_jet%d_%s" , j+1,label.c_str()) , 360 , -180, 180 );
+      h1_[Form("btag_jet%d_%s", j+1,label.c_str())]  = std::make_shared<TH1F>(Form("btag_jet%d", j+1) , Form("btag_jet%d_%s", j+1,label.c_str()) , 100 , 0, 1 );
       h1_[Form("pt_jet%d_%s"  , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d p_{T} [GeV]",j+1));
       h1_[Form("eta_jet%d_%s" , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d  #eta",j+1));
       h1_[Form("phi_jet%d_%s" , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d  #phi",j+1));
       h1_[Form("btag_jet%d_%s", j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d btag discriminator",j+1)); 
       for ( int k = j+1; k < n && j < n; ++k )
       {
-         h1_[Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())   , "" , 50 , 0, 5 );
-         h1_[Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())   , "" ,100 , 0,10 );
-         h1_[Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str())   , "" ,360 , 0,360 );
-         h1_[Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str())   , "" ,300 , 0,3000 );
-         h1_[Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str())   , "" ,200 , -10,10 );
-         h1_[Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str())   , "" ,360 , -180,180 );
-         h1_[Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str())   , "" ,300 , 0,3000 );
+         h1_[Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dr_jet%d%d"  , j+1,k+1) , Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str()) , 50 , 0, 5 );
+         h1_[Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("deta_jet%d%d", j+1,k+1) , Form("deta_jet%d%d_%s", j+1,k+1,label.c_str()) ,100 , 0,10 );
+         h1_[Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dphi_jet%d%d", j+1,k+1) , Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str()) ,360 , 0,360 );
+         h1_[Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d%d"  , j+1,k+1) , Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str()) ,300 , 0,3000 );
+         h1_[Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d%d" , j+1,k+1) , Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str()) ,200 , -10,10 );
+         h1_[Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d%d" , j+1,k+1) , Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str()) ,360 , -180,180 );
+         h1_[Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("m_jet%d%d"   , j+1,k+1) , Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str()) ,300 , 0,3000 );
          h1_[Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#DeltaR(Jet %d, Jet %d)",j+1,k+1));
          h1_[Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta#eta(Jet %d, Jet %d)",j+1,k+1));
          h1_[Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta#phi(Jet %d, Jet %d)",j+1,k+1));
