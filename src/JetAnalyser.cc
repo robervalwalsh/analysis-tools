@@ -121,6 +121,10 @@ void JetAnalyser::jets(const std::string & col)
 
 void JetAnalyser::jetHistograms( const int & n, const std::string & label )
 {
+   this->output()->cd();
+   this->output()->mkdir(label.c_str());
+   this->output()->cd(label.c_str());
+   
    n_hjets_ = n;
    
    h1_[Form("jet_hist_weight_%s",label.c_str())] = std::make_shared<TH1F>(Form("jet_hist_weight_%s",label.c_str()) , "" ,1 , 0. , 1. );
@@ -153,6 +157,9 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
          h1_[Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("M_{%d%d} [GeV]",j+1,k+1));
       }
    }
+   
+   this->output()->cd();
+
 }
 
 
@@ -566,9 +573,12 @@ bool JetAnalyser::onlineBJetMatching(const int & r)
 
 void JetAnalyser::fillJetHistograms(const std::string & label)
 {
+   this->output()->cd();
    ++ cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("*** Filling jets histograms - %s",label.c_str()));
+   
+   this->output()->cd(label.c_str());
    
    int n = n_hjets_;
    
@@ -602,6 +612,7 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
          }
       }
    }
+   this->output()->cd();
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
