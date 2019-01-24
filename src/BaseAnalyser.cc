@@ -55,6 +55,7 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    if ( config_->outputRoot_ != "" )
    {
       hout_= std::make_shared<TFile>(config_->outputRoot_.c_str(),"recreate");
+      hout_ -> cd();
    }
    
    h1_["cutflow"] = std::make_shared<TH1F>("workflow",Form("Workflow #%d",config_->workflow()), 100,0,100);
@@ -76,9 +77,9 @@ BaseAnalyser::~BaseAnalyser()
    {
       std::cout << std::endl;
       std::cout << "output root file: " << config_->outputRoot_ << std::endl;
-      
+      hout_ -> cd();
       hout_->Write();
-      hout_->Close();
+//      hout_->Close();
    }   
    
 //   std::string cutflow = "Cutflow " + config_->outputRoot_;
@@ -191,3 +192,7 @@ float  BaseAnalyser::weight()
    return weight_;
 }
 
+std::shared_ptr<TFile> BaseAnalyser::output()
+{
+   return hout_;
+}

@@ -111,6 +111,9 @@ namespace analysis {
             /// event weight
             float weight();
             void weight(const float &);
+            
+            // output root file
+            std::shared_ptr<TFile> output();
 
       };
    }
