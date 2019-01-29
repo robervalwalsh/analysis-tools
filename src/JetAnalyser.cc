@@ -53,7 +53,7 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
    
    if ( config_->triggerObjDir_ != "" )
    {
-      for ( auto & obj : config_->triggerObjectsJets_ )  analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
+      for ( auto & obj : config_->triggerObjectsJets() )  analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
       for ( auto & obj : config_->triggerObjectsBJets_ ) analysis_->addTree<TriggerObject> (obj,Form("%s/%s",config_->triggerObjDir_.c_str(),obj.c_str()));
    }
    
@@ -84,7 +84,7 @@ bool JetAnalyser::analysisWithJets()
    selectedJets_.clear();
    if ( ! jetsanalysis_ ) return false;
    
-   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets_,0.3);
+   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets(),0.3);
    analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsBJets_,0.3);
 
    // std::shared_ptr< Collection<Jet> >
@@ -509,7 +509,7 @@ bool JetAnalyser::selectionNonBJet(const int & r )
 bool JetAnalyser::onlineJetMatching(const int & r)
 {
    int j = r-1;
-   if ( config_->triggerObjectsJets_.size() == 0 ) return true;
+   if ( config_->triggerObjectsJets().size() == 0 ) return true;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -528,9 +528,9 @@ bool JetAnalyser::onlineJetMatching(const int & r)
    }
    
    std::shared_ptr<Jet> jet = selectedJets_[j];
-   for ( size_t io = 0; io < config_->triggerObjectsJets_.size() ; ++io )
+   for ( size_t io = 0; io < config_->triggerObjectsJets().size() ; ++io )
    {       
-      if ( ! jet->matched(config_->triggerObjectsJets_[io]) ) return false;
+      if ( ! jet->matched(config_->triggerObjectsJets()[io]) ) return false;
    }
 
    h1_["cutflow"] -> Fill(cutflow_,weight_);
