@@ -679,3 +679,39 @@ void JetAnalyser::actionApplyBjetRegression()
    }
    h1_["cutflow"] -> Fill(cutflow_,weight_);
 }
+
+bool JetAnalyser::selectionDiJetMass(const int & r1, const int & r2)
+{
+   float min = config_->massMin();
+   float max = config_->massMax();
+   if ( min < 0. && max < 0. ) return true;
+   
+   ++cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      std::string label = Form("M(Jet %d + Jet %d)",r1,r2);
+      if ( min > 0. )
+      {   
+         if ( max > 0. && max > min ) label = Form("%5.1f < %s < %5.1f",min,label.c_str(),max);
+         else                         label = Form("%s > %5.1f",label.c_str(),min);
+      }
+      else
+      {
+         label = Form("%s < %5.1f",label.c_str(),max);
+      }
+      
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,label.c_str());
+   }
+   
+   int j1 = r1-1;
+   int j2 = r2-1;
+   Composite<Jet,Jet> c_j1j2(*(selectedJets_[j1]),*(selectedJets_[j2]));
+   float mass = c_j1j2.m();
+   
+   if ( min > 0. && mass < min ) return false;
+   if ( max > 0. && mass > max ) return false;
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   return true;
+}
