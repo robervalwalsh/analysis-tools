@@ -156,6 +156,12 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("dPhiMax",po::value <float> (&dphimax_)->default_value(-1.),"Maximum delta phi between candidates")
          ("ptImbalanceMax",po::value <float> (&ptimbalmax_)->default_value(1000.),"Maximum relative imbalance between two candidates");
       
+         
+      // general
+      opt_cfg_.add_options()
+         ("massMin",po::value <float> (&massmin_)->default_value(-1.),"Cut on a mass, min value")
+         ("massMax",po::value <float> (&massmax_)->default_value(-1.),"Cut on a mass, max value");
+            
       po::variables_map vm; 
       try
       {
@@ -292,3 +298,14 @@ float              Config::btagWP(const std::string & wp) const
    return -100.;
 }
  
+std::vector<std::string> Config::triggerObjectsJets() const
+{
+   return triggerObjectsJets_;
+}
+void Config::triggerObjectsJets(const std::string & label, const int & index)
+{
+   triggerObjectsJets_.at(index) = label;
+}
+// General stuff            
+float Config::massMin() const { return massmin_; }
+float Config::massMax() const { return massmax_; }

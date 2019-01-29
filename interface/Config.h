@@ -101,6 +101,9 @@ namespace analysis {
             std::vector<std::string> jetsbtagwp_;
             std::string nonbtagwp_;
             int nonbtagjet_;
+            //
+            std::vector<std::string> triggerObjectsJets_;
+
 
             
             bool bregression_;
@@ -127,6 +130,10 @@ namespace analysis {
             float btagwploose_;
             float btagwpmedium_;
             float btagwptight_;
+            
+         // general
+            float massmin_;
+            float massmax_;
 
                         
          private:
@@ -165,6 +172,8 @@ namespace analysis {
             bool bRegression() const;
             std::string nonBtagWP()  const;
             int   nonBtagJet() const;
+            std::vector<std::string> triggerObjectsJets() const;
+            void triggerObjectsJets(const std::string & label, const int & index);
             
          // muons
             std::string muonsCollection() const;
@@ -184,6 +193,10 @@ namespace analysis {
             
          // btag
             float btagWP(const std::string &) const;
+            
+         // general
+            float massMin() const;
+            float massMax() const;
             
          // ========================
          
@@ -235,7 +248,6 @@ namespace analysis {
             std::vector<std::string> triggerObjects_;
             std::vector<int> triggerObjectsMatches_;
             std::vector<int> triggerObjectsMatchesRank_;
-            std::vector<std::string> triggerObjectsJets_;
             std::vector<std::string> triggerObjectsBJets_;
             std::vector<std::string> triggerObjectsL1Jets_;
             int triggerObjectsJetsMatches_;
