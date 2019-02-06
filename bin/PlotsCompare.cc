@@ -59,7 +59,7 @@ int main(int argc, char * argv[])
    
    int color[10] = {kBlack,kRed};
    
-   TString out;
+   TString out = TString(outplot_);
    
 //   if ( outplot_ == "" ) outplot_ = "comparison_plot.png";
    
@@ -87,11 +87,12 @@ int main(int argc, char * argv[])
          h[i] -> SetNameTitle(Form("%s_%d",hist_.c_str(),i), Form("%s (%s)",title_.c_str(),h[i]->GetXaxis()->GetTitle()));
       }
    }
-      if ( outplot_ == "" )
-      {
-         out = TString(std::string(h[0]->GetName()) + "_versus_" + std::string(h[1]->GetName()) + ".png");
-         out.ReplaceAll("/","_");
-      }
+   if ( outplot_ == "" )
+   {
+      out = TString(std::string(h[0]->GetName()) + "_versus_" + std::string(h[1]->GetName()) + ".png");
+      out.ReplaceAll("/","_");
+   }
+
    for ( int i = 0; i < 2 ; ++i )
    {
       h[i] -> SetMarkerStyle(20);
@@ -105,7 +106,7 @@ int main(int argc, char * argv[])
          h[i] -> GetXaxis()->SetRangeUser(min_,max_);
       }
       h[i] -> SetMinimum(0);
-      if ( logy_ ) h[i] -> SetMinimum(0.1);
+      if ( logy_ ) h[i] -> SetMinimum(0.8);
    }
    h[1] -> Scale(scale_);
    
@@ -125,6 +126,11 @@ int main(int argc, char * argv[])
    c1 -> SaveAs(out);
    
    if ( app_ ) theApp.Run();    // will not return
+   
+   delete rp;
+   delete c1;
+   delete f[0];
+   delete f[1];
    
    return 0;
 }
@@ -155,15 +161,19 @@ int plot_ratio()
    
    rp->Draw();
    
-   rp -> GetLowYaxis() -> SetNdivisions(403);
+   rp -> GetLowYaxis() -> SetNdivisions(503);
    rp -> GetLowerRefGraph() -> GetXaxis() -> SetTitleOffset(1.1);
+   rp -> GetLowerRefGraph() -> GetYaxis() -> SetTitle("ratio");
+   rp -> GetLowerRefYaxis() -> SetTitleOffset(1.2);
+   rp -> GetLowerRefYaxis() -> SetLabelSize(0.05);
+   rp -> GetLowerRefYaxis() -> SetTitleSize(0.05);
    rp->GetLowerRefGraph()->SetMarkerStyle(20);
    rp->GetLowerRefGraph()->SetMarkerColor(kGray+2);
    rp->GetLowerRefGraph()->SetMarkerSize(1.2);
    rp->GetLowerRefGraph()->SetLineWidth(2);
    rp->GetLowerRefGraph()->SetLineColor(kGray+2);
-   rp->GetLowerRefGraph()->SetMinimum(0.3);
-   rp->GetLowerRefGraph()->SetMaximum(1.7);
+   rp->GetLowerRefGraph()->SetMinimum(0.);
+   rp->GetLowerRefGraph()->SetMaximum(2.4);
    
    rp -> GetUpperRefXaxis() -> SetLabelSize(0.05);
    rp -> GetUpperRefXaxis() -> SetTitleSize(0.05);
@@ -187,12 +197,17 @@ int draw_legend()
    if ( TString(var).Contains("m_jet") || TString(var).Contains("pt_jet") )
       legend = rp -> GetUpperPad() -> BuildLegend(0.65,0.65,0.90,0.85);
    else if ( !TString(var).Contains("deta_jet") && ( TString(var).Contains("eta_jet") || TString(var).Contains("phi_jet") ))
-//      legend = rp -> GetUpperPad() -> BuildLegend(0.38,0.05,0.63,0.25);
-      legend = rp -> GetUpperPad() -> BuildLegend(0.65,0.65,0.90,0.85);
+      legend = rp -> GetUpperPad() -> BuildLegend(0.40,0.05,0.65,0.25);
+//      legend = rp -> GetUpperPad() -> BuildLegend(0.65,0.65,0.90,0.85);
    else if ( TString(var).Contains("btag_jet") )
-      legend = rp -> GetUpperPad() -> BuildLegend(0.15,0.65,0.45,0.85);
+   {  
+      if ( logy_ )
+         legend = rp -> GetUpperPad() -> BuildLegend(0.35,0.05,0.60,0.25);
+      else
+         legend = rp -> GetUpperPad() -> BuildLegend(0.35,0.65,0.60,0.85);
+   }
    else
-      legend = rp -> GetUpperPad() -> BuildLegend(0.15,0.65,0.45,0.85);
+      legend = rp -> GetUpperPad() -> BuildLegend(0.15,0.65,0.40,0.85);
    legend -> Clear();
    
    legend ->AddEntry(h[0], leg[0].c_str(), "P");
