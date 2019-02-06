@@ -36,12 +36,12 @@ int main(int argc, char * argv[])
       }
       else if ( i == 2 )
       {
-         printf("| %2d - %-83s |    %10.1f |   %16.4f |  %19s |\n",i-1,label.c_str(),n,rn1,"-");
+         printf("| %2d - %-83s |    %10.1f |   %16.6f |  %19s |\n",i-1,label.c_str(),n,rn1,"-");
       }
       else
       {
          rni = h-> GetBinContent(i)/h->GetBinContent(i-1);
-         printf("| %2d - %-83s |    %10.1f |   %16.4f |     %16.4f |\n",i-1,label.c_str(),n,rn1,rni);
+         printf("| %2d - %-83s |    %10.1f |   %16.6f |     %16.6f |\n",i-1,label.c_str(),n,rn1,rni);
       }
       
    }
