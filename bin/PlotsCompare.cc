@@ -118,7 +118,7 @@ int main(int argc, char * argv[])
    if ( logx_ ) c1 -> SetLogx();   
    if ( logy_ ) c1 -> SetLogy();   
    
-   CMS_lumi(rp->GetUpperPad(),"work in progress");
+   CMS_lumi(rp->GetUpperPad(),"private");
    
    legend -> SetShadowColor(0);
    
