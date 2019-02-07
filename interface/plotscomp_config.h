@@ -13,6 +13,10 @@ int plotscomp_config(int argc, char * argv[]);
 //std::string cfg_;
 
 // if file, give up to 4 histograms
+std::vector<std::string> files_;
+std::vector<std::string> histos_;
+std::vector<std::string> titles_;
+
 std::string file_;
 std::string hist1_;
 std::string hist2_;
@@ -36,6 +40,7 @@ bool logy_;
 bool app_;
 
 
+
 int plotscomp_config(int argc, char * argv[])
 {
    app_ = true;
@@ -50,6 +55,9 @@ int plotscomp_config(int argc, char * argv[])
          ("bkg,b"   , "Run in the background")
          ("logx"    , "x-axis in log scale")
          ("logy"    , "y-axis in log scale")
+         ("files"   , po::value<std::vector<std::string> >(&files_)->multitoken(),"list of files")
+         ("histos"  , po::value<std::vector<std::string> >(&histos_)->multitoken(),"list of histograms")
+         ("titles"  , po::value<std::vector<std::string> >(&titles_)->multitoken(),"titles of histograms")
          ("title,t" , po::value <std::string> (&title_)  -> default_value("")  , "Title of the histogram")
          ("legend1" , po::value <std::string> (&legend1_)-> default_value("histo 1")  , "Legend of the histogram 1")
          ("legend2" , po::value <std::string> (&legend2_)-> default_value("histo 2")  , "Legend of the histogram 2")
