@@ -184,9 +184,9 @@ bool JetAnalyser::selectionJet(const int & r)
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
    {
       if ( config_->jetsPtMax().size() > 0 && config_->jetsPtMax()[j] > config_->jetsPtMin()[j] )
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f and pt < %5.1f and |eta| < %3.1f",r,config_->jetsPtMin()[j], config_->jetsPtMax()[j],config_->jetsEtaMax()[j] ));
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f GeV and pt < %5.1f GeV and |eta| < %3.1f",r,config_->jetsPtMin()[j], config_->jetsPtMax()[j],config_->jetsEtaMax()[j] ));
       else
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f and |eta| < %3.1f",r,config_->jetsPtMin()[j], config_->jetsEtaMax()[j] ));
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f GeV and |eta| < %3.1f",r,config_->jetsPtMin()[j], config_->jetsEtaMax()[j] ));
    }
    
 //   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJetId());
@@ -692,12 +692,12 @@ bool JetAnalyser::selectionDiJetMass(const int & r1, const int & r2)
       std::string label = Form("M(Jet %d + Jet %d)",r1,r2);
       if ( min > 0. )
       {   
-         if ( max > 0. && max > min ) label = Form("%5.1f < %s < %5.1f",min,label.c_str(),max);
-         else                         label = Form("%s > %5.1f",label.c_str(),min);
+         if ( max > 0. && max > min ) label = Form("%5.1f GeV < %s < %5.1f GeV",min,label.c_str(),max);
+         else                         label = Form("%s > %5.1f GeV",label.c_str(),min);
       }
       else
       {
-         label = Form("%s < %5.1f",label.c_str(),max);
+         label = Form("%s < %5.1f GeV",label.c_str(),max);
       }
       
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,label.c_str());
