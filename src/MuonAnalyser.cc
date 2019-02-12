@@ -70,8 +70,10 @@ bool MuonAnalyser::analysisWithMuons()
    onlineMatchedMuons_.clear();
    if ( ! muonsanalysis_ ) return false;
    
-   analysis_->match<Muon,TriggerObject>("Muons",config_->triggerObjectsL1Muons_,0.3);
-   analysis_->match<Muon,TriggerObject>("Muons",config_->triggerObjectsL3Muons_,0.3);
+   if ( config_->triggerObjectsL1Muons_ != "" )
+      analysis_->match<Muon,TriggerObject>("Muons",config_->triggerObjectsL1Muons_,0.3);
+   if ( config_->triggerObjectsL3Muons_ != "" )
+      analysis_->match<Muon,TriggerObject>("Muons",config_->triggerObjectsL3Muons_,0.3);
 
    auto muons = analysis_->collection<Muon>("Muons");
    for ( int j = 0 ; j < muons->size() ; ++j )  muons_.push_back(std::make_shared<Muon>(muons->at(j)));
@@ -118,23 +120,65 @@ void MuonAnalyser::muonHistograms(const std::string & obj, const int & n)
 
 bool MuonAnalyser::selectionMuon(const int & r)
 {
-   ++cutflow_;
-   
    bool isgood = true;
-   int j = r-1;
+   ++cutflow_;
+   int m = r-1;
    
-   if ( selectedMuons_.size() == 0 ) isgood = (isgood && selectionMuonId());
-   if ( !isgood || (int)selectedMuons_.size() < r ) return false;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      if ( config_->muonsPtMax().size() > 0 && config_->muonsPtMax()[m] > config_->muonsPtMin()[m] )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Muon %d: pt > %5.1f GeV and pt < %5.1f GeV and |eta| < %3.1f",r,config_->muonsPtMin()[m], config_->muonsPtMax()[m],config_->muonsEtaMax()[m] ));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Muon %d: pt > %5.1f GeV and |eta| < %3.1f",r,config_->muonsPtMin()[m], config_->muonsEtaMax()[m] ));
+   }
    
    // kinematic selection
-   if ( selectedMuons_[j] -> pt() < config_->muonsPtMin()[j]           && !(config_->muonsPtMin()[j] < 0) )   return false;
-   if ( fabs(selectedMuons_[j] -> eta()) > config_->muonsEtaMax()[j]   && !(config_->muonsEtaMax()[j] < 0) )  return false;
-   
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Muon %d: pt > %5.1f and |eta| < %3.1f",r,config_->muonsPtMin()[j], config_->muonsEtaMax()[j] ));
+   if ( selectedMuons_[m] -> pt() < config_->muonsPtMin()[m]           && !(config_->muonsPtMin()[m] < 0) )   return false;
+   if ( fabs(selectedMuons_[m] -> eta()) > config_->muonsEtaMax()[m]   && !(config_->muonsEtaMax()[m] < 0) )  return false;
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   return isgood;
+}
+
+bool MuonAnalyser::selectionMuons()
+{
+   // selectedMuons will be composed of muons with the lowest pt threshold
+   
+   bool isgood = true;
+   ++cutflow_;
+//    
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      if ( config_->muonsPtMax().size() > 0 && config_->muonsPtMax().back() > config_->muonsPtMin().back() )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Muons selected: pt > %5.1f GeV and pt < %5.1f GeV and |eta| < %3.1f", config_->muonsPtMin().back(), config_->muonsPtMax().back(), config_->muonsEtaMax().back() ));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Muons selected: pt > %5.1f GeV and |eta| < %3.1f", config_->muonsPtMin().back(), config_->muonsEtaMax().back() ));
+   }
+   
+   // kinematic selection
+   auto muon = std::begin(selectedMuons_);
+   while ( muon != std::end(selectedMuons_) )
+   {
+      if ( config_->muonsPtMax().size() > 0 && config_->muonsPtMax().back() > config_->muonsPtMin().back() )
+      {
+         if ( (*muon)->pt() < config_->muonsPtMin().back() || (*muon)->pt() > config_->muonsPtMax().back() || fabs((*muon)->eta()) > config_->muonsEtaMax().back() )
+            muon = selectedMuons_.erase(muon);
+         else
+            ++muon;
+      }
+      else
+      {
+         if ( (*muon)->pt() < config_->muonsPtMin().back() || fabs((*muon)->eta()) > config_->muonsEtaMax().back() )
+            muon = selectedMuons_.erase(muon);
+         else
+            ++muon;
+      }
+   }
+   if ( (int)selectedMuons_.size() < config_->nMuonsMin() ) return false;
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+//    
    return isgood;
 }
 
@@ -143,6 +187,9 @@ bool MuonAnalyser::selectionMuon(const int & r)
 bool MuonAnalyser::selectionMuonId()
 {
    ++cutflow_;
+   
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("MuonId: %s",config_->muonsId().c_str()));
    
    if ( ! muonsanalysis_ ) return false;
    
@@ -156,8 +203,6 @@ bool MuonAnalyser::selectionMuonId()
    }
    if ( selectedMuons_.size() == 0 ) return false;
    
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("MuonId: %s",config_->muonsId().c_str()));
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
@@ -184,13 +229,22 @@ bool MuonAnalyser::onlineMuonMatching()
 {
    if ( config_->triggerObjectsL1Muons_ == "" && config_->triggerObjectsL3Muons_ == ""  ) return true;
    
-   for ( size_t i = 0; i < selectedMuons_.size() ; ++i )
+   ++cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"Muons selected: Online muon matching (L1 and L3)");
+   
+   auto muon = std::begin(selectedMuons_);
+   while ( muon != std::end(selectedMuons_) )
    {
-      int m = i+1;
-      if ( onlineL1MuonMatching(m) && onlineL3MuonMatching(m) ) onlineMatchedMuons_.push_back(selectedMuons_[i]);
+      if ( !((*muon)->matched(config_->triggerObjectsL3Muons_) && (*muon)->matched(config_->triggerObjectsL3Muons_) ))
+         muon = selectedMuons_.erase(muon);
+      else
+         ++muon;
    }
    
-   if ( onlineMatchedMuons_.size() == 0 ) return false;
+   if ( (int)selectedMuons_.size() < config_->nMuonsMin() ) return false;
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    return true;
 }
