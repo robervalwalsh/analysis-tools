@@ -248,6 +248,8 @@ namespace analysis {
             
             /// associate a muon to the jet
             void addMuon(std::shared_ptr<Muon>);
+            /// associate a muon to the jet from a collection of muons 
+            void addMuon(std::vector< std::shared_ptr<Muon> > muons, const float & dr = 0.4);
             /// remove muon association to the jet
             void rmMuon();
             

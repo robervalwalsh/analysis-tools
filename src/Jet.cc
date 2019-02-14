@@ -462,6 +462,20 @@ void Jet::addMuon(const std::shared_ptr<Muon> m)
    muon_ = m;
 }
 
+void Jet::addMuon(std::vector< std::shared_ptr<Muon> > muons, const float & dr)
+{
+   if ( muons.size() == 0 ) return;
+   
+   for ( auto m : muons )
+   {
+      if ( this->deltaR((*m)) < dr )
+      {
+         addMuon(m);
+         return;
+      }
+   }
+}
+
 void Jet::rmMuon()
 {
    muon_ = nullptr;
