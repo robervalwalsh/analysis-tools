@@ -90,6 +90,7 @@ namespace analysis {
             virtual void actionApplyJER();
             virtual void actionApplyBtagSF(const int &);
             virtual void actionApplyBjetRegression();
+            virtual void jetSwap(const int &, const int &);
 
       };
    }

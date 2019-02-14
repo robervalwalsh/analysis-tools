@@ -715,3 +715,22 @@ bool JetAnalyser::selectionDiJetMass(const int & r1, const int & r2)
    
    return true;
 }
+
+void JetAnalyser::jetSwap(const int & r1, const int & r2)
+{
+   if ( r1 == r2 ) return;
+   int j1 = r1-1;
+   int j2 = r2-1;
+//    ++ cutflow_;
+//    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+//       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d <--> Jet %d: jets ranking was swapped ",r1,r2));
+   
+   auto jet1 = selectedJets_[j1];
+   auto jet2 = selectedJets_[j2];
+   
+   selectedJets_[j1] = jet2;
+   selectedJets_[j2] = jet1;
+   
+//    h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+}
