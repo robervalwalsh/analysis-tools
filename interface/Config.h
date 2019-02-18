@@ -76,6 +76,8 @@ namespace analysis {
             bool signalregion_;
             bool blind_;
             bool override_;
+            bool nlo_;
+            int workflow_;
             
             int seed_;
             std::string seedfile_;
@@ -90,7 +92,22 @@ namespace analysis {
             std::vector<float> jetsetamax_;
             std::string jetsid_;
             std::string jetspuid_;
+            // JER resolution and scale factors from txt file
+            std::string jerptres_;
+            std::string jersf_;
+            //
             std::string l1tjetsCol_; 
+            //
+            std::vector<std::string> jetsbtagwp_;
+            std::string nonbtagwp_;
+            int nonbtagjet_;
+            //
+            std::vector<std::string> triggerObjectsJets_;
+
+
+            
+            bool bregression_;
+
 
          // muons
             std::string muonsCol_; 
@@ -105,6 +122,18 @@ namespace analysis {
          // trigger
             std::string triggerCol_;
 
+         // generator level collections
+            std::string genjetsCol_;
+
+
+         // btag
+            float btagwploose_;
+            float btagwpmedium_;
+            float btagwptight_;
+            
+         // general
+            float massmin_;
+            float massmax_;
 
                         
          private:
@@ -121,6 +150,8 @@ namespace analysis {
             bool signalRegion() const;
             bool blind() const;
             bool override() const;
+            bool nlo() const;
+            int  workflow() const;
             
             std::string seedFile() const;
             int seed() const;
@@ -134,7 +165,15 @@ namespace analysis {
             std::vector<float> jetsEtaMax() const;
             std::string jetsId() const;
             std::string jetsPuId() const;
+            std::string jerPtRes() const;
+            std::string jerSF() const;
             std::string l1tJetsCollection() const; 
+            std::vector<std::string> jetsBtagWP() const;
+            bool bRegression() const;
+            std::string nonBtagWP()  const;
+            int   nonBtagJet() const;
+            std::vector<std::string> triggerObjectsJets() const;
+            void triggerObjectsJets(const std::string & label, const int & index);
             
          // muons
             std::string muonsCollection() const;
@@ -148,6 +187,16 @@ namespace analysis {
             
          // trigger
             std::string triggerResults() const;
+            
+         // generator level
+            std::string genJetsCollection() const;
+            
+         // btag
+            float btagWP(const std::string &) const;
+            
+         // general
+            float massMin() const;
+            float massMax() const;
             
          // ========================
          
@@ -191,12 +240,7 @@ namespace analysis {
 
             std::string btagalgo_;
             std::string btagwp_;
-            float btagwploose_;
-            float btagwpmedium_;
-            float btagwptight_;
             //float btagwp_;
-            float nonbtagwp_;
-            int nonbtagjet_;
 
 
             std::string hltPath_;
@@ -204,7 +248,6 @@ namespace analysis {
             std::vector<std::string> triggerObjects_;
             std::vector<int> triggerObjectsMatches_;
             std::vector<int> triggerObjectsMatchesRank_;
-            std::vector<std::string> triggerObjectsJets_;
             std::vector<std::string> triggerObjectsBJets_;
             std::vector<std::string> triggerObjectsL1Jets_;
             int triggerObjectsJetsMatches_;
@@ -219,7 +262,6 @@ namespace analysis {
 
             // ntuples collections
             std::string genParticleCol_;
-            std::string genjetsCol_;
             std::string triggerObjDir_;
 
          protected:

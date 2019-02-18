@@ -166,9 +166,13 @@ void Jet::jerCorrections()
    
    if ( jermatch_ )
    {
-      c     += (sf-1)*((this->pt() - genjet_->pt())/this->pt());
-      cup   += (sfup-1)*((this->pt() - genjet_->pt())/this->pt());
-      cdown += (sfdown-1)*((this->pt() - genjet_->pt())/this->pt());
+//       c     += (sf-1)*((this->pt() - genjet_->pt())/this->pt());
+//       cup   += (sfup-1)*((this->pt() - genjet_->pt())/this->pt());
+//       cdown += (sfdown-1)*((this->pt() - genjet_->pt())/this->pt());
+      // to avoid problems with regression corrections, use "uncorrected" 
+      c     += (sf-1)*((this->pt() - genjet_->pt())/uncorrJetp4_.Pt());
+      cup   += (sfup-1)*((this->pt() - genjet_->pt())/uncorrJetp4_.Pt());
+      cdown += (sfdown-1)*((this->pt() - genjet_->pt())/uncorrJetp4_.Pt());
    }
    else
    {
@@ -219,6 +223,16 @@ void Jet::jerInfo(const JetResolutionInfo & jerinfo, const float & drmin)
    jerCorrections();
 }
       
+void Jet::applyJER(const JetResolutionInfo & jerinfo, const float & drmin)
+{
+   this -> jerInfo(jerinfo,drmin);
+   float pt  = p4_.Pt()*this->jerCorrection();
+   float eta = p4_.Eta();
+   float phi = p4_.Phi();
+   float e   = p4_.E();
+   p4_.SetPtEtaPhiE(pt,eta,phi,e);
+}
+      
 
 
 //
@@ -237,6 +251,18 @@ int   Jet::pileupJetIdFullId()                     const { return puJetIdFullId_
 
 float Jet::bRegCorr() const  { return bRegCorr_; }
 float Jet::bRegRes()  const  { return bRegRes_; }
+
+void Jet::applyBjetRegression()
+{
+   float pt  = p4_.Pt()*this->bRegCorr();
+   float eta = p4_.Eta();
+   float phi = p4_.Phi();
+   float e   = p4_.E();
+   p4_.SetPtEtaPhiE(pt,eta,phi,e);
+}
+      
+
+
 
 double Jet::rho()     const  { return rho_; }
 
@@ -283,9 +309,14 @@ double Jet::btagSFsys(std::shared_ptr<BTagCalibrationReader> reader, const std::
    
    if ( reader == nullptr ) return sf;
    
-   if ( this->flavour(flavalgo) == 5 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_B,    fabs(this->eta()), this->pt() ); 
-   if ( this->flavour(flavalgo) == 4 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_C,    fabs(this->eta()), this->pt() ); 
-   if ( this->flavour(flavalgo) == 0 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_UDSG, fabs(this->eta()), this->pt() );
+//    if ( this->flavour(flavalgo) == 5 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_B,    fabs(this->eta()), this->pt() ); 
+//    if ( this->flavour(flavalgo) == 4 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_C,    fabs(this->eta()), this->pt() ); 
+//    if ( this->flavour(flavalgo) == 0 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_UDSG, fabs(this->eta()), this->pt() );
+   
+// to avoid problems with other corrections   
+   if ( this->flavour(flavalgo) == 5 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_B,    fabs(uncorrJetp4_.Eta()), uncorrJetp4_.Pt() ); 
+   if ( this->flavour(flavalgo) == 4 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_C,    fabs(uncorrJetp4_.Eta()), uncorrJetp4_.Pt() ); 
+   if ( this->flavour(flavalgo) == 0 ) sf = reader->eval_auto_bounds(systype, BTagEntry::FLAV_UDSG, fabs(uncorrJetp4_.Eta()), uncorrJetp4_.Pt() );
    
    return sf;
 }
@@ -429,6 +460,20 @@ void Jet::addMuon(const std::shared_ptr<Muon> m)
       return;
    }
    muon_ = m;
+}
+
+void Jet::addMuon(std::vector< std::shared_ptr<Muon> > muons, const float & dr)
+{
+   if ( muons.size() == 0 ) return;
+   
+   for ( auto m : muons )
+   {
+      if ( this->deltaR((*m)) < dr )
+      {
+         addMuon(m);
+         return;
+      }
+   }
 }
 
 void Jet::rmMuon()

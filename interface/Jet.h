@@ -184,6 +184,7 @@ namespace analysis {
             
             void jerInfo(const JetResolutionInfo &, const std::string &);
             void jerInfo(const JetResolutionInfo &, const float & drmin=0.2);
+            void applyJER(const JetResolutionInfo &, const float & drmin=0.2);
             
             /// add parton that gave rise to jet
             void addParton(const std::shared_ptr<GenParticle> &);
@@ -227,6 +228,8 @@ namespace analysis {
             void bRegCorr(const float &);
             void bRegRes(const float &);
             
+            void applyBjetRegression();
+            
             /// Rho
             void rho(const double &);
             
@@ -245,6 +248,8 @@ namespace analysis {
             
             /// associate a muon to the jet
             void addMuon(std::shared_ptr<Muon>);
+            /// associate a muon to the jet from a collection of muons 
+            void addMuon(std::vector< std::shared_ptr<Muon> > muons, const float & dr = 0.4);
             /// remove muon association to the jet
             void rmMuon();
             

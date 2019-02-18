@@ -60,6 +60,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("output",po::value <std::string> (&outputRoot_)->default_value("histograms.root"),"Output root file")
          ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
+         ("nlo",po::value <bool> (&nlo_)->default_value(false),"Flag for NLO samples")
+         ("workflow",po::value <int> (&workflow_)->default_value(1),"Workflow index defined by user")
          ("blind",po::value <bool> (&blind_)->default_value(true),"Flag for blind analysis")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
          ("seed",po::value <int> (&seed_)->default_value(-1), "Seed value for random numbers")
@@ -78,21 +80,25 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("jetsPtMax", po::value<std::vector<float> >(&jetsptmax_)->multitoken(),"Maximum pt of the jets")
          ("jetsEtaMax", po::value<std::vector<float> >(&jetsetamax_)->multitoken(),"Maximum |eta| of the jets")
          ("jetsBtagMin", po::value<std::vector<float> >(&jetsbtagmin_)->multitoken(),"Minimum btag of the jets; if < 0 -> reverse btag")
+         ("jetsBtagWP", po::value<std::vector<std::string> >(&jetsbtagwp_)->multitoken(),"Jets btag working point")
          ("jetsId",po::value <std::string> (&jetsid_)->default_value("tight"),"Jets id criteria for all jets")
          ("jetsPuId",po::value <std::string> (&jetspuid_)->default_value("loose"),"Jets pileup id criteria for all jets")
+         ("jerPtRes",po::value <std::string> (&jerptres_)->default_value(""),"JER pT resolution file")
+         ("jerSF",po::value <std::string> (&jersf_)->default_value(""),"JER SF file")
+         ("bRegression",po::value <bool> (&bregression_)->default_value(true),"Apply b jet energy regression")
          ("l1tJetsCollection",po::value <std::string> (&l1tjetsCol_)->default_value("l1tJets"),"Name of the L1T jets collection");
 
       // btagging
       opt_cfg_.add_options()
          ("nBJetsMin",po::value <int> (&nbjetsmin_)->default_value(0),"Minimum number of btgaged jets")
-         ("btagSF",po::value <std::string> (&btagsf_)->default_value("DeepCSV.csv"),"b-tagging scale factor in CSV format")
+         ("btagSF",po::value <std::string> (&btagsf_)->default_value(""),"b-tagging scale factor in CSV format")
          ("btagAlgorithm",po::value <std::string> (&btagalgo_)->default_value("csvivf"),"BTag algorithm")
          ("btagWorkingPoint",po::value <std::string> (&btagwp_)->default_value("tight"),"BTag working point")
-         ("btagWPLoose",po::value <float> (&btagwploose_)->default_value(0.46),"BTag working point LOOSE")
-         ("btagWPMedium",po::value <float> (&btagwpmedium_)->default_value(0.84),"BTag working point MEDIUM")
-         ("btagWPTight",po::value <float> (&btagwptight_)->default_value(0.92),"BTag working point TIGHT")
-         ("nonbtagWP",po::value <float> (&nonbtagwp_)->default_value(0.46),"non-Btag working point")
-         ("nonbtagJet",po::value <int> (&nonbtagjet_)->default_value(-1),"non-Btag Jet");
+         ("btagLoose",po::value <float> (&btagwploose_)->default_value(0.46),"BTag working point LOOSE")
+         ("btagMedium",po::value <float> (&btagwpmedium_)->default_value(0.84),"BTag working point MEDIUM")
+         ("btagTight",po::value <float> (&btagwptight_)->default_value(0.92),"BTag working point TIGHT")
+         ("nonBtagWP",po::value <std::string> (&nonbtagwp_)->default_value(""),"non-Btag working point")
+         ("nonBtagJet",po::value <int> (&nonbtagjet_)->default_value(-1),"non-Btag Jet");
 
       // muons
       opt_cfg_.add_options()
@@ -150,6 +156,12 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("dPhiMax",po::value <float> (&dphimax_)->default_value(-1.),"Maximum delta phi between candidates")
          ("ptImbalanceMax",po::value <float> (&ptimbalmax_)->default_value(1000.),"Maximum relative imbalance between two candidates");
       
+         
+      // general
+      opt_cfg_.add_options()
+         ("massMin",po::value <float> (&massmin_)->default_value(-1.),"Cut on a mass, min value")
+         ("massMax",po::value <float> (&massmax_)->default_value(-1.),"Cut on a mass, max value");
+            
       po::variables_map vm; 
       try
       {
@@ -234,21 +246,28 @@ int                Config::nEventsMax()      const { return nevtmax_; }
 bool               Config::isMC()            const { return isMC_; }
 bool               Config::signalRegion()    const { return signalregion_; }
 bool               Config::blind()           const { return blind_; }
+bool               Config::nlo()             const { return nlo_; }
+int                Config::workflow()        const { return workflow_; }
 
 // analysis control
-bool               Config::override()        const { return override_; }
+bool               Config::override()          const { return override_; }
 
 // jets
-std::string        Config::jetsCollection()    const { return jetsCol_; }
-int                Config::nJetsMin()          const { return njetsmin_; }
-int                Config::nJetsMax()          const { return njetsmax_; }
-std::vector<float> Config::jetsPtMin()         const { return jetsptmin_; }
-std::vector<float> Config::jetsPtMax()         const { return jetsptmax_; }
-std::vector<float> Config::jetsEtaMax()        const { return jetsetamax_; }
-std::string        Config::jetsId()            const { return jetsid_; }
-std::string        Config::jetsPuId()          const { return jetspuid_; }
-std::string        Config::l1tJetsCollection() const { return l1tjetsCol_; } 
-
+std::string        Config::jetsCollection()     const { return jetsCol_; }
+int                Config::nJetsMin()           const { return njetsmin_; }
+int                Config::nJetsMax()           const { return njetsmax_; }
+std::vector<float> Config::jetsPtMin()          const { return jetsptmin_; }
+std::vector<float> Config::jetsPtMax()          const { return jetsptmax_; }
+std::vector<float> Config::jetsEtaMax()         const { return jetsetamax_; }
+std::string        Config::jetsId()             const { return jetsid_; }
+std::string        Config::jetsPuId()           const { return jetspuid_; }
+std::string        Config::jerPtRes()           const { return jerptres_; }
+std::string        Config::jerSF()              const { return jersf_; }
+std::string        Config::l1tJetsCollection()  const { return l1tjetsCol_; } 
+std::vector<std::string> Config::jetsBtagWP()   const { return jetsbtagwp_; }
+bool               Config::bRegression()        const { return bregression_; }
+std::string        Config::nonBtagWP()          const { return nonbtagwp_; }
+int                Config::nonBtagJet()         const { return nonbtagjet_; }
 // muons
 std::string        Config::muonsCollection()    const { return muonsCol_; }
 int                Config::nMuonsMin()          const { return nmuonsmin_; }
@@ -262,6 +281,31 @@ std::string        Config::l1tMuonsCollection() const { return l1tmuonsCol_; }
 // trigger
 std::string        Config::triggerResults()     const { return triggerCol_; }
 
+// generator level
+std::string        Config::genJetsCollection()  const { return genjetsCol_; }
+
 // seed 
 std::string        Config::seedFile()           const { return seedfile_; }
 int                Config::seed()               const { return seed_;     }
+
+// btag
+float              Config::btagWP(const std::string & wp) const
+{
+   if ( wp == "loose"  ) return btagwploose_ ;
+   if ( wp == "medium" ) return btagwpmedium_;
+   if ( wp == "tight"  ) return btagwptight_ ;
+   
+   return -100.;
+}
+ 
+std::vector<std::string> Config::triggerObjectsJets() const
+{
+   return triggerObjectsJets_;
+}
+void Config::triggerObjectsJets(const std::string & label, const int & index)
+{
+   triggerObjectsJets_.at(index) = label;
+}
+// General stuff            
+float Config::massMin() const { return massmin_; }
+float Config::massMax() const { return massmax_; }

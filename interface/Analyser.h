@@ -60,6 +60,8 @@ namespace analysis {
          public:
             // Actions
             virtual bool event(const int &);
+         
+            void generatorWeight();
                
 
       };
