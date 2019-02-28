@@ -86,7 +86,10 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("jetsPuId",po::value <std::string> (&jetspuid_)->default_value("loose"),"Jets pileup id criteria for all jets")
          ("jerPtRes",po::value <std::string> (&jerptres_)->default_value(""),"JER pT resolution file")
          ("jerSF",po::value <std::string> (&jersf_)->default_value(""),"JER SF file")
-         ("bRegression",po::value <bool> (&bregression_)->default_value(true),"Apply b jet energy regression")
+         ("bRegression",po::value <bool> (&bregression_)->default_value(false),"Apply b jet energy regression")
+         ("doDijet",po::value <bool> (&dodijet_)->default_value(false),"Combine jets in dijet objects")
+         ("useJetsFlavour",po::value <bool> (&usejetsflv_)->default_value(false),"For splitting results accoding to jet flavour")
+         ("useJetsExtendedFlavour",po::value <bool> (&usejetsextflv_)->default_value(false),"For splitting results accoding to jet extended flavour")
          ("l1tJetsCollection",po::value <std::string> (&l1tjetsCol_)->default_value("l1tJets"),"Name of the L1T jets collection");
 
       // btagging
@@ -271,6 +274,10 @@ std::vector<std::string> Config::jetsBtagWP()   const { return jetsbtagwp_; }
 bool               Config::bRegression()        const { return bregression_; }
 std::string        Config::nonBtagWP()          const { return nonbtagwp_; }
 int                Config::nonBtagJet()         const { return nonbtagjet_; }
+bool               Config::useJetsFlavour()     const { return usejetsflv_; }
+bool               Config::useJetsExtendedFlavour() const { return usejetsextflv_; }
+bool               Config::doDijet() const            { return dodijet_; }
+
 // muons
 std::string        Config::muonsCollection()    const { return muonsCol_; }
 int                Config::nMuonsMin()          const { return nmuonsmin_; }

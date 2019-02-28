@@ -103,8 +103,9 @@ namespace analysis {
             int nonbtagjet_;
             //
             std::vector<std::string> triggerObjectsJets_;
-
-
+            bool usejetsflv_;
+            bool usejetsextflv_;
+            bool dodijet_;
             
             bool bregression_;
 
@@ -174,6 +175,9 @@ namespace analysis {
             int   nonBtagJet() const;
             std::vector<std::string> triggerObjectsJets() const;
             void triggerObjectsJets(const std::string & label, const int & index);
+            bool useJetsFlavour() const;
+            bool useJetsExtendedFlavour() const;
+            bool doDijet() const;
             
          // muons
             std::string muonsCollection() const;
