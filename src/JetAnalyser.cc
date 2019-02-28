@@ -93,7 +93,7 @@ bool JetAnalyser::analysisWithJets()
    if ( this->genParticlesAnalysis() && config_ -> useJetsExtendedFlavour() )
    {
       auto particles = analysis_->collection<GenParticle>("GenParticles");
-      jets->associatePartons(particles,0.4,1.,false);
+      jets->associatePartons(particles,0.4,1.,config_->pythia8());
    }
    
    if ( genjetsanalysis_ )
