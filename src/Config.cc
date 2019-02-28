@@ -187,9 +187,9 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          boost::algorithm::to_lower(jetsid_);
          std::transform(btagalgo_.begin(), btagalgo_.end(), btagalgo_.begin(), ::tolower);
          std::transform(btagwp_.begin(), btagwp_.end(), btagwp_.begin(), ::tolower);
-         jerptres_ = Form("%s/%s",datapath.c_str(),jerptres_.c_str());
-         jersf_    = Form("%s/%s",datapath.c_str(),jersf_.c_str()   );
-         btagsf_   = Form("%s/%s",datapath.c_str(),btagsf_.c_str()  );
+         if ( jerptres_ != "" )  jerptres_ = Form("%s/%s", datapath.c_str(), jerptres_.c_str());
+         if ( jersf_    != "" )  jersf_    = Form("%s/%s", datapath.c_str(), jersf_.c_str()   );
+         if ( btagsf_   != "" )  btagsf_   = Form("%s/%s", datapath.c_str(), btagsf_.c_str()  );
          
       }
       catch(po::error& e)
