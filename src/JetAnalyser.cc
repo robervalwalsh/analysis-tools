@@ -127,7 +127,7 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
    
    for ( int j = 0; j < n; ++j )
    {
-      h1_[Form("pt_jet%d_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d"  , j+1) , Form("pt_jet%d_%s"  , j+1,label.c_str()) ,100 , 0   , 1000  );
+      h1_[Form("pt_jet%d_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d"  , j+1) , Form("pt_jet%d_%s"  , j+1,label.c_str()) ,150 , 0   , 1500  );
       h1_[Form("eta_jet%d_%s" , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d" , j+1) , Form("eta_jet%d_%s" , j+1,label.c_str()) , 60 , -3, 3 );
       h1_[Form("phi_jet%d_%s" , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d" , j+1) , Form("phi_jet%d_%s" , j+1,label.c_str()) , 360 , -180, 180 );
       h1_[Form("btag_jet%d_%s", j+1,label.c_str())]  = std::make_shared<TH1F>(Form("btag_jet%d", j+1) , Form("btag_jet%d_%s", j+1,label.c_str()) , 100 , 0, 1 );
@@ -145,7 +145,7 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
          }
          for ( auto & flv : flavours )
          {
-            h1_[Form("pt_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_%s"  , j+1,flv.c_str()) , Form("pt_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str()) ,100 , 0   , 1000  );
+            h1_[Form("pt_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_%s"  , j+1,flv.c_str()) , Form("pt_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str()) ,150 , 0   , 1500  );
             h1_[Form("eta_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d_%s" , j+1,flv.c_str()) , Form("eta_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str()) , 60 , -3, 3 );
             h1_[Form("phi_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d_%s" , j+1,flv.c_str()) , Form("phi_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str()) , 360 , -180, 180 );
             h1_[Form("btag_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("btag_jet%d_%s", j+1,flv.c_str()) , Form("btag_jet%d_%s_%s", j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );
