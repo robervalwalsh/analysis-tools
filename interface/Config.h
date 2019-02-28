@@ -135,6 +135,7 @@ namespace analysis {
             float btagwploose_;
             float btagwpmedium_;
             float btagwptight_;
+            float btagwpxxx_;
             
          // general
             float massmin_;

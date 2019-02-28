@@ -102,6 +102,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("btagLoose",po::value <float> (&btagwploose_)->default_value(0.46),"BTag working point LOOSE")
          ("btagMedium",po::value <float> (&btagwpmedium_)->default_value(0.84),"BTag working point MEDIUM")
          ("btagTight",po::value <float> (&btagwptight_)->default_value(0.92),"BTag working point TIGHT")
+         ("btagXXX",po::value <float> (&btagwpxxx_)->default_value(0.92),"BTag undefined working point XXX")
          ("nonBtagWP",po::value <std::string> (&nonbtagwp_)->default_value(""),"non-Btag working point")
          ("nonBtagJet",po::value <int> (&nonbtagjet_)->default_value(-1),"non-Btag Jet");
 
@@ -308,6 +309,7 @@ float              Config::btagWP(const std::string & wp) const
    if ( wp == "loose"  ) return btagwploose_ ;
    if ( wp == "medium" ) return btagwpmedium_;
    if ( wp == "tight"  ) return btagwptight_ ;
+   if ( wp == "xxx"    ) return btagwpxxx_;
    
    return -100.;
 }
