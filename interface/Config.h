@@ -125,6 +125,8 @@ namespace analysis {
 
          // generator level collections
             std::string genjetsCol_;
+            std::string genpartsCol_;
+            
 
 
          // btag
@@ -194,6 +196,7 @@ namespace analysis {
             
          // generator level
             std::string genJetsCollection() const;
+            std::string genParticlesCollection() const;
             
          // btag
             float btagWP(const std::string &) const;
@@ -265,7 +268,6 @@ namespace analysis {
             int triggerObjectsL3MuonsMatches_;
 
             // ntuples collections
-            std::string genParticleCol_;
             std::string triggerObjDir_;
 
          protected:

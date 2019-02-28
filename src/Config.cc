@@ -141,7 +141,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
 
       // generator level
       opt_cfg_.add_options()
-         ("genParticleCollection",po::value <std::string> (&genParticleCol_)->default_value(""),"Name of the gen particle collection")
+         ("genparticlesCollection",po::value <std::string> (&genpartsCol_)->default_value(""),"Name of the gen particle collection")
          ("genjetsCollection",po::value <std::string> (&genjetsCol_)->default_value(""),"Name of the gen jets collection");
             
          
@@ -292,7 +292,8 @@ std::string        Config::l1tMuonsCollection() const { return l1tmuonsCol_; }
 std::string        Config::triggerResults()     const { return triggerCol_; }
 
 // generator level
-std::string        Config::genJetsCollection()  const { return genjetsCol_; }
+std::string        Config::genJetsCollection()       const { return genjetsCol_; }
+std::string        Config::genParticlesCollection()  const { return genpartsCol_; }
 
 // seed 
 std::string        Config::seedFile()           const { return seedfile_; }
