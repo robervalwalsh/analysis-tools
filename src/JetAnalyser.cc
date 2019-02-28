@@ -62,7 +62,7 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
       jerinfo_ = analysis_->jetResolutionInfo(config_->jerPtRes(),config_->jerSF());
       applyjer_ = ( jerinfo_ != nullptr );
    }
-      
+   
 //   histograms("jet",config_->nJetsMin());
 }
 
@@ -139,22 +139,45 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
       h1_[Form("eta_jet%d_%s" , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d  #eta",j+1));
       h1_[Form("phi_jet%d_%s" , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d  #phi",j+1));
       h1_[Form("btag_jet%d_%s", j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d btag discriminator",j+1)); 
-      for ( int k = j+1; k < n && j < n; ++k )
+      if ( config_->isMC() && ( config_->useJetsFlavour() || config_->useJetsExtendedFlavour() ) )
       {
-         h1_[Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dr_jet%d%d"  , j+1,k+1) , Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str()) , 50 , 0, 5 );
-         h1_[Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("deta_jet%d%d", j+1,k+1) , Form("deta_jet%d%d_%s", j+1,k+1,label.c_str()) ,100 , 0,10 );
-         h1_[Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dphi_jet%d%d", j+1,k+1) , Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str()) ,360 , 0,360 );
-         h1_[Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d%d"  , j+1,k+1) , Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str()) ,300 , 0,3000 );
-         h1_[Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d%d" , j+1,k+1) , Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str()) ,200 , -10,10 );
-         h1_[Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d%d" , j+1,k+1) , Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str()) ,360 , -180,180 );
-         h1_[Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("m_jet%d%d"   , j+1,k+1) , Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str()) ,300 , 0,3000 );
-         h1_[Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#DeltaR(Jet %d, Jet %d)",j+1,k+1));
-         h1_[Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta#eta(Jet %d, Jet %d)",j+1,k+1));
-         h1_[Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta#phi(Jet %d, Jet %d)",j+1,k+1));
-         h1_[Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d + Jet %d p_{T} [GeV]",j+1,k+1));
-         h1_[Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d + Jet %d  #eta",j+1,k+1));
-         h1_[Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d + Jet %d  #phi",j+1,k+1));
-         h1_[Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("M_{%d%d} [GeV]",j+1,k+1));
+         std::vector<std::string> flavours = {"udsg","c","b"};
+         if ( config_->useJetsExtendedFlavour() )
+         {
+            flavours.push_back("cc");
+            flavours.push_back("bb");
+         }
+         for ( auto & flv : flavours )
+         {
+            h1_[Form("pt_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_%s"  , j+1,flv.c_str()) , Form("pt_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str()) ,100 , 0   , 1000  );
+            h1_[Form("eta_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d_%s" , j+1,flv.c_str()) , Form("eta_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str()) , 60 , -3, 3 );
+            h1_[Form("phi_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d_%s" , j+1,flv.c_str()) , Form("phi_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str()) , 360 , -180, 180 );
+            h1_[Form("btag_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("btag_jet%d_%s", j+1,flv.c_str()) , Form("btag_jet%d_%s_%s", j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );
+            h1_[Form("pt_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d (%s) p_{T} [GeV]",j+1,flv.c_str()));
+            h1_[Form("eta_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d (%s)  #eta",j+1,flv.c_str()));
+            h1_[Form("phi_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d (%s)  #phi",j+1,flv.c_str()));
+            h1_[Form("btag_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d (%s) btag discriminator",j+1,flv.c_str())); 
+         }
+      }
+      if ( config_->doDijet() )
+      {
+         for ( int k = j+1; k < n && j < n; ++k )
+         {
+            h1_[Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dr_jet%d%d"  , j+1,k+1) , Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str()) , 50 , 0, 5 );
+            h1_[Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("deta_jet%d%d", j+1,k+1) , Form("deta_jet%d%d_%s", j+1,k+1,label.c_str()) ,100 , 0,10 );
+            h1_[Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dphi_jet%d%d", j+1,k+1) , Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str()) ,360 , 0,360 );
+            h1_[Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d%d"  , j+1,k+1) , Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str()) ,300 , 0,3000 );
+            h1_[Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d%d" , j+1,k+1) , Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str()) ,200 , -10,10 );
+            h1_[Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d%d" , j+1,k+1) , Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str()) ,360 , -180,180 );
+            h1_[Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("m_jet%d%d"   , j+1,k+1) , Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str()) ,300 , 0,3000 );
+            h1_[Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#DeltaR(Jet %d, Jet %d)",j+1,k+1));
+            h1_[Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta#eta(Jet %d, Jet %d)",j+1,k+1));
+            h1_[Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta#phi(Jet %d, Jet %d)",j+1,k+1));
+            h1_[Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d + Jet %d p_{T} [GeV]",j+1,k+1));
+            h1_[Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d + Jet %d  #eta",j+1,k+1));
+            h1_[Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d + Jet %d  #phi",j+1,k+1));
+            h1_[Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("M_{%d%d} [GeV]",j+1,k+1));
+         }
       }
    }
    
@@ -588,27 +611,46 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
    
    for ( int j = 0; j < n; ++j )
    {
-      h1_[Form("pt_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
-      h1_[Form("eta_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->eta(),weight_);
-      h1_[Form("phi_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->phi()*180./acos(-1.),weight_);
+      h1_[Form("pt_jet%d_%s",j+1,label.c_str())]   -> Fill(selectedJets_[j]->pt(),weight_);
+      h1_[Form("eta_jet%d_%s",j+1,label.c_str())]  -> Fill(selectedJets_[j]->eta(),weight_);
+      h1_[Form("phi_jet%d_%s",j+1,label.c_str())]  -> Fill(selectedJets_[j]->phi()*180./acos(-1.),weight_);
       h1_[Form("btag_jet%d_%s",j+1,label.c_str())] -> Fill(btag(*selectedJets_[j],config_->btagalgo_),weight_);
-      for ( int k = j+1; k < n && j < n; ++k )
+      
+      if ( config_ -> useJetsFlavour() || config_ -> useJetsExtendedFlavour() )
       {
-         Composite<Jet,Jet> c_ij(*(selectedJets_[j]),*(selectedJets_[k]));
-         
-         h1_[Form("dr_jet%d%d_%s",j+1,k+1,label.c_str())]    -> Fill(c_ij.deltaR(),weight_);
-         h1_[Form("deta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.deltaEta(),weight_);
-         
-         h1_[Form("pt_jet%d%d_%s",j+1,k+1,label.c_str())]   -> Fill(c_ij.pt(),weight_);
-         h1_[Form("eta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.eta(),weight_);
-         h1_[Form("phi_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.phi()*180./acos(-1.),weight_);
-         if ( config_->isMC() || !config_->signalRegion() )
+         std::string flv = "udsg";
+         if ( config_ -> useJetsFlavour() )
          {
-            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.m(),weight_);
+            if ( abs(selectedJets_[j]->flavour()) == 4 ) flv = "c"; 
+            if ( abs(selectedJets_[j]->flavour()) == 5 ) flv = "b"; 
          }
-         else  // blind
+         if ( config_ -> useJetsExtendedFlavour() ) flv = selectedJets_[j]->extendedFlavour();
+         h1_[Form("pt_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->pt(),weight_);
+         h1_[Form("eta_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->eta(),weight_);
+         h1_[Form("phi_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->phi()*180./acos(-1.),weight_);
+         h1_[Form("btag_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())]  -> Fill(btag(*selectedJets_[j],config_->btagalgo_),weight_);
+      }
+      
+      if ( config_ -> doDijet() )
+      {
+         for ( int k = j+1; k < n && j < n; ++k )
          {
-            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(0.,weight_);
+            Composite<Jet,Jet> c_ij(*(selectedJets_[j]),*(selectedJets_[k]));
+            
+            h1_[Form("dr_jet%d%d_%s",j+1,k+1,label.c_str())]    -> Fill(c_ij.deltaR(),weight_);
+            h1_[Form("deta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.deltaEta(),weight_);
+            
+            h1_[Form("pt_jet%d%d_%s",j+1,k+1,label.c_str())]   -> Fill(c_ij.pt(),weight_);
+            h1_[Form("eta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.eta(),weight_);
+            h1_[Form("phi_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.phi()*180./acos(-1.),weight_);
+            if ( config_->isMC() || !config_->signalRegion() )
+            {
+               h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.m(),weight_);
+            }
+            else  // blind
+            {
+               h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(0.,weight_);
+            }
          }
       }
    }
