@@ -90,21 +90,17 @@ bool JetAnalyser::analysisWithJets()
    // std::shared_ptr< Collection<Jet> >
    auto jets = analysis_->collection<Jet>("Jets");
    
+   if ( this->genParticlesAnalysis() && config_ -> useJetsExtendedFlavour() )
+   {
+      auto particles = analysis_->collection<GenParticle>("GenParticles");
+      jets->associatePartons(particles,0.4,1.,false);
+   }
+   
    if ( genjetsanalysis_ )
    {
       auto genjets = analysis_->collection<GenJet>("GenJets");
       jets->addGenJets(genjets);
-//       for ( int j = 0 ; j < jets->size() ; ++j )
-//       {
-//          auto jet = std::make_shared<Jet>(jets->at(j));
-//          jet -> applyJER(*jerinfo_,0.2);
-//          jets_.push_back(jet);
-//       }
    }
-//    else
-//    {
-//       for ( int j = 0 ; j < jets->size() ; ++j )  jets_.push_back(std::make_shared<Jet>(jets->at(j)));
-//    }
    
    for ( int j = 0 ; j < jets->size() ; ++j )  jets_.push_back(std::make_shared<Jet>(jets->at(j)));
    
