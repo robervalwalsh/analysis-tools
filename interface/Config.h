@@ -81,6 +81,8 @@ namespace analysis {
             
             int seed_;
             std::string seedfile_;
+            
+            bool pythia8_;
 
 
          // jets
@@ -158,6 +160,8 @@ namespace analysis {
             
             std::string seedFile() const;
             int seed() const;
+            
+            bool pythia8() const;
             
          // jets
             std::string jetsCollection() const;
