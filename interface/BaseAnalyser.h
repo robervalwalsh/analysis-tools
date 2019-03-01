@@ -72,6 +72,7 @@ namespace analysis {
             // output root file
             std::shared_ptr<TFile> hout_;
             std::map<std::string, std::shared_ptr<TH1F> > h1_;
+            std::map<std::string, std::shared_ptr<TH2F> > h2_;
             
             bool genpartsanalysis_; 
          
