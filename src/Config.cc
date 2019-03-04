@@ -61,7 +61,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("output",po::value <std::string> (&outputRoot_)->default_value("histograms.root"),"Output root file")
          ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
-         ("pythia8",po::value <bool> (&pythia8_)->default_value(false),"Flag for Pythia8 MC")
+         ("pythia8",po::value <bool> (&pythia8_)->default_value(true),"Flag for Pythia8 or other recent generators MC")
          ("nlo",po::value <bool> (&nlo_)->default_value(false),"Flag for NLO samples")
          ("workflow",po::value <int> (&workflow_)->default_value(1),"Workflow index defined by user")
          ("blind",po::value <bool> (&blind_)->default_value(true),"Flag for blind analysis")
