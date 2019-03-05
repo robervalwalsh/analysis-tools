@@ -250,6 +250,9 @@ namespace analysis {
 
             float ptimbalmax_;
             float ptimbalmin_;
+            
+            float qgmin_;
+            float qgmax_;
 
             std::string btagalgo_;
             std::string btagwp_;
