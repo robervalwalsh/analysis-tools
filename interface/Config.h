@@ -249,6 +249,7 @@ namespace analysis {
             float dphimax_;
 
             float ptimbalmax_;
+            float ptimbalmin_;
 
             std::string btagalgo_;
             std::string btagwp_;
