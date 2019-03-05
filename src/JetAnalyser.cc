@@ -171,13 +171,18 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
       {
          for ( int k = j+1; k < n && j < n; ++k )
          {
+            h1_[Form("dptrel_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dptrel_jet%d%d" , j+1,k+1) , Form("dptrel_jet%d%d_%s" , j+1,k+1,label.c_str()) ,1000 , 0,1 );
+            h1_[Form("dpt_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dpt_jet%d%d" , j+1,k+1) , Form("dpt_jet%d%d_%s" , j+1,k+1,label.c_str()) ,1000 , 0,1000 );
             h1_[Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dr_jet%d%d"  , j+1,k+1) , Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str()) , 100 , 0, 5 );
             h1_[Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("deta_jet%d%d", j+1,k+1) , Form("deta_jet%d%d_%s", j+1,k+1,label.c_str()) , 100 , 0,10 );
-            h1_[Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dphi_jet%d%d", j+1,k+1) , Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str()) , 360 , 0,360 );
+            h1_[Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dphi_jet%d%d", j+1,k+1) , Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str()) , 315 , 0, 3.15 );
             h1_[Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d%d"  , j+1,k+1) , Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str()) , 300 , 0,3000 );
             h1_[Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d%d" , j+1,k+1) , Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str()) , 200 , -10,10 );
             h1_[Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d%d" , j+1,k+1) , Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str()) , 360 , -180,180 );
             h1_[Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("m_jet%d%d"   , j+1,k+1) , Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str()) ,3000 , 0,3000 );
+            
+            h1_[Form("dptrel_jet%d%d_%s" , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#DeltaP_{T}(Jet %d, Jet %d)/Jet %d p_{T}",j+1,k+1,j+1));
+            h1_[Form("dpt_jet%d%d_%s" , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta p_{T}(Jet %d, Jet %d) [GeV]",j+1,k+1));
             h1_[Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#DeltaR(Jet %d, Jet %d)",j+1,k+1));
             h1_[Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta#eta(Jet %d, Jet %d)",j+1,k+1));
             h1_[Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta#phi(Jet %d, Jet %d)",j+1,k+1));
@@ -651,8 +656,11 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
          {
             Composite<Jet,Jet> c_ij(*(selectedJets_[j]),*(selectedJets_[k]));
             
+            h1_[Form("dptrel_jet%d%d_%s" , j+1,k+1,label.c_str())] -> Fill(fabs(selectedJets_[j]->pt()-selectedJets_[k]->pt())/selectedJets_[j]->pt(),weight_);
+            h1_[Form("dpt_jet%d%d_%s" , j+1,k+1,label.c_str())] -> Fill(fabs(selectedJets_[j]->pt()-selectedJets_[k]->pt()),weight_);
             h1_[Form("dr_jet%d%d_%s",j+1,k+1,label.c_str())]    -> Fill(c_ij.deltaR(),weight_);
             h1_[Form("deta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.deltaEta(),weight_);
+            h1_[Form("dphi_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(fabs(selectedJets_[j]->deltaPhi(*selectedJets_[k])));
             
             h1_[Form("pt_jet%d%d_%s",j+1,k+1,label.c_str())]   -> Fill(c_ij.pt(),weight_);
             h1_[Form("eta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.eta(),weight_);
