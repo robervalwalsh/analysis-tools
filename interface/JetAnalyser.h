@@ -93,6 +93,8 @@ namespace analysis {
             virtual void actionApplyBtagSF(const int &);
             virtual void actionApplyBjetRegression();
             virtual void jetSwap(const int &, const int &);
+            virtual bool selectionJetQGlikelihood(const int &, const float &);
+            virtual bool selectionJetQGlikelihood(const int &);
 
       };
    }

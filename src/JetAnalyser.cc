@@ -883,3 +883,57 @@ bool JetAnalyser::selectionJetPtImbalance(const int & j1, const int & j2)
    
 }
 
+bool JetAnalyser::selectionJetQGlikelihood(const int & r, const float & cut)
+{
+   int j = r-1;
+   
+   
+   
+   ++cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      if ( cut > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d Q-G likelihood < %4.2f",r,fabs(cut)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d Q-G likelihood > %4.2f",r,fabs(cut)));
+   }
+   
+   if ( cut > 0 )
+   {
+      if ( selectedJets_[j]->qgLikelihood() > fabs(cut) ) return false;
+   }
+   else
+   {
+      if ( selectedJets_[j]->qgLikelihood() < fabs(cut) ) return false;
+   }
+        
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+    
+   return true;
+   
+}
+
+bool JetAnalyser::selectionJetQGlikelihood(const int & j)
+{
+   bool ok = true;
+   if (config_->qgmax_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetQGlikelihood(j,config_->qgmax_);
+   }
+   
+   if (config_->qgmin_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetQGlikelihood(j,-1*config_->qgmin_);
+   }
+   return ok;
+   
+}
+
