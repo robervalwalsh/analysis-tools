@@ -76,6 +76,8 @@ namespace analysis {
             virtual bool selectionJetDphi(const int &, const int &);
             virtual bool selectionJetDr(const int &, const int &, const float &);
             virtual bool selectionJetDr(const int &, const int &);
+            virtual bool selectionJetPtImbalance(const int &, const int &, const float &);
+            virtual bool selectionJetPtImbalance(const int &, const int &);
             virtual bool selectionJetId();
             virtual bool selectionJetPileupId();
             virtual bool selectionNJets();

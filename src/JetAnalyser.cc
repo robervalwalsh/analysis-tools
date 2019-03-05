@@ -786,6 +786,8 @@ bool JetAnalyser::selectionDiJetMass(const int & r1, const int & r2)
    return true;
 }
 
+
+
 void JetAnalyser::jetSwap(const int & r1, const int & r2)
 {
    if ( r1 == r2 ) return;
@@ -804,3 +806,62 @@ void JetAnalyser::jetSwap(const int & r1, const int & r2)
 //    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
 }
+
+
+
+bool JetAnalyser::selectionJetPtImbalance(const int & j1, const int & j2, const float & delta)
+{
+   ++cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      if ( delta > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DpT(jet %d, jet %d)/jet %d pT < %4.2f",j1,j2,j1,fabs(delta)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DpT(jet %d, jet %d)/jet %d pT > %4.2f",j1,j2,j1,fabs(delta)));
+   }
+   
+   
+   if ( (int)selectedJets_.size() < j1 || (int)selectedJets_.size() < j2 )
+   {
+      std::cout << "-errr- JetAnalyser::selectionJetDptrel(): you dont have enough selected jets. Will return false" << std::endl;
+      return false;
+   }
+   if ( delta > 0 )
+   {
+      if ( fabs(selectedJets_[j1-1]->pt() - selectedJets_[j2-1]->pt())/selectedJets_[j1-1]->pt() > fabs(delta) ) return false;
+   }
+   else
+   {
+      if ( fabs(selectedJets_[j1-1]->eta() - selectedJets_[j2-1]->eta())/selectedJets_[j1-1]->pt() < fabs(delta) ) return false;
+   }
+
+        
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+    
+   return true;
+   
+}
+bool JetAnalyser::selectionJetPtImbalance(const int & j1, const int & j2)
+{
+   bool ok = true;
+   if (config_->ptimbalmax_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetPtImbalance(j1,j2,config_->ptimbalmax_);
+   }
+   
+   if (config_->ptimbalmin_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetPtImbalance(j1,j2,-1*config_->ptimbalmin_);
+   }
+   return ok;
+   
+}
+
