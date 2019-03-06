@@ -887,8 +887,6 @@ bool JetAnalyser::selectionJetQGlikelihood(const int & r, const float & cut)
 {
    int j = r-1;
    
-   
-   
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
    {
@@ -913,25 +911,26 @@ bool JetAnalyser::selectionJetQGlikelihood(const int & r, const float & cut)
    
 }
 
-bool JetAnalyser::selectionJetQGlikelihood(const int & j)
+bool JetAnalyser::selectionJetQGlikelihood(const int & r)
 {
+   int j = r-1;
    bool ok = true;
-   if (config_->qgmax_ < 0 )
+   if ( config_->qgmax_.size() == 0 || config_->qgmax_[j] < 0 || (int)config_->qgmax_.size() < r )
    {
       ok = ok && true;
    }
    else
    {
-      ok = ok && selectionJetQGlikelihood(j,config_->qgmax_);
+      ok = ok && selectionJetQGlikelihood(r,config_->qgmax_[j]);
    }
    
-   if (config_->qgmin_ < 0 )
+   if (config_->qgmin_.size() == 0 || config_->qgmin_[j] < 0 || (int)config_->qgmin_.size() < r )
    {
       ok = ok && true;
    }
    else
    {
-      ok = ok && selectionJetQGlikelihood(j,-1*config_->qgmin_);
+      ok = ok && selectionJetQGlikelihood(r,-1*config_->qgmin_[j] );
    }
    return ok;
    
