@@ -80,6 +80,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("nJetsMax",po::value <int> (&njetsmax_)->default_value(-1),"Maximum number of jets")
          ("jetsPtMin", po::value<std::vector<float> >(&jetsptmin_)->multitoken(),"Mimium pt of the jets")
          ("jetsPtMax", po::value<std::vector<float> >(&jetsptmax_)->multitoken(),"Maximum pt of the jets")
+         ("qgMin", po::value<std::vector<float> >(&qgmin_)->multitoken(),"Minimum value for q-g likelihood")
+         ("qgMax", po::value<std::vector<float> >(&qgmax_)->multitoken(),"Maximum value for q-g likelihood")
          ("jetsEtaMax", po::value<std::vector<float> >(&jetsetamax_)->multitoken(),"Maximum |eta| of the jets")
          ("jetsBtagMin", po::value<std::vector<float> >(&jetsbtagmin_)->multitoken(),"Minimum btag of the jets; if < 0 -> reverse btag")
          ("jetsBtagWP", po::value<std::vector<std::string> >(&jetsbtagwp_)->multitoken(),"Jets btag working point")
@@ -160,8 +162,6 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("dEtaMin",po::value <float> (&detamin_)->default_value(-1.),"Minimum delta eta between candidates")
          ("dPhiMin",po::value <float> (&dphimin_)->default_value(-1.),"Minimum delta phi between candidates")
          ("dPhiMax",po::value <float> (&dphimax_)->default_value(-1.),"Maximum delta phi between candidates")
-         ("qgMin",po::value <float> (&qgmin_)->default_value(-1),"Minimum value for q-g likelihood")
-         ("qgMax",po::value <float> (&qgmax_)->default_value(-1),"Maximum value for q-g likelihood")
          ("ptImbalanceMin",po::value <float> (&ptimbalmin_)->default_value(-1),"Minimum relative imbalance between two candidates")
          ("ptImbalanceMax",po::value <float> (&ptimbalmax_)->default_value(-1),"Maximum relative imbalance between two candidates");
       
