@@ -108,6 +108,7 @@ namespace analysis {
             bool usejetsflv_;
             bool usejetsextflv_;
             bool dodijet_;
+            bool dodijet_flavour_;
             
             bool bregression_;
 
@@ -185,6 +186,7 @@ namespace analysis {
             bool useJetsFlavour() const;
             bool useJetsExtendedFlavour() const;
             bool doDijet() const;
+            bool doDijetFlavour() const;
             
          // muons
             std::string muonsCollection() const;

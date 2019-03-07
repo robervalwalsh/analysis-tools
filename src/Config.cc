@@ -91,6 +91,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("jerSF",po::value <std::string> (&jersf_)->default_value(""),"JER SF file")
          ("bRegression",po::value <bool> (&bregression_)->default_value(false),"Apply b jet energy regression")
          ("doDijet",po::value <bool> (&dodijet_)->default_value(false),"Combine jets in dijet objects")
+         ("doDijetFlavour",po::value <bool> (&dodijet_flavour_)->default_value(false),"Combine jets in dijet objects split by flavour combination")
          ("useJetsFlavour",po::value <bool> (&usejetsflv_)->default_value(false),"For splitting results accoding to jet flavour")
          ("useJetsExtendedFlavour",po::value <bool> (&usejetsextflv_)->default_value(false),"For splitting results accoding to jet extended flavour")
          ("l1tJetsCollection",po::value <std::string> (&l1tjetsCol_)->default_value("l1tJets"),"Name of the L1T jets collection");
@@ -282,6 +283,7 @@ int                Config::nonBtagJet()         const { return nonbtagjet_; }
 bool               Config::useJetsFlavour()     const { return usejetsflv_; }
 bool               Config::useJetsExtendedFlavour() const { return usejetsextflv_; }
 bool               Config::doDijet() const            { return dodijet_; }
+bool               Config::doDijetFlavour()     const { return dodijet_flavour_; }
 
 // muons
 std::string        Config::muonsCollection()    const { return muonsCol_; }
