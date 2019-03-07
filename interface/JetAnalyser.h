@@ -56,6 +56,8 @@ namespace analysis {
             std::map<std::string, std::shared_ptr<BTagCalibrationReader> >bsf_reader_;
             
             std::shared_ptr<JetResolutionInfo> jerinfo_;
+            
+            std::vector<std::string> flavours_;
          
          private:
                
