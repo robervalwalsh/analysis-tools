@@ -84,6 +84,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("qgMax", po::value<std::vector<float> >(&qgmax_)->multitoken(),"Maximum value for q-g likelihood")
          ("jetsEtaMax", po::value<std::vector<float> >(&jetsetamax_)->multitoken(),"Maximum |eta| of the jets")
          ("jetsBtagMin", po::value<std::vector<float> >(&jetsbtagmin_)->multitoken(),"Minimum btag of the jets; if < 0 -> reverse btag")
+         ("jetsBtagProbBB", po::value<std::vector<float> >(&jetsbtagprobbb_)->multitoken(),"Maximum (minimum) btag prob bb of the jets if >0 (<0)")
+         ("jetsBtagProbC", po::value<std::vector<float> >(&jetsbtagprobc_)->multitoken(),"Maximum (minimum) btag prob c of the jets if >0 (<0)")
          ("jetsBtagWP", po::value<std::vector<std::string> >(&jetsbtagwp_)->multitoken(),"Jets btag working point")
          ("jetsId",po::value <std::string> (&jetsid_)->default_value("tight"),"Jets id criteria for all jets")
          ("jetsPuId",po::value <std::string> (&jetspuid_)->default_value("loose"),"Jets pileup id criteria for all jets")
@@ -277,6 +279,8 @@ std::string        Config::jerPtRes()           const { return jerptres_; }
 std::string        Config::jerSF()              const { return jersf_; }
 std::string        Config::l1tJetsCollection()  const { return l1tjetsCol_; } 
 std::vector<std::string> Config::jetsBtagWP()   const { return jetsbtagwp_; }
+std::vector<float> Config::jetsBtagProbBB()     const { return jetsbtagprobbb_; }
+std::vector<float> Config::jetsBtagProbC()      const { return jetsbtagprobc_; }
 bool               Config::bRegression()        const { return bregression_; }
 std::string        Config::nonBtagWP()          const { return nonbtagwp_; }
 int                Config::nonBtagJet()         const { return nonbtagjet_; }

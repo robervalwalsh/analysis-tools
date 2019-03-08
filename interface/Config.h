@@ -103,6 +103,10 @@ namespace analysis {
             std::vector<std::string> jetsbtagwp_;
             std::string nonbtagwp_;
             int nonbtagjet_;
+            // cuts on the probabilities
+            std::vector<float> jetsbtagprobbb_;
+            std::vector<float> jetsbtagprobc_;
+            
             //
             std::vector<std::string> triggerObjectsJets_;
             bool usejetsflv_;
@@ -178,6 +182,8 @@ namespace analysis {
             std::string jerSF() const;
             std::string l1tJetsCollection() const; 
             std::vector<std::string> jetsBtagWP() const;
+            std::vector<float> jetsBtagProbBB() const;
+            std::vector<float> jetsBtagProbC() const;
             bool bRegression() const;
             std::string nonBtagWP()  const;
             int   nonBtagJet() const;
