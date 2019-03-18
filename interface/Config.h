@@ -104,8 +104,12 @@ namespace analysis {
             std::string nonbtagwp_;
             int nonbtagjet_;
             // cuts on the probabilities
+            std::vector<float> jetsbtagprobb_;
             std::vector<float> jetsbtagprobbb_;
+            std::vector<float> jetsbtagproblepb_;
             std::vector<float> jetsbtagprobc_;
+            std::vector<float> jetsbtagprobg_;
+            std::vector<float> jetsbtagproblight_;
             
             //
             std::vector<std::string> triggerObjectsJets_;
@@ -145,6 +149,14 @@ namespace analysis {
          // general
             float massmin_;
             float massmax_;
+            
+         // AI
+            std::vector<std::string> varsf_ai_;
+            std::vector<std::string> varsi_ai_;
+            std::string dir_ai_;
+            std::string method_ai_;
+            float disc_max_ai_;
+            float disc_min_ai_;
 
                         
          private:
@@ -182,8 +194,12 @@ namespace analysis {
             std::string jerSF() const;
             std::string l1tJetsCollection() const; 
             std::vector<std::string> jetsBtagWP() const;
+            std::vector<float> jetsBtagProbB() const;
             std::vector<float> jetsBtagProbBB() const;
+            std::vector<float> jetsBtagProbLepB() const;
             std::vector<float> jetsBtagProbC() const;
+            std::vector<float> jetsBtagProbG() const;
+            std::vector<float> jetsBtagProbLight() const;
             bool bRegression() const;
             std::string nonBtagWP()  const;
             int   nonBtagJet() const;
@@ -217,6 +233,13 @@ namespace analysis {
          // general
             float massMin() const;
             float massMax() const;
+            
+         // AI
+            std::vector<std::string> variablesAI(const std::string & t = "F") const;
+            std::string directoryAI() const;
+            std::string methodAI() const;
+            float discriminatorMaxAI() const;
+            float discriminatorMinAI() const;
             
          // ========================
          

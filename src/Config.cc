@@ -84,8 +84,12 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("qgMax", po::value<std::vector<float> >(&qgmax_)->multitoken(),"Maximum value for q-g likelihood")
          ("jetsEtaMax", po::value<std::vector<float> >(&jetsetamax_)->multitoken(),"Maximum |eta| of the jets")
          ("jetsBtagMin", po::value<std::vector<float> >(&jetsbtagmin_)->multitoken(),"Minimum btag of the jets; if < 0 -> reverse btag")
+         ("jetsBtagProbB", po::value<std::vector<float> >(&jetsbtagprobb_)->multitoken(),"Maximum (minimum) btag prob b of the jets if >0 (<0)")
          ("jetsBtagProbBB", po::value<std::vector<float> >(&jetsbtagprobbb_)->multitoken(),"Maximum (minimum) btag prob bb of the jets if >0 (<0)")
+         ("jetsBtagProbLepB", po::value<std::vector<float> >(&jetsbtagproblepb_)->multitoken(),"Maximum (minimum) btag prob lepb of the jets if >0 (<0)")
          ("jetsBtagProbC", po::value<std::vector<float> >(&jetsbtagprobc_)->multitoken(),"Maximum (minimum) btag prob c of the jets if >0 (<0)")
+         ("jetsBtagProbG", po::value<std::vector<float> >(&jetsbtagprobg_)->multitoken(),"Maximum (minimum) btag prob g of the jets if >0 (<0)")
+         ("jetsBtagProbLight", po::value<std::vector<float> >(&jetsbtagproblight_)->multitoken(),"Maximum (minimum) btag prob light of the jets if >0 (<0)")
          ("jetsBtagWP", po::value<std::vector<std::string> >(&jetsbtagwp_)->multitoken(),"Jets btag working point")
          ("jetsId",po::value <std::string> (&jetsid_)->default_value("tight"),"Jets id criteria for all jets")
          ("jetsPuId",po::value <std::string> (&jetspuid_)->default_value("loose"),"Jets pileup id criteria for all jets")
@@ -173,6 +177,21 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
       opt_cfg_.add_options()
          ("massMin",po::value <float> (&massmin_)->default_value(-1.),"Cut on a mass, min value")
          ("massMax",po::value <float> (&massmax_)->default_value(-1.),"Cut on a mass, max value");
+            
+         // AI
+            std::vector<std::string> varsf_ai_;
+            std::vector<std::string> varsi_ai_;
+            std::string dir_ai_;
+            std::string method_ai_;
+
+      // AI
+      opt_cfg_.add_options()
+         ("variablesFloatAI", po::value<std::vector<std::string> >(&varsf_ai_)->multitoken(),"Float variables names for AI(TMVA)")
+         ("variablesIntAI", po::value<std::vector<std::string> >(&varsi_ai_)->multitoken(),"Integer variables names for AI(TMVA)")
+         ("directoryAI",po::value <std::string> (&dir_ai_)->default_value(""),"Directory with weights for AI(TMVA)")
+         ("methodAI",po::value <std::string> (&method_ai_)->default_value(""),"Method AI(TMVA)")
+         ("discriminatorMaxAI",po::value <float> (&disc_max_ai_)->default_value(-1.),"Max value for AI discriminator")
+         ("discriminatorMinAI",po::value <float> (&disc_min_ai_)->default_value(-1.),"Min value for AI discriminator");
             
       po::variables_map vm; 
       try
@@ -279,8 +298,12 @@ std::string        Config::jerPtRes()           const { return jerptres_; }
 std::string        Config::jerSF()              const { return jersf_; }
 std::string        Config::l1tJetsCollection()  const { return l1tjetsCol_; } 
 std::vector<std::string> Config::jetsBtagWP()   const { return jetsbtagwp_; }
+std::vector<float> Config::jetsBtagProbB()      const { return jetsbtagprobb_; }
 std::vector<float> Config::jetsBtagProbBB()     const { return jetsbtagprobbb_; }
+std::vector<float> Config::jetsBtagProbLepB()   const { return jetsbtagproblepb_; }
 std::vector<float> Config::jetsBtagProbC()      const { return jetsbtagprobc_; }
+std::vector<float> Config::jetsBtagProbG()      const { return jetsbtagprobg_; }
+std::vector<float> Config::jetsBtagProbLight()   const { return jetsbtagproblight_; }
 bool               Config::bRegression()        const { return bregression_; }
 std::string        Config::nonBtagWP()          const { return nonbtagwp_; }
 int                Config::nonBtagJet()         const { return nonbtagjet_; }
@@ -334,3 +357,15 @@ void Config::triggerObjectsJets(const std::string & label, const int & index)
 // General stuff            
 float Config::massMin() const { return massmin_; }
 float Config::massMax() const { return massmax_; }
+
+
+// AI
+std::vector<std::string> Config::variablesAI(const std::string & t) const
+{
+   if ( t == "I" ) return varsi_ai_;
+   return varsf_ai_;
+}
+std::string Config::directoryAI() const { return dir_ai_; }
+std::string Config::methodAI() const { return method_ai_; }
+float Config::discriminatorMaxAI() const { return disc_max_ai_; }
+float Config::discriminatorMinAI() const { return disc_min_ai_; }
