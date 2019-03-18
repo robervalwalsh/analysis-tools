@@ -158,6 +158,9 @@ namespace analysis {
             float disc_max_ai_;
             float disc_min_ai_;
             float eff_min_ai_;
+         // output tree
+            
+            bool do_tree_;
 
                         
          private:
@@ -242,6 +245,9 @@ namespace analysis {
             float discriminatorMaxAI() const;
             float discriminatorMinAI() const;
             float efficiencyMinAI() const;
+            
+         // output tree
+            bool doTree() const;
             
          // ========================
          

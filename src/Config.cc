@@ -71,6 +71,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
 
       // analysis control
       opt_cfg_.add_options()
+         ("doTree",po::value <bool> (&do_tree_)->default_value(false),"Flag for output")
          ("override",po::value <bool> (&override_)->default_value(true),"Flag to be used to override procedure, e.g. a selection");
       
       // jets
@@ -365,3 +366,7 @@ std::string Config::methodAI()     const { return method_ai_  ; }
 float Config::discriminatorMaxAI() const { return disc_max_ai_; }
 float Config::discriminatorMinAI() const { return disc_min_ai_; }
 float Config::efficiencyMinAI()    const { return eff_min_ai_ ; }
+
+// output tree
+bool Config::doTree() const { return do_tree_; 
+}
