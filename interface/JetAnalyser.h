@@ -85,7 +85,12 @@ namespace analysis {
             virtual bool selectionNJets();
             virtual bool selectionDiJetMass(const int &, const int &);
             virtual bool selectionBJet(const int &);
+            virtual bool selectionBJetProbB(const int &);
             virtual bool selectionBJetProbBB(const int &);
+            virtual bool selectionBJetProbLepB(const int &);
+            virtual bool selectionBJetProbC(const int &);
+            virtual bool selectionBJetProbG(const int &);
+            virtual bool selectionBJetProbLight(const int &);
             virtual ScaleFactors btagSF(const int &, const std::string &);
             virtual bool selectionNonBJet(const int &);
             virtual bool onlineJetMatching(const int &);

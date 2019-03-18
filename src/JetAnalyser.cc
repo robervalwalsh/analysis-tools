@@ -595,45 +595,6 @@ bool JetAnalyser::selectionBJet(const int & r )
    return true;
 }
 
-bool JetAnalyser::selectionBJetProbBB(const int & r )
-{
-   int j = r-1;
-   float wp = config_->jetsBtagProbBB()[j];
-   std::string algo = config_->btagalgo_;
-   if ( fabs(wp) > 1 ) return true; // there is no selection here, so will not update the cutflow
-   
-   ++ cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-   {
-      if ( wp > 0 )
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob bb < %6.4f",r,algo.c_str(),fabs(wp)));
-      else
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob bb > %6.4f",r,algo.c_str(),fabs(wp)));
-   }
-         
-   
-   if ( r > config_->nbjetsmin_ ) 
-   {
-      std::cout << "* warning * -  JetAnalyser::selectionBJetProbBB(): given jet rank > nbjetsmin. Returning false! " << std::endl;
-      return false;
-   }
-   
-   // jet  btag
-   if ( algo == "deepcsv" )
-   {
-      if ( wp > 0 && selectedJets_[j]->btag("btag_deepbb") > fabs(wp) ) return false;
-      if ( wp < 0 && selectedJets_[j]->btag("btag_deepbb") < fabs(wp) ) return false;
-   }
-   if ( algo == "deepflavour" )
-   {
-      if ( wp > 0 && selectedJets_[j]->btag("btag_dfbb") > fabs(wp) ) return false;
-      if ( wp < 0 && selectedJets_[j]->btag("btag_dfbb") < fabs(wp) ) return false;
-   }
-   
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
-   
-   return true;
-}
 
 bool JetAnalyser::selectionNonBJet(const int & r )
 {
@@ -1101,4 +1062,247 @@ bool JetAnalyser::selectionJetQGlikelihood(const int & r)
    return ok;
    
 }
+
+
+bool JetAnalyser::selectionBJetProbB(const int & r )
+{
+   if ( config_->jetsBtagProbB().size() == 0 ) return true;
+   int j = r-1;
+   float wp = config_->jetsBtagProbB()[j];
+   std::string algo = config_->btagalgo_;
+   if ( fabs(wp) > 1 ) return true; // there is no selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      if ( wp > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob b < %6.4f",r,algo.c_str(),fabs(wp)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob b > %6.4f",r,algo.c_str(),fabs(wp)));
+   }
+         
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  JetAnalyser::selectionBJetProbB(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
+   
+   // jet  btag
+   if ( algo == "deepcsv" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_deepb") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_deepb") < fabs(wp) ) return false;
+   }
+   if ( algo == "deepflavour" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_dfb") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_dfb") < fabs(wp) ) return false;
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   return true;
+}
+
+
+
+
+bool JetAnalyser::selectionBJetProbBB(const int & r )
+{
+   if ( config_->jetsBtagProbBB().size() == 0 ) return true;
+   int j = r-1;
+   float wp = config_->jetsBtagProbBB()[j];
+   std::string algo = config_->btagalgo_;
+   if ( fabs(wp) > 1 ) return true; // there is no selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      if ( wp > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob bb < %6.4f",r,algo.c_str(),fabs(wp)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob bb > %6.4f",r,algo.c_str(),fabs(wp)));
+   }
+         
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  JetAnalyser::selectionBJetProbBB(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
+   
+   // jet  btag
+   if ( algo == "deepcsv" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_deepbb") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_deepbb") < fabs(wp) ) return false;
+   }
+   if ( algo == "deepflavour" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_dfbb") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_dfbb") < fabs(wp) ) return false;
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   return true;
+}
+
+bool JetAnalyser::selectionBJetProbLepB(const int & r )
+{
+   if ( config_->jetsBtagProbLepB().size() == 0 ) return true;
+   int j = r-1;
+   float wp = config_->jetsBtagProbLepB()[j];
+   std::string algo = config_->btagalgo_;
+   if ( fabs(wp) > 1 || algo == "deepcsv" ) return true; // there is no selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      if ( wp > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob lepb < %6.4f",r,algo.c_str(),fabs(wp)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob lepb > %6.4f",r,algo.c_str(),fabs(wp)));
+   }
+         
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  JetAnalyser::selectionBJetProbLepB(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
+   
+   // jet  btag
+   if ( algo == "deepflavour" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_dflepb") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_dflepb") < fabs(wp) ) return false;
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   return true;
+}
+
+
+
+bool JetAnalyser::selectionBJetProbC(const int & r )
+{
+   if ( config_->jetsBtagProbC().size() == 0 ) return true;
+   int j = r-1;
+   float wp = config_->jetsBtagProbC()[j];
+   std::string algo = config_->btagalgo_;
+   if ( fabs(wp) > 1 ) return true; // there is no selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      if ( wp > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob c < %6.4f",r,algo.c_str(),fabs(wp)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob c > %6.4f",r,algo.c_str(),fabs(wp)));
+   }
+         
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  JetAnalyser::selectionBJetProbC(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
+   
+   // jet  btag
+   if ( algo == "deepcsv" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_deepc") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_deepc") < fabs(wp) ) return false;
+   }
+   if ( algo == "deepflavour" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_dfc") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_dfc") < fabs(wp) ) return false;
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   return true;
+}
+
+bool JetAnalyser::selectionBJetProbG(const int & r )
+{
+   if ( config_->jetsBtagProbG().size() == 0 ) return true;
+   int j = r-1;
+   float wp = config_->jetsBtagProbG()[j];
+   std::string algo = config_->btagalgo_;
+   if ( fabs(wp) > 1 || algo == "deepcsv" ) return true; // there is no selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      if ( wp > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob g < %6.4f",r,algo.c_str(),fabs(wp)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob g > %6.4f",r,algo.c_str(),fabs(wp)));
+   }
+         
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  JetAnalyser::selectionBJetProbG(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
+   
+   // jet  btag
+   if ( algo == "deepflavour" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_dfg") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_dfg") < fabs(wp) ) return false;
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   return true;
+}
+
+bool JetAnalyser::selectionBJetProbLight(const int & r )
+{
+   if ( config_->jetsBtagProbLight().size() == 0 ) return true;
+   int j = r-1;
+   float wp = config_->jetsBtagProbLight()[j];
+   std::string algo = config_->btagalgo_;
+   if ( fabs(wp) > 1 ) return true; // there is no selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      if ( wp > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob light < %6.4f",r,algo.c_str(),fabs(wp)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob light > %6.4f",r,algo.c_str(),fabs(wp)));
+   }
+         
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  JetAnalyser::selectionBJetProbLight(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
+   
+   // jet  btag
+   if ( algo == "deepcsv" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_deeplight") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_deeplight") < fabs(wp) ) return false;
+   }
+   if ( algo == "deepflavour" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_dflight") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_dflight") < fabs(wp) ) return false;
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   return true;
+}
+
 
