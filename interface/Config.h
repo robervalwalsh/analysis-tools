@@ -157,6 +157,7 @@ namespace analysis {
             std::string method_ai_;
             float disc_max_ai_;
             float disc_min_ai_;
+            float eff_min_ai_;
 
                         
          private:
@@ -240,6 +241,7 @@ namespace analysis {
             std::string methodAI() const;
             float discriminatorMaxAI() const;
             float discriminatorMinAI() const;
+            float efficiencyMinAI() const;
             
          // ========================
          

@@ -178,20 +178,15 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("massMin",po::value <float> (&massmin_)->default_value(-1.),"Cut on a mass, min value")
          ("massMax",po::value <float> (&massmax_)->default_value(-1.),"Cut on a mass, max value");
             
-         // AI
-            std::vector<std::string> varsf_ai_;
-            std::vector<std::string> varsi_ai_;
-            std::string dir_ai_;
-            std::string method_ai_;
-
       // AI
       opt_cfg_.add_options()
          ("variablesFloatAI", po::value<std::vector<std::string> >(&varsf_ai_)->multitoken(),"Float variables names for AI(TMVA)")
          ("variablesIntAI", po::value<std::vector<std::string> >(&varsi_ai_)->multitoken(),"Integer variables names for AI(TMVA)")
          ("directoryAI",po::value <std::string> (&dir_ai_)->default_value(""),"Directory with weights for AI(TMVA)")
          ("methodAI",po::value <std::string> (&method_ai_)->default_value(""),"Method AI(TMVA)")
-         ("discriminatorMaxAI",po::value <float> (&disc_max_ai_)->default_value(-1.),"Max value for AI discriminator")
-         ("discriminatorMinAI",po::value <float> (&disc_min_ai_)->default_value(-1.),"Min value for AI discriminator");
+         ("efficiencyMinAI",po::value <float> (&eff_min_ai_)->default_value(-1.),"Min value for AI Cuts efficiency")
+         ("discriminatorMaxAI",po::value <float> (&disc_max_ai_)->default_value(-1001.),"Max value for AI discriminator")
+         ("discriminatorMinAI",po::value <float> (&disc_min_ai_)->default_value(-1001.),"Min value for AI discriminator");
             
       po::variables_map vm; 
       try
@@ -365,7 +360,8 @@ std::vector<std::string> Config::variablesAI(const std::string & t) const
    if ( t == "I" ) return varsi_ai_;
    return varsf_ai_;
 }
-std::string Config::directoryAI() const { return dir_ai_; }
-std::string Config::methodAI() const { return method_ai_; }
+std::string Config::directoryAI()  const { return dir_ai_     ; }
+std::string Config::methodAI()     const { return method_ai_  ; }
 float Config::discriminatorMaxAI() const { return disc_max_ai_; }
 float Config::discriminatorMinAI() const { return disc_min_ai_; }
+float Config::efficiencyMinAI()    const { return eff_min_ai_ ; }
