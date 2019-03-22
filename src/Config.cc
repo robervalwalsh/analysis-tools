@@ -299,7 +299,7 @@ std::vector<float> Config::jetsBtagProbBB()     const { return jetsbtagprobbb_; 
 std::vector<float> Config::jetsBtagProbLepB()   const { return jetsbtagproblepb_; }
 std::vector<float> Config::jetsBtagProbC()      const { return jetsbtagprobc_; }
 std::vector<float> Config::jetsBtagProbG()      const { return jetsbtagprobg_; }
-std::vector<float> Config::jetsBtagProbLight()   const { return jetsbtagproblight_; }
+std::vector<float> Config::jetsBtagProbLight()  const { return jetsbtagproblight_; }
 bool               Config::bRegression()        const { return bregression_; }
 std::string        Config::nonBtagWP()          const { return nonbtagwp_; }
 int                Config::nonBtagJet()         const { return nonbtagjet_; }
@@ -319,9 +319,10 @@ std::string        Config::muonsId()            const { return muonsid_; }
 std::string        Config::l1tMuonsCollection() const { return l1tmuonsCol_; } 
 
 // trigger
-std::string        Config::triggerResults()     const { return triggerCol_   ; }
-std::string        Config::triggerObjectsDir()  const { return triggerObjDir_; }
-
+std::string        Config::triggerResults()        const { return triggerCol_   ; }
+std::string        Config::triggerObjectsDir()     const { return triggerObjDir_; }
+std::string        Config::triggerObjectsL1Muons() const { return triggerObjectsL1Muons_; }
+std::string        Config::triggerObjectsL3Muons() const { return triggerObjectsL3Muons_; }
 // generator level
 std::string        Config::genJetsCollection()       const { return genjetsCol_; }
 std::string        Config::genParticlesCollection()  const { return genpartsCol_; }
