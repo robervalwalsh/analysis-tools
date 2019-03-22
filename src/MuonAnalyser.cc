@@ -40,15 +40,6 @@ MuonAnalyser::MuonAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
    // Muons
    muonsanalysis_  = ( analysis_->addTree<Muon> ("Muons",config_->muonsCollection()) != nullptr );
    
-   if ( muonsanalysis_ )
-   {
-      if ( config_->triggerObjDir_ != "" )
-      {
-         analysis_->addTree<TriggerObject> (config_->triggerObjectsL1Muons_,Form("%s/%s",config_->triggerObjDir_.c_str(),config_->triggerObjectsL1Muons_.c_str()));
-         analysis_->addTree<TriggerObject> (config_->triggerObjectsL3Muons_,Form("%s/%s",config_->triggerObjDir_.c_str(),config_->triggerObjectsL3Muons_.c_str()));
-      }
-//      muonHistograms("muon",config_->nMuonsMin());
-   }
 }
 
 MuonAnalyser::~MuonAnalyser()
