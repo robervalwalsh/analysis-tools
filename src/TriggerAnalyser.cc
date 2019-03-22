@@ -49,8 +49,8 @@ TriggerAnalyser::TriggerAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,ar
       for ( auto & obj : config_->triggerObjectsBJets_ )
          analysis_->addTree<TriggerObject> (obj,Form("%s/%s", config_->triggerObjectsDir().c_str(),obj.c_str()));
       // online muons
-      analysis_->addTree<TriggerObject> (config_->triggerObjectsL1Muons_,Form("%s/%s",config_->triggerObjectsDir().c_str(),config_->triggerObjectsL1Muons_.c_str()));
-      analysis_->addTree<TriggerObject> (config_->triggerObjectsL3Muons_,Form("%s/%s",config_->triggerObjectsDir().c_str(),config_->triggerObjectsL3Muons_.c_str()));
+      analysis_->addTree<TriggerObject> (config_->triggerObjectsL1Muons(),Form("%s/%s",config_->triggerObjectsDir().c_str(),config_->triggerObjectsL1Muons().c_str()));
+      analysis_->addTree<TriggerObject> (config_->triggerObjectsL3Muons(),Form("%s/%s",config_->triggerObjectsDir().c_str(),config_->triggerObjectsL3Muons().c_str()));
    }
    
 }
