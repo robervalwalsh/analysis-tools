@@ -133,6 +133,7 @@ namespace analysis {
             
          // trigger
             std::string triggerCol_;
+            std::string triggerObjDir_;
 
          // generator level collections
             std::string genjetsCol_;
@@ -226,6 +227,7 @@ namespace analysis {
             
          // trigger
             std::string triggerResults() const;
+            std::string triggerObjectsDir() const;
             
          // generator level
             std::string genJetsCollection() const;
@@ -314,9 +316,6 @@ namespace analysis {
             int triggerObjectsMuonsMatches_;
             int triggerObjectsL1MuonsMatches_;
             int triggerObjectsL3MuonsMatches_;
-
-            // ntuples collections
-            std::string triggerObjDir_;
 
          protected:
             int argc_;

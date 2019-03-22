@@ -319,7 +319,8 @@ std::string        Config::muonsId()            const { return muonsid_; }
 std::string        Config::l1tMuonsCollection() const { return l1tmuonsCol_; } 
 
 // trigger
-std::string        Config::triggerResults()     const { return triggerCol_; }
+std::string        Config::triggerResults()     const { return triggerCol_   ; }
+std::string        Config::triggerObjectsDir()  const { return triggerObjDir_; }
 
 // generator level
 std::string        Config::genJetsCollection()       const { return genjetsCol_; }
