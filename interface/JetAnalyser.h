@@ -56,6 +56,8 @@ namespace analysis {
             std::map<std::string, std::shared_ptr<BTagCalibrationReader> >bsf_reader_;
             
             std::shared_ptr<JetResolutionInfo> jerinfo_;
+            
+            std::vector<std::string> flavours_;
          
          private:
                
@@ -76,11 +78,19 @@ namespace analysis {
             virtual bool selectionJetDphi(const int &, const int &);
             virtual bool selectionJetDr(const int &, const int &, const float &);
             virtual bool selectionJetDr(const int &, const int &);
+            virtual bool selectionJetPtImbalance(const int &, const int &, const float &);
+            virtual bool selectionJetPtImbalance(const int &, const int &);
             virtual bool selectionJetId();
             virtual bool selectionJetPileupId();
             virtual bool selectionNJets();
             virtual bool selectionDiJetMass(const int &, const int &);
             virtual bool selectionBJet(const int &);
+            virtual bool selectionBJetProbB(const int &);
+            virtual bool selectionBJetProbBB(const int &);
+            virtual bool selectionBJetProbLepB(const int &);
+            virtual bool selectionBJetProbC(const int &);
+            virtual bool selectionBJetProbG(const int &);
+            virtual bool selectionBJetProbLight(const int &);
             virtual ScaleFactors btagSF(const int &, const std::string &);
             virtual bool selectionNonBJet(const int &);
             virtual bool onlineJetMatching(const int &);
@@ -91,6 +101,8 @@ namespace analysis {
             virtual void actionApplyBtagSF(const int &);
             virtual void actionApplyBjetRegression();
             virtual void jetSwap(const int &, const int &);
+            virtual bool selectionJetQGlikelihood(const int &, const float &);
+            virtual bool selectionJetQGlikelihood(const int &);
 
       };
    }

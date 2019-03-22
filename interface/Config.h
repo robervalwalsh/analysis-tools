@@ -81,6 +81,8 @@ namespace analysis {
             
             int seed_;
             std::string seedfile_;
+            
+            bool pythia8_;
 
 
          // jets
@@ -101,10 +103,20 @@ namespace analysis {
             std::vector<std::string> jetsbtagwp_;
             std::string nonbtagwp_;
             int nonbtagjet_;
+            // cuts on the probabilities
+            std::vector<float> jetsbtagprobb_;
+            std::vector<float> jetsbtagprobbb_;
+            std::vector<float> jetsbtagproblepb_;
+            std::vector<float> jetsbtagprobc_;
+            std::vector<float> jetsbtagprobg_;
+            std::vector<float> jetsbtagproblight_;
+            
             //
             std::vector<std::string> triggerObjectsJets_;
-
-
+            bool usejetsflv_;
+            bool usejetsextflv_;
+            bool dodijet_;
+            bool dodijet_flavour_;
             
             bool bregression_;
 
@@ -124,16 +136,31 @@ namespace analysis {
 
          // generator level collections
             std::string genjetsCol_;
+            std::string genpartsCol_;
+            
 
 
          // btag
             float btagwploose_;
             float btagwpmedium_;
             float btagwptight_;
+            float btagwpxxx_;
             
          // general
             float massmin_;
             float massmax_;
+            
+         // AI
+            std::vector<std::string> varsf_ai_;
+            std::vector<std::string> varsi_ai_;
+            std::string dir_ai_;
+            std::string method_ai_;
+            float disc_max_ai_;
+            float disc_min_ai_;
+            float eff_min_ai_;
+         // output tree
+            
+            bool do_tree_;
 
                         
          private:
@@ -156,6 +183,8 @@ namespace analysis {
             std::string seedFile() const;
             int seed() const;
             
+            bool pythia8() const;
+            
          // jets
             std::string jetsCollection() const;
             int nJetsMin() const;
@@ -169,11 +198,21 @@ namespace analysis {
             std::string jerSF() const;
             std::string l1tJetsCollection() const; 
             std::vector<std::string> jetsBtagWP() const;
+            std::vector<float> jetsBtagProbB() const;
+            std::vector<float> jetsBtagProbBB() const;
+            std::vector<float> jetsBtagProbLepB() const;
+            std::vector<float> jetsBtagProbC() const;
+            std::vector<float> jetsBtagProbG() const;
+            std::vector<float> jetsBtagProbLight() const;
             bool bRegression() const;
             std::string nonBtagWP()  const;
             int   nonBtagJet() const;
             std::vector<std::string> triggerObjectsJets() const;
             void triggerObjectsJets(const std::string & label, const int & index);
+            bool useJetsFlavour() const;
+            bool useJetsExtendedFlavour() const;
+            bool doDijet() const;
+            bool doDijetFlavour() const;
             
          // muons
             std::string muonsCollection() const;
@@ -190,6 +229,7 @@ namespace analysis {
             
          // generator level
             std::string genJetsCollection() const;
+            std::string genParticlesCollection() const;
             
          // btag
             float btagWP(const std::string &) const;
@@ -197,6 +237,17 @@ namespace analysis {
          // general
             float massMin() const;
             float massMax() const;
+            
+         // AI
+            std::vector<std::string> variablesAI(const std::string & t = "F") const;
+            std::string directoryAI() const;
+            std::string methodAI() const;
+            float discriminatorMaxAI() const;
+            float discriminatorMinAI() const;
+            float efficiencyMinAI() const;
+            
+         // output tree
+            bool doTree() const;
             
          // ========================
          
@@ -237,6 +288,10 @@ namespace analysis {
             float dphimax_;
 
             float ptimbalmax_;
+            float ptimbalmin_;
+            
+            std::vector<float>  qgmin_;
+            std::vector<float>  qgmax_;
 
             std::string btagalgo_;
             std::string btagwp_;
@@ -261,7 +316,6 @@ namespace analysis {
             int triggerObjectsL3MuonsMatches_;
 
             // ntuples collections
-            std::string genParticleCol_;
             std::string triggerObjDir_;
 
          protected:

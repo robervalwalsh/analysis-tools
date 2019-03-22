@@ -58,6 +58,8 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
       hout_ -> cd();
    }
    
+   genpartsanalysis_  = ( analysis_->addTree<GenParticle> ("GenParticles",config_->genParticlesCollection()) != nullptr && config_->isMC() );
+   
    h1_["cutflow"] = std::make_shared<TH1F>("workflow",Form("Workflow #%d",config_->workflow()), 100,0,100);
       if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" ) 
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(1,"Total events read");
@@ -196,3 +198,9 @@ std::shared_ptr<TFile> BaseAnalyser::output()
 {
    return hout_;
 }
+
+bool  BaseAnalyser::genParticlesAnalysis() const
+{
+   return genpartsanalysis_;
+}
+

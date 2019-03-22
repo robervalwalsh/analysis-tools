@@ -39,6 +39,7 @@ Config::Config()
 // Main constructor
 Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configuration")
 {
+   std::string datapath = Form("%s/src/Analysis/Tools/data",getenv("CMSSW_BASE"));
    argc_ = argc;
    argv_ = argv;
    // read configuration options
@@ -60,6 +61,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("output",po::value <std::string> (&outputRoot_)->default_value("histograms.root"),"Output root file")
          ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
+         ("pythia8",po::value <bool> (&pythia8_)->default_value(true),"Flag for Pythia8 or other recent generators MC")
          ("nlo",po::value <bool> (&nlo_)->default_value(false),"Flag for NLO samples")
          ("workflow",po::value <int> (&workflow_)->default_value(1),"Workflow index defined by user")
          ("blind",po::value <bool> (&blind_)->default_value(true),"Flag for blind analysis")
@@ -69,6 +71,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
 
       // analysis control
       opt_cfg_.add_options()
+         ("doTree",po::value <bool> (&do_tree_)->default_value(false),"Flag for output")
          ("override",po::value <bool> (&override_)->default_value(true),"Flag to be used to override procedure, e.g. a selection");
       
       // jets
@@ -78,14 +81,26 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("nJetsMax",po::value <int> (&njetsmax_)->default_value(-1),"Maximum number of jets")
          ("jetsPtMin", po::value<std::vector<float> >(&jetsptmin_)->multitoken(),"Mimium pt of the jets")
          ("jetsPtMax", po::value<std::vector<float> >(&jetsptmax_)->multitoken(),"Maximum pt of the jets")
+         ("qgMin", po::value<std::vector<float> >(&qgmin_)->multitoken(),"Minimum value for q-g likelihood")
+         ("qgMax", po::value<std::vector<float> >(&qgmax_)->multitoken(),"Maximum value for q-g likelihood")
          ("jetsEtaMax", po::value<std::vector<float> >(&jetsetamax_)->multitoken(),"Maximum |eta| of the jets")
          ("jetsBtagMin", po::value<std::vector<float> >(&jetsbtagmin_)->multitoken(),"Minimum btag of the jets; if < 0 -> reverse btag")
+         ("jetsBtagProbB", po::value<std::vector<float> >(&jetsbtagprobb_)->multitoken(),"Maximum (minimum) btag prob b of the jets if >0 (<0)")
+         ("jetsBtagProbBB", po::value<std::vector<float> >(&jetsbtagprobbb_)->multitoken(),"Maximum (minimum) btag prob bb of the jets if >0 (<0)")
+         ("jetsBtagProbLepB", po::value<std::vector<float> >(&jetsbtagproblepb_)->multitoken(),"Maximum (minimum) btag prob lepb of the jets if >0 (<0)")
+         ("jetsBtagProbC", po::value<std::vector<float> >(&jetsbtagprobc_)->multitoken(),"Maximum (minimum) btag prob c of the jets if >0 (<0)")
+         ("jetsBtagProbG", po::value<std::vector<float> >(&jetsbtagprobg_)->multitoken(),"Maximum (minimum) btag prob g of the jets if >0 (<0)")
+         ("jetsBtagProbLight", po::value<std::vector<float> >(&jetsbtagproblight_)->multitoken(),"Maximum (minimum) btag prob light of the jets if >0 (<0)")
          ("jetsBtagWP", po::value<std::vector<std::string> >(&jetsbtagwp_)->multitoken(),"Jets btag working point")
          ("jetsId",po::value <std::string> (&jetsid_)->default_value("tight"),"Jets id criteria for all jets")
          ("jetsPuId",po::value <std::string> (&jetspuid_)->default_value("loose"),"Jets pileup id criteria for all jets")
          ("jerPtRes",po::value <std::string> (&jerptres_)->default_value(""),"JER pT resolution file")
          ("jerSF",po::value <std::string> (&jersf_)->default_value(""),"JER SF file")
-         ("bRegression",po::value <bool> (&bregression_)->default_value(true),"Apply b jet energy regression")
+         ("bRegression",po::value <bool> (&bregression_)->default_value(false),"Apply b jet energy regression")
+         ("doDijet",po::value <bool> (&dodijet_)->default_value(false),"Combine jets in dijet objects")
+         ("doDijetFlavour",po::value <bool> (&dodijet_flavour_)->default_value(false),"Combine jets in dijet objects split by flavour combination")
+         ("useJetsFlavour",po::value <bool> (&usejetsflv_)->default_value(false),"For splitting results accoding to jet flavour")
+         ("useJetsExtendedFlavour",po::value <bool> (&usejetsextflv_)->default_value(false),"For splitting results accoding to jet extended flavour")
          ("l1tJetsCollection",po::value <std::string> (&l1tjetsCol_)->default_value("l1tJets"),"Name of the L1T jets collection");
 
       // btagging
@@ -97,6 +112,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("btagLoose",po::value <float> (&btagwploose_)->default_value(0.46),"BTag working point LOOSE")
          ("btagMedium",po::value <float> (&btagwpmedium_)->default_value(0.84),"BTag working point MEDIUM")
          ("btagTight",po::value <float> (&btagwptight_)->default_value(0.92),"BTag working point TIGHT")
+         ("btagXXX",po::value <float> (&btagwpxxx_)->default_value(0.92),"BTag undefined working point XXX")
          ("nonBtagWP",po::value <std::string> (&nonbtagwp_)->default_value(""),"non-Btag working point")
          ("nonBtagJet",po::value <int> (&nonbtagjet_)->default_value(-1),"non-Btag Jet");
 
@@ -137,7 +153,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
 
       // generator level
       opt_cfg_.add_options()
-         ("genParticleCollection",po::value <std::string> (&genParticleCol_)->default_value(""),"Name of the gen particle collection")
+         ("genparticlesCollection",po::value <std::string> (&genpartsCol_)->default_value(""),"Name of the gen particle collection")
          ("genjetsCollection",po::value <std::string> (&genjetsCol_)->default_value(""),"Name of the gen jets collection");
             
          
@@ -154,13 +170,24 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("dEtaMin",po::value <float> (&detamin_)->default_value(-1.),"Minimum delta eta between candidates")
          ("dPhiMin",po::value <float> (&dphimin_)->default_value(-1.),"Minimum delta phi between candidates")
          ("dPhiMax",po::value <float> (&dphimax_)->default_value(-1.),"Maximum delta phi between candidates")
-         ("ptImbalanceMax",po::value <float> (&ptimbalmax_)->default_value(1000.),"Maximum relative imbalance between two candidates");
+         ("ptImbalanceMin",po::value <float> (&ptimbalmin_)->default_value(-1),"Minimum relative imbalance between two candidates")
+         ("ptImbalanceMax",po::value <float> (&ptimbalmax_)->default_value(-1),"Maximum relative imbalance between two candidates");
       
          
       // general
       opt_cfg_.add_options()
          ("massMin",po::value <float> (&massmin_)->default_value(-1.),"Cut on a mass, min value")
          ("massMax",po::value <float> (&massmax_)->default_value(-1.),"Cut on a mass, max value");
+            
+      // AI
+      opt_cfg_.add_options()
+         ("variablesFloatAI", po::value<std::vector<std::string> >(&varsf_ai_)->multitoken(),"Float variables names for AI(TMVA)")
+         ("variablesIntAI", po::value<std::vector<std::string> >(&varsi_ai_)->multitoken(),"Integer variables names for AI(TMVA)")
+         ("directoryAI",po::value <std::string> (&dir_ai_)->default_value(""),"Directory with weights for AI(TMVA)")
+         ("methodAI",po::value <std::string> (&method_ai_)->default_value(""),"Method AI(TMVA)")
+         ("efficiencyMinAI",po::value <float> (&eff_min_ai_)->default_value(-1.),"Min value for AI Cuts efficiency")
+         ("discriminatorMaxAI",po::value <float> (&disc_max_ai_)->default_value(-1001.),"Max value for AI discriminator")
+         ("discriminatorMinAI",po::value <float> (&disc_min_ai_)->default_value(-1001.),"Min value for AI discriminator");
             
       po::variables_map vm; 
       try
@@ -186,7 +213,9 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          boost::algorithm::to_lower(jetsid_);
          std::transform(btagalgo_.begin(), btagalgo_.end(), btagalgo_.begin(), ::tolower);
          std::transform(btagwp_.begin(), btagwp_.end(), btagwp_.begin(), ::tolower);
-         
+         if ( jerptres_ != "" )  jerptres_ = Form("%s/%s", datapath.c_str(), jerptres_.c_str());
+         if ( jersf_    != "" )  jersf_    = Form("%s/%s", datapath.c_str(), jersf_.c_str()   );
+         if ( btagsf_   != "" )  btagsf_   = Form("%s/%s", datapath.c_str(), btagsf_.c_str()  );
          
       }
       catch(po::error& e)
@@ -265,9 +294,20 @@ std::string        Config::jerPtRes()           const { return jerptres_; }
 std::string        Config::jerSF()              const { return jersf_; }
 std::string        Config::l1tJetsCollection()  const { return l1tjetsCol_; } 
 std::vector<std::string> Config::jetsBtagWP()   const { return jetsbtagwp_; }
+std::vector<float> Config::jetsBtagProbB()      const { return jetsbtagprobb_; }
+std::vector<float> Config::jetsBtagProbBB()     const { return jetsbtagprobbb_; }
+std::vector<float> Config::jetsBtagProbLepB()   const { return jetsbtagproblepb_; }
+std::vector<float> Config::jetsBtagProbC()      const { return jetsbtagprobc_; }
+std::vector<float> Config::jetsBtagProbG()      const { return jetsbtagprobg_; }
+std::vector<float> Config::jetsBtagProbLight()   const { return jetsbtagproblight_; }
 bool               Config::bRegression()        const { return bregression_; }
 std::string        Config::nonBtagWP()          const { return nonbtagwp_; }
 int                Config::nonBtagJet()         const { return nonbtagjet_; }
+bool               Config::useJetsFlavour()     const { return usejetsflv_; }
+bool               Config::useJetsExtendedFlavour() const { return usejetsextflv_; }
+bool               Config::doDijet() const            { return dodijet_; }
+bool               Config::doDijetFlavour()     const { return dodijet_flavour_; }
+
 // muons
 std::string        Config::muonsCollection()    const { return muonsCol_; }
 int                Config::nMuonsMin()          const { return nmuonsmin_; }
@@ -282,11 +322,14 @@ std::string        Config::l1tMuonsCollection() const { return l1tmuonsCol_; }
 std::string        Config::triggerResults()     const { return triggerCol_; }
 
 // generator level
-std::string        Config::genJetsCollection()  const { return genjetsCol_; }
+std::string        Config::genJetsCollection()       const { return genjetsCol_; }
+std::string        Config::genParticlesCollection()  const { return genpartsCol_; }
 
 // seed 
 std::string        Config::seedFile()           const { return seedfile_; }
 int                Config::seed()               const { return seed_;     }
+
+bool               Config::pythia8()            const { return pythia8_;  }
 
 // btag
 float              Config::btagWP(const std::string & wp) const
@@ -294,6 +337,7 @@ float              Config::btagWP(const std::string & wp) const
    if ( wp == "loose"  ) return btagwploose_ ;
    if ( wp == "medium" ) return btagwpmedium_;
    if ( wp == "tight"  ) return btagwptight_ ;
+   if ( wp == "xxx"    ) return btagwpxxx_;
    
    return -100.;
 }
@@ -309,3 +353,20 @@ void Config::triggerObjectsJets(const std::string & label, const int & index)
 // General stuff            
 float Config::massMin() const { return massmin_; }
 float Config::massMax() const { return massmax_; }
+
+
+// AI
+std::vector<std::string> Config::variablesAI(const std::string & t) const
+{
+   if ( t == "I" ) return varsi_ai_;
+   return varsf_ai_;
+}
+std::string Config::directoryAI()  const { return dir_ai_     ; }
+std::string Config::methodAI()     const { return method_ai_  ; }
+float Config::discriminatorMaxAI() const { return disc_max_ai_; }
+float Config::discriminatorMinAI() const { return disc_min_ai_; }
+float Config::efficiencyMinAI()    const { return eff_min_ai_ ; }
+
+// output tree
+bool Config::doTree() const { return do_tree_; 
+}

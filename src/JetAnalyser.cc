@@ -62,7 +62,16 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
       jerinfo_ = analysis_->jetResolutionInfo(config_->jerPtRes(),config_->jerSF());
       applyjer_ = ( jerinfo_ != nullptr );
    }
-      
+   
+   if ( config_->isMC() )
+   {
+      flavours_ = {"udsg","c","b"};
+      if ( config_->useJetsExtendedFlavour() )
+      {
+         flavours_.push_back("cc");
+         flavours_.push_back("bb");
+      }
+   }
 //   histograms("jet",config_->nJetsMin());
 }
 
@@ -90,21 +99,17 @@ bool JetAnalyser::analysisWithJets()
    // std::shared_ptr< Collection<Jet> >
    auto jets = analysis_->collection<Jet>("Jets");
    
+   if ( this->genParticlesAnalysis() && config_ -> useJetsExtendedFlavour() )
+   {
+      auto particles = analysis_->collection<GenParticle>("GenParticles");
+      jets->associatePartons(particles,0.4,1.,config_->pythia8());
+   }
+   
    if ( genjetsanalysis_ )
    {
       auto genjets = analysis_->collection<GenJet>("GenJets");
       jets->addGenJets(genjets);
-//       for ( int j = 0 ; j < jets->size() ; ++j )
-//       {
-//          auto jet = std::make_shared<Jet>(jets->at(j));
-//          jet -> applyJER(*jerinfo_,0.2);
-//          jets_.push_back(jet);
-//       }
    }
-//    else
-//    {
-//       for ( int j = 0 ; j < jets->size() ; ++j )  jets_.push_back(std::make_shared<Jet>(jets->at(j)));
-//    }
    
    for ( int j = 0 ; j < jets->size() ; ++j )  jets_.push_back(std::make_shared<Jet>(jets->at(j)));
    
@@ -129,32 +134,142 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
    
    h1_[Form("jet_hist_weight_%s",label.c_str())] = std::make_shared<TH1F>(Form("jet_hist_weight_%s",label.c_str()) , Form("jet_hist_weight_%s",label.c_str()) ,1 , 0. , 1. );
    
-   for ( int j = 0; j < n; ++j )
+   for ( int j = 0; j < n; ++j ) // loop over jets
    {
-      h1_[Form("pt_jet%d_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d"  , j+1) , Form("pt_jet%d_%s"  , j+1,label.c_str()) ,100 , 0   , 1000  );
-      h1_[Form("eta_jet%d_%s" , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d" , j+1) , Form("eta_jet%d_%s" , j+1,label.c_str()) , 60 , -3, 3 );
+      // 1D histograms
+      h1_[Form("pt_jet%d_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d"  , j+1) , Form("pt_jet%d_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
+      h1_[Form("eta_jet%d_%s" , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d" , j+1) , Form("eta_jet%d_%s" , j+1,label.c_str()) , 600 , -3, 3 );
       h1_[Form("phi_jet%d_%s" , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d" , j+1) , Form("phi_jet%d_%s" , j+1,label.c_str()) , 360 , -180, 180 );
-      h1_[Form("btag_jet%d_%s", j+1,label.c_str())]  = std::make_shared<TH1F>(Form("btag_jet%d", j+1) , Form("btag_jet%d_%s", j+1,label.c_str()) , 100 , 0, 1 );
+      h1_[Form("btag_jet%d_%s", j+1,label.c_str())]  = std::make_shared<TH1F>(Form("btag_jet%d", j+1) , Form("btag_jet%d_%s", j+1,label.c_str()) , 200 , 0, 1 );
+      h1_[Form("qglikelihood_jet%d_%s", j+1,label.c_str())]  = std::make_shared<TH1F>(Form("qglikelihood_jet%d", j+1) , Form("qglikelihood_jet%d_%s", j+1,label.c_str()) , 200 , 0, 1 );
+      h1_[Form("nconstituents_jet%d_%s", j+1,label.c_str())]  = std::make_shared<TH1F>(Form("nconstituents_jet%d", j+1) , Form("nconstituents_jet%d_%s", j+1,label.c_str()) , 200 , 0, 200 );
+      
       h1_[Form("pt_jet%d_%s"  , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d p_{T} [GeV]",j+1));
       h1_[Form("eta_jet%d_%s" , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d  #eta",j+1));
       h1_[Form("phi_jet%d_%s" , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d  #phi",j+1));
       h1_[Form("btag_jet%d_%s", j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d btag discriminator",j+1)); 
-      for ( int k = j+1; k < n && j < n; ++k )
+      h1_[Form("qglikelihood_jet%d_%s", j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d q-g likelihood",j+1)); 
+      h1_[Form("nconstituents_jet%d_%s", j+1,label.c_str())]-> GetXaxis() -> SetTitle(Form("Jet %d n constituents",j+1)); 
+      
+      if ( config_->btagalgo_ == "deepcsv")
       {
-         h1_[Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dr_jet%d%d"  , j+1,k+1) , Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str()) , 50 , 0, 5 );
-         h1_[Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("deta_jet%d%d", j+1,k+1) , Form("deta_jet%d%d_%s", j+1,k+1,label.c_str()) ,100 , 0,10 );
-         h1_[Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dphi_jet%d%d", j+1,k+1) , Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str()) ,360 , 0,360 );
-         h1_[Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d%d"  , j+1,k+1) , Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str()) ,300 , 0,3000 );
-         h1_[Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d%d" , j+1,k+1) , Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str()) ,200 , -10,10 );
-         h1_[Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d%d" , j+1,k+1) , Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str()) ,360 , -180,180 );
-         h1_[Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("m_jet%d%d"   , j+1,k+1) , Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str()) ,300 , 0,3000 );
-         h1_[Form("dr_jet%d%d_%s"  , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#DeltaR(Jet %d, Jet %d)",j+1,k+1));
-         h1_[Form("deta_jet%d%d_%s", j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta#eta(Jet %d, Jet %d)",j+1,k+1));
-         h1_[Form("dphi_jet%d%d_%s", j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta#phi(Jet %d, Jet %d)",j+1,k+1));
-         h1_[Form("pt_jet%d%d_%s"  , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d + Jet %d p_{T} [GeV]",j+1,k+1));
-         h1_[Form("eta_jet%d%d_%s" , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d + Jet %d  #eta",j+1,k+1));
-         h1_[Form("phi_jet%d%d_%s" , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d + Jet %d  #phi",j+1,k+1));
-         h1_[Form("m_jet%d%d_%s"   , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("M_{%d%d} [GeV]",j+1,k+1));
+         h1_[Form("btag_light_jet%d_%s", j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_light_jet%d", j+1) , Form("btag_light_jet%d_%s", j+1,label.c_str()) , 100 , 0, 1 );         
+         h1_[Form("btag_c_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_c_jet%d"    , j+1) , Form("btag_c_jet%d_%s"    , j+1,label.c_str()) , 100 , 0, 1 );         
+         h1_[Form("btag_b_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_b_jet%d"    , j+1) , Form("btag_b_jet%d_%s"    , j+1,label.c_str()) , 100 , 0, 1 );         
+         h1_[Form("btag_bb_jet%d_%s"   , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_bb_jet%d"   , j+1) , Form("btag_bb_jet%d_%s"   , j+1,label.c_str()) , 100 , 0, 1 );         
+         h1_[Form("btag_cc_jet%d_%s"   , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_cc_jet%d"   , j+1) , Form("btag_cc_jet%d_%s"   , j+1,label.c_str()) , 100 , 0, 1 );         
+      }
+      if ( config_->btagalgo_ == "deepflavour")
+      {
+         h1_[Form("btag_light_jet%d_%s", j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_light_jet%d", j+1) , Form("btag_light_jet%d_%s", j+1,label.c_str()) , 100 , 0, 1 );         
+         h1_[Form("btag_g_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_g_jet%d"    , j+1) , Form("btag_g_jet%d_%s"    , j+1,label.c_str()) , 100 , 0, 1 );         
+         h1_[Form("btag_c_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_c_jet%d"    , j+1) , Form("btag_c_jet%d_%s"    , j+1,label.c_str()) , 100 , 0, 1 );         
+         h1_[Form("btag_b_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_b_jet%d"    , j+1) , Form("btag_b_jet%d_%s"    , j+1,label.c_str()) , 100 , 0, 1 );         
+         h1_[Form("btag_bb_jet%d_%s"   , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_bb_jet%d"   , j+1) , Form("btag_bb_jet%d_%s"   , j+1,label.c_str()) , 100 , 0, 1 );         
+         h1_[Form("btag_lepb_jet%d_%s" , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_lepb_jet%d" , j+1) , Form("btag_lepb_jet%d_%s" , j+1,label.c_str()) , 100, 0, 1 );         
+      }
+      
+      // 2D histograms
+      h2_[Form("pt_eta_jet%d_%s"  , j+1,label.c_str())]  = std::make_shared<TH2F>(Form("pt_eta_jet%d"  , j+1) , Form("pt_eta_jet%d_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500, 600, -3, 3  );
+      h2_[Form("pt_eta_jet%d_%s"  , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d p_{T} [GeV]",j+1));
+      h2_[Form("pt_eta_jet%d_%s"  , j+1,label.c_str())] -> GetYaxis() -> SetTitle(Form("Jet %d  #eta",j+1));
+      
+      if ( config_->isMC() && ( config_->useJetsFlavour() || config_->useJetsExtendedFlavour() ) )
+      {
+         for ( auto & flv : flavours_ ) // flavour dependent histograms
+         {
+            // 1D histograms
+            h1_[Form("pt_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_%s"   , j+1, flv.c_str()) , Form("pt_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str()) ,1500 , 0   , 1500  );
+            h1_[Form("eta_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d_%s"  , j+1, flv.c_str()) , Form("eta_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str()) , 600 , -3, 3 );
+            h1_[Form("phi_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d_%s"  , j+1, flv.c_str()) , Form("phi_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str()) , 360 , -180, 180 );
+            h1_[Form("btag_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("btag_jet%d_%s" , j+1, flv.c_str()) , Form("btag_jet%d_%s_%s", j+1,label.c_str(),flv.c_str()) , 200 , 0, 1 );
+            h1_[Form("qglikelihood_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("qglikelihood_jet%d_%s" , j+1, flv.c_str()) , Form("qglikelihood_jet%d_%s_%s", j+1,label.c_str(),flv.c_str()) , 200 , 0, 1 );
+            h1_[Form("nconstituents_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH1F>(Form("nconstituents_jet%d_%s" , j+1, flv.c_str()) , Form("nconstituents_jet%d_%s_%s", j+1,label.c_str(),flv.c_str()) , 200 , 0, 200 );
+            
+            h1_[Form("pt_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d (%s) p_{T} [GeV]"        , j+1, flv.c_str()));
+            h1_[Form("eta_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d (%s)  #eta"              , j+1, flv.c_str()));
+            h1_[Form("phi_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d (%s)  #phi"              , j+1, flv.c_str()));
+            h1_[Form("btag_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d (%s) btag discriminator" , j+1, flv.c_str())); 
+            h1_[Form("qglikelihood_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d (%s) q-g likelihood" , j+1, flv.c_str())); 
+            h1_[Form("nconstituents_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d (%s) n constituents" , j+1, flv.c_str())); 
+            
+            if ( config_->btagalgo_ == "deepcsv")
+            {
+               h1_[Form("btag_light_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_light_jet%d_%s", j+1,flv.c_str()) , Form("btag_light_jet%d_%s_%s", j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );         
+               h1_[Form("btag_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_c_jet%d_%s"    , j+1,flv.c_str()) , Form("btag_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );         
+               h1_[Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_b_jet%d_%s"    , j+1,flv.c_str()) , Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );         
+               h1_[Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_bb_jet%d_%s"   , j+1,flv.c_str()) , Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );         
+               h1_[Form("btag_cc_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_cc_jet%d_%s"   , j+1,flv.c_str()) , Form("btag_cc_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );         
+            }
+            if ( config_->btagalgo_ == "deepflavour")
+            {
+               h1_[Form("btag_light_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_light_jet%d_%s", j+1,flv.c_str()) , Form("btag_light_jet%d_%s_%s", j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );         
+               h1_[Form("btag_g_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_g_jet%d_%s"    , j+1,flv.c_str()) , Form("btag_g_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );         
+               h1_[Form("btag_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_c_jet%d_%s"    , j+1,flv.c_str()) , Form("btag_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );         
+               h1_[Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_b_jet%d_%s"    , j+1,flv.c_str()) , Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );         
+               h1_[Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_bb_jet%d_%s"   , j+1,flv.c_str()) , Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );         
+               h1_[Form("btag_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_lepb_jet%d_%s" , j+1,flv.c_str()) , Form("btag_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str()) , 100, 0, 1 );         
+            }
+            // 2D histograms
+            h2_[Form("pt_eta_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH2F>(Form("pt_eta_jet%d_%s" , j+1,flv.c_str()) , Form("pt_eta_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str()) ,1500 , 0   , 1500, 600, -3, 3  );
+            h2_[Form("pt_eta_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d (%s) p_{T} [GeV]" , j+1,flv.c_str()));
+            h2_[Form("pt_eta_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())] -> GetYaxis() -> SetTitle(Form("Jet %d (%s)  #eta" ,j+1,flv.c_str()));
+
+         }
+      }
+      if ( config_->doDijet() || config_->doDijetFlavour() )  // dijet histograms
+      {
+         for ( int k = j+1; k < n && j < n; ++k )
+         {
+            h1_[Form("dptrel_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dptrel_jet%d%d" , j+1,k+1) , Form("dptrel_jet%d%d_%s" , j+1,k+1,label.c_str()) ,1000 , 0,1 );
+            h1_[Form("dpt_jet%d%d_%s"    , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dpt_jet%d%d" , j+1,k+1)    , Form("dpt_jet%d%d_%s"    , j+1,k+1,label.c_str()) ,1000 , 0,1000 );
+            h1_[Form("dr_jet%d%d_%s"     , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dr_jet%d%d"  , j+1,k+1)    , Form("dr_jet%d%d_%s"     , j+1,k+1,label.c_str()) , 100 , 0, 5 );
+            h1_[Form("deta_jet%d%d_%s"   , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("deta_jet%d%d", j+1,k+1)    , Form("deta_jet%d%d_%s"   , j+1,k+1,label.c_str()) , 100 , 0,10 );
+            h1_[Form("dphi_jet%d%d_%s"   , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dphi_jet%d%d", j+1,k+1)    , Form("dphi_jet%d%d_%s"   , j+1,k+1,label.c_str()) , 315 , 0, 3.15 );
+            h1_[Form("pt_jet%d%d_%s"     , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d%d"  , j+1,k+1)    , Form("pt_jet%d%d_%s"     , j+1,k+1,label.c_str()) , 300 , 0,3000 );
+            h1_[Form("eta_jet%d%d_%s"    , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d%d" , j+1,k+1)    , Form("eta_jet%d%d_%s"    , j+1,k+1,label.c_str()) , 200 , -10,10 );
+            h1_[Form("phi_jet%d%d_%s"    , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d%d" , j+1,k+1)    , Form("phi_jet%d%d_%s"    , j+1,k+1,label.c_str()) , 360 , -180,180 );
+            h1_[Form("m_jet%d%d_%s"      , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("m_jet%d%d"   , j+1,k+1)    , Form("m_jet%d%d_%s"      , j+1,k+1,label.c_str()) ,3000 , 0,3000 );
+            
+            h1_[Form("dptrel_jet%d%d_%s" , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#DeltaP_{T}(Jet %d, Jet %d)/Jet %d p_{T}",j+1,k+1,j+1));
+            h1_[Form("dpt_jet%d%d_%s"    , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta p_{T}(Jet %d, Jet %d) [GeV]",j+1,k+1));
+            h1_[Form("dr_jet%d%d_%s"     , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#DeltaR(Jet %d, Jet %d)",j+1,k+1));
+            h1_[Form("deta_jet%d%d_%s"   , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta#eta(Jet %d, Jet %d)",j+1,k+1));
+            h1_[Form("dphi_jet%d%d_%s"   , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("#Delta#phi(Jet %d, Jet %d)",j+1,k+1));
+            h1_[Form("pt_jet%d%d_%s"     , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d + Jet %d p_{T} [GeV]",j+1,k+1));
+            h1_[Form("eta_jet%d%d_%s"    , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d + Jet %d  #eta",j+1,k+1));
+            h1_[Form("phi_jet%d%d_%s"    , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d + Jet %d  #phi",j+1,k+1));
+            h1_[Form("m_jet%d%d_%s"      , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("M_{%d%d} [GeV]",j+1,k+1));
+            
+            if ( config_->isMC() && config_->doDijetFlavour() )
+            {
+               for ( auto & flv1 : flavours_ )
+               {
+                  for ( auto & flv2 : flavours_ )
+                  {
+                     h1_[Form("dptrel_jet%d%d_%s_%s_%s" , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  = std::make_shared<TH1F>(Form("dptrel_jet%d%d_%s_%s" , j+1,k+1,flv1.c_str(),flv2.c_str()) , Form("dptrel_jet%d%d_%s_%s_%s" , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str()) , 100 , 0,1 );
+                     h1_[Form("dpt_jet%d%d_%s_%s_%s"    , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  = std::make_shared<TH1F>(Form("dpt_jet%d%d_%s_%s"    , j+1,k+1,flv1.c_str(),flv2.c_str()) , Form("dpt_jet%d%d_%s_%s_%s"    , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str()) , 100 , 0,1000 );
+                     h1_[Form("dr_jet%d%d_%s_%s_%s"     , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  = std::make_shared<TH1F>(Form("dr_jet%d%d_%s_%s"     , j+1,k+1,flv1.c_str(),flv2.c_str()) , Form("dr_jet%d%d_%s_%s_%s"     , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str()) , 100 , 0, 5 );
+                     h1_[Form("deta_jet%d%d_%s_%s_%s"   , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  = std::make_shared<TH1F>(Form("deta_jet%d%d_%s_%s"   , j+1,k+1,flv1.c_str(),flv2.c_str()) , Form("deta_jet%d%d_%s_%s_%s"   , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str()) , 100 , 0,10 );
+                     h1_[Form("dphi_jet%d%d_%s_%s_%s"   , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  = std::make_shared<TH1F>(Form("dphi_jet%d%d_%s_%s"   , j+1,k+1,flv1.c_str(),flv2.c_str()) , Form("dphi_jet%d%d_%s_%s_%s"   , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str()) , 315 , 0, 3.15 );
+                     h1_[Form("pt_jet%d%d_%s_%s_%s"     , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d%d_%s_%s"     , j+1,k+1,flv1.c_str(),flv2.c_str()) , Form("pt_jet%d%d_%s_%s_%s"     , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str()) , 300 , 0,300 );
+                     h1_[Form("eta_jet%d%d_%s_%s_%s"    , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d%d_%s_%s"    , j+1,k+1,flv1.c_str(),flv2.c_str()) , Form("eta_jet%d%d_%s_%s_%s"    , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str()) , 200 , -10,10 );
+                     h1_[Form("phi_jet%d%d_%s_%s_%s"    , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d%d_%s_%s"    , j+1,k+1,flv1.c_str(),flv2.c_str()) , Form("phi_jet%d%d_%s_%s_%s"    , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str()) , 360 , -180,180 );
+                     h1_[Form("m_jet%d%d_%s_%s_%s"      , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  = std::make_shared<TH1F>(Form("m_jet%d%d_%s_%s"      , j+1,k+1,flv1.c_str(),flv2.c_str()) , Form("m_jet%d%d_%s_%s_%s"      , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str()) ,3000 , 0,300 );
+                     
+                     h1_[Form("dptrel_jet%d%d_%s_%s_%s" , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> GetXaxis() -> SetTitle(Form("#DeltaP_{T}(Jet %d (%s), Jet %d (%s))/Jet %d p_{T}",j+1,flv1.c_str(),k+1,flv2.c_str(),j+1));
+                     h1_[Form("dpt_jet%d%d_%s_%s_%s"    , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> GetXaxis() -> SetTitle(Form("#Delta p_{T}(Jet %d (%s), Jet %d (%s)) [GeV]",j+1,flv1.c_str(),k+1,flv2.c_str()));
+                     h1_[Form("dr_jet%d%d_%s_%s_%s"     , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> GetXaxis() -> SetTitle(Form("#DeltaR(Jet %d (%s), Jet %d (%s))",j+1,flv1.c_str(),k+1,flv2.c_str()));
+                     h1_[Form("deta_jet%d%d_%s_%s_%s"   , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> GetXaxis() -> SetTitle(Form("#Delta#eta(Jet %d (%s), Jet %d (%s))",j+1,flv1.c_str(),k+1,flv2.c_str()));
+                     h1_[Form("dphi_jet%d%d_%s_%s_%s"   , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> GetXaxis() -> SetTitle(Form("#Delta#phi(Jet %d (%s), Jet %d (%s))",j+1,flv1.c_str(),k+1,flv2.c_str()));
+                     h1_[Form("pt_jet%d%d_%s_%s_%s"     , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> GetXaxis() -> SetTitle(Form("Jet %d (%s) + Jet %d (%s) p_{T} [GeV]",j+1,flv1.c_str(),k+1,flv2.c_str()));
+                     h1_[Form("eta_jet%d%d_%s_%s_%s"    , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> GetXaxis() -> SetTitle(Form("Jet %d (%s) + Jet %d (%s)  #eta",j+1,flv1.c_str(),k+1,flv2.c_str()));
+                     h1_[Form("phi_jet%d%d_%s_%s_%s"    , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> GetXaxis() -> SetTitle(Form("Jet %d (%s) + Jet %d (%s)  #phi",j+1,flv1.c_str(),k+1,flv2.c_str()));
+                     h1_[Form("m_jet%d%d_%s_%s_%s"      , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> GetXaxis() -> SetTitle(Form("M_{%d%d} (%s)(%s) [GeV]",j+1,k+1,flv1.c_str(),flv2.c_str()));                                          
+                  }
+               }
+            }
+         }
       }
    }
    
@@ -480,6 +595,7 @@ bool JetAnalyser::selectionBJet(const int & r )
    return true;
 }
 
+
 bool JetAnalyser::selectionNonBJet(const int & r )
 {
    int j = r-1;
@@ -588,27 +704,120 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
    
    for ( int j = 0; j < n; ++j )
    {
-      h1_[Form("pt_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
-      h1_[Form("eta_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->eta(),weight_);
-      h1_[Form("phi_jet%d_%s",j+1,label.c_str())] -> Fill(selectedJets_[j]->phi()*180./acos(-1.),weight_);
+      // 1D histograms
+      h1_[Form("pt_jet%d_%s",j+1,label.c_str())]   -> Fill(selectedJets_[j]->pt(),weight_);
+      h1_[Form("eta_jet%d_%s",j+1,label.c_str())]  -> Fill(selectedJets_[j]->eta(),weight_);
+      h1_[Form("phi_jet%d_%s",j+1,label.c_str())]  -> Fill(selectedJets_[j]->phi()*180./acos(-1.),weight_);
       h1_[Form("btag_jet%d_%s",j+1,label.c_str())] -> Fill(btag(*selectedJets_[j],config_->btagalgo_),weight_);
-      for ( int k = j+1; k < n && j < n; ++k )
+      h1_[Form("qglikelihood_jet%d_%s", j+1,label.c_str())] -> Fill(selectedJets_[j]->qgLikelihood(),weight_);
+      h1_[Form("nconstituents_jet%d_%s", j+1,label.c_str())] -> Fill(selectedJets_[j]->constituents(),weight_);
+      
+      if ( config_->btagalgo_ == "deepcsv")
       {
-         Composite<Jet,Jet> c_ij(*(selectedJets_[j]),*(selectedJets_[k]));
-         
-         h1_[Form("dr_jet%d%d_%s",j+1,k+1,label.c_str())]    -> Fill(c_ij.deltaR(),weight_);
-         h1_[Form("deta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.deltaEta(),weight_);
-         
-         h1_[Form("pt_jet%d%d_%s",j+1,k+1,label.c_str())]   -> Fill(c_ij.pt(),weight_);
-         h1_[Form("eta_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.eta(),weight_);
-         h1_[Form("phi_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.phi()*180./acos(-1.),weight_);
-         if ( config_->isMC() || !config_->signalRegion() )
+         h1_[Form("btag_light_jet%d_%s", j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_deeplight"),weight_);
+         h1_[Form("btag_c_jet%d_%s"    , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_deepc"),weight_); 
+         h1_[Form("btag_b_jet%d_%s"    , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_deepb"),weight_); 
+         h1_[Form("btag_bb_jet%d_%s"   , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_deepbb"),weight_); 
+         h1_[Form("btag_cc_jet%d_%s"   , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_deepcc"),weight_); 
+      }
+      if ( config_->btagalgo_ == "deepflavour")
+      {
+         h1_[Form("btag_light_jet%d_%s", j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dflight"),weight_);
+         h1_[Form("btag_g_jet%d_%s"    , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfg"),weight_); 
+         h1_[Form("btag_c_jet%d_%s"    , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfc"),weight_); 
+         h1_[Form("btag_b_jet%d_%s"    , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfb"),weight_); 
+         h1_[Form("btag_bb_jet%d_%s"   , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfbb"),weight_); 
+         h1_[Form("btag_lepb_jet%d_%s" , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dflepb"),weight_); 
+      }
+      // 2D histograms
+      h2_[Form("pt_eta_jet%d_%s"  , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(), selectedJets_[j]->eta(), weight_);
+      
+      if ( config_->isMC() && ( config_ -> useJetsFlavour() || config_ -> useJetsExtendedFlavour() ))
+      {
+         std::string flv = "udsg";
+         if ( config_ -> useJetsFlavour() )
          {
-            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.m(),weight_);
+            if ( abs(selectedJets_[j]->flavour()) == 4 ) flv = "c"; 
+            if ( abs(selectedJets_[j]->flavour()) == 5 ) flv = "b"; 
          }
-         else  // blind
+         if ( config_ -> useJetsExtendedFlavour() ) flv = selectedJets_[j]->extendedFlavour();
+         // 1D histograms
+         h1_[Form("pt_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->pt(),weight_);
+         h1_[Form("eta_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->eta(),weight_);
+         h1_[Form("phi_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->phi()*180./acos(-1.),weight_);
+         h1_[Form("btag_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())]  -> Fill(btag(*selectedJets_[j],config_->btagalgo_),weight_);
+         h1_[Form("qglikelihood_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())] -> Fill(selectedJets_[j]->qgLikelihood(),weight_);
+         h1_[Form("nconstituents_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())] -> Fill(selectedJets_[j]->constituents(),weight_);
+         if ( config_->btagalgo_ == "deepcsv")
          {
-            h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(0.,weight_);
+            h1_[Form("btag_light_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_deeplight"),weight_);
+            h1_[Form("btag_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_deepc"),weight_); 
+            h1_[Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_deepb"),weight_); 
+            h1_[Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_deepbb"),weight_); 
+            h1_[Form("btag_cc_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_deepcc"),weight_); 
+         }
+         if ( config_->btagalgo_ == "deepflavour")
+         {
+            h1_[Form("btag_light_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dflight"),weight_);
+            h1_[Form("btag_g_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfg"),weight_); 
+            h1_[Form("btag_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfc"),weight_); 
+            h1_[Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfb"),weight_); 
+            h1_[Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfbb"),weight_); 
+            h1_[Form("btag_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dflepb"),weight_); 
+         }
+         // 2D histograms
+         h2_[Form("pt_eta_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())] -> Fill(selectedJets_[j]->pt(), selectedJets_[j]->eta(), weight_);
+      }
+      
+      if ( config_ -> doDijet() || config_->doDijetFlavour() )
+      {
+         for ( int k = j+1; k < n && j < n; ++k )
+         {
+            Composite<Jet,Jet> c_ij(*(selectedJets_[j]),*(selectedJets_[k]));
+            
+            h1_[Form("dptrel_jet%d%d_%s" , j+1,k+1,label.c_str())] -> Fill(fabs(selectedJets_[j]->pt()-selectedJets_[k]->pt())/selectedJets_[j]->pt(),weight_);
+            h1_[Form("dpt_jet%d%d_%s" , j+1,k+1,label.c_str())]    -> Fill(fabs(selectedJets_[j]->pt()-selectedJets_[k]->pt()),weight_);
+            h1_[Form("dr_jet%d%d_%s",j+1,k+1,label.c_str())]       -> Fill(c_ij.deltaR(),weight_);
+            h1_[Form("deta_jet%d%d_%s",j+1,k+1,label.c_str())]     -> Fill(c_ij.deltaEta(),weight_);
+            h1_[Form("dphi_jet%d%d_%s",j+1,k+1,label.c_str())]     -> Fill(fabs(selectedJets_[j]->deltaPhi(*selectedJets_[k])));
+            h1_[Form("pt_jet%d%d_%s",j+1,k+1,label.c_str())]       -> Fill(c_ij.pt(),weight_);
+            h1_[Form("eta_jet%d%d_%s",j+1,k+1,label.c_str())]      -> Fill(c_ij.eta(),weight_);
+            h1_[Form("phi_jet%d%d_%s",j+1,k+1,label.c_str())]      -> Fill(c_ij.phi()*180./acos(-1.),weight_);
+            if ( config_->isMC() || !config_->signalRegion() )
+            {
+               h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(c_ij.m(),weight_);
+            }
+            else  // blind
+            {
+               h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(0.,weight_);
+            }
+            if ( config_->isMC() && config_->doDijetFlavour() )
+            {
+               std::string flv1 = "udsg";
+               std::string flv2 = "udsg";
+               if ( config_ -> useJetsFlavour() )
+               {
+                  if ( abs(selectedJets_[j]->flavour()) == 4 ) flv1 = "c"; 
+                  if ( abs(selectedJets_[j]->flavour()) == 5 ) flv1 = "b"; 
+                  if ( abs(selectedJets_[k]->flavour()) == 4 ) flv2 = "c"; 
+                  if ( abs(selectedJets_[k]->flavour()) == 5 ) flv2 = "b"; 
+               }
+               if ( config_ -> useJetsExtendedFlavour() )
+               {
+                  flv1 = selectedJets_[j]->extendedFlavour();
+                  flv2 = selectedJets_[k]->extendedFlavour();
+               }
+               h1_[Form("dptrel_jet%d%d_%s_%s_%s" , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> Fill(fabs(selectedJets_[j]->pt()-selectedJets_[k]->pt())/selectedJets_[j]->pt(),weight_);
+               h1_[Form("dpt_jet%d%d_%s_%s_%s"    , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> Fill(fabs(selectedJets_[j]->pt()-selectedJets_[k]->pt()),weight_);
+               h1_[Form("dr_jet%d%d_%s_%s_%s"     , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> Fill(c_ij.deltaR(),weight_);
+               h1_[Form("deta_jet%d%d_%s_%s_%s"   , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> Fill(c_ij.deltaEta(),weight_);
+               h1_[Form("dphi_jet%d%d_%s_%s_%s"   , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> Fill(fabs(selectedJets_[j]->deltaPhi(*selectedJets_[k])));
+               h1_[Form("pt_jet%d%d_%s_%s_%s"     , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> Fill(c_ij.pt(),weight_);
+               h1_[Form("eta_jet%d%d_%s_%s_%s"    , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> Fill(c_ij.eta(),weight_);
+               h1_[Form("phi_jet%d%d_%s_%s_%s"    , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> Fill(c_ij.phi()*180./acos(-1.),weight_);
+               h1_[Form("m_jet%d%d_%s_%s_%s"      , j+1,k+1,label.c_str(),flv1.c_str(),flv2.c_str())]  -> Fill(c_ij.m(),weight_);
+
+            }
          }
       }
    }
@@ -655,10 +864,16 @@ void JetAnalyser::actionApplyBtagSF(const int & r)
    
    int j = r-1;
    ++ cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: btag SF applied (%s %s WP)",r,config_->btagalgo_.c_str(),config_->jetsBtagWP()[j].c_str()));
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      if ( config_->jetsBtagWP()[j] == "xxx" )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: btag SF = 1 applied (%s %s WP)",r,config_->btagalgo_.c_str(),config_->jetsBtagWP()[j].c_str()));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: btag SF applied (%s %s WP)",r,config_->btagalgo_.c_str(),config_->jetsBtagWP()[j].c_str()));
+   }
    
-   float sf = this->btagSF(r,config_->jetsBtagWP()[j]).nominal;
+   float sf = 1.;
+   if ( config_->jetsBtagWP()[j] != "xxx" )  sf = this->btagSF(r,config_->jetsBtagWP()[j]).nominal;
    
    weight_ *= sf;
    h1_["cutflow"] -> Fill(cutflow_,weight_);
@@ -716,6 +931,8 @@ bool JetAnalyser::selectionDiJetMass(const int & r1, const int & r2)
    return true;
 }
 
+
+
 void JetAnalyser::jetSwap(const int & r1, const int & r2)
 {
    if ( r1 == r2 ) return;
@@ -734,3 +951,358 @@ void JetAnalyser::jetSwap(const int & r1, const int & r2)
 //    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
 }
+
+
+
+bool JetAnalyser::selectionJetPtImbalance(const int & j1, const int & j2, const float & delta)
+{
+   ++cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      if ( delta > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DpT(jet %d, jet %d)/jet %d pT < %4.2f",j1,j2,j1,fabs(delta)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DpT(jet %d, jet %d)/jet %d pT > %4.2f",j1,j2,j1,fabs(delta)));
+   }
+   
+   
+   if ( (int)selectedJets_.size() < j1 || (int)selectedJets_.size() < j2 )
+   {
+      std::cout << "-errr- JetAnalyser::selectionJetDptrel(): you dont have enough selected jets. Will return false" << std::endl;
+      return false;
+   }
+   if ( delta > 0 )
+   {
+      if ( fabs(selectedJets_[j1-1]->pt() - selectedJets_[j2-1]->pt())/selectedJets_[j1-1]->pt() > fabs(delta) ) return false;
+   }
+   else
+   {
+      if ( fabs(selectedJets_[j1-1]->pt() - selectedJets_[j2-1]->pt())/selectedJets_[j1-1]->pt() < fabs(delta) ) return false;
+   }
+
+        
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+    
+   return true;
+   
+}
+bool JetAnalyser::selectionJetPtImbalance(const int & j1, const int & j2)
+{
+   bool ok = true;
+   if (config_->ptimbalmax_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetPtImbalance(j1,j2,config_->ptimbalmax_);
+   }
+   
+   if (config_->ptimbalmin_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetPtImbalance(j1,j2,-1*config_->ptimbalmin_);
+   }
+   return ok;
+   
+}
+
+bool JetAnalyser::selectionJetQGlikelihood(const int & r, const float & cut)
+{
+   int j = r-1;
+   
+   ++cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      if ( cut > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d Q-G likelihood < %4.2f",r,fabs(cut)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d Q-G likelihood > %4.2f",r,fabs(cut)));
+   }
+   
+   if ( cut > 0 )
+   {
+      if ( selectedJets_[j]->qgLikelihood() > fabs(cut) ) return false;
+   }
+   else
+   {
+      if ( selectedJets_[j]->qgLikelihood() < fabs(cut) ) return false;
+   }
+        
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+    
+   return true;
+   
+}
+
+bool JetAnalyser::selectionJetQGlikelihood(const int & r)
+{
+   int j = r-1;
+   bool ok = true;
+   if ( config_->qgmax_.size() == 0 || config_->qgmax_[j] < 0 || (int)config_->qgmax_.size() < r )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetQGlikelihood(r,config_->qgmax_[j]);
+   }
+   
+   if (config_->qgmin_.size() == 0 || config_->qgmin_[j] < 0 || (int)config_->qgmin_.size() < r )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetQGlikelihood(r,-1*config_->qgmin_[j] );
+   }
+   return ok;
+   
+}
+
+
+bool JetAnalyser::selectionBJetProbB(const int & r )
+{
+   if ( config_->jetsBtagProbB().size() == 0 ) return true;
+   int j = r-1;
+   float wp = config_->jetsBtagProbB()[j];
+   std::string algo = config_->btagalgo_;
+   if ( fabs(wp) > 1 ) return true; // there is no selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      if ( wp > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob b < %6.4f",r,algo.c_str(),fabs(wp)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob b > %6.4f",r,algo.c_str(),fabs(wp)));
+   }
+         
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  JetAnalyser::selectionBJetProbB(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
+   
+   // jet  btag
+   if ( algo == "deepcsv" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_deepb") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_deepb") < fabs(wp) ) return false;
+   }
+   if ( algo == "deepflavour" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_dfb") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_dfb") < fabs(wp) ) return false;
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   return true;
+}
+
+
+
+
+bool JetAnalyser::selectionBJetProbBB(const int & r )
+{
+   if ( config_->jetsBtagProbBB().size() == 0 ) return true;
+   int j = r-1;
+   float wp = config_->jetsBtagProbBB()[j];
+   std::string algo = config_->btagalgo_;
+   if ( fabs(wp) > 1 ) return true; // there is no selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      if ( wp > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob bb < %6.4f",r,algo.c_str(),fabs(wp)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob bb > %6.4f",r,algo.c_str(),fabs(wp)));
+   }
+         
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  JetAnalyser::selectionBJetProbBB(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
+   
+   // jet  btag
+   if ( algo == "deepcsv" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_deepbb") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_deepbb") < fabs(wp) ) return false;
+   }
+   if ( algo == "deepflavour" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_dfbb") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_dfbb") < fabs(wp) ) return false;
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   return true;
+}
+
+bool JetAnalyser::selectionBJetProbLepB(const int & r )
+{
+   if ( config_->jetsBtagProbLepB().size() == 0 ) return true;
+   int j = r-1;
+   float wp = config_->jetsBtagProbLepB()[j];
+   std::string algo = config_->btagalgo_;
+   if ( fabs(wp) > 1 || algo == "deepcsv" ) return true; // there is no selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      if ( wp > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob lepb < %6.4f",r,algo.c_str(),fabs(wp)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob lepb > %6.4f",r,algo.c_str(),fabs(wp)));
+   }
+         
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  JetAnalyser::selectionBJetProbLepB(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
+   
+   // jet  btag
+   if ( algo == "deepflavour" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_dflepb") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_dflepb") < fabs(wp) ) return false;
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   return true;
+}
+
+
+
+bool JetAnalyser::selectionBJetProbC(const int & r )
+{
+   if ( config_->jetsBtagProbC().size() == 0 ) return true;
+   int j = r-1;
+   float wp = config_->jetsBtagProbC()[j];
+   std::string algo = config_->btagalgo_;
+   if ( fabs(wp) > 1 ) return true; // there is no selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      if ( wp > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob c < %6.4f",r,algo.c_str(),fabs(wp)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob c > %6.4f",r,algo.c_str(),fabs(wp)));
+   }
+         
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  JetAnalyser::selectionBJetProbC(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
+   
+   // jet  btag
+   if ( algo == "deepcsv" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_deepc") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_deepc") < fabs(wp) ) return false;
+   }
+   if ( algo == "deepflavour" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_dfc") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_dfc") < fabs(wp) ) return false;
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   return true;
+}
+
+bool JetAnalyser::selectionBJetProbG(const int & r )
+{
+   if ( config_->jetsBtagProbG().size() == 0 ) return true;
+   int j = r-1;
+   float wp = config_->jetsBtagProbG()[j];
+   std::string algo = config_->btagalgo_;
+   if ( fabs(wp) > 1 || algo == "deepcsv" ) return true; // there is no selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      if ( wp > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob g < %6.4f",r,algo.c_str(),fabs(wp)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob g > %6.4f",r,algo.c_str(),fabs(wp)));
+   }
+         
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  JetAnalyser::selectionBJetProbG(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
+   
+   // jet  btag
+   if ( algo == "deepflavour" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_dfg") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_dfg") < fabs(wp) ) return false;
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   return true;
+}
+
+bool JetAnalyser::selectionBJetProbLight(const int & r )
+{
+   if ( config_->jetsBtagProbLight().size() == 0 ) return true;
+   int j = r-1;
+   float wp = config_->jetsBtagProbLight()[j];
+   std::string algo = config_->btagalgo_;
+   if ( fabs(wp) > 1 ) return true; // there is no selection here, so will not update the cutflow
+   
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      if ( wp > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob light < %6.4f",r,algo.c_str(),fabs(wp)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag prob light > %6.4f",r,algo.c_str(),fabs(wp)));
+   }
+         
+   
+   if ( r > config_->nbjetsmin_ ) 
+   {
+      std::cout << "* warning * -  JetAnalyser::selectionBJetProbLight(): given jet rank > nbjetsmin. Returning false! " << std::endl;
+      return false;
+   }
+   
+   // jet  btag
+   if ( algo == "deepcsv" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_deeplight") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_deeplight") < fabs(wp) ) return false;
+   }
+   if ( algo == "deepflavour" )
+   {
+      if ( wp > 0 && selectedJets_[j]->btag("btag_dflight") > fabs(wp) ) return false;
+      if ( wp < 0 && selectedJets_[j]->btag("btag_dflight") < fabs(wp) ) return false;
+   }
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   return true;
+}
+
+
