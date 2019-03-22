@@ -136,8 +136,10 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("triggerObjectsMatches", po::value<std::vector<int> >(&triggerObjectsMatches_)->multitoken(),"Number of trigger objects matches")
          ("triggerObjectsMatchesRank", po::value<std::vector<int> >(&triggerObjectsMatchesRank_)->multitoken(),"Rank of offline object the trigger objects matches")
          ("triggerObjectsJets", po::value<std::vector<std::string> >(&triggerObjectsJets_)->multitoken(),"Trigger objects for b jets")
-         ("triggerObjectsBJets", po::value<std::vector<std::string> >(&triggerObjectsBJets_)->multitoken(),"Trigger objects for btag jets")
-         ("triggerObjectsL1Jets", po::value<std::vector<std::string> >(&triggerObjectsL1Jets_)->multitoken(),"Trigger objects for L1 jets")
+         ("triggerObjectsBJets"    , po::value<std::string> (&triggerObjectsBJets_)   ->default_value(""),"Trigger objects for btag jets")
+         ("triggerObjectsL1Jets"   , po::value<std::string> (&triggerObjectsL1Jets_)  ->default_value(""),"Trigger objects for L1 jets")
+         ("triggerObjectsCaloJets" , po::value<std::string> (&triggerObjectsCaloJets_)->default_value(""),"Trigger objects for Calo jets")
+         ("triggerObjectsPFJets"   , po::value<std::string> (&triggerObjectsPFJets_)  ->default_value(""),"Trigger objects for PF jets")
          ("triggerObjectsJetsMatches", po::value<int> (&triggerObjectsJetsMatches_)->default_value(-1),"Number of matches with trigger objects for jets")
          ("triggerObjectsBJetsMatches", po::value<int> (&triggerObjectsBJetsMatches_)->default_value(-1),"Number of matches with trigger objects for b jets")
          ("triggerObjectsL1JetsMatches", po::value<int> (&triggerObjectsL1JetsMatches_)->default_value(-1),"Number of matches with L1 trigger objects jets")
@@ -319,10 +321,14 @@ std::string        Config::muonsId()            const { return muonsid_; }
 std::string        Config::l1tMuonsCollection() const { return l1tmuonsCol_; } 
 
 // trigger
-std::string        Config::triggerResults()        const { return triggerCol_   ; }
-std::string        Config::triggerObjectsDir()     const { return triggerObjDir_; }
-std::string        Config::triggerObjectsL1Muons() const { return triggerObjectsL1Muons_; }
-std::string        Config::triggerObjectsL3Muons() const { return triggerObjectsL3Muons_; }
+std::string        Config::triggerResults()         const { return triggerCol_; }
+std::string        Config::triggerObjectsDir()      const { return triggerObjDir_; }
+std::string        Config::triggerObjectsL1Muons()  const { return triggerObjectsL1Muons_; }
+std::string        Config::triggerObjectsL3Muons()  const { return triggerObjectsL3Muons_; }
+std::string        Config::triggerObjectsBJets()    const { return triggerObjectsBJets_; }
+std::string        Config::triggerObjectsL1Jets()   const { return triggerObjectsL1Jets_; }
+std::string        Config::triggerObjectsCaloJets() const { return triggerObjectsCaloJets_; }
+std::string        Config::triggerObjectsPFJets()   const { return triggerObjectsPFJets_; }
 // generator level
 std::string        Config::genJetsCollection()       const { return genjetsCol_; }
 std::string        Config::genParticlesCollection()  const { return genpartsCol_; }
