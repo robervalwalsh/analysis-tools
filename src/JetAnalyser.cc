@@ -87,8 +87,10 @@ bool JetAnalyser::analysisWithJets()
    selectedJets_.clear();
    if ( ! jetsanalysis_ ) return false;
    
-   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsJets(),0.3);
-   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsBJets_,0.3);
+   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsL1Jets(),0.3);
+   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsCaloJets(),0.3);
+   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsPFJets(),0.3);
+   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsBJets(),0.3);
 
    // std::shared_ptr< Collection<Jet> >
    auto jets = analysis_->collection<Jet>("Jets");
@@ -619,7 +621,7 @@ bool JetAnalyser::selectionNonBJet(const int & r )
 bool JetAnalyser::onlineJetMatching(const int & r)
 {
    int j = r-1;
-   if ( config_->triggerObjectsJets().size() == 0 ) return true;
+   if ( config_->triggerObjectsL1Jets() == "" && config_->triggerObjectsCaloJets() == "" && config_->triggerObjectsPFJets() == "") return true;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -638,10 +640,9 @@ bool JetAnalyser::onlineJetMatching(const int & r)
    }
    
    std::shared_ptr<Jet> jet = selectedJets_[j];
-   for ( size_t io = 0; io < config_->triggerObjectsJets().size() ; ++io )
-   {       
-      if ( ! jet->matched(config_->triggerObjectsJets()[io]) ) return false;
-   }
+   if ( ! jet->matched(config_->triggerObjectsL1Jets()   ) ) return false;
+   if ( ! jet->matched(config_->triggerObjectsCaloJets() ) ) return false;
+   if ( ! jet->matched(config_->triggerObjectsPFJets()   ) ) return false;
 
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
@@ -652,7 +653,7 @@ bool JetAnalyser::onlineJetMatching(const int & r)
 bool JetAnalyser::onlineBJetMatching(const int & r)
 {
    int j = r-1;
-   if ( config_->triggerObjectsBJets_.size() == 0 ) return true;
+   if ( config_->triggerObjectsBJets() == "" ) return true;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -671,10 +672,7 @@ bool JetAnalyser::onlineBJetMatching(const int & r)
    }
    
    std::shared_ptr<Jet> jet = selectedJets_[j];
-   for ( size_t io = 0; io < config_->triggerObjectsBJets_.size() ; ++io )
-   {       
-      if ( ! jet->matched(config_->triggerObjectsBJets_[io]) ) return false;
-   }
+   if ( ! jet->matched(config_->triggerObjectsBJets()) ) return false;
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
