@@ -39,15 +39,14 @@ TriggerAnalyser::TriggerAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,ar
 {
    triggeranalysis_  = analysis_->triggerResults(config_->triggerResults());
    
-   
    if ( config_->triggerObjectsDir() != "" )
    {
       // online jets
-      for ( auto & obj : config_->triggerObjectsJets() )
-         analysis_->addTree<TriggerObject> (obj,Form("%s/%s", config_->triggerObjectsDir().c_str(),obj.c_str()));
+      analysis_->addTree<TriggerObject> (config_->triggerObjectsL1Jets()  ,Form("%s/%s", config_->triggerObjectsDir().c_str(),config_->triggerObjectsL1Jets().c_str()));
+      analysis_->addTree<TriggerObject> (config_->triggerObjectsCaloJets(),Form("%s/%s", config_->triggerObjectsDir().c_str(),config_->triggerObjectsCaloJets().c_str()));
+      analysis_->addTree<TriggerObject> (config_->triggerObjectsPFJets()  ,Form("%s/%s", config_->triggerObjectsDir().c_str(),config_->triggerObjectsPFJets().c_str()));
       // online b jets
-      for ( auto & obj : config_->triggerObjectsBJets_ )
-         analysis_->addTree<TriggerObject> (obj,Form("%s/%s", config_->triggerObjectsDir().c_str(),obj.c_str()));
+      analysis_->addTree<TriggerObject> (config_->triggerObjectsBJets(),Form("%s/%s", config_->triggerObjectsDir().c_str(),config_->triggerObjectsBJets().c_str()));
       // online muons
       analysis_->addTree<TriggerObject> (config_->triggerObjectsL1Muons(),Form("%s/%s",config_->triggerObjectsDir().c_str(),config_->triggerObjectsL1Muons().c_str()));
       analysis_->addTree<TriggerObject> (config_->triggerObjectsL3Muons(),Form("%s/%s",config_->triggerObjectsDir().c_str(),config_->triggerObjectsL3Muons().c_str()));
@@ -111,5 +110,51 @@ bool TriggerAnalyser::selectionL1()
 bool TriggerAnalyser::analysisWithTrigger()
 {
    return triggeranalysis_;
+}
+
+
+std::vector< std::shared_ptr<TriggerObject> > TriggerAnalyser::triggerObjectsL1Jets()
+{
+   auto collection = analysis_->collection<TriggerObject>(config_->triggerObjectsL1Jets());
+   std::vector< std::shared_ptr<TriggerObject> > objects;
+   for ( int j = 0 ; j < collection->size() ; ++j )
+      objects.push_back(std::make_shared<TriggerObject>(collection->at(j)));
+   return objects;
+}
+
+std::vector< std::shared_ptr<TriggerObject> > TriggerAnalyser::triggerObjectsCaloJets()
+{
+   auto collection = analysis_->collection<TriggerObject>(config_->triggerObjectsCaloJets());
+   std::vector< std::shared_ptr<TriggerObject> > objects;
+   for ( int j = 0 ; j < collection->size() ; ++j )
+      objects.push_back(std::make_shared<TriggerObject>(collection->at(j)));
+   return objects;
+}
+
+std::vector< std::shared_ptr<TriggerObject> > TriggerAnalyser::triggerObjectsPFJets()
+{
+   auto collection = analysis_->collection<TriggerObject>(config_->triggerObjectsPFJets());
+   std::vector< std::shared_ptr<TriggerObject> > objects;
+   for ( int j = 0 ; j < collection->size() ; ++j )
+      objects.push_back(std::make_shared<TriggerObject>(collection->at(j)));
+   return objects;
+}
+
+std::vector< std::shared_ptr<TriggerObject> > TriggerAnalyser::triggerObjectsL1Muons()
+{
+   auto collection = analysis_->collection<TriggerObject>(config_->triggerObjectsL1Muons());
+   std::vector< std::shared_ptr<TriggerObject> > objects;
+   for ( int j = 0 ; j < collection->size() ; ++j )
+      objects.push_back(std::make_shared<TriggerObject>(collection->at(j)));
+   return objects;
+}
+
+std::vector< std::shared_ptr<TriggerObject> > TriggerAnalyser::triggerObjectsL3Muons()
+{
+   auto collection = analysis_->collection<TriggerObject>(config_->triggerObjectsL3Muons());
+   std::vector< std::shared_ptr<TriggerObject> > objects;
+   for ( int j = 0 ; j < collection->size() ; ++j )
+      objects.push_back(std::make_shared<TriggerObject>(collection->at(j)));
+   return objects;
 }
 
