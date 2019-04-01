@@ -59,8 +59,14 @@ int main(int argc, char * argv[])
       for ( int j = 0 ; j < jets->size() ; ++j )
       {
          Jet jet = jets->at(j);
-         if ( btagalgo_ != "deepcsv" ) continue;
-         if ( (jet.btag("btag_deepb") + jet.btag("btag_deepbb")) < btagmin ) continue;  // probing btag DeepCSV jets
+         if ( btagalgo_ != "deepcsv" && btagalgo_ != "deepflavour" ) continue;
+         float btag = -10000.;
+         if ( btagalgo_ == "deepcsv" )
+            btag = jet.btag("btag_deepb") + jet.btag("btag_deepbb");
+         if ( btagalgo_ == "deepflavour" )
+            btag = jet.btag("btag_dfb") + jet.btag("btag_dfbb") + jet.btag("btag_dflepb");
+         
+         if ( btag < btagmin ) continue;  // probing btag jets
          
          ++nbjets;
          
