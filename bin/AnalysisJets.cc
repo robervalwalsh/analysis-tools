@@ -37,10 +37,14 @@ int main(int argc, char * argv[])
    // btagwp_   = "tight";
    auto bsf_reader = analysis.btagCalibration(btagalgo_, btagsf_, btagwp_);
    
+   // jer
+   // Jet energy resolution scale factors and pt resolution
+   auto jerinfo = analysis.jetResolutionInfo(jerpt_,jersf_);
    
    // Physics Objects Collections
    analysis.addTree<Jet> ("Jets",jetsCol_);
    analysis.addTree<GenParticle> ("GenParticles",genParticleCol_);
+   analysis.addTree<GenJet> ("GenJets",genjetsCol_);
    
    // Analysis of events
    std::cout << "This analysis has " << analysis.size() << " events" << std::endl;
@@ -54,11 +58,17 @@ int main(int argc, char * argv[])
       std::cout << std::endl;
       
       // GenParticles
-      auto particles = analysis.collection<GenParticle>("GenParticles");
+      auto particles = analysis.collection<GenParticle>("GenParticles");  // of course one can also loop over the particles
+      // GenJets
+      auto genjets = analysis.collection<GenJet>("GenJets");              // of course one can also loop over the genjets
       // Jets
       auto jets = analysis.collection<Jet>("Jets");
+      
       // associate partons to jets
       jets->associatePartons(particles,0.4,1);
+      // associate genjets to jets
+      jets->addGenJets(genjets);  // if not defined -> jerMatch = false, smearing will be done using the stochastic method only
+
       for ( int j = 0 ; j < jets->size() ; ++j )
       {
          Jet jet = jets->at(j);
@@ -75,15 +85,21 @@ int main(int argc, char * argv[])
          double jet_bscalefactorup   = jet.btagSFup(bsf_reader,2); 
          double jet_bscalefactordown = jet.btagSFdown(bsf_reader,2); 
          
-      // FLAVOUR
+      // JER 
+         jet.jerInfo(*jerinfo,0.2); // this also performs matching to the added gen jets above, with delta R < 0.2 which is default and can be omitted
+        
+         
+      // PRINTOUT
      
-         std::cout << "    Jet #" << j << ": ";
+         std::cout << "Jet #" << j << ": ";
          std::cout << "pT  = "     << jet.pt()      << ", ";
          std::cout << "eta = "     << jet.eta()     << ", ";
          std::cout << "phi = "     << jet.phi()     << ", ";
          std::cout << "flavour = " << jet.flavour() << " (extended = " << jet.extendedFlavour() << "), ";
          std::cout << "btag = "    << btag    << " with scale factor = " <<  jet_bscalefactor;
-         std::cout << " up  = " << jet_bscalefactorup << "  down = " << jet_bscalefactordown << std::endl;
+         std::cout << " up  = "    << jet_bscalefactorup << "  down = " << jet_bscalefactordown << std::endl;
+         std::cout << "     JER SF  = "    << jet.jerSF()  << ", match = " << jet.jerMatch() << " jer corr = " << jet.jerCorrection() << " + ";
+         std::cout << jet.jerCorrection("up") << " - " << jet.jerCorrection("down") << std::endl;
          std::cout << "     quark-gluon likelihood = " << jet.qgLikelihood() << std::endl;
          std::cout << "     pileup jet id full discriminant = " << jet.pileupJetIdFullDiscriminant() << std::endl;
          std::cout << "     pileup jet id full id = " << jet.pileupJetIdFullId() << std::endl;
@@ -107,7 +123,7 @@ float btagMin(const string & wp)
    
 }
 
-
+// ====================================================================
 // // Below is a snippet of how to use the BTV standalone classes
 // 
 // // before the event loop
@@ -126,7 +142,7 @@ float btagMin(const string & wp)
 //             BTagEntry::FLAV_UDSG, // btag flavour - UDSG
 //             "incl");              // measurement type   
 //    
-// // inside the event loop
+// // inside the jet loop
 //    
 //          // b-tag scale factors
 //          double jet_bscalefactor;
@@ -134,3 +150,23 @@ float btagMin(const string & wp)
 //          if ( jet.flavour("Hadron") == 4 ) jet_bscalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_C,    fabs(jet.eta()), jet.pt() ); 
 //          if ( jet.flavour("Hadron") == 0 ) jet_bscalefactor = reader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, fabs(jet.eta()), jet.pt() ); 
 //    
+
+// ====================================================================
+
+
+// // Below is a snippet of how to use the JME standalone classes
+// 
+// // before the event loop
+//    // Jet energy resolution scale factors and pt resolution
+//    JME::JetResolution resolution = JME::JetResolution(jerpt_);
+//    JME::JetResolutionScaleFactor resolution_sf = JME::JetResolutionScaleFactor(jersf_);
+// 
+// // inside the event loop
+//       analysis.match<Jet,GenJet>("Jets","GenJets",0.2);
+// // inside the jet loop      
+//          JME::JetParameters jetResPars = {{JME::Binning::JetPt, jet.pt()}, {JME::Binning::JetEta, jet.eta()}, {JME::Binning::Rho, jet.rho()}};
+//          JME::JetParameters jetResSFPars = {{JME::Binning::JetEta, jet.eta()}, {JME::Binning::Rho, jet.rho()}};;
+//          
+//          std::cout << "resolution = " << resolution.getResolution(jetResPars) << ", ";
+//          std::cout << "JER SF  = "    << resolution_sf.getScaleFactor(jetResSFPars)  << ", " << genjet << std::endl;
+//          
