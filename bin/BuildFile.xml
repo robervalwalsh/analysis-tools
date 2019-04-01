@@ -16,7 +16,7 @@
 <flags   LDFLAGS="-lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -lm -ldl -rdynamic"/>
 </bin>
 
-<bin   name="AnalysisMetadata" file="AnalysisMetadata.cc">
+<bin   name="AnalysisMetadataExample" file="AnalysisMetadataExample.cc">
 <flags   LDFLAGS="-lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -lm -ldl -rdynamic"/>
 </bin>
 
@@ -41,10 +41,6 @@
 </bin>
 
 <bin   name="SimpleMssmHbbAnalysis" file="SimpleMssmHbbAnalysis.cc">
-<flags   LDFLAGS="-lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -lm -ldl -rdynamic"/>
-</bin>
-
-<bin   name="NtupleDiagnostics" file="NtupleDiagnostics.cc">
 <flags   LDFLAGS="-lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -lm -ldl -rdynamic"/>
 </bin>
 
