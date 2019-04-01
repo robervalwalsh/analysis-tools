@@ -44,7 +44,9 @@ int main(int argc, char * argv[])
 
    // Analysis of events
    std::cout << "This analysis has " << analysis.size() << " events" << std::endl;
-   for ( int i = 0 ; i < analysis.size() ; ++i )
+   int nevts = analysis.size();
+   if ( nevts > 0 ) nevts = nevtmax_;
+   for ( int i = 0 ; i < nevts ; ++i )
    {
       analysis.event(i);
       
