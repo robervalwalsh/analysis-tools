@@ -53,6 +53,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
       // analysis info
       opt_cfg_.add_options()
          ("ntuplesList",po::value <std::string> (&inputlist_)->default_value("rootFileList.txt"),"File with list of ntuples")
+         ("eventInfo",po::value <std::string> (&eventinfo_)->default_value("MssmHbb/Events/EventInfo"),"EventInfo directory in the tree")
          ("collectionsTreePath",po::value <std::string> (&treePath_)->default_value("Events"),"Name of the tree path for the event collections")
          ("nEventsMax",po::value <int> (&nevtmax_)->default_value(-1), "Maximum number of events")
          ("nLumiSections",po::value <int> (&nlumis_)->default_value(-1), "Number of lumi sections processed")
@@ -273,6 +274,7 @@ void Config::loadOptions()
 
 // analysis info
 std::string        Config::ntuplesList()     const { return inputlist_; }
+std::string        Config::eventInfo()       const { return eventinfo_; }
 int                Config::nEventsMax()      const { return nevtmax_; }
 bool               Config::isMC()            const { return isMC_; }
 bool               Config::signalRegion()    const { return signalregion_; }

@@ -63,6 +63,7 @@ namespace analysis {
          
             void generatorWeight();
                
+            virtual bool muonJet(const int & );
 
       };
    }

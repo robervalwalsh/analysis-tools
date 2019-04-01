@@ -42,7 +42,7 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    exe_ = std::string(argv[0]);
    
    config_   = std::make_shared<Config>(argc,argv);
-   analysis_ = std::make_shared<Analysis>(config_->ntuplesList());
+   analysis_ = std::make_shared<Analysis>(config_->ntuplesList(),config_->eventInfo());
    
    seed_ = analysis_ ->seed(config_->seedFile());
    

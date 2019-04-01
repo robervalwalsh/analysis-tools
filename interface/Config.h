@@ -71,6 +71,7 @@ namespace analysis {
             
          // analysis control
             std::string inputlist_;
+            std::string eventinfo_;
             int nevtmax_;
             bool isMC_;
             bool signalregion_;
@@ -179,6 +180,7 @@ namespace analysis {
          // gets (to replace the public variables)
          // analysis control
             std::string ntuplesList() const;
+            std::string eventInfo() const;
             int  nEventsMax() const;
             bool isMC() const;
             bool signalRegion() const;

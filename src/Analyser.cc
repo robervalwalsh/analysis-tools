@@ -97,3 +97,23 @@ void Analyser::generatorWeight()
    }
    
 }
+
+bool Analyser::muonJet(const int & r)
+{
+   int j = r-1;
+   ++ cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: Jet-muon association",r));
+   }
+   
+   auto jet = selectedJets_[j];
+   jet -> addMuon(selectedMuons_);
+   
+   if ( ! jet -> muon() ) return false;
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   return true;
+   
+}
+
