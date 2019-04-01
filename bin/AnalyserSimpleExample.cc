@@ -13,14 +13,17 @@ int main(int argc, char ** argv)
    TH1::SetDefaultSumw2();  // proper treatment of errors when scaling histograms
    
    Analyser analyser(argc,argv);
-   
+// HISTOGRAMS   
+   // create some predefined jet histograms
    analyser.jetHistograms(2,"dijet");
+   // create some predefined muon histograms
+   // muon histograms still not available
 
    for ( int i = 0 ; i < analyser.nEvents() ; ++i )
    {
-      bool goodEvent = analyser.event(i);
+      if ( ! analyser.event(i)                  )   continue;
       
-// TRIGGER
+// TRIGGER selection
       if ( ! analyser.selectionHLT()            )   continue;
       if ( ! analyser.selectionL1 ()            )   continue;  // to be used mainly in case of "OR" of seeds
       
@@ -36,12 +39,14 @@ int main(int argc, char ** argv)
       if ( ! analyser.selectionNJets()          )   continue;
       
 // CORRECTIONS to pre-selected jets
-      // b energy regression
-      analyser.actionApplyBjetRegression();
-      // MC-only jet corrections
+   // b energy regression
+      if ( analyser.config()->bRegression() )
+         analyser.actionApplyBjetRegression();
+      
+   // MC-only jet corrections
       if ( analyser.config()->isMC() )
       {
-      // btag SF
+      // apply btag SF
          analyser.actionApplyBtagSF(1);
          analyser.actionApplyBtagSF(2);
          
@@ -68,7 +73,7 @@ int main(int argc, char ** argv)
    // MUON
       // muon kinematic selection
       if ( ! analyser.selectionMuons()         )   continue;
-      // muon trigger matching
+      // muon trigger matching - at least nmin offline muons matched to online objects
       if ( ! analyser.onlineMuonMatching()     )   continue;
       
    // MUONJET
