@@ -55,7 +55,12 @@ int main(int argc, char * argv[])
       analysis.event(i);
       
       std::cout << "++++++    ENTRY  " << i;
-      std::cout << std::endl;
+      
+      // EventInfo
+      std::cout << ", Run = " << analysis.run();
+      std::cout << ", Event = " << analysis.event();
+      std::cout << ", LumiSection = " << analysis.lumiSection();
+      std::cout << "\n" << std::endl;      
       
       // GenParticles
       auto particles = analysis.collection<GenParticle>("GenParticles");  // of course one can also loop over the particles
