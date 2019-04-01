@@ -26,26 +26,6 @@ int main(int argc, char * argv[])
    
    // Physics Objects Collections
    analysis.addTree<Muon> ("Muons","MssmHbb/Events/slimmedMuons");
-   
-//    // Trigger results
-//    analysis.triggerResults("MssmHbb/Events/TriggerResults");
-//    std::string hltPath = "HLT_DoubleJetsC100_DoubleBTagCSV_p014_DoublePFJetsC100MaxDeta1p6_v";
-//    
-//    // Trigger objects
-//    std::vector<std::string> triggerObjects;
-//    triggerObjects.push_back("hltL1sDoubleJetC100");
-//    triggerObjects.push_back("hltDoubleJetsC100");
-//    triggerObjects.push_back("hltBTagCaloCSVp014DoubleWithMatching");
-//    triggerObjects.push_back("hltDoublePFJetsC100");
-//    triggerObjects.push_back("hltDoublePFJetsC100MaxDeta1p6");
-//    
-//    std::string trgobj_path = "MssmHbb/Events/selectedPatTrigger/";
-//    for ( auto & obj : triggerObjects )
-//       analysis.addTree<TriggerObject>(obj,trgobj_path+obj);
-//    
-//    // Certified lumis
-//    if ( ! isMC ) analysis.processJsonFile("json.txt");
-   
 
    TFile hout("histograms_muons.root","recreate");
    
@@ -72,20 +52,6 @@ int main(int argc, char * argv[])
       if ( i > 0 && i%100000 == 0 ) std::cout << i << " events processed..." << std::endl;
       
       analysis.event(i);
-      
-//       if ( !isMC )
-//       {
-//          if ( !analysis.selectJson() ) continue;
-//       }
-
-//       // Trigger results
-//       // hltPath
-//       int trgFired = analysis.triggerResult(hltPath);
-//       if ( ! trgFired ) continue;
-//       ++nFired;
-            
-//       std::cout << "++++++    ENTRY  " << i;
-//       std::cout << std::endl;
       
       // Muons
       auto muons = analysis.collection<Muon>("Muons");
