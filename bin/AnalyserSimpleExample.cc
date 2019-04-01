@@ -13,11 +13,18 @@ int main(int argc, char ** argv)
    TH1::SetDefaultSumw2();  // proper treatment of errors when scaling histograms
    
    Analyser analyser(argc,argv);
+   
+   // you can always get the ususal analysis class
+   auto analysis = analyser.analysis();
+   
 // HISTOGRAMS   
    // create some predefined jet histograms
    analyser.jetHistograms(2,"dijet");
    // create some predefined muon histograms
    // muon histograms still not available
+   
+   // get a map with all TH1F histograms pointers
+   std::map<std::string, std::shared_ptr<TH1F> > histos = analyser.histograms();
 
    for ( int i = 0 ; i < analyser.nEvents() ; ++i )
    {
@@ -31,12 +38,16 @@ int main(int argc, char ** argv)
       // muon identification selection
       if ( ! analyser.selectionMuonId()         )   continue;
       if ( ! analyser.selectionNMuons()         )   continue;
+      // if you need the selected muons explicitly - be careful where you use it
+      std::vector< std::shared_ptr<Muon> > selmuon = analyser.selectedMuons();
         
 // JETS pre-selection 
       // jet identification selection
       if ( ! analyser.selectionJetId()          )   continue;
       if ( ! analyser.selectionJetPileupId()    )   continue;
       if ( ! analyser.selectionNJets()          )   continue;
+      // if you need the selected jets explicitly - be careful where you use it
+      std::vector< std::shared_ptr<Jet> > seljets = analyser.selectedJets();
       
 // CORRECTIONS to pre-selected jets
    // b energy regression
