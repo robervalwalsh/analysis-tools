@@ -8,6 +8,7 @@
 #include "TH1.h" 
 
 #include "Analysis/Tools/interface/Analysis.h"
+#include "Analysis/Tools/bin/macro_config.h"
 
 using namespace std;
 using namespace analysis;
@@ -19,54 +20,57 @@ int main(int argc, char * argv[])
 {
    TH1::SetDefaultSumw2();  // proper treatment of errors when scaling histograms
    
+   if ( macro_config(argc, argv) != 0 ) return -1;
+   
    // Input files list
-   std::string inputList = "rootfile.txt";
-   Analysis analysis(inputList);
+   Analysis analysis(inputlist_);
    
-   // Physics Objects Collections
-   analysis.triggerResults("MssmHbb/Events/TriggerResults");
-   std::string hltPath = "HLT_Mu8_v";
-   std::vector<std::string> l1seeds;
-   l1seeds.push_back("L1_SingleMu3");
-   l1seeds.push_back("L1_SingleMu5");
-   l1seeds.push_back("L1_SingleMu7");
+   // Trigger
+   analysis.triggerResults(triggerCol_);
    
-//    // Trigger objects
-//    std::vector<std::string> jetTriggerObjects;
-//    jetTriggerObjects.push_back("hltL1sDoubleJetC100");
-//    jetTriggerObjects.push_back("hltDoubleJetsC100");
-//    jetTriggerObjects.push_back("hltSingleBTagCSV0p84");
-//    jetTriggerObjects.push_back("hltJetC350");
-//    
-//    std::string trgobj_path = "MssmHbb/Events/selectedPatTrigger/";
-//    for ( auto & obj : jetTriggerObjects )
-//       analysis.addTree<TriggerObject>(obj,trgobj_path+obj);
+   // Trigger objects
+   for ( auto & obj : triggerObjectsJets_ )
+      analysis.addTree<TriggerObject>(obj,triggerObjDir_+"/"+obj);
    
    // Analysis of events
    std::cout << "This analysis has " << analysis.size() << " events" << std::endl;
    int nevts = analysis.size();
-   nevts = 1;
+   if ( nevts > 0 ) nevts = nevtmax_;
    for ( int i = 0 ; i < nevts ; ++i )
    {
       analysis.event(i);
       
-      std::cout << "++++++    ENTRY  " << i;
-      std::cout << std::endl;
+      std::cout << "++++++    ENTRY  " << i << std::endl;
       
       // Trigger results: fired and prescales
-      // hltPath1
-      int trg_fired = analysis.triggerResult(hltPath);
-      std::map<std::string,int> l1ps = analysis.triggerPrescale(l1seeds);
-      int hltps = analysis.triggerPrescale(hltPath);
+      // hltPath 
+      int trg_fired = analysis.triggerResult(hltPath_);
+      // prescales
+      int l1ps  = analysis.triggerPrescale(l1Seed_);
+      int hltps = analysis.triggerPrescale(hltPath_);
       std::string s_accept = " fired ";
-      if ( ! trg_fired ) s_accept = " did not fire ";
-      std::cout << "The path " << hltPath << s_accept << "and has HLT PS = " << hltps << std::endl; 
-      std::cout << "and its L1 seeds have the following prescales: " << endl;
-      for ( auto & l1 : l1seeds )
-         std::cout << "   " << l1 << ": " << l1ps[l1] << std::endl;
+      
+      // printing info
+      if ( ! trg_fired )
+      {
+         std::cout << "The path " << hltPath_ << " did not fire " << std::endl; 
+         continue;
+      }
+      
+      std::cout << "The path " << hltPath_ << " fired and has HLT PS = " << hltps << std::endl; 
+      std::cout << "and its L1 seed " << l1Seed_ << " has the following prescale: " << l1ps << endl;
+      
+      // dealing with trigger objects
+      // *** WARNING! *** the order you enter the trigger object in the config file matter!
+      auto l1jets = analysis.collection<TriggerObject>(triggerObjectsJets_[0]);
+      for ( int j = 0 ; j < l1jets->size() ; ++j )
+      {
+         TriggerObject l1jet = l1jets->at(j);
+         std::cout << "L1 Jet: pT = " << l1jet.pt() << ", " << l1jet.eta() << ", " << l1jet.phi() << std::endl;
+      }
       
    }
    
-//    
+   
 }
 

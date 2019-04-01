@@ -133,7 +133,14 @@ namespace analysis {
             
          // trigger
             std::string triggerCol_;
-
+            std::string triggerObjDir_;
+            std::string triggerObjectsL1Muons_;
+            std::string triggerObjectsL3Muons_;
+            std::string triggerObjectsBJets_;
+            std::string triggerObjectsL1Jets_;
+            std::string triggerObjectsCaloJets_;
+            std::string triggerObjectsPFJets_;
+            
          // generator level collections
             std::string genjetsCol_;
             std::string genpartsCol_;
@@ -225,8 +232,14 @@ namespace analysis {
             std::string l1tMuonsCollection() const; 
             
          // trigger
-            std::string triggerResults() const;
-            
+            std::string triggerResults()         const;
+            std::string triggerObjectsDir()      const;
+            std::string triggerObjectsL1Muons()  const;
+            std::string triggerObjectsL3Muons()  const;
+            std::string triggerObjectsBJets()    const;
+            std::string triggerObjectsL1Jets()   const;
+            std::string triggerObjectsCaloJets() const;
+            std::string triggerObjectsPFJets()   const;            
          // generator level
             std::string genJetsCollection() const;
             std::string genParticlesCollection() const;
@@ -303,20 +316,17 @@ namespace analysis {
             std::vector<std::string> triggerObjects_;
             std::vector<int> triggerObjectsMatches_;
             std::vector<int> triggerObjectsMatchesRank_;
-            std::vector<std::string> triggerObjectsBJets_;
-            std::vector<std::string> triggerObjectsL1Jets_;
+            
+            
+            
+            
             int triggerObjectsJetsMatches_;
             int triggerObjectsBJetsMatches_;
             int triggerObjectsL1JetsMatches_;
             std::vector<std::string> triggerObjectsMuons_;
-            std::string triggerObjectsL1Muons_;
-            std::string triggerObjectsL3Muons_;
             int triggerObjectsMuonsMatches_;
             int triggerObjectsL1MuonsMatches_;
             int triggerObjectsL3MuonsMatches_;
-
-            // ntuples collections
-            std::string triggerObjDir_;
 
          protected:
             int argc_;

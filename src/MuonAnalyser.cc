@@ -40,15 +40,6 @@ MuonAnalyser::MuonAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
    // Muons
    muonsanalysis_  = ( analysis_->addTree<Muon> ("Muons",config_->muonsCollection()) != nullptr );
    
-   if ( muonsanalysis_ )
-   {
-      if ( config_->triggerObjDir_ != "" )
-      {
-         analysis_->addTree<TriggerObject> (config_->triggerObjectsL1Muons_,Form("%s/%s",config_->triggerObjDir_.c_str(),config_->triggerObjectsL1Muons_.c_str()));
-         analysis_->addTree<TriggerObject> (config_->triggerObjectsL3Muons_,Form("%s/%s",config_->triggerObjDir_.c_str(),config_->triggerObjectsL3Muons_.c_str()));
-      }
-//      muonHistograms("muon",config_->nMuonsMin());
-   }
 }
 
 MuonAnalyser::~MuonAnalyser()
@@ -70,10 +61,10 @@ bool MuonAnalyser::analysisWithMuons()
    onlineMatchedMuons_.clear();
    if ( ! muonsanalysis_ ) return false;
    
-   if ( config_->triggerObjectsL1Muons_ != "" )
-      analysis_->match<Muon,TriggerObject>("Muons",config_->triggerObjectsL1Muons_,0.3);
-   if ( config_->triggerObjectsL3Muons_ != "" )
-      analysis_->match<Muon,TriggerObject>("Muons",config_->triggerObjectsL3Muons_,0.3);
+   if ( config_->triggerObjectsL1Muons() != "" )
+      analysis_->match<Muon,TriggerObject>("Muons",config_->triggerObjectsL1Muons(),0.3);
+   if ( config_->triggerObjectsL3Muons() != "" )
+      analysis_->match<Muon,TriggerObject>("Muons",config_->triggerObjectsL3Muons(),0.3);
 
    auto muons = analysis_->collection<Muon>("Muons");
    for ( int j = 0 ; j < muons->size() ; ++j )  muons_.push_back(std::make_shared<Muon>(muons->at(j)));
@@ -227,7 +218,7 @@ bool MuonAnalyser::selectionNMuons()
 
 bool MuonAnalyser::onlineMuonMatching()
 {
-   if ( config_->triggerObjectsL1Muons_ == "" && config_->triggerObjectsL3Muons_ == ""  ) return true;
+   if ( config_->triggerObjectsL1Muons() == "" && config_->triggerObjectsL3Muons() == ""  ) return true;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -236,7 +227,7 @@ bool MuonAnalyser::onlineMuonMatching()
    auto muon = std::begin(selectedMuons_);
    while ( muon != std::end(selectedMuons_) )
    {
-      if ( !((*muon)->matched(config_->triggerObjectsL3Muons_) && (*muon)->matched(config_->triggerObjectsL3Muons_) ))
+      if ( !((*muon)->matched(config_->triggerObjectsL3Muons()) && (*muon)->matched(config_->triggerObjectsL3Muons()) ))
          muon = selectedMuons_.erase(muon);
       else
          ++muon;
@@ -252,7 +243,7 @@ bool MuonAnalyser::onlineMuonMatching()
 bool MuonAnalyser::onlineL1MuonMatching(const int & r)
 {
    int j = r-1;
-   if ( config_->triggerObjectsL1Muons_ == "" ) return true;
+   if ( config_->triggerObjectsL1Muons() == "" ) return true;
    
    ++cutflow_;
    
@@ -267,7 +258,7 @@ bool MuonAnalyser::onlineL1MuonMatching(const int & r)
       return false;  // asking for a match beyond the selection, that's wrong, therefore false
    }
    
-   if ( ! selectedMuons_[j]->matched(config_->triggerObjectsL1Muons_) ) return false;
+   if ( ! selectedMuons_[j]->matched(config_->triggerObjectsL1Muons()) ) return false;
 
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("L1MuonTriggerMatch_%d",r));
@@ -280,7 +271,7 @@ bool MuonAnalyser::onlineL1MuonMatching(const int & r)
 bool MuonAnalyser::onlineL3MuonMatching(const int & r)
 {
    int j = r-1;
-   if ( config_->triggerObjectsL3Muons_ == "" ) return true;
+   if ( config_->triggerObjectsL3Muons() == "" ) return true;
    
    ++cutflow_;
    
@@ -295,7 +286,7 @@ bool MuonAnalyser::onlineL3MuonMatching(const int & r)
       return false;  // asking for a match beyond the selection, that's wrong, therefore false
    }
    
-   if ( ! selectedMuons_[j]->matched(config_->triggerObjectsL3Muons_) ) return false;
+   if ( ! selectedMuons_[j]->matched(config_->triggerObjectsL3Muons()) ) return false;
 
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("L3MuonTriggerMatch_%d",r));
