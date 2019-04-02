@@ -67,6 +67,7 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
       }
    }
 //   histograms("jet",config_->nJetsMin());
+
 }
 
 JetAnalyser::~JetAnalyser()
@@ -137,6 +138,7 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
       h1_[Form("eta_jet%d_%s" , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_jet%d" , j+1) , Form("eta_jet%d_%s" , j+1,label.c_str()) , 600 , -3, 3 );
       h1_[Form("phi_jet%d_%s" , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("phi_jet%d" , j+1) , Form("phi_jet%d_%s" , j+1,label.c_str()) , 360 , -180, 180 );
       h1_[Form("btag_jet%d_%s", j+1,label.c_str())]  = std::make_shared<TH1F>(Form("btag_jet%d", j+1) , Form("btag_jet%d_%s", j+1,label.c_str()) , 200 , 0, 1 );
+      h1_[Form("btaglog_jet%d_%s", j+1,label.c_str())]  = std::make_shared<TH1F>(Form("btaglog_jet%d", j+1) , Form("btaglog_jet%d_%s", j+1,label.c_str()) , 200 , 1.e-6, 10 );
       h1_[Form("qglikelihood_jet%d_%s", j+1,label.c_str())]  = std::make_shared<TH1F>(Form("qglikelihood_jet%d", j+1) , Form("qglikelihood_jet%d_%s", j+1,label.c_str()) , 200 , 0, 1 );
       h1_[Form("nconstituents_jet%d_%s", j+1,label.c_str())]  = std::make_shared<TH1F>(Form("nconstituents_jet%d", j+1) , Form("nconstituents_jet%d_%s", j+1,label.c_str()) , 200 , 0, 200 );
       
@@ -144,6 +146,7 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
       h1_[Form("eta_jet%d_%s" , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d  #eta",j+1));
       h1_[Form("phi_jet%d_%s" , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d  #phi",j+1));
       h1_[Form("btag_jet%d_%s", j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d btag discriminator",j+1)); 
+      h1_[Form("btaglog_jet%d_%s", j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d -ln(1-btag discriminator)",j+1)); 
       h1_[Form("qglikelihood_jet%d_%s", j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d q-g likelihood",j+1)); 
       h1_[Form("nconstituents_jet%d_%s", j+1,label.c_str())]-> GetXaxis() -> SetTitle(Form("Jet %d n constituents",j+1)); 
       
@@ -162,7 +165,13 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
          h1_[Form("btag_c_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_c_jet%d"    , j+1) , Form("btag_c_jet%d_%s"    , j+1,label.c_str()) , 100 , 0, 1 );         
          h1_[Form("btag_b_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_b_jet%d"    , j+1) , Form("btag_b_jet%d_%s"    , j+1,label.c_str()) , 100 , 0, 1 );         
          h1_[Form("btag_bb_jet%d_%s"   , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_bb_jet%d"   , j+1) , Form("btag_bb_jet%d_%s"   , j+1,label.c_str()) , 100 , 0, 1 );         
-         h1_[Form("btag_lepb_jet%d_%s" , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_lepb_jet%d" , j+1) , Form("btag_lepb_jet%d_%s" , j+1,label.c_str()) , 100, 0, 1 );         
+         h1_[Form("btag_lepb_jet%d_%s" , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_lepb_jet%d" , j+1) , Form("btag_lepb_jet%d_%s" , j+1,label.c_str()) , 100 , 0, 1 );         
+//          h1_[Form("btaglog_light_jet%d_%s", j+1,label.c_str())] = std::make_shared<TH1F>(Form("btaglog_light_jet%d", j+1) , Form("btaglog_light_jet%d_%s", j+1,label.c_str()), 200 , 1.e-6, 10  );         
+//          h1_[Form("btaglog_g_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btaglog_g_jet%d"    , j+1) , Form("btaglog_g_jet%d_%s"    , j+1,label.c_str()), 200 , 1.e-6, 10  );         
+//          h1_[Form("btaglog_c_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btaglog_c_jet%d"    , j+1) , Form("btaglog_c_jet%d_%s"    , j+1,label.c_str()), 200 , 1.e-6, 10  );         
+//          h1_[Form("btaglog_b_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btaglog_b_jet%d"    , j+1) , Form("btaglog_b_jet%d_%s"    , j+1,label.c_str()), 200 , 1.e-6, 10  );         
+//          h1_[Form("btaglog_bb_jet%d_%s"   , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btaglog_bb_jet%d"   , j+1) , Form("btaglog_bb_jet%d_%s"   , j+1,label.c_str()), 200 , 1.e-6, 10  );         
+//          h1_[Form("btaglog_lepb_jet%d_%s" , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btaglog_lepb_jet%d" , j+1) , Form("btaglog_lepb_jet%d_%s" , j+1,label.c_str()), 200 , 1.e-6, 10  );         
       }
       
       // 2D histograms
@@ -205,6 +214,12 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
                h1_[Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_b_jet%d_%s"    , j+1,flv.c_str()) , Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );         
                h1_[Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_bb_jet%d_%s"   , j+1,flv.c_str()) , Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str()) , 100 , 0, 1 );         
                h1_[Form("btag_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_lepb_jet%d_%s" , j+1,flv.c_str()) , Form("btag_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str()) , 100, 0, 1 );         
+//                h1_[Form("btaglog_light_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btaglog_light_jet%d_%s", j+1,flv.c_str()) , Form("btaglog_light_jet%d_%s_%s", j+1,label.c_str(),flv.c_str()) , 200 , 1.e-6, 10  );         
+//                h1_[Form("btaglog_g_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btaglog_g_jet%d_%s"    , j+1,flv.c_str()) , Form("btaglog_g_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str()) , 200 , 1.e-6, 10  );         
+//                h1_[Form("btaglog_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btaglog_c_jet%d_%s"    , j+1,flv.c_str()) , Form("btaglog_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str()) , 200 , 1.e-6, 10  );         
+//                h1_[Form("btaglog_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btaglog_b_jet%d_%s"    , j+1,flv.c_str()) , Form("btaglog_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str()) , 200 , 1.e-6, 10  );         
+//                h1_[Form("btaglog_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btaglog_bb_jet%d_%s"   , j+1,flv.c_str()) , Form("btaglog_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str()) , 200 , 1.e-6, 10  );         
+//                h1_[Form("btaglog_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btaglog_lepb_jet%d_%s" , j+1,flv.c_str()) , Form("btaglog_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str()) , 200 , 1.e-6, 10  );         
             }
             // 2D histograms
             h2_[Form("pt_eta_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH2F>(Form("pt_eta_jet%d_%s" , j+1,flv.c_str()) , Form("pt_eta_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str()) ,1500 , 0   , 1500, 600, -3, 3  );
@@ -270,7 +285,6 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
    }
    
    this->output()->cd();
-
 }
 
 
@@ -700,7 +714,11 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
       h1_[Form("pt_jet%d_%s",j+1,label.c_str())]   -> Fill(selectedJets_[j]->pt(),weight_);
       h1_[Form("eta_jet%d_%s",j+1,label.c_str())]  -> Fill(selectedJets_[j]->eta(),weight_);
       h1_[Form("phi_jet%d_%s",j+1,label.c_str())]  -> Fill(selectedJets_[j]->phi()*180./acos(-1.),weight_);
-      h1_[Form("btag_jet%d_%s",j+1,label.c_str())] -> Fill(btag(*selectedJets_[j],config_->btagalgo_),weight_);
+      float mybtag = btag(*selectedJets_[j],config_->btagalgo_);
+      float mybtaglog = 1.e-7;
+      if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
+      h1_[Form("btag_jet%d_%s",j+1,label.c_str())]    -> Fill(mybtag,weight_);
+      h1_[Form("btaglog_jet%d_%s",j+1,label.c_str())] -> Fill(mybtaglog,weight_);
       h1_[Form("qglikelihood_jet%d_%s", j+1,label.c_str())] -> Fill(selectedJets_[j]->qgLikelihood(),weight_);
       h1_[Form("nconstituents_jet%d_%s", j+1,label.c_str())] -> Fill(selectedJets_[j]->constituents(),weight_);
       
@@ -715,11 +733,37 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
       if ( config_->btagalgo_ == "deepflavour")
       {
          h1_[Form("btag_light_jet%d_%s", j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dflight"),weight_);
-         h1_[Form("btag_g_jet%d_%s"    , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfg"),weight_); 
-         h1_[Form("btag_c_jet%d_%s"    , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfc"),weight_); 
-         h1_[Form("btag_b_jet%d_%s"    , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfb"),weight_); 
-         h1_[Form("btag_bb_jet%d_%s"   , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfbb"),weight_); 
-         h1_[Form("btag_lepb_jet%d_%s" , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dflepb"),weight_); 
+         h1_[Form("btag_g_jet%d_%s"    , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfg")    ,weight_); 
+         h1_[Form("btag_c_jet%d_%s"    , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfc")    ,weight_); 
+         h1_[Form("btag_b_jet%d_%s"    , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfb")    ,weight_); 
+         h1_[Form("btag_bb_jet%d_%s"   , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfbb")   ,weight_); 
+         h1_[Form("btag_lepb_jet%d_%s" , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dflepb") ,weight_); 
+         
+//          mybtag = selectedJets_[j]->btag("btag_dflight");
+//          mybtaglog = 1.e-7;
+//          if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
+//          h1_[Form("btaglog_light_jet%d_%s", j+1,label.c_str())]  -> Fill(mybtaglog ,weight_);
+//          mybtag = selectedJets_[j]->btag("btag_dfg");
+//          mybtaglog = 1.e-7;
+//          if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
+//          h1_[Form("btaglog_g_jet%d_%s"    , j+1,label.c_str())]  -> Fill(mybtaglog ,weight_); 
+//          mybtag = selectedJets_[j]->btag("btag_dfc");
+//          mybtaglog = 1.e-7;
+//          if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
+//          h1_[Form("btaglog_c_jet%d_%s"    , j+1,label.c_str())]  -> Fill(mybtaglog ,weight_); 
+//          mybtag = selectedJets_[j]->btag("btag_dfb");
+//          mybtaglog = 1.e-7;
+//          if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
+//          h1_[Form("btaglog_b_jet%d_%s"    , j+1,label.c_str())]  -> Fill(mybtaglog ,weight_); 
+//          mybtag = selectedJets_[j]->btag("btag_dfbb");
+//          mybtaglog = 1.e-7;
+//          if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
+//          h1_[Form("btaglog_bb_jet%d_%s"   , j+1,label.c_str())]  -> Fill(mybtaglog ,weight_); 
+//          mybtag = selectedJets_[j]->btag("btag_dflepb");
+//          mybtaglog = 1.e-7;
+//          if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
+//          h1_[Form("btaglog_lepb_jet%d_%s" , j+1,label.c_str())]  -> Fill(mybtaglog ,weight_); 
+
       }
       // 2D histograms
       h2_[Form("pt_eta_jet%d_%s"  , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(), selectedJets_[j]->eta(), weight_);
@@ -751,11 +795,37 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
          if ( config_->btagalgo_ == "deepflavour")
          {
             h1_[Form("btag_light_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dflight"),weight_);
-            h1_[Form("btag_g_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfg"),weight_); 
-            h1_[Form("btag_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfc"),weight_); 
-            h1_[Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfb"),weight_); 
-            h1_[Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfbb"),weight_); 
-            h1_[Form("btag_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dflepb"),weight_); 
+            h1_[Form("btag_g_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfg")    ,weight_); 
+            h1_[Form("btag_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfc")    ,weight_); 
+            h1_[Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfb")    ,weight_); 
+            h1_[Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfbb")   ,weight_); 
+            h1_[Form("btag_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dflepb") ,weight_); 
+            
+//             mybtag = selectedJets_[j]->btag("btag_dflight");
+//             mybtaglog = 1.e-7;
+//             if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
+//             h1_[Form("btag_light_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())]  -> Fill(mybtaglog ,weight_);
+//             mybtag = selectedJets_[j]->btag("btag_dfg");
+//             mybtaglog = 1.e-7;
+//             if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
+//             h1_[Form("btag_g_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(mybtaglog ,weight_); 
+//             mybtag = selectedJets_[j]->btag("btag_dfc");
+//             mybtaglog = 1.e-7;
+//             if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
+//             h1_[Form("btag_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(mybtaglog ,weight_); 
+//             mybtag = selectedJets_[j]->btag("btag_dfb");
+//             mybtaglog = 1.e-7;
+//             if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
+//             h1_[Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(mybtaglog ,weight_); 
+//             mybtag = selectedJets_[j]->btag("btag_dfbb");
+//             mybtaglog = 1.e-7;
+//             if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
+//             h1_[Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())]  -> Fill(mybtaglog ,weight_); 
+//             mybtag = selectedJets_[j]->btag("btag_dflepb");
+//             mybtaglog = 1.e-7;
+//             if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
+//             h1_[Form("btag_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  -> Fill(mybtaglog ,weight_); 
+            
          }
          // 2D histograms
          h2_[Form("pt_eta_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())] -> Fill(selectedJets_[j]->pt(), selectedJets_[j]->eta(), weight_);
