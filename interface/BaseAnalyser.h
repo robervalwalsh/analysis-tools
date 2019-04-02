@@ -69,6 +69,9 @@ namespace analysis {
             // event weight
             float weight_;
             
+            // cross section
+            float xsection_;
+            
             // output root file
             std::shared_ptr<TFile> hout_;
             std::map<std::string, std::shared_ptr<TH1F> > h1_;
@@ -114,6 +117,9 @@ namespace analysis {
             /// event weight
             float weight();
             void weight(const float &);
+            
+            // cross section
+            float crossSection() const;
             
             // output root file
             std::shared_ptr<TFile> output();
