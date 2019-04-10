@@ -903,17 +903,16 @@ ScaleFactors JetAnalyser::btagSF(const int & r, const std::string & wp)
 
 void JetAnalyser::actionApplyJER()
 {
+   if ( ! applyjer_ )  return;  // will not apply btag SF
+   
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"*** Apply JER smearing");
    
    
-   if ( applyjer_ )
+   for ( auto & j : selectedJets_ )
    {
-      for ( auto & j : selectedJets_ )
-      {
-         j -> applyJER(*jerinfo_,0.2);
-      }
+      j -> applyJER(*jerinfo_,0.2);
    }
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
