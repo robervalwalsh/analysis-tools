@@ -64,7 +64,8 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
       hout_ -> cd();
    }
    
-   genpartsanalysis_  = ( analysis_->addTree<GenParticle> ("GenParticles",config_->genParticlesCollection()) != nullptr && config_->isMC() );
+   genpartsanalysis_ = false;
+   if ( config_->isMC() )  genpartsanalysis_  = ( analysis_->addTree<GenParticle> ("GenParticles",config_->genParticlesCollection()) != nullptr );
    
    h1_["cutflow"] = std::make_shared<TH1F>("workflow",Form("Workflow #%d",config_->workflow()), 100,0,100);
       if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" ) 
