@@ -72,6 +72,9 @@ namespace analysis {
          // analysis control
             std::string inputlist_;
             std::string eventinfo_;
+            std::string xsectiontree_;
+            std::string xsectiontype_;
+            float lumi_;
             int nevtmax_;
             bool isMC_;
             bool signalregion_;
@@ -181,6 +184,9 @@ namespace analysis {
          // analysis control
             std::string ntuplesList() const;
             std::string eventInfo() const;
+            std::string crossSectionTree() const;
+            std::string crossSectionType() const;
+            float luminosity() const;
             int  nEventsMax() const;
             bool isMC() const;
             bool signalRegion() const;

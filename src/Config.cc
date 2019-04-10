@@ -54,6 +54,9 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
       opt_cfg_.add_options()
          ("ntuplesList",po::value <std::string> (&inputlist_)->default_value("rootFileList.txt"),"File with list of ntuples")
          ("eventInfo",po::value <std::string> (&eventinfo_)->default_value("MssmHbb/Events/EventInfo"),"EventInfo directory in the tree")
+         ("crossSectionTree",po::value <std::string> (&xsectiontree_)->default_value("MssmHbb/Metadata/CrossSections"),"Tree containing cross sections")
+         ("crossSectionType",po::value <std::string> (&xsectiontype_)->default_value("crossSection"),"Type of cross section")
+         ("luminosity",po::value <float> (&lumi_)->default_value(-1.), "Luminosity in pb-1 to scale histograms")   
          ("collectionsTreePath",po::value <std::string> (&treePath_)->default_value("Events"),"Name of the tree path for the event collections")
          ("nEventsMax",po::value <int> (&nevtmax_)->default_value(-1), "Maximum number of events")
          ("nLumiSections",po::value <int> (&nlumis_)->default_value(-1), "Number of lumi sections processed")
@@ -273,14 +276,17 @@ void Config::loadOptions()
 }
 
 // analysis info
-std::string        Config::ntuplesList()     const { return inputlist_; }
-std::string        Config::eventInfo()       const { return eventinfo_; }
-int                Config::nEventsMax()      const { return nevtmax_; }
-bool               Config::isMC()            const { return isMC_; }
-bool               Config::signalRegion()    const { return signalregion_; }
-bool               Config::blind()           const { return blind_; }
-bool               Config::nlo()             const { return nlo_; }
-int                Config::workflow()        const { return workflow_; }
+std::string        Config::ntuplesList()      const { return inputlist_; }
+std::string        Config::eventInfo()        const { return eventinfo_; }
+std::string        Config::crossSectionTree() const { return xsectiontree_; }
+std::string        Config::crossSectionType() const { return xsectiontype_; }
+float              Config::luminosity()       const { return lumi_; }
+int                Config::nEventsMax()       const { return nevtmax_; }
+bool               Config::isMC()             const { return isMC_; }
+bool               Config::signalRegion()     const { return signalregion_; }
+bool               Config::blind()            const { return blind_; }
+bool               Config::nlo()              const { return nlo_; }
+int                Config::workflow()         const { return workflow_; }
 
 // analysis control
 bool               Config::override()          const { return override_; }

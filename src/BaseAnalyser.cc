@@ -46,6 +46,12 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    
    seed_ = analysis_ ->seed(config_->seedFile());
    
+   if ( config_->isMC() )
+   {
+      analysis_ -> crossSections(config_->crossSectionTree());
+      xsection_ = analysis_->crossSection(config_->crossSectionType());
+   }
+   
    weight_ = 1.;
    
    // JSON for data   
@@ -74,6 +80,35 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
 BaseAnalyser::~BaseAnalyser()
 {
    std::cout << std::endl;
+   // scale to luminosity
+   if ( config_->isMC() && config_ -> luminosity() > 0 )
+   {
+      int lastbin = 0;
+      for ( int i = 1; i <= h1_["cutflow"] ->GetNbinsX(); ++i )
+      {
+         std::string label = std::string(h1_["cutflow"]->GetXaxis()->GetBinLabel(i));
+         if ( label == "" )
+         {
+            lastbin = i-1;
+            break;
+         }
+      }
+      
+      float fevts =  h1_["cutflow"] -> GetBinContent(lastbin);
+      float nwevts = h1_["cutflow"] -> GetBinContent(2);
+      float genlumi = nwevts/xsection_;
+      float scale = config_->luminosity()/genlumi;
+      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(lastbin+1)) == "" )
+      {
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(lastbin+1,Form("Number of events after scaling to luminosity = %8.3f/pb",config_->luminosity()));
+      }
+      h1_["cutflow"] -> Fill(lastbin,fevts*scale);
+      for ( auto h : h1_ )
+      {
+         if ( h.first == "cutflow" ) continue;
+         h.second -> Scale(scale);
+      }
+   }
    cutflow();
    if ( hout_ )
    {
@@ -202,5 +237,10 @@ std::shared_ptr<TFile> BaseAnalyser::output()
 bool  BaseAnalyser::genParticlesAnalysis() const
 {
    return genpartsanalysis_;
+}
+
+float BaseAnalyser::crossSection() const
+{
+   return xsection_;
 }
 
