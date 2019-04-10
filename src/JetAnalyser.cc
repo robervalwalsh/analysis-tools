@@ -40,7 +40,8 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
    // Physics objects
    // Jets
    jetsanalysis_  = ( analysis_->addTree<Jet> ("Jets",config_->jetsCollection()) != nullptr );
-   genjetsanalysis_ = false;
+   
+   genjetsanalysis_ = false; // should I move to BaseAnalyser???
    if ( config_->isMC() )  genjetsanalysis_  = ( analysis_->addTree<GenJet> ("GenJets",config_->genJetsCollection()) != nullptr );
    
    applyjer_ = false;
