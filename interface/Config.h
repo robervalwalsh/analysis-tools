@@ -87,6 +87,8 @@ namespace analysis {
             std::string seedfile_;
             
             bool pythia8_;
+            
+            float scale_;
 
 
          // jets
@@ -199,6 +201,8 @@ namespace analysis {
             int seed() const;
             
             bool pythia8() const;
+            
+            float scale() const;
             
          // jets
             std::string jetsCollection() const;

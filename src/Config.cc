@@ -56,6 +56,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("eventInfo",po::value <std::string> (&eventinfo_)->default_value("MssmHbb/Events/EventInfo"),"EventInfo directory in the tree")
          ("crossSectionTree",po::value <std::string> (&xsectiontree_)->default_value("MssmHbb/Metadata/CrossSections"),"Tree containing cross sections")
          ("crossSectionType",po::value <std::string> (&xsectiontype_)->default_value("crossSection"),"Type of cross section")
+         ("scale",po::value <float> (&scale_)->default_value(-1.), "Overall scale for histograms")  
          ("luminosity",po::value <float> (&lumi_)->default_value(-1.), "Luminosity in pb-1 to scale histograms")   
          ("collectionsTreePath",po::value <std::string> (&treePath_)->default_value("Events"),"Name of the tree path for the event collections")
          ("nEventsMax",po::value <int> (&nevtmax_)->default_value(-1), "Maximum number of events")
@@ -287,6 +288,7 @@ bool               Config::signalRegion()     const { return signalregion_; }
 bool               Config::blind()            const { return blind_; }
 bool               Config::nlo()              const { return nlo_; }
 int                Config::workflow()         const { return workflow_; }
+float              Config::scale()            const { return scale_; }
 
 // analysis control
 bool               Config::override()          const { return override_; }
