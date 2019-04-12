@@ -81,34 +81,47 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
 BaseAnalyser::~BaseAnalyser()
 {
    std::cout << std::endl;
-   // scale to luminosity
-   if ( config_->isMC() && config_ -> luminosity() > 0 )
+   // get last bin
+   int lastbin = 0;
+   for ( int i = 1; i <= h1_["cutflow"] ->GetNbinsX(); ++i )
    {
-      int lastbin = 0;
-      for ( int i = 1; i <= h1_["cutflow"] ->GetNbinsX(); ++i )
+      std::string label = std::string(h1_["cutflow"]->GetXaxis()->GetBinLabel(i));
+      if ( label == "" )
       {
-         std::string label = std::string(h1_["cutflow"]->GetXaxis()->GetBinLabel(i));
-         if ( label == "" )
-         {
-            lastbin = i-1;
-            break;
-         }
+         lastbin = i-1;
+         break;
       }
-      
-      float fevts =  h1_["cutflow"] -> GetBinContent(lastbin);
+   }
+   float fevts =  h1_["cutflow"] -> GetBinContent(lastbin);
+   // overall scale
+   float scale = 1.;  
+   // scale to luminosity
+   if ( config_->isMC() && config_ -> luminosity() > 0. && config_ -> scale() < 0. )
+   {
       float nwevts = h1_["cutflow"] -> GetBinContent(2);
       float genlumi = nwevts/xsection_;
-      float scale = config_->luminosity()/genlumi;
+      scale = config_->luminosity()/genlumi;
       if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(lastbin+1)) == "" )
       {
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(lastbin+1,Form("Number of events after scaling to luminosity = %8.3f/pb",config_->luminosity()));
       }
       h1_["cutflow"] -> Fill(lastbin,fevts*scale);
-      for ( auto h : h1_ )
+   }
+   // scale from config
+   if ( config_ -> scale() > 0. )
+   {
+      scale = config_ -> scale();
+      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(lastbin+1)) == "" )
       {
-         if ( h.first == "cutflow" ) continue;
-         h.second -> Scale(scale);
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(lastbin+1,Form("Number of events after scaling to = %10.5f/pb",scale));
       }
+      h1_["cutflow"] -> Fill(lastbin,fevts*scale);
+   }
+   
+   for ( auto h : h1_ )
+   {
+      if ( h.first == "cutflow" ) continue;
+      h.second -> Scale(scale);
    }
    cutflow();
    if ( hout_ )
