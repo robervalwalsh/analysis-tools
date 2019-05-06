@@ -133,7 +133,7 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
    
    h1_[Form("jet_hist_weight_%s",label.c_str())] = std::make_shared<TH1F>(Form("jet_hist_weight_%s",label.c_str()) , Form("jet_hist_weight_%s",label.c_str()) ,1 , 0. , 1. );
    
-   // btag binning
+   // btag variable binning
    float min1 = 0.0;
    float max1 = 0.1;
    float size1 = 0.0001;
@@ -149,10 +149,17 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
    int nbins_btag = nbins1+nbins2+nbins3;
    
    std::vector<float> bins_btag;
+   bins_btag.clear();
    int counter = 0; 
    for ( int i = 0; i<nbins1; ++i)   {  bins_btag.push_back(min1 + size1*i);  ++counter; }
    for ( int i = 0; i<nbins2; ++i)   {  bins_btag.push_back(min2 + size2*i);  ++counter; }
    for ( int i = 0; i<nbins3+1; ++i) {  bins_btag.push_back(min3 + size3*i);  ++counter; }
+   
+   // uniform binning for btag (comment it out if you want the variable binning above)
+   float size = 0.0002;
+   nbins_btag = int(1./size);
+   bins_btag.clear();
+   for ( int i = 0; i<nbins_btag+1; ++i)   {  bins_btag.push_back(size*i);  ++counter; }
    
    
    for ( int j = 0; j < n; ++j ) // loop over jets
@@ -190,12 +197,6 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
          h1_[Form("btag_b_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_b_jet%d"    , j+1) , Form("btag_b_jet%d_%s"    , j+1,label.c_str()) , nbins_btag, &bins_btag[0] );         
          h1_[Form("btag_bb_jet%d_%s"   , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_bb_jet%d"   , j+1) , Form("btag_bb_jet%d_%s"   , j+1,label.c_str()) , nbins_btag, &bins_btag[0] );         
          h1_[Form("btag_lepb_jet%d_%s" , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btag_lepb_jet%d" , j+1) , Form("btag_lepb_jet%d_%s" , j+1,label.c_str()) , nbins_btag, &bins_btag[0] );         
-//          h1_[Form("btaglog_light_jet%d_%s", j+1,label.c_str())] = std::make_shared<TH1F>(Form("btaglog_light_jet%d", j+1) , Form("btaglog_light_jet%d_%s", j+1,label.c_str()), 200 , 1.e-6, 10  );         
-//          h1_[Form("btaglog_g_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btaglog_g_jet%d"    , j+1) , Form("btaglog_g_jet%d_%s"    , j+1,label.c_str()), 200 , 1.e-6, 10  );         
-//          h1_[Form("btaglog_c_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btaglog_c_jet%d"    , j+1) , Form("btaglog_c_jet%d_%s"    , j+1,label.c_str()), 200 , 1.e-6, 10  );         
-//          h1_[Form("btaglog_b_jet%d_%s"    , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btaglog_b_jet%d"    , j+1) , Form("btaglog_b_jet%d_%s"    , j+1,label.c_str()), 200 , 1.e-6, 10  );         
-//          h1_[Form("btaglog_bb_jet%d_%s"   , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btaglog_bb_jet%d"   , j+1) , Form("btaglog_bb_jet%d_%s"   , j+1,label.c_str()), 200 , 1.e-6, 10  );         
-//          h1_[Form("btaglog_lepb_jet%d_%s" , j+1,label.c_str())] = std::make_shared<TH1F>(Form("btaglog_lepb_jet%d" , j+1) , Form("btaglog_lepb_jet%d_%s" , j+1,label.c_str()), 200 , 1.e-6, 10  );         
       }
       
       // 2D histograms
@@ -238,12 +239,6 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
                h1_[Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_b_jet%d_%s"    , j+1,flv.c_str()) , Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str()) , nbins_btag, &bins_btag[0] );         
                h1_[Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_bb_jet%d_%s"   , j+1,flv.c_str()) , Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str()) , nbins_btag, &bins_btag[0] );         
                h1_[Form("btag_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btag_lepb_jet%d_%s" , j+1,flv.c_str()) , Form("btag_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str()) , nbins_btag, &bins_btag[0] );         
-//                h1_[Form("btaglog_light_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btaglog_light_jet%d_%s", j+1,flv.c_str()) , Form("btaglog_light_jet%d_%s_%s", j+1,label.c_str(),flv.c_str()) , 200 , 1.e-6, 10  );         
-//                h1_[Form("btaglog_g_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btaglog_g_jet%d_%s"    , j+1,flv.c_str()) , Form("btaglog_g_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str()) , 200 , 1.e-6, 10  );         
-//                h1_[Form("btaglog_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btaglog_c_jet%d_%s"    , j+1,flv.c_str()) , Form("btaglog_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str()) , 200 , 1.e-6, 10  );         
-//                h1_[Form("btaglog_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btaglog_b_jet%d_%s"    , j+1,flv.c_str()) , Form("btaglog_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str()) , 200 , 1.e-6, 10  );         
-//                h1_[Form("btaglog_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btaglog_bb_jet%d_%s"   , j+1,flv.c_str()) , Form("btaglog_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str()) , 200 , 1.e-6, 10  );         
-//                h1_[Form("btaglog_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())] = std::make_shared<TH1F>(Form("btaglog_lepb_jet%d_%s" , j+1,flv.c_str()) , Form("btaglog_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str()) , 200 , 1.e-6, 10  );         
             }
             // 2D histograms
             h2_[Form("pt_eta_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())]  = std::make_shared<TH2F>(Form("pt_eta_jet%d_%s" , j+1,flv.c_str()) , Form("pt_eta_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str()) ,1500 , 0   , 1500, 600, -3, 3  );
