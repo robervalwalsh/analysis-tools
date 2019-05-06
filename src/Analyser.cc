@@ -86,7 +86,7 @@ void Analyser::generatorWeight()
    if ( ! config_->isMC() ) return;
    
    float weight = analysis_->genWeight();
-   if ( config_->nlo() )
+   if ( ! config_->fullWeight() )
    {
       float sign =  (weight > 0) ? 1 : ((weight < 0) ? -1 : 0);
       weight_ *= sign;
