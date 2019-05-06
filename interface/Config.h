@@ -81,6 +81,7 @@ namespace analysis {
             bool blind_;
             bool override_;
             bool nlo_;
+            bool fullweight_;
             int workflow_;
             
             int seed_;
@@ -195,6 +196,7 @@ namespace analysis {
             bool blind() const;
             bool override() const;
             bool nlo() const;
+            bool fullWeight() const;
             int  workflow() const;
             
             std::string seedFile() const;

@@ -68,6 +68,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
          ("pythia8",po::value <bool> (&pythia8_)->default_value(true),"Flag for Pythia8 or other recent generators MC")
          ("nlo",po::value <bool> (&nlo_)->default_value(false),"Flag for NLO samples")
+         ("fullWeight",po::value <bool> (&fullweight_)->default_value(false),"Flag for full weight of MC samples")
          ("workflow",po::value <int> (&workflow_)->default_value(1),"Workflow index defined by user")
          ("blind",po::value <bool> (&blind_)->default_value(true),"Flag for blind analysis")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
@@ -287,6 +288,7 @@ bool               Config::isMC()             const { return isMC_; }
 bool               Config::signalRegion()     const { return signalregion_; }
 bool               Config::blind()            const { return blind_; }
 bool               Config::nlo()              const { return nlo_; }
+bool               Config::fullWeight()       const { return fullweight_; }
 int                Config::workflow()         const { return workflow_; }
 float              Config::scale()            const { return scale_; }
 
