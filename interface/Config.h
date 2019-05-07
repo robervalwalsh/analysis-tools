@@ -93,6 +93,8 @@ namespace analysis {
             
             std::vector<std::string> era_;
             std::vector<float> eralumi_;
+            
+            std::string puweight_;
 
 
          // jets
@@ -211,6 +213,8 @@ namespace analysis {
             
             std::vector<float> eraLumi() const;
             std::vector<std::string> era() const;
+            
+            std::string pileupWeight() const;
             
          // jets
             std::string jetsCollection() const;
