@@ -90,13 +90,14 @@ namespace analysis {
             bool pythia8_;
             
             float scale_;
-            
+                        
             std::vector<std::string> era_;
             std::vector<float> eralumi_;
             
             std::string puweight_;
             
          // generic options
+            int prescale_;
             int n_;
             float min_;
             float max_;
@@ -292,6 +293,7 @@ namespace analysis {
             bool doTree() const;
             
          // generic options
+            int prescale() const;
             int n() const;
             float min() const;
             float max() const;

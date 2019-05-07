@@ -80,6 +80,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
 
       // generic options
       opt_cfg_.add_options()
+         ("prescale",po::value <int> (&prescale_)->default_value(1), "Prescale factor")  
          ("n",po::value <int> (&n_)->default_value(-1), "Some integer")
          ("min",po::value <float> (&min_)->default_value(-1.), "some minimum value")  
          ("max",po::value <float> (&max_)->default_value(-1.), "some maximum value");
@@ -405,7 +406,8 @@ bool Config::doTree() const { return do_tree_;
 }
 
 // generic options
-int   Config::n()   const { return n_;   }
-float Config::min() const { return min_; }
-float Config::max() const { return max_; }
+int   Config::prescale()   const { return prescale_; }
+int   Config::n()          const { return n_;   }
+float Config::min()        const { return min_; }
+float Config::max()        const { return max_; }
 
