@@ -17,12 +17,14 @@ int main(int argc, char ** argv)
    
    TRandom3 * rnd = new TRandom3();
    
+   float ps = 1./analyser.config()->prescale();
+   
    // events loop
    for ( int i = 0 ; i < analyser.nEvents() ; ++i )
    {
       // avoiding bias for some samples
       auto x = rnd->Rndm();
-      if ( x > 0.001 ) continue;
+      if ( x > ps ) continue;
       analyser.event(i);
       analyser.fillPileupHistogram();
       
