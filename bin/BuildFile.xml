@@ -69,7 +69,7 @@
 </bin>
 
 
-<bin   name="AnalyserTruePileup" file="AnalyserTruePileup.cc">
+<bin   name="TruePileup" file="TruePileup.cc">
 <flags   LDFLAGS="-lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -lm -ldl -rdynamic"/>
 </bin>
 
