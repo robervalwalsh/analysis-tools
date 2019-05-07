@@ -4,7 +4,7 @@
 
 from argparse import ArgumentParser
 from importlib import import_module
-from ROOT import TH1F
+from ROOT import TH1D
 from ROOT import TFile
 
 # parsing arguments
@@ -25,7 +25,7 @@ bins = puconfig.mix.input.nbPileupEvents.probFunctionVariable
 values = puconfig.mix.input.nbPileupEvents.probValue
 
 
-hPU = TH1F("pileup",  "true pileup", args.nbins, args.min, args.max)
+hPU = TH1D("pileup",  "true pileup", args.nbins, args.min, args.max)
 
 for i in range(1, args.nbins+1):
    try: 
