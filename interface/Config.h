@@ -214,7 +214,7 @@ namespace analysis {
             std::vector<float> eraLumi() const;
             std::vector<std::string> era() const;
             
-            std::string pileupWeight() const;
+            std::string pileupWeights() const;
             
          // jets
             std::string jetsCollection() const;
