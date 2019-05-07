@@ -23,10 +23,11 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <map>
+#include <iostream>
 // 
 // user include files
 
-#include "Analysis/Tools/interface/Analysis.h"
 #include "TH1.h"
 
 
