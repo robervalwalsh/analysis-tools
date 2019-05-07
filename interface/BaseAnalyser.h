@@ -81,6 +81,7 @@ namespace analysis {
             
             // pileup weight
             std::shared_ptr<PileupWeight> puweights_;
+            bool istruepu_;
          
          private:
             
@@ -134,6 +135,10 @@ namespace analysis {
             std::shared_ptr<PileupWeight> pileupWeights() const;
             float pileupWeight(const float & truepu, const int & var) const;
             void actionApplyPileupWeight(const int & var = 0);
+            
+            void pileupHistogram();
+            void fillPileupHistogram();
+
 
       };
    }

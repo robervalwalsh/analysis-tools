@@ -127,6 +127,11 @@ BaseAnalyser::~BaseAnalyser()
    for ( auto h : h1_ )
    {
       if ( h.first == "cutflow" ) continue;
+      if ( h.first == "pileup" )
+      {
+         h.second -> Scale(1./h.second->Integral());
+         continue;
+      }
       h.second -> Scale(scale);
    }
    cutflow();
@@ -287,5 +292,16 @@ void BaseAnalyser::actionApplyPileupWeight(const int & var)
    weight_ *= this->pileupWeight(analysis_->nTruePileup(),var);
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
+}
+
+void BaseAnalyser::pileupHistogram()
+{
+   this->output()->cd();
+   h1_["pileup"] = std::make_shared<TH1F>("pileup" , "pileup" , config_->n() , config_->min() , config_->max() );
+   
+}
+void BaseAnalyser::fillPileupHistogram()
+{
+   h1_["pileup"] -> Fill(analysis_->nTruePileup());
 }
 
