@@ -72,6 +72,9 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("workflow",po::value <int> (&workflow_)->default_value(1),"Workflow index defined by user")
          ("blind",po::value <bool> (&blind_)->default_value(true),"Flag for blind analysis")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
+         ("eraLumi", po::value<std::vector<float> >(&eralumi_)->multitoken(),"Lumi of an era")
+         ("era", po::value<std::vector<std::string> >(&era_)->multitoken(),"Era of data taking")
+         
          ("seed",po::value <int> (&seed_)->default_value(-1), "Seed value for random numbers")
          ("seedFile",po::value <std::string> (&seedfile_)->default_value("no_seed.txt"),"File with seed value for random numbers");
 
@@ -291,6 +294,8 @@ bool               Config::nlo()              const { return nlo_; }
 bool               Config::fullWeight()       const { return fullweight_; }
 int                Config::workflow()         const { return workflow_; }
 float              Config::scale()            const { return scale_; }
+std::vector<float> Config::eraLumi()          const { return eralumi_; }
+std::vector<std::string> Config::era()        const { return era_; }
 
 // analysis control
 bool               Config::override()          const { return override_; }

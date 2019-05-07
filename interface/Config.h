@@ -90,6 +90,9 @@ namespace analysis {
             bool pythia8_;
             
             float scale_;
+            
+            std::vector<std::string> era_;
+            std::vector<float> eralumi_;
 
 
          // jets
@@ -205,6 +208,9 @@ namespace analysis {
             bool pythia8() const;
             
             float scale() const;
+            
+            std::vector<float> eraLumi() const;
+            std::vector<std::string> era() const;
             
          // jets
             std::string jetsCollection() const;
