@@ -95,6 +95,11 @@ namespace analysis {
             std::vector<float> eralumi_;
             
             std::string puweight_;
+            
+         // generic options
+            int n_;
+            float min_;
+            float max_;
 
 
          // jets
@@ -285,6 +290,11 @@ namespace analysis {
             
          // output tree
             bool doTree() const;
+            
+         // generic options
+            int n() const;
+            float min() const;
+            float max() const;
             
          // ========================
          

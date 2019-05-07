@@ -78,6 +78,12 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("seed",po::value <int> (&seed_)->default_value(-1), "Seed value for random numbers")
          ("seedFile",po::value <std::string> (&seedfile_)->default_value("no_seed.txt"),"File with seed value for random numbers");
 
+      // generic options
+      opt_cfg_.add_options()
+         ("n",po::value <int> (&n_)->default_value(-1), "Some integer")
+         ("min",po::value <float> (&min_)->default_value(-1.), "some minimum value")  
+         ("max",po::value <float> (&max_)->default_value(-1.), "some maximum value");
+      
       // analysis control
       opt_cfg_.add_options()
          ("doTree",po::value <bool> (&do_tree_)->default_value(false),"Flag for output")
@@ -397,3 +403,9 @@ float Config::efficiencyMinAI()    const { return eff_min_ai_ ; }
 // output tree
 bool Config::doTree() const { return do_tree_; 
 }
+
+// generic options
+int   Config::n()   const { return n_;   }
+float Config::min() const { return min_; }
+float Config::max() const { return max_; }
+
