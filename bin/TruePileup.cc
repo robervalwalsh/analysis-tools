@@ -1,8 +1,7 @@
+#include "TRandom3.h"
 #include "Analysis/Tools/interface/Analyser.h"
 
-// this example is a dijet analysis in which the leading jet
-// is required to have a muon, and both of the leading
-// jets are btagged
+// this produces histogram with the true pileup
 
 using namespace std;
 using namespace analysis;
@@ -16,9 +15,14 @@ int main(int argc, char ** argv)
    
    analyser.pileupHistogram();
    
+   TRandom3 * rnd = new TRandom3();
+   
    // events loop
    for ( int i = 0 ; i < analyser.nEvents() ; ++i )
    {
+      // avoiding bias for some samples
+      auto x = rnd->Rndm();
+      if ( x > 0.001 ) continue;
       analyser.event(i);
       analyser.fillPileupHistogram();
       
