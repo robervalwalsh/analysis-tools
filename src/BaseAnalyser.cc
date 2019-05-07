@@ -54,6 +54,12 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    
    weight_ = 1.;
    
+   // Pileup weights
+   if ( config_->isMC() && config_->pileupWeights() != "" )
+   {
+      puweights_ = analysis_->pileupWeights(config_->pileupWeights());
+   }
+   
    // JSON for data   
    if( !config_->isMC() && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
    
@@ -256,5 +262,30 @@ bool  BaseAnalyser::genParticlesAnalysis() const
 float BaseAnalyser::crossSection() const
 {
    return xsection_;
+}
+
+std::shared_ptr<PileupWeight>  BaseAnalyser::pileupWeights() const
+{
+   return puweights_;
+}
+
+float BaseAnalyser::pileupWeight(const float & truepu, const int & var) const
+{
+   if ( ! puweights_ ) return 1.;   
+   return puweights_->weight(truepu,var);
+}
+
+void BaseAnalyser::actionApplyPileupWeight(const int & var)
+{
+   if ( ! puweights_ ) return;
+   if ( ! config_->isMC() ) return;
+   
+   ++cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"*** Apply pileup weight");
+   
+   weight_ *= this->pileupWeight(analysis_->nTruePileup(),var);
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
 }
 

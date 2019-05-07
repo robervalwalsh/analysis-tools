@@ -78,6 +78,9 @@ namespace analysis {
             std::map<std::string, std::shared_ptr<TH2F> > h2_;
             
             bool genpartsanalysis_; 
+            
+            // pileup weight
+            std::shared_ptr<PileupWeight> puweights_;
          
          private:
             
@@ -126,6 +129,11 @@ namespace analysis {
             
             // genparticle collection
             bool genParticlesAnalysis() const;
+            
+            // pileup
+            std::shared_ptr<PileupWeight> pileupWeights() const;
+            float pileupWeight(const float & truepu, const int & var) const;
+            void actionApplyPileupWeight(const int & var = 0);
 
       };
    }
