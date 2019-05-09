@@ -2,8 +2,10 @@
 //#include "TASImage.h"
 
 void 
-CMS_lumi( TPad* pad, int iPeriod, int iPosX )
+CMS_lumi( TPad* pad, TString mytxt , int iPeriod, int iPosX )
 {            
+  writeExtraText = true;
+  extraText = mytxt;
   bool outOfFrame    = false;
   if( iPosX/10==0 ) 
     {
@@ -153,7 +155,8 @@ CMS_lumi( TPad* pad, int iPeriod, int iPosX )
       latex.SetTextFont(extraTextFont);
       latex.SetTextSize(extraTextSize*t);
       latex.SetTextAlign(align_);
-      latex.DrawLatex(posX_, posY_+0.7, extraText);      
+//      latex.DrawLatex(posX_, posY_+0.7, extraText);      
+      latex.DrawLatex(posX_, posY_, extraText);      
     }
   return;
 }

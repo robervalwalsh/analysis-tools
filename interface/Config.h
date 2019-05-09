@@ -71,10 +71,36 @@ namespace analysis {
             
          // analysis control
             std::string inputlist_;
+            std::string eventinfo_;
+            std::string xsectiontree_;
+            std::string xsectiontype_;
+            float lumi_;
             int nevtmax_;
             bool isMC_;
             bool signalregion_;
+            bool blind_;
             bool override_;
+            bool nlo_;
+            bool fullweight_;
+            int workflow_;
+            
+            int seed_;
+            std::string seedfile_;
+            
+            bool pythia8_;
+            
+            float scale_;
+                        
+            std::vector<std::string> era_;
+            std::vector<float> eralumi_;
+            
+            std::string puweight_;
+            
+         // generic options
+            int prescale_;
+            int n_;
+            float min_;
+            float max_;
 
 
          // jets
@@ -86,7 +112,32 @@ namespace analysis {
             std::vector<float> jetsetamax_;
             std::string jetsid_;
             std::string jetspuid_;
+            // JER resolution and scale factors from txt file
+            std::string jerptres_;
+            std::string jersf_;
+            //
             std::string l1tjetsCol_; 
+            //
+            std::vector<std::string> jetsbtagwp_;
+            std::string nonbtagwp_;
+            int nonbtagjet_;
+            // cuts on the probabilities
+            std::vector<float> jetsbtagprobb_;
+            std::vector<float> jetsbtagprobbb_;
+            std::vector<float> jetsbtagproblepb_;
+            std::vector<float> jetsbtagprobc_;
+            std::vector<float> jetsbtagprobg_;
+            std::vector<float> jetsbtagproblight_;
+            
+            //
+            std::vector<std::string> triggerObjectsJets_;
+            bool usejetsflv_;
+            bool usejetsextflv_;
+            bool dodijet_;
+            bool dodijet_flavour_;
+            
+            bool bregression_;
+
 
          // muons
             std::string muonsCol_; 
@@ -100,7 +151,41 @@ namespace analysis {
             
          // trigger
             std::string triggerCol_;
+            std::string triggerObjDir_;
+            std::string triggerObjectsL1Muons_;
+            std::string triggerObjectsL3Muons_;
+            std::string triggerObjectsBJets_;
+            std::string triggerObjectsL1Jets_;
+            std::string triggerObjectsCaloJets_;
+            std::string triggerObjectsPFJets_;
+            
+         // generator level collections
+            std::string genjetsCol_;
+            std::string genpartsCol_;
+            
 
+
+         // btag
+            float btagwploose_;
+            float btagwpmedium_;
+            float btagwptight_;
+            float btagwpxxx_;
+            
+         // general
+            float massmin_;
+            float massmax_;
+            
+         // AI
+            std::vector<std::string> varsf_ai_;
+            std::vector<std::string> varsi_ai_;
+            std::string dir_ai_;
+            std::string method_ai_;
+            float disc_max_ai_;
+            float disc_min_ai_;
+            float eff_min_ai_;
+         // output tree
+            
+            bool do_tree_;
 
                         
          private:
@@ -112,10 +197,30 @@ namespace analysis {
          // gets (to replace the public variables)
          // analysis control
             std::string ntuplesList() const;
+            std::string eventInfo() const;
+            std::string crossSectionTree() const;
+            std::string crossSectionType() const;
+            float luminosity() const;
             int  nEventsMax() const;
             bool isMC() const;
             bool signalRegion() const;
+            bool blind() const;
             bool override() const;
+            bool nlo() const;
+            bool fullWeight() const;
+            int  workflow() const;
+            
+            std::string seedFile() const;
+            int seed() const;
+            
+            bool pythia8() const;
+            
+            float scale() const;
+            
+            std::vector<float> eraLumi() const;
+            std::vector<std::string> era() const;
+            
+            std::string pileupWeights() const;
             
          // jets
             std::string jetsCollection() const;
@@ -126,7 +231,25 @@ namespace analysis {
             std::vector<float> jetsEtaMax() const;
             std::string jetsId() const;
             std::string jetsPuId() const;
+            std::string jerPtRes() const;
+            std::string jerSF() const;
             std::string l1tJetsCollection() const; 
+            std::vector<std::string> jetsBtagWP() const;
+            std::vector<float> jetsBtagProbB() const;
+            std::vector<float> jetsBtagProbBB() const;
+            std::vector<float> jetsBtagProbLepB() const;
+            std::vector<float> jetsBtagProbC() const;
+            std::vector<float> jetsBtagProbG() const;
+            std::vector<float> jetsBtagProbLight() const;
+            bool bRegression() const;
+            std::string nonBtagWP()  const;
+            int   nonBtagJet() const;
+            std::vector<std::string> triggerObjectsJets() const;
+            void triggerObjectsJets(const std::string & label, const int & index);
+            bool useJetsFlavour() const;
+            bool useJetsExtendedFlavour() const;
+            bool doDijet() const;
+            bool doDijetFlavour() const;
             
          // muons
             std::string muonsCollection() const;
@@ -139,7 +262,41 @@ namespace analysis {
             std::string l1tMuonsCollection() const; 
             
          // trigger
-            std::string triggerResults() const;
+            std::string triggerResults()         const;
+            std::string triggerObjectsDir()      const;
+            std::string triggerObjectsL1Muons()  const;
+            std::string triggerObjectsL3Muons()  const;
+            std::string triggerObjectsBJets()    const;
+            std::string triggerObjectsL1Jets()   const;
+            std::string triggerObjectsCaloJets() const;
+            std::string triggerObjectsPFJets()   const;            
+         // generator level
+            std::string genJetsCollection() const;
+            std::string genParticlesCollection() const;
+            
+         // btag
+            float btagWP(const std::string &) const;
+            
+         // general
+            float massMin() const;
+            float massMax() const;
+            
+         // AI
+            std::vector<std::string> variablesAI(const std::string & t = "F") const;
+            std::string directoryAI() const;
+            std::string methodAI() const;
+            float discriminatorMaxAI() const;
+            float discriminatorMinAI() const;
+            float efficiencyMinAI() const;
+            
+         // output tree
+            bool doTree() const;
+            
+         // generic options
+            int prescale() const;
+            int n() const;
+            float min() const;
+            float max() const;
             
          // ========================
          
@@ -177,17 +334,17 @@ namespace analysis {
             float detamax_;
             float detamin_;
             float dphimin_;
+            float dphimax_;
 
             float ptimbalmax_;
+            float ptimbalmin_;
+            
+            std::vector<float>  qgmin_;
+            std::vector<float>  qgmax_;
 
             std::string btagalgo_;
             std::string btagwp_;
-            float btagwploose_;
-            float btagwpmedium_;
-            float btagwptight_;
             //float btagwp_;
-            float nonbtagwp_;
-            int nonbtagjet_;
 
 
             std::string hltPath_;
@@ -195,21 +352,17 @@ namespace analysis {
             std::vector<std::string> triggerObjects_;
             std::vector<int> triggerObjectsMatches_;
             std::vector<int> triggerObjectsMatchesRank_;
-            std::vector<std::string> triggerObjectsJets_;
-            std::vector<std::string> triggerObjectsBJets_;
-            std::vector<std::string> triggerObjectsL1Jets_;
+            
+            
+            
+            
             int triggerObjectsJetsMatches_;
             int triggerObjectsBJetsMatches_;
             int triggerObjectsL1JetsMatches_;
             std::vector<std::string> triggerObjectsMuons_;
-            std::vector<std::string> triggerObjectsL1Muons_;
             int triggerObjectsMuonsMatches_;
             int triggerObjectsL1MuonsMatches_;
-
-            // ntuples collections
-            std::string genParticleCol_;
-            std::string genjetsCol_;
-            std::string triggerObjDir_;
+            int triggerObjectsL3MuonsMatches_;
 
          protected:
             int argc_;
