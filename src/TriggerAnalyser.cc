@@ -37,7 +37,9 @@ TriggerAnalyser::TriggerAnalyser()
 
 TriggerAnalyser::TriggerAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
 {
-   triggeranalysis_  = analysis_->triggerResults(config_->triggerResults());
+   triggeranalysis_ = false;
+   if ( config_->triggerResults() != "" )
+      triggeranalysis_  = analysis_->triggerResults(config_->triggerResults());
    
    if ( config_->triggerObjectsDir() != "" )
    {

@@ -54,6 +54,10 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
       opt_cfg_.add_options()
          ("ntuplesList",po::value <std::string> (&inputlist_)->default_value("rootFileList.txt"),"File with list of ntuples")
          ("eventInfo",po::value <std::string> (&eventinfo_)->default_value("MssmHbb/Events/EventInfo"),"EventInfo directory in the tree")
+         ("crossSectionTree",po::value <std::string> (&xsectiontree_)->default_value("MssmHbb/Metadata/CrossSections"),"Tree containing cross sections")
+         ("crossSectionType",po::value <std::string> (&xsectiontype_)->default_value("crossSection"),"Type of cross section")
+         ("scale",po::value <float> (&scale_)->default_value(-1.), "Overall scale for histograms")  
+         ("luminosity",po::value <float> (&lumi_)->default_value(-1.), "Luminosity in pb-1 to scale histograms")   
          ("collectionsTreePath",po::value <std::string> (&treePath_)->default_value("Events"),"Name of the tree path for the event collections")
          ("nEventsMax",po::value <int> (&nevtmax_)->default_value(-1), "Maximum number of events")
          ("nLumiSections",po::value <int> (&nlumis_)->default_value(-1), "Number of lumi sections processed")
@@ -64,12 +68,23 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("isMC",po::value <bool> (&isMC_)->default_value(true),"Flag for MC dataset")
          ("pythia8",po::value <bool> (&pythia8_)->default_value(true),"Flag for Pythia8 or other recent generators MC")
          ("nlo",po::value <bool> (&nlo_)->default_value(false),"Flag for NLO samples")
+         ("fullWeight",po::value <bool> (&fullweight_)->default_value(false),"Flag for full weight of MC samples")
          ("workflow",po::value <int> (&workflow_)->default_value(1),"Workflow index defined by user")
          ("blind",po::value <bool> (&blind_)->default_value(true),"Flag for blind analysis")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
+         ("eraLumi", po::value<std::vector<float> >(&eralumi_)->multitoken(),"Lumi of an era")
+         ("era", po::value<std::vector<std::string> >(&era_)->multitoken(),"Era of data taking")
+         ("pileupWeights",po::value <std::string> (&puweight_)->default_value(""),"Root file containing pileup weights")
          ("seed",po::value <int> (&seed_)->default_value(-1), "Seed value for random numbers")
          ("seedFile",po::value <std::string> (&seedfile_)->default_value("no_seed.txt"),"File with seed value for random numbers");
 
+      // generic options
+      opt_cfg_.add_options()
+         ("prescale",po::value <int> (&prescale_)->default_value(1), "Prescale factor")  
+         ("n",po::value <int> (&n_)->default_value(-1), "Some integer")
+         ("min",po::value <float> (&min_)->default_value(-1.), "some minimum value")  
+         ("max",po::value <float> (&max_)->default_value(-1.), "some maximum value");
+      
       // analysis control
       opt_cfg_.add_options()
          ("doTree",po::value <bool> (&do_tree_)->default_value(false),"Flag for output")
@@ -219,6 +234,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          if ( jerptres_ != "" )  jerptres_ = Form("%s/%s", datapath.c_str(), jerptres_.c_str());
          if ( jersf_    != "" )  jersf_    = Form("%s/%s", datapath.c_str(), jersf_.c_str()   );
          if ( btagsf_   != "" )  btagsf_   = Form("%s/%s", datapath.c_str(), btagsf_.c_str()  );
+         if ( puweight_ != "" )  puweight_ = Form("%s/%s", datapath.c_str(), puweight_.c_str());
          
       }
       catch(po::error& e)
@@ -273,14 +289,22 @@ void Config::loadOptions()
 }
 
 // analysis info
-std::string        Config::ntuplesList()     const { return inputlist_; }
-std::string        Config::eventInfo()       const { return eventinfo_; }
-int                Config::nEventsMax()      const { return nevtmax_; }
-bool               Config::isMC()            const { return isMC_; }
-bool               Config::signalRegion()    const { return signalregion_; }
-bool               Config::blind()           const { return blind_; }
-bool               Config::nlo()             const { return nlo_; }
-int                Config::workflow()        const { return workflow_; }
+std::string        Config::ntuplesList()      const { return inputlist_; }
+std::string        Config::eventInfo()        const { return eventinfo_; }
+std::string        Config::crossSectionTree() const { return xsectiontree_; }
+std::string        Config::crossSectionType() const { return xsectiontype_; }
+float              Config::luminosity()       const { return lumi_; }
+int                Config::nEventsMax()       const { return nevtmax_; }
+bool               Config::isMC()             const { return isMC_; }
+bool               Config::signalRegion()     const { return signalregion_; }
+bool               Config::blind()            const { return blind_; }
+bool               Config::nlo()              const { return nlo_; }
+bool               Config::fullWeight()       const { return fullweight_; }
+int                Config::workflow()         const { return workflow_; }
+float              Config::scale()            const { return scale_; }
+std::vector<float> Config::eraLumi()          const { return eralumi_; }
+std::vector<std::string> Config::era()        const { return era_; }
+std::string        Config::pileupWeights()    const { return puweight_; }
 
 // analysis control
 bool               Config::override()          const { return override_; }
@@ -380,3 +404,10 @@ float Config::efficiencyMinAI()    const { return eff_min_ai_ ; }
 // output tree
 bool Config::doTree() const { return do_tree_; 
 }
+
+// generic options
+int   Config::prescale()   const { return prescale_; }
+int   Config::n()          const { return n_;   }
+float Config::min()        const { return min_; }
+float Config::max()        const { return max_; }
+

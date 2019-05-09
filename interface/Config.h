@@ -72,18 +72,35 @@ namespace analysis {
          // analysis control
             std::string inputlist_;
             std::string eventinfo_;
+            std::string xsectiontree_;
+            std::string xsectiontype_;
+            float lumi_;
             int nevtmax_;
             bool isMC_;
             bool signalregion_;
             bool blind_;
             bool override_;
             bool nlo_;
+            bool fullweight_;
             int workflow_;
             
             int seed_;
             std::string seedfile_;
             
             bool pythia8_;
+            
+            float scale_;
+                        
+            std::vector<std::string> era_;
+            std::vector<float> eralumi_;
+            
+            std::string puweight_;
+            
+         // generic options
+            int prescale_;
+            int n_;
+            float min_;
+            float max_;
 
 
          // jets
@@ -181,18 +198,29 @@ namespace analysis {
          // analysis control
             std::string ntuplesList() const;
             std::string eventInfo() const;
+            std::string crossSectionTree() const;
+            std::string crossSectionType() const;
+            float luminosity() const;
             int  nEventsMax() const;
             bool isMC() const;
             bool signalRegion() const;
             bool blind() const;
             bool override() const;
             bool nlo() const;
+            bool fullWeight() const;
             int  workflow() const;
             
             std::string seedFile() const;
             int seed() const;
             
             bool pythia8() const;
+            
+            float scale() const;
+            
+            std::vector<float> eraLumi() const;
+            std::vector<std::string> era() const;
+            
+            std::string pileupWeights() const;
             
          // jets
             std::string jetsCollection() const;
@@ -263,6 +291,12 @@ namespace analysis {
             
          // output tree
             bool doTree() const;
+            
+         // generic options
+            int prescale() const;
+            int n() const;
+            float min() const;
+            float max() const;
             
          // ========================
          

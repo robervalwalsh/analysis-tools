@@ -69,12 +69,19 @@ namespace analysis {
             // event weight
             float weight_;
             
+            // cross section
+            float xsection_;
+            
             // output root file
             std::shared_ptr<TFile> hout_;
             std::map<std::string, std::shared_ptr<TH1F> > h1_;
             std::map<std::string, std::shared_ptr<TH2F> > h2_;
             
             bool genpartsanalysis_; 
+            
+            // pileup weight
+            std::shared_ptr<PileupWeight> puweights_;
+            bool istruepu_;
          
          private:
             
@@ -115,11 +122,23 @@ namespace analysis {
             float weight();
             void weight(const float &);
             
+            // cross section
+            float crossSection() const;
+            
             // output root file
             std::shared_ptr<TFile> output();
             
             // genparticle collection
             bool genParticlesAnalysis() const;
+            
+            // pileup
+            std::shared_ptr<PileupWeight> pileupWeights() const;
+            float pileupWeight(const float & truepu, const int & var) const;
+            void actionApplyPileupWeight(const int & var = 0);
+            
+            void pileupHistogram();
+            void fillPileupHistogram();
+
 
       };
    }

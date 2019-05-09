@@ -505,6 +505,12 @@ std::shared_ptr<JetResolutionInfo> Analysis::jetResolutionInfo(const std::string
    return jerinfo_;
 }
       
+std::shared_ptr<PileupWeight> Analysis::pileupWeights(const std::string & f_pu)
+{
+   puweights_ = std::make_shared<PileupWeight>(PileupWeight(f_pu));
+   return puweights_;
+}
+      
 std::shared_ptr<BTagCalibrationReader> Analysis::btagCalibration(const std::string & tagger,
                                 const std::string & filename,
                                 const std::string & wp,
