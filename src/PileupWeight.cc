@@ -79,7 +79,7 @@ float PileupWeight::weight(const float & truepu, const int & var)
    float weight = 1.;
    if ( ! histos_[0] ) return weight;
    if ( ! histos_[var] ) return weight;
-   int bin = histos_[var] -> GetBin(truepu);
+   int bin = histos_[var] -> FindBin(truepu);
    weight = histos_[var] -> GetBinContent(bin);
    return weight;
 }
