@@ -70,6 +70,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("nlo",po::value <bool> (&nlo_)->default_value(false),"Flag for NLO samples")
          ("fullWeight",po::value <bool> (&fullweight_)->default_value(false),"Flag for full weight of MC samples")
          ("workflow",po::value <int> (&workflow_)->default_value(1),"Workflow index defined by user")
+         ("index",po::value <int> (&index_)->default_value(-1),"Some generic index for user")
          ("blind",po::value <bool> (&blind_)->default_value(true),"Flag for blind analysis")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
          ("eraLumi", po::value<std::vector<float> >(&eralumi_)->multitoken(),"Lumi of an era")
@@ -301,6 +302,7 @@ bool               Config::blind()            const { return blind_; }
 bool               Config::nlo()              const { return nlo_; }
 bool               Config::fullWeight()       const { return fullweight_; }
 int                Config::workflow()         const { return workflow_; }
+int                Config::index()            const { return index_; }
 float              Config::scale()            const { return scale_; }
 std::vector<float> Config::eraLumi()          const { return eralumi_; }
 std::vector<std::string> Config::era()        const { return era_; }

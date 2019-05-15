@@ -83,6 +83,7 @@ namespace analysis {
             bool nlo_;
             bool fullweight_;
             int workflow_;
+            int index_;
             
             int seed_;
             std::string seedfile_;
@@ -209,6 +210,7 @@ namespace analysis {
             bool nlo() const;
             bool fullWeight() const;
             int  workflow() const;
+            int  index() const;
             
             std::string seedFile() const;
             int seed() const;
