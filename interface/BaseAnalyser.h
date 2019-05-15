@@ -105,7 +105,9 @@ namespace analysis {
             std::shared_ptr<TH1F> histogram(const std::string &);
             
             /// print out the cut flow
-            void cutflow();
+            void workflow();
+            int  cutflow();
+            void cutflow(const int &);
             
             // Actions
             /// event entry to be readout and processed

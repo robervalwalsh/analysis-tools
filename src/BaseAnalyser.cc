@@ -134,7 +134,7 @@ BaseAnalyser::~BaseAnalyser()
       }
       h.second -> Scale(scale);
    }
-   cutflow();
+   workflow();
    if ( hout_ )
    {
       std::cout << std::endl;
@@ -195,7 +195,7 @@ std::map<std::string, std::shared_ptr<TH1F> > BaseAnalyser::histograms()
 }
 
 
-void BaseAnalyser::cutflow()
+void BaseAnalyser::workflow()
 {
    printf("+%s+\n", std::string(150,'-').c_str());
    printf("| %-88s |    %10s |   %16s |   %16s |\n",h1_["cutflow"] -> GetTitle(),"n events","ratio wrt first","ratio wrt previous");
@@ -311,3 +311,12 @@ void BaseAnalyser::fillPileupHistogram()
    h1_["pileup"] -> Fill(analysis_->nTruePileup());
 }
 
+int BaseAnalyser::cutflow()
+{
+   return cutflow_;
+}
+
+void BaseAnalyser::cutflow(const int & c)
+{
+   cutflow_ = c;
+}
