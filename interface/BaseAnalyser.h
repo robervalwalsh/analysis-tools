@@ -105,7 +105,9 @@ namespace analysis {
             std::shared_ptr<TH1F> histogram(const std::string &);
             
             /// print out the cut flow
-            void cutflow();
+            void workflow();
+            int  cutflow();
+            void cutflow(const int &);
             
             // Actions
             /// event entry to be readout and processed
@@ -134,6 +136,8 @@ namespace analysis {
             // pileup
             std::shared_ptr<PileupWeight> pileupWeights() const;
             float pileupWeight(const float & truepu, const int & var) const;
+            float trueInteractions() const;
+            float trueInteractionsWeighted(const int & var = 0) const;
             void actionApplyPileupWeight(const int & var = 0);
             
             void pileupHistogram();
