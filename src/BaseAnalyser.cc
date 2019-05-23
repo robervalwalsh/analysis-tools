@@ -280,6 +280,20 @@ float BaseAnalyser::pileupWeight(const float & truepu, const int & var) const
    return puweights_->weight(truepu,var);
 }
 
+float BaseAnalyser::trueInteractions() const
+{
+   if ( ! config_->isMC() ) return -1;
+    
+   return float(analysis_->nTruePileup());
+}
+
+float BaseAnalyser::trueInteractionsWeighted(const int & var) const
+{
+   if ( ! config_->isMC() ) return -1;
+    
+   return float(analysis_->nTruePileup())*this->pileupWeight(analysis_->nTruePileup(),var);
+}
+
 void BaseAnalyser::actionApplyPileupWeight(const int & var)
 {
    if ( ! puweights_ ) return;
