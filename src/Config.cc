@@ -73,8 +73,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("index",po::value <int> (&index_)->default_value(-1),"Some generic index for user")
          ("blind",po::value <bool> (&blind_)->default_value(true),"Flag for blind analysis")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
-         ("eraLumi", po::value<std::vector<float> >(&eralumi_)->multitoken(),"Lumi of an era")
-         ("era", po::value<std::vector<std::string> >(&era_)->multitoken(),"Era of data taking")
+         ("erasLumi", po::value<std::vector<float> >(&eraslumi_)->multitoken(),"Lumi of an era")
+         ("eras", po::value<std::vector<std::string> >(&eras_)->multitoken(),"Era of data taking")
          ("pileupWeights",po::value <std::string> (&puweight_)->default_value(""),"Root file containing pileup weights")
          ("seed",po::value <int> (&seed_)->default_value(-1), "Seed value for random numbers")
          ("seedFile",po::value <std::string> (&seedfile_)->default_value("no_seed.txt"),"File with seed value for random numbers");
@@ -304,8 +304,8 @@ bool               Config::fullWeight()       const { return fullweight_; }
 int                Config::workflow()         const { return workflow_; }
 int                Config::index()            const { return index_; }
 float              Config::scale()            const { return scale_; }
-std::vector<float> Config::eraLumi()          const { return eralumi_; }
-std::vector<std::string> Config::era()        const { return era_; }
+std::vector<float> Config::erasLumi()         const { return eraslumi_; }
+std::vector<std::string> Config::eras()       const { return eras_; }
 std::string        Config::pileupWeights()    const { return puweight_; }
 
 // analysis control

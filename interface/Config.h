@@ -92,8 +92,8 @@ namespace analysis {
             
             float scale_;
                         
-            std::vector<std::string> era_;
-            std::vector<float> eralumi_;
+            std::vector<std::string> eras_;
+            std::vector<float> eraslumi_;
             
             std::string puweight_;
             
@@ -219,8 +219,8 @@ namespace analysis {
             
             float scale() const;
             
-            std::vector<float> eraLumi() const;
-            std::vector<std::string> era() const;
+            std::vector<float> erasLumi() const;
+            std::vector<std::string> eras() const;
             
             std::string pileupWeights() const;
             
