@@ -126,7 +126,7 @@ BaseAnalyser::~BaseAnalyser()
    
    for ( auto h : h1_ )
    {
-      if ( h.first == "cutflow" ) continue;
+      if ( h.first == "cutflow" || h.first == "pileup" || h.first == "pileup_w" ) continue;
       if ( h.first == "pileup" )
       {
          h.second -> Scale(1./h.second->Integral());
@@ -287,13 +287,6 @@ float BaseAnalyser::trueInteractions() const
    return float(analysis_->nTruePileup());
 }
 
-float BaseAnalyser::trueInteractionsWeighted(const int & var) const
-{
-   if ( ! config_->isMC() ) return -1;
-    
-   return float(analysis_->nTruePileup())*this->pileupWeight(analysis_->nTruePileup(),var);
-}
-
 void BaseAnalyser::actionApplyPileupWeight(const int & var)
 {
    if ( ! puweights_ ) return;
@@ -311,7 +304,16 @@ void BaseAnalyser::actionApplyPileupWeight(const int & var)
 void BaseAnalyser::pileupHistogram()
 {
    this->output()->cd();
-   h1_["pileup"] = std::make_shared<TH1F>("pileup" , "pileup" , config_->n() , config_->min() , config_->max() );
+   if ( config_->min() > 0 && config_->max() > 0 )
+   {
+      h1_["pileup"] = std::make_shared<TH1F>("pileup" , "pileup" , config_->n() , config_->min() , config_->max() );
+      h1_["pileup_w"] = std::make_shared<TH1F>("pileup_w" , "weighted pileup" , config_->n() , config_->min() , config_->max() );
+   }
+   else
+   {
+      h1_["pileup"] = std::make_shared<TH1F>("pileup" , "pileup" , 100 , 0 , 100 );
+      h1_["pileup_w"] = std::make_shared<TH1F>("pileup_w" , "weighted pileup" , 100 , 0 , 100 );
+   }
    
 }
 void BaseAnalyser::fillPileupHistogram()
@@ -323,6 +325,7 @@ void BaseAnalyser::fillPileupHistogram()
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    h1_["pileup"] -> Fill(analysis_->nTruePileup());
+   h1_["pileup_w"] -> Fill(analysis_->nTruePileup(),this->pileupWeight(analysis_->nTruePileup(),0));
 }
 
 int BaseAnalyser::cutflow()

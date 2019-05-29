@@ -137,7 +137,6 @@ namespace analysis {
             std::shared_ptr<PileupWeight> pileupWeights() const;
             float pileupWeight(const float & truepu, const int & var) const;
             float trueInteractions() const;
-            float trueInteractionsWeighted(const int & var = 0) const;
             void actionApplyPileupWeight(const int & var = 0);
             
             void pileupHistogram();
