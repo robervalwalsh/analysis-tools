@@ -82,6 +82,9 @@ namespace analysis {
             // pileup weight
             std::shared_ptr<PileupWeight> puweights_;
             bool istruepu_;
+            
+            // overall scaling
+            float scale_;
          
          private:
             
@@ -141,6 +144,8 @@ namespace analysis {
             
             void pileupHistogram();
             void fillPileupHistogram();
+            
+            void scale(const float &);
 
 
       };
