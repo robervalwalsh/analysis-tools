@@ -74,6 +74,7 @@ namespace analysis {
             std::string eventinfo_;
             std::string xsectiontree_;
             std::string xsectiontype_;
+            float xsection_;
             float lumi_;
             int nevtmax_;
             bool isMC_;
@@ -201,6 +202,7 @@ namespace analysis {
             std::string eventInfo() const;
             std::string crossSectionTree() const;
             std::string crossSectionType() const;
+            float crossSection() const;
             float luminosity() const;
             int  nEventsMax() const;
             bool isMC() const;
