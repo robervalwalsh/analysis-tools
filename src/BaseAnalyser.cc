@@ -41,6 +41,8 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
 {
    exe_ = std::string(argv[0]);
    
+   scale_ = -1.;
+   
    config_   = std::make_shared<Config>(argc,argv);
    analysis_ = std::make_shared<Analysis>(config_->ntuplesList(),config_->eventInfo());
    
@@ -100,41 +102,51 @@ BaseAnalyser::~BaseAnalyser()
    }
    float fevts =  h1_["cutflow"] -> GetBinContent(lastbin);
    // overall scale
-   float scale = 1.;  
-   // scale to luminosity
-   if ( config_->isMC() && config_ -> luminosity() > 0. && config_ -> scale() < 0. )
+   float scale = 1.; 
+   bool doscale = false;
+   if ( scale_ > 0. )  // superseeds the scale from config
    {
-      float nwevts = h1_["cutflow"] -> GetBinContent(2);
-      float genlumi = nwevts/xsection_;
-      scale = config_->luminosity()/genlumi;
+      doscale = true;
+      scale = scale_;
+   }
+   else
+   {
+      // scale from config
+      if ( config_ -> scale() > 0. )
+      {
+         doscale = true;
+         scale = config_ -> scale();
+      }
+   }
+   if ( doscale )
+   {
       if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(lastbin+1)) == "" )
       {
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(lastbin+1,Form("Number of events after scaling to luminosity = %8.3f/pb",config_->luminosity()));
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(lastbin+1,Form("Number of events after scaling to %10.5f",scale));
       }
       h1_["cutflow"] -> Fill(lastbin,fevts*scale);
    }
-   // scale from config
-   if ( config_ -> scale() > 0. )
-   {
-      scale = config_ -> scale();
-      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(lastbin+1)) == "" )
-      {
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(lastbin+1,Form("Number of events after scaling to = %10.5f/pb",scale));
-      }
-      h1_["cutflow"] -> Fill(lastbin,fevts*scale);
-   }
+    
+//    // scale to luminosity
+//    if ( config_->isMC() && config_ -> luminosity() > 0. && config_ -> scale() < 0. )
+//    {
+//       float nwevts = h1_["cutflow"] -> GetBinContent(2);
+//       float genlumi = nwevts/xsection_;
+//       scale = config_->luminosity()/genlumi;
+//       if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(lastbin+1)) == "" )
+//       {
+//          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(lastbin+1,Form("Number of events after scaling to luminosity = %8.3f/pb",config_->luminosity()));
+//       }
+//       h1_["cutflow"] -> Fill(lastbin,fevts*scale);
+//    }
+   
    
    for ( auto h : h1_ )
    {
-      if ( h.first == "cutflow" ) continue;
-      if ( h.first == "pileup" )
-      {
-         h.second -> Scale(1./h.second->Integral());
-         continue;
-      }
-      h.second -> Scale(scale);
+      if ( h.first == "cutflow" || h.first == "pileup" || h.first == "pileup_w" ) continue;
+      if ( doscale ) h.second -> Scale(scale);
    }
-   cutflow();
+   workflow();
    if ( hout_ )
    {
       std::cout << std::endl;
@@ -195,7 +207,7 @@ std::map<std::string, std::shared_ptr<TH1F> > BaseAnalyser::histograms()
 }
 
 
-void BaseAnalyser::cutflow()
+void BaseAnalyser::workflow()
 {
    printf("+%s+\n", std::string(150,'-').c_str());
    printf("| %-88s |    %10s |   %16s |   %16s |\n",h1_["cutflow"] -> GetTitle(),"n events","ratio wrt first","ratio wrt previous");
@@ -280,6 +292,13 @@ float BaseAnalyser::pileupWeight(const float & truepu, const int & var) const
    return puweights_->weight(truepu,var);
 }
 
+float BaseAnalyser::trueInteractions() const
+{
+   if ( ! config_->isMC() ) return -1;
+    
+   return float(analysis_->nTruePileup());
+}
+
 void BaseAnalyser::actionApplyPileupWeight(const int & var)
 {
    if ( ! puweights_ ) return;
@@ -297,7 +316,16 @@ void BaseAnalyser::actionApplyPileupWeight(const int & var)
 void BaseAnalyser::pileupHistogram()
 {
    this->output()->cd();
-   h1_["pileup"] = std::make_shared<TH1F>("pileup" , "pileup" , config_->n() , config_->min() , config_->max() );
+   if ( config_->min() > 0 && config_->max() > 0 )
+   {
+      h1_["pileup"] = std::make_shared<TH1F>("pileup" , "pileup" , config_->n() , config_->min() , config_->max() );
+      h1_["pileup_w"] = std::make_shared<TH1F>("pileup_w" , "weighted pileup" , config_->n() , config_->min() , config_->max() );
+   }
+   else
+   {
+      h1_["pileup"] = std::make_shared<TH1F>("pileup" , "pileup" , 100 , 0 , 100 );
+      h1_["pileup_w"] = std::make_shared<TH1F>("pileup_w" , "weighted pileup" , 100 , 0 , 100 );
+   }
    
 }
 void BaseAnalyser::fillPileupHistogram()
@@ -309,5 +337,20 @@ void BaseAnalyser::fillPileupHistogram()
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    h1_["pileup"] -> Fill(analysis_->nTruePileup());
+   h1_["pileup_w"] -> Fill(analysis_->nTruePileup(),this->pileupWeight(analysis_->nTruePileup(),0));
 }
 
+int BaseAnalyser::cutflow()
+{
+   return cutflow_;
+}
+
+void BaseAnalyser::cutflow(const int & c)
+{
+   cutflow_ = c;
+}
+
+void BaseAnalyser::scale(const float & scale)
+{
+   scale_ = scale;
+}
