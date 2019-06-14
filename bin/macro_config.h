@@ -22,6 +22,9 @@ std::string inputlist_;
 std::string outputRoot_;
 std::string json_;
 
+int seed_;
+std::string seedfile_;
+
 //
 bool matchonoff_;
 float matchonoffdrmax_;
@@ -62,6 +65,10 @@ std::vector<float> l1tjetsrefetamax_;
 
 // btag SF csv file
 std::string btagsf_;
+
+// JER resolution and scale factors from txt file
+std::string jerpt_;
+std::string jersf_;
 
 
 // muons
@@ -128,6 +135,7 @@ std::string l1tjetsCol_;
 std::string l1tmuonsCol_; 
 std::string triggerCol_;
 std::string genParticleCol_;
+std::string genjetsCol_;
 std::string triggerObjDir_;
 
 //Prescale across eras
@@ -153,7 +161,11 @@ int macro_config(int argc, char * argv[])
          ("runMax",po::value <int> (&runmax_)->default_value(-1), "Minimum run number")
          ("output",po::value <std::string> (&outputRoot_)->default_value("histograms.root"),"Output root file")
          ("json",po::value <std::string> (&json_)->default_value("no_json.txt"),"JSON file for data")
+         ("seedFile",po::value <std::string> (&seedfile_)->default_value("seed.txt"),"File containing a seed value for random number generator")
+         ("seed",po::value <int> (&seed_)->default_value(1), "Seed value for random number generator")
          ("btagSF",po::value <std::string> (&btagsf_)->default_value("DeepCSV.csv"),"b-tagging scale factor in CSV format")
+         ("jerPT",po::value <std::string> (&jerpt_)->default_value("JERPT.txt"),"JER pt resolution in txt format")
+         ("jerSF",po::value <std::string> (&jersf_)->default_value("JERSF.txt"),"JER scale factor in txt format")
 //      
          ("nJetsMin",po::value <int> (&njetsmin_)->default_value(0),"Minimum number of jets")
          ("nJetsMax",po::value <int> (&njetsmax_)->default_value(100),"Maximum number of jets")
@@ -237,6 +249,7 @@ int macro_config(int argc, char * argv[])
          ("l1tJetsCollection",po::value <std::string> (&l1tjetsCol_)->default_value("l1tJets"),"Name of the L1T jets collection")
          ("l1tMuonsCollection",po::value <std::string> (&l1tmuonsCol_)->default_value("l1tMuons"),"Name of the L1T muons collection")
          ("genParticleCollection",po::value <std::string> (&genParticleCol_)->default_value("prunedGenParticles"),"Name of the gen particle collection")
+         ("genjetsCollection",po::value <std::string> (&genjetsCol_)->default_value("slimmedGenJets"),"Name of the gen jets collection")
 
          ("triggerResultsCollection",po::value <std::string> (&triggerCol_)->default_value("TriggerResults"),"Name of the trigger results collection")
          ("triggerObjectsDirectory",po::value <std::string> (&triggerObjDir_)->default_value("slimmedPatTrigger"),"Name of the trigger objects directory")

@@ -172,7 +172,7 @@ void Analysis::treeInit_(const std::string & unique_name, const std::string & pa
 // =============== Method for Trigger Results=================
 // ===========================================================
 
-void Analysis::triggerResults(const std::string & path)
+bool Analysis::triggerResults(const std::string & path)
 {
    t_triggerResults_  = new TChain(path.c_str());
    int ok = t_triggerResults_ -> AddFileInfoList(fileList_);
@@ -180,7 +180,7 @@ void Analysis::triggerResults(const std::string & path)
    if ( ok == 0 )
    {
       std::cout << "tree does not exist" << std::endl;
-      return;
+      return false;
    }
    TObjArray * triggerBranches = t_triggerResults_ -> GetListOfBranches();
    for ( int i = 0 ; i < triggerBranches->GetEntries() ; ++i )
@@ -197,10 +197,12 @@ void Analysis::triggerResults(const std::string & path)
          t_triggerResults_ -> SetBranchAddress(branch.c_str(), &triggerResults_[branch]);
       }
    }
+   return true;
 }
 
 bool Analysis::triggerResult(const std::string & trig)
 {
+   if ( trig == "" ) return true;
    if ( t_triggerResults_ == NULL ) return false;
    return triggerResults_[trig];
 }
@@ -495,6 +497,20 @@ void triggerNames(std::string &trueTriggerNames,const char *myTriggerNames, TTre
 }
 */
       
+std::shared_ptr<JetResolutionInfo> Analysis::jetResolutionInfo(const std::string & f_jer, const std::string & f_jersf)
+{
+   JetResolution res = JetResolution(f_jer);
+   JetResolutionScaleFactor sf = JetResolutionScaleFactor(f_jersf);
+   jerinfo_ = std::make_shared<JetResolutionInfo>(JetResolutionInfo{res,sf});
+   return jerinfo_;
+}
+      
+std::shared_ptr<PileupWeight> Analysis::pileupWeights(const std::string & f_pu)
+{
+   puweights_ = std::make_shared<PileupWeight>(PileupWeight(f_pu));
+   return puweights_;
+}
+      
 std::shared_ptr<BTagCalibrationReader> Analysis::btagCalibration(const std::string & tagger,
                                 const std::string & filename,
                                 const std::string & wp,
@@ -544,3 +560,16 @@ std::string Analysis::fileName()
    return filename ;
 }
 
+
+int Analysis::seed(const std::string & name)
+{
+   int seed = 1;
+   std::ifstream f(name.c_str(),std::ios_base::in);
+   if ( ! f.good() )   return -1;
+   
+   f >> seed;
+   f.close();
+   if ( seed < 1 )     return -1;
+   
+   return seed;
+}

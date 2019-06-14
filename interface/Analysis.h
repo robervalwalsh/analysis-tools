@@ -41,10 +41,14 @@
 #include "Analysis/Tools/interface/PhysicsObjectTree.h"
 #include "Analysis/Tools/interface/Collection.h"
 #include "Analysis/Tools/interface/BTagCalibrationStandalone.h"
+#include "Analysis/Tools/interface/PileupWeight.h"
+
 
 //
 // class declaration
 //
+
+using namespace JME;
 
 namespace analysis {
    namespace tools {
@@ -57,6 +61,9 @@ namespace analysis {
             // Info
             void tag(const std::string &);
             std::string tag();
+            
+            /// seed for random number generator read from a txt file given as a parameter
+            int seed(const std::string &);
 
             // Event
             int  numberEvents();
@@ -117,7 +124,7 @@ namespace analysis {
             double luminosity(const std::string & title);
 
             // Trigger results
-            void triggerResults(const std::string & path);
+            bool triggerResults(const std::string & path);
             bool triggerResult(const std::string & trig);
             int triggerPrescale(const std::string & trig);
             std::map<std::string,int> triggerPrescale(const std::vector<std::string> & trigs);
@@ -145,6 +152,8 @@ namespace analysis {
             void  btagEfficienciesAlgo(const std::string & );
             void  btagEfficienciesFlavour(const std::string & );
             
+            std::shared_ptr<JetResolutionInfo> jetResolutionInfo(const std::string &, const std::string & );
+            
             std::shared_ptr<BTagCalibrationReader> btagCalibration(const std::string & tagger,
                                  const std::string & filename,
                                  const std::string & wp,
@@ -156,6 +165,7 @@ namespace analysis {
             
             float scaleLuminosity(const float & lumi);  // in pb-1
 
+            std::shared_ptr<PileupWeight> pileupWeights(const std::string & );
 
             // ----------member data ---------------------------
          protected:
@@ -175,6 +185,11 @@ namespace analysis {
             
             std::shared_ptr<BTagCalibration> btagcalib_;
             std::shared_ptr<BTagCalibrationReader> btagcalibread_;
+            
+            std::shared_ptr<JetResolutionInfo> jerinfo_;
+            
+            // pileup weight
+            std::shared_ptr<PileupWeight> puweights_;
 
 
             std::map<std::string, double> xsections_;
@@ -249,6 +264,7 @@ namespace analysis {
       template <class Object>
       std::shared_ptr< PhysicsObjectTree<Object> >  Analysis::addTree(const std::string & unique_name, const std::string & path)
       {
+         if ( path == "" || unique_name == "" ) return nullptr;
          this->treeInit_(unique_name,path);
          t_any_[unique_name] = std::shared_ptr< PhysicsObjectTree<Object> > ( new PhysicsObjectTree<Object>(tree_[unique_name], unique_name) );
          std::string type = boost::core::demangle(typeid(Object).name());

@@ -21,6 +21,7 @@
 
 // system include files
 #include <memory>
+#include <boost/any.hpp>
 //
 
 // 
@@ -28,13 +29,28 @@
 #include "Analysis/Tools/interface/Candidate.h"
 #include "Analysis/Tools/interface/Muon.h"
 #include "Analysis/Tools/interface/GenParticle.h"
+#include "Analysis/Tools/interface/GenJet.h"
 #include "Analysis/Tools/interface/BTagCalibrationStandalone.h"
+#include "Analysis/Tools/interface/Utils.h"
+
+
 //
 // class declaration
 //
 
+
+
+using namespace JME;
+
 namespace analysis {
    namespace tools {
+      
+      struct JERCorrections
+      {
+         float nominal;
+         float up;
+         float down;
+      };
       
       class Jet : public Candidate {
          public:
@@ -52,7 +68,7 @@ namespace analysis {
             /// returns if jet is Puppi
             bool  isPuppi()                     const;
             /// returns the btag value of btag_csvivf
-            float btag()                        const;
+//            float btag()                        const;
             /// returns the btag value of algorithm
             float btag(const std::string & )    const;
             /// returns the flavour with the Hadron definition (=0 for data)
@@ -63,6 +79,8 @@ namespace analysis {
             bool  idLoose()                     const;
             /// returns if jet has id tight working point
             bool  idTight()                     const;
+            /// returns if jet has a given working point
+            bool  id(const std::string & wp = "tight" )  const;
             /// returns the jet energy correction uncertainty
             float jecUncert()                   const;
             /// returns the vector containing flavours inside the jet
@@ -71,14 +89,30 @@ namespace analysis {
             std::string extendedFlavour()       const;
             /// returns the vector of pointers to the generated partons
             std::vector< std::shared_ptr<GenParticle> > partons() const;
-            /// returns jet energy resolution
-            float JerResolution() const;
+            /// returns jet pt resolution
+            float jerPtResolution() const;
+            /// returns jet pt resolution from text file
+            float jerPtResolution(const JetResolution &) const;
             /// returns jet energy resolution SF
-            float JerSf() const;
+            float jerSF() const;
+            /// returns jet energy resolution SF
+            float jerSF(const JetResolutionScaleFactor &) const;
             /// returns jet energy resolution SF Down variation
-            float JerSfDown() const;
+            float jerSFdown() const;
+            /// returns jet energy resolution SF Down variation
+            float jerSFdown(const JetResolutionScaleFactor &) const;
             /// returns jet energy resolution SF Up variation
-            float JerSfUp() const;
+            float jerSFup() const;
+            /// returns jet energy resolution SF Up variation
+            float jerSFup(const JetResolutionScaleFactor &) const;
+            
+            /// JER matching
+            bool jerMatch(const std::string &);
+            bool jerMatch(const float & drmin=0.2);
+            bool jerMatch() const;
+            
+            void jerCorrections();
+            float jerCorrection(const std::string & var = "nominal", const float & nsig = 1) const;
             
             float neutralHadronFraction()  const ;
             float neutralEmFraction()      const ;
@@ -105,16 +139,20 @@ namespace analysis {
             double rho() const;
             
             /// btag SF
-            double btagSF(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo = "Hadron") const;
-            double btagSFup(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo = "Hadron") const;
-            double btagSFdown(std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo = "Hadron") const;
-            double btagSFsys(std::shared_ptr<BTagCalibrationReader> reader, const std::string & systype = "central", const std::string & flavalgo = "Hadron") const;
+            double btagSF    (std::shared_ptr<BTagCalibrationReader> reader, const std::string & flavalgo = "Hadron") const;
+            double btagSFup  (std::shared_ptr<BTagCalibrationReader> reader, const float & nsig = 1, const std::string & flavalgo = "Hadron") const;
+            double btagSFdown(std::shared_ptr<BTagCalibrationReader> reader, const float & nsig = 1, const std::string & flavalgo = "Hadron") const;
+            double btagSFsys (std::shared_ptr<BTagCalibrationReader> reader, const std::string & systype  = "central", const std::string & flavalgo = "Hadron") const;
             
             /// pointer to the FSR jet
             Jet * fsrJet();
             
             /// pointer to the muon
-            Muon * muon();
+            std::shared_ptr<Muon> muon() const;
+            
+            /// Pointer to GenJet
+            std::shared_ptr<GenJet> generatedJet() const;
+//            GenJet * generatedJet(const std::vector<GenJet*> &, const float &);
                
             // Sets
             /// sets the isPuppi value
@@ -136,13 +174,18 @@ namespace analysis {
             /// sets the jet energy correction uncertainty
             void  jecUncert(const float &);
             /// sets jet energy resolution
-            void JerResolution(const float & jerResolution);
+            void jerPtResolution(const float &);
             /// sets jet energy resolution SF
-            void JerSf(const float & jerSf);
+            void jerSF(const float &);
             /// sets jet energy resolution SF Up variation
-            void JerSfUp(const float & jerSfUp);
+            void jerSFup(const float &);
             /// sets jet energy resolution SF Down variation
-            void JerSfDown(const float & jerSfDown);
+            void jerSFdown(const float &);
+            
+            void jerInfo(const JetResolutionInfo &, const std::string &);
+            void jerInfo(const JetResolutionInfo &, const float & drmin=0.2);
+            void applyJER(const JetResolutionInfo &, const float & drmin=0.2);
+            
             /// add parton that gave rise to jet
             void addParton(const std::shared_ptr<GenParticle> &);
             /// remove parton from jet parton list
@@ -157,13 +200,22 @@ namespace analysis {
             void muonFraction(const float & muFrac);
             
             /// calculates the jet id
+//             void id(const float & nHadFrac,
+//                     const float & nEmFrac ,
+//                     const float & nMult   ,
+//                     const float & cHadFrac,
+//                     const float & cEmFrac ,
+//                     const float & cMult   ,
+//                     const float & muFrac  );
+            
             void id(const float & nHadFrac,
                     const float & nEmFrac ,
                     const float & nMult   ,
                     const float & cHadFrac,
                     const float & cEmFrac ,
                     const float & cMult   ,
-                    const float & muFrac  );
+                    const float & muFrac  ,
+                    const float & puppi   );
             
             /// quark-gluon separation
             void qgLikelihood(const float & discr);
@@ -176,6 +228,8 @@ namespace analysis {
             void bRegCorr(const float &);
             void bRegRes(const float &);
             
+            void applyBjetRegression();
+            
             /// Rho
             void rho(const double &);
             
@@ -184,15 +238,23 @@ namespace analysis {
             void associatePartons(const std::vector< std::shared_ptr<GenParticle> > &, const float & dRmax = 0.5, const float & ptMin = 1., const bool & pythi8 = true );
 //            using Candidate::set; // in case needed to overload the function set
             
+            /// gen jets
+            void genJets(const std::vector< std::shared_ptr<GenJet> > &);
+            
             /// add a final state radiation jet, will modify the 4-momentum
             void addFSR(Jet*);
             /// remove the final state radiation jet, will change back the original 4-momentum
             void rmFSR();
             
             /// associate a muon to the jet
-            void addMuon(Muon*);
+            void addMuon(std::shared_ptr<Muon>);
+            /// associate a muon to the jet from a collection of muons 
+            void addMuon(std::vector< std::shared_ptr<Muon> > muons, const float & dr = 0.4);
             /// remove muon association to the jet
             void rmMuon();
+            
+            /// GenJet matching
+            void generatedJet(std::shared_ptr<GenJet>);
             
             
          protected:
@@ -222,13 +284,19 @@ namespace analysis {
             /// jet energy correction uncertainty
             float jecUnc_;
             /// jet energy resolution SF
-            float jerSF_;
+            float jersf_;
             /// jet energy resolution SF Up variation
-            float jerSFUp_;
+            float jersfup_;
             /// jet energy resolution SF Down variation
-            float jerSFDown_;
+            float jersfdown_;
             /// jet energy resolution
-            float jerResolution_;
+            float jerptres_;
+            /// JER matching
+            bool jermatch_;
+            /// JER correction factor
+            JERCorrections jercorr_;
+            /// JER info
+            JetResolutionInfo jerinfo_;
             
             /// jet id
             float nHadFrac_;
@@ -257,8 +325,15 @@ namespace analysis {
             /// 4-momentum before FSR correction
             TLorentzVector uncorrJetp4_;
             
+            /// generated jet
+            std::shared_ptr<GenJet> genjet_;
+            
+            /// collection of GenJets
+            std::vector< std::shared_ptr<GenJet> > genjets_;
+            
+            
             /// muon in jet
-            Muon * muon_;
+            std::shared_ptr<Muon> muon_;
             
             
          private:
