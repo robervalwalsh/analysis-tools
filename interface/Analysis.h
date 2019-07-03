@@ -118,7 +118,7 @@ namespace analysis {
             std::string defaultCollection();
             
             // Cross sections
-            void   crossSections(const std::string & path);
+            int    crossSections(const std::string & path);
             double crossSection();
             double crossSection(const std::string & title);
             void   listCrossSections();

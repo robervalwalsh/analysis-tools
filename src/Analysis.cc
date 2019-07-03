@@ -229,14 +229,15 @@ std::map<std::string,int> Analysis::triggerPrescale(const std::vector<std::strin
 // ===========================================================
 // ===========================================================
 // ------------ methods called for metadata  ------------
-void Analysis::crossSections(const std::string & path)
+int Analysis::crossSections(const std::string & path)
 {
+   if ( path == "" ) return -2;
    t_xsection_  = new TChain(path.c_str());
    int ok = t_xsection_ -> AddFileInfoList(fileList_);
    if ( ok == 0 )
    {
       std::cout << "tree does not exist" << std::endl;
-      return;
+      return -1;
    }
    TObjArray * xsecBranches = t_xsection_->GetListOfBranches();
    for ( int i = 0 ; i < xsecBranches->GetEntries() ; ++i )
@@ -247,6 +248,7 @@ void Analysis::crossSections(const std::string & path)
       t_xsection_ -> SetBranchAddress(branch.c_str(), &xsections_[branch]);
    }
    t_xsection_ -> GetEntry(0);
+   return 0;
 }
 
 double Analysis::crossSection()
