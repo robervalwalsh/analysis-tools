@@ -42,7 +42,11 @@
 #include "Analysis/Tools/interface/Collection.h"
 #include "Analysis/Tools/interface/BTagCalibrationStandalone.h"
 #include "Analysis/Tools/interface/PileupWeight.h"
+#include "Analysis/Tools/interface/MuonIdWeight.h"
 
+
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
 //
 // class declaration
@@ -166,6 +170,7 @@ namespace analysis {
             float scaleLuminosity(const float & lumi);  // in pb-1
 
             std::shared_ptr<PileupWeight> pileupWeights(const std::string & );
+            std::shared_ptr<MuonIdWeight> muonIDWeights(const std::string & );
 
             // ----------member data ---------------------------
          protected:
@@ -190,6 +195,9 @@ namespace analysis {
             
             // pileup weight
             std::shared_ptr<PileupWeight> puweights_;
+	    
+	    // muonID weight
+	    std::shared_ptr<MuonIdWeight> muonIDweights_;
 
 
             std::map<std::string, double> xsections_;

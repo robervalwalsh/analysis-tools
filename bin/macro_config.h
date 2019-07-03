@@ -138,6 +138,10 @@ std::string genParticleCol_;
 std::string genjetsCol_;
 std::string triggerObjDir_;
 
+//Prescale across eras
+std::vector<float> prescaleEra_;
+
+
 int macro_config(int argc, char * argv[])
 {
    try
@@ -249,9 +253,10 @@ int macro_config(int argc, char * argv[])
 
          ("triggerResultsCollection",po::value <std::string> (&triggerCol_)->default_value("TriggerResults"),"Name of the trigger results collection")
          ("triggerObjectsDirectory",po::value <std::string> (&triggerObjDir_)->default_value("slimmedPatTrigger"),"Name of the trigger objects directory")
-         ("collectionsTreePath",po::value <std::string> (&treePath_)->default_value("Events"),"Name of the tree path for the event collections.");
-         
-         
+	("collectionsTreePath",po::value <std::string> (&treePath_)->default_value("Events"),"Name of the tree path for the event collections.")
+
+       	("prescaleEra",po::value <std::vector<float> >(&prescaleEra_)->multitoken(),"Prescale CR by # events in SR in each era");
+
 
          for ( int i = 0 ; i < 10 ; ++i )
          {
@@ -324,6 +329,13 @@ int macro_config(int argc, char * argv[])
             std::cout << "Config Error *** Muon maximum |eta| were not defined or the definition does not match the minimum number of muons" <<std::endl;
             return -1;
          }
+
+	 if ( (int)prescaleEra_.size() != 4 )
+ 	   {
+ 	     std::cout << "Config Error *** The prescales for the CR in each era were not defined or the definition does not match the number of eras" <<std::endl;
+ 	     return -1;
+ 	   }
+
          std::transform(btagalgo_.begin(), btagalgo_.end(), btagalgo_.begin(), ::tolower);
          std::transform(btagwp_.begin(), btagwp_.end(), btagwp_.begin(), ::tolower);
          
