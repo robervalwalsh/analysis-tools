@@ -41,47 +41,52 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
 {
    exe_ = std::string(argv[0]);
    
-   scale_ = -1.;
+   // some inits
+   scale_    = -1.;
+   weight_   = 1.;
+   xsection_ = -1.;
+   genpartsanalysis_ = false;
    
+   // the heavy stuff
    config_   = std::make_shared<Config>(argc,argv);
    analysis_ = std::make_shared<Analysis>(config_->ntuplesList(),config_->eventInfo());
    
    seed_ = analysis_ ->seed(config_->seedFile());
    
-   if ( config_->isMC() )
-   {
-      analysis_ -> crossSections(config_->crossSectionTree());
-      xsection_ = analysis_->crossSection(config_->crossSectionType());
-   }
+   // Workflow
+   h1_["cutflow"] = std::make_shared<TH1F>("workflow",Form("Workflow #%d",config_->workflow()), 100,0,100);
+      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" ) 
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(1,"Total events read");
+      
    
-   weight_ = 1.;
+   isMC_ = config_->isMC();
+   isData_ = !isMC_;
    
-   // Pileup weights
-   if ( config_->isMC() && config_->pileupWeights() != "" )
+   // Some MC-only stuff
+   if ( isMC_ )
    {
-      puweights_ = analysis_->pileupWeights(config_->pileupWeights());
+      // Cross sections
+      if ( analysis_ -> crossSections(config_->crossSectionTree()) == 0 )
+         xsection_ = analysis_->crossSection(config_->crossSectionType());
+      // Pileup weights
+      if ( config_->pileupWeights() != "" )
+         puweights_ = analysis_->pileupWeights(config_->pileupWeights());
+      // gen part analysis
+      genpartsanalysis_  = ( analysis_->addTree<GenParticle> ("GenParticles",config_->genParticlesCollection()) != nullptr );
+      // cutflow init for MC
+      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(2)) == "" ) 
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(2,"Generated weighted events");
+      
    }
    
    // JSON for data   
-   if( !config_->isMC() && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
+   if( isData_ && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
    
    // output file
    if ( config_->outputRoot_ != "" )
    {
       hout_= std::make_shared<TFile>(config_->outputRoot_.c_str(),"recreate");
       hout_ -> cd();
-   }
-   
-   genpartsanalysis_ = false;
-   if ( config_->isMC() )  genpartsanalysis_  = ( analysis_->addTree<GenParticle> ("GenParticles",config_->genParticlesCollection()) != nullptr );
-   
-   h1_["cutflow"] = std::make_shared<TH1F>("workflow",Form("Workflow #%d",config_->workflow()), 100,0,100);
-      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" ) 
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(1,"Total events read");
-   if ( config_->isMC() )
-   {
-      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(2)) == "" ) 
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(2,"Generated weighted events");
    }
    
 }
