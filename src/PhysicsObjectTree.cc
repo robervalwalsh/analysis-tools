@@ -1,8 +1,8 @@
 /**\class PhysicsObjectTree PhysicsObjectTree.cc Analysis/Tools/src/PhysicsObjectTree.cc
 
- Description: [one line class summary]
+Description: [one line class summary]
 
- Implementation:
+Implementation:
      [Notes on implementation]
 */
 //
