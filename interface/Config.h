@@ -74,6 +74,7 @@ namespace analysis {
             std::string eventinfo_;
             std::string xsectiontree_;
             std::string xsectiontype_;
+            float xsection_;
             float lumi_;
             int nevtmax_;
             bool isMC_;
@@ -92,8 +93,8 @@ namespace analysis {
             
             float scale_;
                         
-            std::vector<std::string> era_;
-            std::vector<float> eralumi_;
+            std::vector<std::string> eras_;
+            std::vector<float> eraslumi_;
             
             std::string puweight_;
             
@@ -201,6 +202,7 @@ namespace analysis {
             std::string eventInfo() const;
             std::string crossSectionTree() const;
             std::string crossSectionType() const;
+            float crossSection() const;
             float luminosity() const;
             int  nEventsMax() const;
             bool isMC() const;
@@ -219,8 +221,8 @@ namespace analysis {
             
             float scale() const;
             
-            std::vector<float> eraLumi() const;
-            std::vector<std::string> era() const;
+            std::vector<float> erasLumi() const;
+            std::vector<std::string> eras() const;
             
             std::string pileupWeights() const;
             

@@ -54,8 +54,9 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
       opt_cfg_.add_options()
          ("ntuplesList",po::value <std::string> (&inputlist_)->default_value("rootFileList.txt"),"File with list of ntuples")
          ("eventInfo",po::value <std::string> (&eventinfo_)->default_value("MssmHbb/Events/EventInfo"),"EventInfo directory in the tree")
-         ("crossSectionTree",po::value <std::string> (&xsectiontree_)->default_value("MssmHbb/Metadata/CrossSections"),"Tree containing cross sections")
+         ("crossSectionTree",po::value <std::string> (&xsectiontree_)->default_value(""),"Tree containing cross sections")
          ("crossSectionType",po::value <std::string> (&xsectiontype_)->default_value("crossSection"),"Type of cross section")
+         ("crossSection",po::value <float> (&xsection_)->default_value(-1.), "Cross section")  
          ("scale",po::value <float> (&scale_)->default_value(-1.), "Overall scale for histograms")  
          ("luminosity",po::value <float> (&lumi_)->default_value(-1.), "Luminosity in pb-1 to scale histograms")   
          ("collectionsTreePath",po::value <std::string> (&treePath_)->default_value("Events"),"Name of the tree path for the event collections")
@@ -73,8 +74,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("index",po::value <int> (&index_)->default_value(-1),"Some generic index for user")
          ("blind",po::value <bool> (&blind_)->default_value(true),"Flag for blind analysis")
          ("signalRegion",po::value <bool> (&signalregion_)->default_value(true),"Flag for signal region")
-         ("eraLumi", po::value<std::vector<float> >(&eralumi_)->multitoken(),"Lumi of an era")
-         ("era", po::value<std::vector<std::string> >(&era_)->multitoken(),"Era of data taking")
+         ("erasLumi", po::value<std::vector<float> >(&eraslumi_)->multitoken(),"Lumi of an era")
+         ("eras", po::value<std::vector<std::string> >(&eras_)->multitoken(),"Era of data taking")
          ("pileupWeights",po::value <std::string> (&puweight_)->default_value(""),"Root file containing pileup weights")
          ("seed",po::value <int> (&seed_)->default_value(-1), "Seed value for random numbers")
          ("seedFile",po::value <std::string> (&seedfile_)->default_value("no_seed.txt"),"File with seed value for random numbers");
@@ -294,6 +295,7 @@ std::string        Config::ntuplesList()      const { return inputlist_; }
 std::string        Config::eventInfo()        const { return eventinfo_; }
 std::string        Config::crossSectionTree() const { return xsectiontree_; }
 std::string        Config::crossSectionType() const { return xsectiontype_; }
+float              Config::crossSection()     const { return xsection_; }
 float              Config::luminosity()       const { return lumi_; }
 int                Config::nEventsMax()       const { return nevtmax_; }
 bool               Config::isMC()             const { return isMC_; }
@@ -304,8 +306,8 @@ bool               Config::fullWeight()       const { return fullweight_; }
 int                Config::workflow()         const { return workflow_; }
 int                Config::index()            const { return index_; }
 float              Config::scale()            const { return scale_; }
-std::vector<float> Config::eraLumi()          const { return eralumi_; }
-std::vector<std::string> Config::era()        const { return era_; }
+std::vector<float> Config::erasLumi()         const { return eraslumi_; }
+std::vector<std::string> Config::eras()       const { return eras_; }
 std::string        Config::pileupWeights()    const { return puweight_; }
 
 // analysis control
