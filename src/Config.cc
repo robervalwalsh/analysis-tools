@@ -59,12 +59,11 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Info.json"                    , po::value <std::string>               (&json_)            -> default_value("no_json.txt")            ,"JSON file for data")
          ("Info.output"                  , po::value <std::string>               (&outputRoot_)      -> default_value("histograms.root")        ,"Output root file")
          ("Info.seedFile"                , po::value <std::string>               (&seedfile_)        -> default_value("no_seed.txt")            ,"File with seed value for random numbers")
-         ("Info.blindAnalysis"           , po::value <bool>                      (&blind_)           -> default_value(true)                     ,"Flag for blind analysis")
+         ("Info.blindAnalysis"           , po::value <bool>                      (&blind_)           -> default_value(false)                     ,"Flag for blind analysis")
          ("Info.nloMC"                   , po::value <bool>                      (&nlo_)             -> default_value(false)                    ,"Flag for NLO MC samples")
          ("Info.isMC"                    , po::value <bool>                      (&isMC_)            -> default_value(true)                     ,"Flag for MC dataset")
          ("Info.fullWeight"              , po::value <bool>                      (&fullweight_)      -> default_value(false)                    ,"Flag for full weight of MC samples, otherwise only sign")
          ("Info.signalRegion"            , po::value <bool>                      (&signalregion_)    -> default_value(true)                     ,"Flag for signal region")
-         ("Info.workflow"                , po::value <int>                       (&workflow_)        -> default_value(1)                        , "Workflow index defined by user")
          ("Info.eventsMax"               , po::value <int>                       (&nevtmax_)         -> default_value(-1)                       , "Maximum number of events")
          ("Info.seed"                    , po::value <int>                       (&seed_)            -> default_value(-1)                       , "Seed value for random numbers");
                                                                                                                                                 
@@ -158,6 +157,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("User.massMax"                 , po::value <float>                     (&massmax_)         -> default_value(-1.)                      , "Cut on a mass, max value")
          ("User.min"                     , po::value <float>                     (&min_)             -> default_value(-1.)                      , "some minimum value")  
          ("User.max"                     , po::value <float>                     (&max_)             -> default_value(-1.)                      , "some maximum value")
+         ("User.scale"                   , po::value <float>                     (&scale_)           -> default_value(-1.)                      , "Overall scale for histograms")  
+         ("User.workflow"                , po::value <int>                       (&workflow_)        -> default_value(1)                        , "Workflow index defined by user")
          ("User.prescale"                , po::value <int>                       (&prescale_)        -> default_value(1)                        , "Prescale factor")  
          ("User.n"                       , po::value <int>                       (&n_)               -> default_value(-1)                       , "Some integer")
          ("User.index"                   , po::value <int>                       (&index_)           -> default_value(-1)                       , "Some User index for user");
@@ -201,7 +202,6 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("crossSectionTree",po::value <std::string> (&xsectiontree_)->default_value(""),"Tree containing cross sections")
          ("crossSectionType",po::value <std::string> (&xsectiontype_)->default_value("crossSection"),"Type of cross section")
          ("crossSection",po::value <float> (&xsection_)->default_value(-1.), "Cross section")  
-         ("scale",po::value <float> (&scale_)->default_value(-1.), "Overall scale for histograms")  
          ("luminosity",po::value <float> (&lumi_)->default_value(-1.), "Luminosity in pb-1 to scale histograms")   
          ("nLumiSections",po::value <int> (&nlumis_)->default_value(-1), "Number of lumi sections processed")
          ("runMin",po::value <int> (&runmin_)->default_value(-1), "Minimum run number")
