@@ -85,6 +85,10 @@ namespace analysis {
             
             // overall scaling
             float scale_;
+            
+            // 
+            bool isMC_;
+            bool isData_;
          
          private:
             
