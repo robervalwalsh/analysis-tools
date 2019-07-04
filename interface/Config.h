@@ -307,7 +307,7 @@ namespace analysis {
          // ========================
          
          // analysis control
-            std::string treePath_;
+            std::string eventsdir_;
             int nlumis_;
             int runmin_;
             int runmax_;
