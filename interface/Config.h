@@ -72,6 +72,7 @@ namespace analysis {
          // analysis control
             std::string inputlist_;
             std::string eventinfo_;
+            std::string process_;
             std::string xsectiontree_;
             std::string xsectiontype_;
             float xsection_;
@@ -85,6 +86,8 @@ namespace analysis {
             bool fullweight_;
             int workflow_;
             int index_;
+            
+            bool apply_correct_;
             
             int seed_;
             std::string seedfile_;
@@ -132,11 +135,12 @@ namespace analysis {
             std::vector<float> jetsbtagproblight_;
             
             //
-            std::vector<std::string> triggerObjectsJets_;
             bool usejetsflv_;
             bool usejetsextflv_;
             bool dodijet_;
-            bool dodijet_flavour_;
+            bool dodijet_flav_;
+            
+            std::vector<int> dijet_ranks_;
             
             bool bregression_;
 
@@ -154,12 +158,12 @@ namespace analysis {
          // trigger
             std::string triggerCol_;
             std::string triggerObjDir_;
-            std::string triggerObjectsL1Muons_;
-            std::string triggerObjectsL3Muons_;
-            std::string triggerObjectsBJets_;
-            std::string triggerObjectsL1Jets_;
-            std::string triggerObjectsCaloJets_;
-            std::string triggerObjectsPFJets_;
+            std::string trgObjsL1Muons_;
+            std::string trgObjsL3Muons_;
+            std::string trgObjsBJets_;
+            std::string trgObjsL1Jets_;
+            std::string trgObjsCaloJets_;
+            std::string trgObjsPFJets_;
             
          // generator level collections
             std::string genjetsCol_;
@@ -248,8 +252,6 @@ namespace analysis {
             bool bRegression() const;
             std::string nonBtagWP()  const;
             int   nonBtagJet() const;
-            std::vector<std::string> triggerObjectsJets() const;
-            void triggerObjectsJets(const std::string & label, const int & index);
             bool useJetsFlavour() const;
             bool useJetsExtendedFlavour() const;
             bool doDijet() const;
@@ -353,21 +355,7 @@ namespace analysis {
 
             std::string hltPath_;
             std::string l1Seed_;
-            std::vector<std::string> triggerObjects_;
-            std::vector<int> triggerObjectsMatches_;
-            std::vector<int> triggerObjectsMatchesRank_;
             
-            
-            
-            
-            int triggerObjectsJetsMatches_;
-            int triggerObjectsBJetsMatches_;
-            int triggerObjectsL1JetsMatches_;
-            std::vector<std::string> triggerObjectsMuons_;
-            int triggerObjectsMuonsMatches_;
-            int triggerObjectsL1MuonsMatches_;
-            int triggerObjectsL3MuonsMatches_;
-
          protected:
             int argc_;
             char ** argv_;
