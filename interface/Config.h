@@ -64,9 +64,9 @@ namespace analysis {
             void loadOptions();
            
             // configuration variables - some basic ones out in the private section and make set/get methods
-            std::string cfg_;
          
          // gets (to replace the public variables)
+            std::string configFile() const;
          // analysis control
             std::string ntuplesList() const;
             std::string eventInfo() const;
@@ -228,6 +228,8 @@ namespace analysis {
                
             int argc_;
             char ** argv_;
+            
+            std::string cfg_; // config file
          
             po::options_description opt_cmd_;
             po::options_description opt_cfg_;

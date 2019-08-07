@@ -317,6 +317,9 @@ void Config::loadOptions()
    
 }
 
+//
+std::string        Config::configFile()       const { return cfg_; }
+
 // analysis info
 std::string        Config::ntuplesList()      const { return inputlist_; }
 std::string        Config::eventInfo()        const { return eventinfo_; }
