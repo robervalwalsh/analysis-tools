@@ -112,6 +112,7 @@ namespace analysis {
             std::string jetsCol_; 
             int njetsmin_;
             int njetsmax_;
+            int njets_;
             std::vector<float> jetsptmin_;
             std::vector<float> jetsptmax_;
             std::vector<float> jetsetamax_;
@@ -234,6 +235,7 @@ namespace analysis {
             std::string jetsCollection() const;
             int nJetsMin() const;
             int nJetsMax() const;
+            int nJets() const;
             std::vector<float> jetsPtMin() const;
             std::vector<float> jetsPtMax() const;
             std::vector<float> jetsEtaMax() const;

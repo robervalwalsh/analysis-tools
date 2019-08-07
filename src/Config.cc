@@ -86,6 +86,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Jets.puId"                    , po::value <std::string>               (&jetspuid_)        -> default_value("loose")                  , "Jets pileup id criteria for all jets")
          ("Jets.flavours"                , po::value <bool>                      (&usejetsflv_)      -> default_value(false)                    , "For splitting results accoding to jet flavour")
          ("Jets.extendedFlavours"        , po::value <bool>                      (&usejetsextflv_)   -> default_value(false)                    , "For splitting results accoding to jet extended flavour")
+         ("Jets.n"                       , po::value <int>                       (&njets_)           -> default_value(-1)                        , "Minimum number of jets")
          ("Jets.nMin"                    , po::value <int>                       (&njetsmin_)        -> default_value(0)                        , "Minimum number of jets")
          ("Jets.nMax"                    , po::value <int>                       (&njetsmax_)        -> default_value(-1)                       , "Maximum number of jets");
                                                                                                                                                 
@@ -258,6 +259,12 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          
          usejetsflv_ = ( usejetsflv_ || usejetsextflv_   );  // if extended is enabled, flavour must be enabled
          dodijet_    = ( dodijet_    || dodijet_flav_ );  // if flavour is enabled dijet must be enabled
+         
+         if ( njets_ > 0 )
+         {
+            njetsmin_ = njets_;
+            njetsmax_ = njets_;
+         }
       }
       catch(po::error& e)
       { 
@@ -337,6 +344,7 @@ bool               Config::override()          const { return override_; }
 std::string        Config::jetsCollection()     const { return jetsCol_; }
 int                Config::nJetsMin()           const { return njetsmin_; }
 int                Config::nJetsMax()           const { return njetsmax_; }
+int                Config::nJets()              const { return njets_; }
 std::vector<float> Config::jetsPtMin()          const { return jetsptmin_; }
 std::vector<float> Config::jetsPtMax()          const { return jetsptmax_; }
 std::vector<float> Config::jetsEtaMax()         const { return jetsetamax_; }
