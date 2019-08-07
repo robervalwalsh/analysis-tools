@@ -260,7 +260,10 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          usejetsflv_ = ( usejetsflv_ || usejetsextflv_   );  // if extended is enabled, flavour must be enabled
          dodijet_    = ( dodijet_    || dodijet_flav_ );  // if flavour is enabled dijet must be enabled
          
-         if ( njets_ > 0 )
+         if ( njetsmax_ < njetsmin_ ) njetsmax_ = -1;
+         if ( njetsmin_ < 0 && njetsmax_ > 0 ) njetsmin_ = 0;
+         
+         if ( njets_ >= 0 )
          {
             njetsmin_ = njets_;
             njetsmax_ = njets_;
