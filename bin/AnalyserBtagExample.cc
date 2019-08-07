@@ -54,6 +54,7 @@ int main(int argc, char ** argv)
       if ( ! analyser.selectionJet(1)          )   continue;
       if ( ! analyser.selectionJet(2)          )   continue;
       // delta R jet selection
+      if ( ! analyser.selectionJetDphi(1,2)    )   continue;
       if ( ! analyser.selectionJetDr(1,2)      )   continue;
 // HISTOGRAMS
       analyser.fillJetHistograms("jets");
