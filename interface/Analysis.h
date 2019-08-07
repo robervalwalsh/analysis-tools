@@ -342,6 +342,7 @@ namespace analysis {
       template <class Object1, class Object2>
       void Analysis::match(const std::string & collection, const std::string & match_collection, const float & deltaR)
       {
+         if ( match_collection == "" ) return;
          auto o1 = boost::any_cast< std::shared_ptr< Collection<Object1> > > (c_any_[collection]);
          auto o2 = boost::any_cast< std::shared_ptr< Collection<Object2> > > (c_any_[match_collection]);
          o1->matchTo(o2->vectorCandidates(),o2->name(), deltaR);
