@@ -590,12 +590,35 @@ bool JetAnalyser::selectionJetPileupId()
 
 bool JetAnalyser::selectionNJets()
 {
+   if ( config_->nJetsMin() < 0 ) return true;
+   
    ++cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("NJets >= %d",config_->nJetsMin()));
    
+   bool first = ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" );
    
-   if  ((int)selectedJets_.size() < config_->nJetsMin()) return false;
+   if ( config_->nJetsMax() <= 0 )
+   {
+      if ( first )  h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("NJets >= %d",config_->nJetsMin()));
+      if ((int)selectedJets_.size() < config_->nJetsMin()) return false;
+   }
+   else if ( config_->nJets() >= 0 )
+   {
+      if ( first )  h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("NJets = %d",config_->nJets()));
+      if ((int)selectedJets_.size() != config_->nJets()) return false;
+   }
+   else
+   {
+      if ( config_->nJetsMin() == 0 )
+      {
+         if ( first )  h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("NJets <= %d",config_->nJetsMax()));
+         if ((int)selectedJets_.size() > config_->nJetsMax()) return false;
+      }
+      else
+      {
+         if ( first )  h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("%d <= NJets <= %d",config_->nJetsMin(),config_->nJetsMax()));
+         if  ((int)selectedJets_.size() < config_->nJetsMin() || (int)selectedJets_.size() > config_->nJetsMax()) return false;
+      }
+   }
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
@@ -606,6 +629,8 @@ bool JetAnalyser::selectionNJets()
 
 bool JetAnalyser::selectionBJet(const int & r )
 {
+   if ( config_->nJetsMin() < config_->nbjetsmin_ ) return true;
+   
    if ( ! config_->signalRegion() && r == config_->nonBtagJet() ) return this->selectionNonBJet(r);
       
    int j = r-1;
@@ -662,6 +687,7 @@ bool JetAnalyser::onlineJetMatching(const int & r)
 {
    int j = r-1;
    if ( config_->triggerObjectsL1Jets() == "" && config_->triggerObjectsCaloJets() == "" && config_->triggerObjectsPFJets() == "") return true;
+   if ( config_->nJetsMin() < 0 ) return true;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
