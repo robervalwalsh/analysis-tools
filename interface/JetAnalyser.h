@@ -95,7 +95,8 @@ namespace analysis {
             virtual bool selectionNonBJet(const int &);
             virtual bool onlineJetMatching(const int &);
             virtual bool onlineBJetMatching(const int &);
-            virtual void jetHistograms(const int & n = 1, const std::string & label = "x");
+            virtual void jetHistograms(const int & n, const std::string & label = "x");
+            virtual void jetHistograms(const std::string & label = "x");
             virtual void fillJetHistograms(const std::string & label = "x");
             virtual void actionApplyJER();
             virtual void actionApplyBtagSF(const int &);

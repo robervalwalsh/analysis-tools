@@ -90,6 +90,16 @@ bool JetAnalyser::analysisWithJets()
    selectedJets_.clear();
    if ( ! jetsanalysis_ ) return false;
    
+   ++cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet collection: %s",(config_->jetsCollection()).c_str()));
+   }
+        
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   
+   
    analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsL1Jets(),0.3);
    analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsCaloJets(),0.3);
    analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsPFJets(),0.3);
@@ -123,6 +133,10 @@ void JetAnalyser::jets(const std::string & col)
    analysis_->addTree<Jet> ("Jets",col);
 }
 
+void JetAnalyser::jetHistograms( const std::string & label )
+{
+   this -> jetHistograms(config_->nJetsMin(), label);
+}
 void JetAnalyser::jetHistograms( const int & n, const std::string & label )
 {
    this->output()->cd();
