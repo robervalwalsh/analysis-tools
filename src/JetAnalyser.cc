@@ -976,7 +976,7 @@ ScaleFactors JetAnalyser::btagSF(const int & r, const std::string & wp)
 
 void JetAnalyser::actionApplyJER()
 {
-   
+   if ( ! jetsanalysis_ ) return;
    ++cutflow_;
    if ( applyjer_ )
    {
@@ -995,7 +995,7 @@ void JetAnalyser::actionApplyJER()
    {
       if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       {
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"JER smearing (*** missing ***)");
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"WARNING: NO JER smearing (*** missing JER Info and/or GenJet collection ***)");
       }
    }
    
