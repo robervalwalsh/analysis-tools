@@ -93,7 +93,7 @@ bool JetAnalyser::analysisWithJets()
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
    {
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet collection: %s",(config_->jetsCollection()).c_str()));
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Open Jet collection: %s",(config_->jetsCollection()).c_str()));
    }
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
@@ -115,6 +115,12 @@ bool JetAnalyser::analysisWithJets()
    
    if ( genjetsanalysis_ )
    {
+      ++cutflow_;
+      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+      {
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Open GenJet collection: %s",(config_->genJetsCollection()).c_str()));
+      }
+      h1_["cutflow"] -> Fill(cutflow_,weight_);
       auto genjets = analysis_->collection<GenJet>("GenJets");
       jets->addGenJets(genjets);
    }
