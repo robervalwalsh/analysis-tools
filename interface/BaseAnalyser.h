@@ -56,6 +56,7 @@ namespace analysis {
          
             // ----------member data ---------------------------
          protected:
+            void actionApplyPileupWeight(const int & var = 0);
             // main objects
             std::shared_ptr<Analysis> analysis_;
             std::shared_ptr<Config>   config_;
@@ -144,7 +145,6 @@ namespace analysis {
             std::shared_ptr<PileupWeight> pileupWeights() const;
             float pileupWeight(const float & truepu, const int & var) const;
             float trueInteractions() const;
-            void actionApplyPileupWeight(const int & var = 0);
             
             void pileupHistogram();
             void fillPileupHistogram();
