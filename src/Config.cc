@@ -81,7 +81,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Jets.ptMin"                   , po::value <std::vector<float> >       (&jetsptmin_)       -> multitoken()                            , "Mimium pt of the jets")
          ("Jets.ptMax"                   , po::value <std::vector<float> >       (&jetsptmax_)       -> multitoken()                            , "Maximum pt of the jets")
          ("Jets.etaMax"                  , po::value <std::vector<float> >       (&jetsetamax_)      -> multitoken()                            , "Maximum |eta| of the jets")
-         ("Jets.jets"                    , po::value <std::string>               (&jetsCol_)         -> default_value("updatedPatJets")         , "Name of the jets collection")
+         ("Jets.jets"                    , po::value <std::string>               (&jetsCol_)         -> default_value("")                       , "Name of the jets collection")
          ("Jets.id"                      , po::value <std::string>               (&jetsid_)          -> default_value("tight")                  , "Jets id criteria for all jets")
          ("Jets.puId"                    , po::value <std::string>               (&jetspuid_)        -> default_value("loose")                  , "Jets pileup id criteria for all jets")
          ("Jets.flavours"                , po::value <bool>                      (&usejetsflv_)      -> default_value(false)                    , "For splitting results accoding to jet flavour")
@@ -256,8 +256,10 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          eventinfo_     =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , eventinfo_.c_str()      );
          triggerCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , triggerCol_.c_str()     );
          triggerObjDir_ =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , triggerObjDir_.c_str()  );
-         jetsCol_       =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , jetsCol_.c_str()        );
-         muonsCol_      =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , muonsCol_.c_str()       );
+         if ( jetsCol_ != "" )
+            jetsCol_       =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , jetsCol_.c_str()        );
+         if ( muonsCol_ != "" )
+            muonsCol_      =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , muonsCol_.c_str()       );
          if ( genpartsCol_ != "" )
             genpartsCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , genpartsCol_.c_str()    );
          if ( genjetsCol_ != "" )
