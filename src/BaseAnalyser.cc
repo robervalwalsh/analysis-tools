@@ -39,6 +39,8 @@ BaseAnalyser::BaseAnalyser()
 
 BaseAnalyser::BaseAnalyser(int argc, char * argv[])
 {
+   TH1::SetDefaultSumw2();
+   
    exe_ = std::string(argv[0]);
    
    // some inits
@@ -85,7 +87,7 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    // output file
    if ( config_->outputRoot_ != "" )
    {
-      hout_= std::make_shared<TFile>(config_->outputRoot_.c_str(),"recreate");
+      hout_= std::make_shared<TFile>(config_->outputRoot_.c_str(),"recreate",Form("%s %s %s",argv[0],argv[1],argv[2]));
       hout_ -> cd();
    }
    
