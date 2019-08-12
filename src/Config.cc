@@ -142,8 +142,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
                                                                                                                                                 
       // generator level                                                                                                                        
       opt_cfg_.add_options()                                                                                                                    
-         ("Generator.genParticles"       , po::value <std::string>               (&genpartsCol_)     -> default_value("prunedGenParticles")     , "Name of the gen particle collection")
-         ("Generator.genJets"            , po::value <std::string>               (&genjetsCol_)      -> default_value("slimmedGenJets")         , "Name of the gen jets collection");
+         ("Generator.genParticles"       , po::value <std::string>               (&genpartsCol_)     -> default_value("")                       , "Name of the gen particle collection")
+         ("Generator.genJets"            , po::value <std::string>               (&genjetsCol_)      -> default_value("")                       , "Name of the gen jets collection");
                                                                                                                                                 
                                                                                                                                                 
       // general                                                                                                                                
@@ -252,8 +252,10 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          triggerObjDir_ =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , triggerObjDir_.c_str()  );
          jetsCol_       =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , jetsCol_.c_str()        );
          muonsCol_      =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , muonsCol_.c_str()       );
-         genpartsCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , genpartsCol_.c_str()    );
-         genjetsCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , genjetsCol_.c_str()     );
+         if ( genpartsCol_ != "" )
+            genpartsCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , genpartsCol_.c_str()    );
+         if ( genjetsCol_ != "" )
+            genjetsCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , genjetsCol_.c_str()     );
          l1tjetsCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , l1tjetsCol_.c_str()     );
          l1tmuonsCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , l1tmuonsCol_.c_str()    );
          
