@@ -412,22 +412,22 @@ bool JetAnalyser::selectionJetDeta(const int & j1, const int & j2, const float &
 bool JetAnalyser::selectionJetDeta(const int & j1, const int & j2)
 {
    bool ok = true;
-   if (config_->detamax_ < 0 )
+   if (config_->jetsdetamax_ < 0 )
    {
       ok = ok && true;
    }
    else
    {
-      ok = ok && selectionJetDeta(j1,j2,config_->detamax_);
+      ok = ok && selectionJetDeta(j1,j2,config_->jetsdetamax_);
    }
    
-   if (config_->detamin_ < 0 )
+   if (config_->jetsdetamin_ < 0 )
    {
       ok = ok && true;
    }
    else
    {
-      ok = ok && selectionJetDeta(j1,j2,-1*config_->detamin_);
+      ok = ok && selectionJetDeta(j1,j2,-1*config_->jetsdetamin_);
    }
    return ok;
    
@@ -466,22 +466,22 @@ bool JetAnalyser::selectionJetDphi(const int & j1, const int & j2, const float &
 bool JetAnalyser::selectionJetDphi(const int & j1, const int & j2)
 {
    bool ok = true;
-   if (config_->dphimax_ < 0 )
+   if (config_->jetsdphimax_ < 0 )
    {
       ok = ok && true;
    }
    else
    {
-      ok = ok && selectionJetDphi(j1,j2,config_->dphimax_);
+      ok = ok && selectionJetDphi(j1,j2,config_->jetsdphimax_);
    }
    
-   if (config_->dphimin_ < 0 )
+   if (config_->jetsdphimin_ < 0 )
    {
       ok = ok && true;
    }
    else
    {
-      ok = ok && selectionJetDphi(j1,j2,-1*config_->dphimin_);
+      ok = ok && selectionJetDphi(j1,j2,-1*config_->jetsdphimin_);
    }
    return ok;
    
@@ -525,22 +525,22 @@ bool JetAnalyser::selectionJetDr(const int & j1, const int & j2, const float & d
 bool JetAnalyser::selectionJetDr(const int & j1, const int & j2)
 {
    bool ok = true;
-   if (config_->drmax_ < 0 )
+   if (config_->jetsdrmax_ < 0 )
    {
       ok = ok && true;
    }
    else
    {
-      ok = ok && selectionJetDr(j1,j2,config_->drmax_);
+      ok = ok && selectionJetDr(j1,j2,config_->jetsdrmax_);
    }
    
-   if (config_->drmin_ < 0 )
+   if (config_->jetsdrmin_ < 0 )
    {
       ok = ok && true;
    }
    else
    {
-      ok = ok && selectionJetDr(j1,j2,-1*config_->drmin_);
+      ok = ok && selectionJetDr(j1,j2,-1*config_->jetsdrmin_);
    }
    return ok;
 }
