@@ -201,6 +201,13 @@ namespace analysis {
             std::vector<float> ptmax_;
             std::vector<float> etamax_;
 
+            float jetsdrmin_;
+            float jetsdrmax_;
+            float jetsdetamax_;
+            float jetsdetamin_;
+            float jetsdphimin_;
+            float jetsdphimax_;
+            
 
             float drmin_;
             float drmax_;
@@ -283,6 +290,7 @@ namespace analysis {
             std::vector<float> jetsetamax_;
             std::string jetsid_;
             std::string jetspuid_;
+            
             // JER resolution and scale factors from txt file
             std::string jerptres_;
             std::string jersf_;

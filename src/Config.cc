@@ -53,7 +53,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
       // analysis info
       opt_cfg_.add_options()
          ("Info.ntuplesList"             , po::value <std::string>               (&inputlist_)       -> default_value("rootFileList.txt")       ,"File with list of ntuples")
-         ("Info.process"                 , po::value <std::string>               (&process_)         -> default_value("MssmHbb")                ,"File with list of ntuples")
+         ("Info.process"                 , po::value <std::string>               (&process_)         -> default_value("MssmHbb")                ,"Process of ntuples")
          ("Info.events"                  , po::value <std::string>               (&eventsdir_)       -> default_value("Events")                 ,"Name of the events directory")
          ("Info.eventInfo"               , po::value <std::string>               (&eventinfo_)       -> default_value("EventInfo")              ,"EventInfo directory in the tree")
          ("Info.json"                    , po::value <std::string>               (&json_)            -> default_value("no_json.txt")            ,"JSON file for data")
@@ -88,7 +88,13 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Jets.extendedFlavours"        , po::value <bool>                      (&usejetsextflv_)   -> default_value(false)                    , "For splitting results accoding to jet extended flavour")
          ("Jets.n"                       , po::value <int>                       (&njets_)           -> default_value(-1)                       , "Minimum number of jets")
          ("Jets.nMin"                    , po::value <int>                       (&njetsmin_)        -> default_value(0)                        , "Minimum number of jets")
-         ("Jets.nMax"                    , po::value <int>                       (&njetsmax_)        -> default_value(-1)                       , "Maximum number of jets");
+         ("Jets.nMax"                    , po::value <int>                       (&njetsmax_)        -> default_value(-1)                       , "Maximum number of jets")
+         ("Jets.dRMin"                   , po::value <float>                     (&jetsdrmin_)       -> default_value(-1.)                      , "Minimum delta R between jets")
+         ("Jets.dRMax"                   , po::value <float>                     (&jetsdrmax_)       -> default_value(-1.)                      , "Maximum delta R between jets")
+         ("Jets.dEtaMax"                 , po::value <float>                     (&jetsdetamax_)     -> default_value(-1.)                      , "Maximum delta eta between jets")
+         ("Jets.dEtaMin"                 , po::value <float>                     (&jetsdetamin_)     -> default_value(-1.)                      , "Minimum delta eta between jets")
+         ("Jets.dPhiMin"                 , po::value <float>                     (&jetsdphimin_)     -> default_value(-1.)                      , "Minimum delta phi between jets")
+         ("Jets.dPhiMax"                 , po::value <float>                     (&jetsdphimax_)     -> default_value(-1.)                      , "Maximum delta phi between jets");
                                                                                                                                                 
       // dijets                                                                                                                                 
       opt_cfg_.add_options()                                                                                                                    
