@@ -326,7 +326,7 @@ void BaseAnalyser::actionApplyPileupWeight(const int & var)
       {
          basename = "*** missing *** assuming puweight = 1";
       }
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("*** Apply pileup weight (%s)",basename.c_str()));
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Pileup weight (%s)",basename.c_str()));
    }
    
    if ( puweights_ )

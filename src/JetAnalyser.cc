@@ -983,7 +983,7 @@ void JetAnalyser::actionApplyJER()
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"*** Apply JER smearing");
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"JER smearing");
    
    
    for ( auto & j : selectedJets_ )
@@ -1023,7 +1023,7 @@ void JetAnalyser::actionApplyBjetRegression()
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"*** Apply b jet energy regression");
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"b jet energy regression");
    
    for ( auto & j : selectedJets_ )
    {
