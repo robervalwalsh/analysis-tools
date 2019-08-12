@@ -311,7 +311,17 @@ void BaseAnalyser::actionApplyPileupWeight(const int & var)
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"*** Apply pileup weight");
+   {
+      std::string name = config_->pileupWeights();
+      std::string basename;
+      std::vector<std::string> paths;
+      if ( name != "" )
+      {
+         boost::split(paths, name, boost::is_any_of("/"));
+         basename = paths.back();
+      }
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("*** Apply pileup weight (%s)",basename.c_str()));
+   }
    
    weight_ *= this->pileupWeight(analysis_->nTruePileup(),var);
    
