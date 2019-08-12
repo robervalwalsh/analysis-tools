@@ -631,29 +631,23 @@ bool JetAnalyser::selectionNJets()
 
 bool JetAnalyser::selectionBJet(const int & r )
 {
-   if ( config_->nJetsMin() < config_->nbjetsmin_ ) return true;
+   if ( config_->nJetsMin() < config_->nbjetsmin_ || config_->nbjetsmin_ < 1 || r > config_->nbjetsmin_ ||  (int)(config_->jetsBtagWP()).size() < config_->nbjetsmin_ ) return true;
    
    if ( ! config_->signalRegion() && r == config_->nonBtagJet() ) return this->selectionNonBJet(r);
       
    int j = r-1;
+   
    if ( config_->btagWP(config_->jetsBtagWP()[j]) < 0 ) return true; // there is no selection here, so will not update the cutflow
    
    ++ cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: %s btag > %6.4f (%s)",r,config_->btagalgo_.c_str(),config_->btagWP(config_->jetsBtagWP()[j]),config_->jetsBtagWP()[j].c_str()));
    
-   if ( r > config_->nbjetsmin_ ) 
-   {
-      std::cout << "* warning * -  JetAnalyser::selectionBJet(): given jet rank > nbjetsmin. Returning false! " << std::endl;
-      return false;
-   }
-   
-   // jet  btag
-//   if ( btag(*selectedJets_[j],config_->btagalgo_) < config_->jetsbtagmin_[j] ) return false;
-   
    if ( btag(*selectedJets_[j],config_->btagalgo_) < config_->btagWP(config_->jetsBtagWP()[j]) ) return false;
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   this -> actionApplyBtagSF(r);
    
    return true;
 }
