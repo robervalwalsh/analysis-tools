@@ -73,6 +73,16 @@ bool Analyser::event(const int & i)
    
    if ( ! ok ) return false;
    
+   if ( this->genParticlesAnalysis() )
+   {
+      ++cutflow_;
+      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+      {
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Open GenParticles collection: %s",(config_->genParticlesCollection()).c_str()));
+      }
+      h1_["cutflow"] -> Fill(cutflow_,weight_);
+   }
+   
    analysisWithJets();
    analysisWithMuons();
       
