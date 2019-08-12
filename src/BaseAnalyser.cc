@@ -77,8 +77,10 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
       // gen part analysis
       genpartsanalysis_  = ( analysis_->addTree<GenParticle> ("GenParticles",config_->genParticlesCollection()) != nullptr );
       // cutflow init for MC
-      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(2)) == "" ) 
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(2,"Generated weighted events");
+      std::string genweight_type = "sign of weights";
+      if ( config_->fullGenWeight() ) genweight_type = "full weights";
+      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(2)) == "" )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(2,Form("Generated weighted events (%s)",genweight_type.c_str()));
       
    }
    

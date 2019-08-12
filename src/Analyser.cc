@@ -93,7 +93,7 @@ void Analyser::generatorWeight()
    
    ++cutflow_;
    float weight = analysis_->genWeight();
-   if ( config_->fullWeight() )
+   if ( config_->fullGenWeight() )
    {
       weight_ *= weight;
    }
