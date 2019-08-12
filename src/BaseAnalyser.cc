@@ -306,24 +306,33 @@ float BaseAnalyser::trueInteractions() const
 
 void BaseAnalyser::actionApplyPileupWeight(const int & var)
 {
-   if ( ! puweights_ ) return;
    if ( ! config_->isMC() ) return;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
    {
-      std::string name = config_->pileupWeights();
       std::string basename;
-      std::vector<std::string> paths;
-      if ( name != "" )
+      if ( puweights_ )
       {
-         boost::split(paths, name, boost::is_any_of("/"));
-         basename = paths.back();
+         std::string name = config_->pileupWeights();
+         std::vector<std::string> paths;
+         if ( name != "" )
+         {
+            boost::split(paths, name, boost::is_any_of("/"));
+            basename = paths.back();
+         }
+      }
+      else
+      {
+         basename = "*** missing *** assuming puweight = 1";
       }
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("*** Apply pileup weight (%s)",basename.c_str()));
    }
    
-   weight_ *= this->pileupWeight(analysis_->nTruePileup(),var);
+   if ( puweights_ )
+      weight_ *= this->pileupWeight(analysis_->nTruePileup(),var);
+   else
+      weight_ *= 1;
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
 }
