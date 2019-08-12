@@ -150,6 +150,8 @@ namespace analysis {
             void fillPileupHistogram();
             
             void scale(const float &);
+            
+            std::string basename(const std::string &);
 
 
       };

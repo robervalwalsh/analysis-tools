@@ -311,22 +311,16 @@ void BaseAnalyser::actionApplyPileupWeight(const int & var)
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
    {
-      std::string basename;
+      std::string bn;
       if ( puweights_ )
       {
-         std::string name = config_->pileupWeights();
-         std::vector<std::string> paths;
-         if ( name != "" )
-         {
-            boost::split(paths, name, boost::is_any_of("/"));
-            basename = paths.back();
-         }
+         bn = basename(config_->pileupWeights());
       }
       else
       {
-         basename = "*** missing *** assuming puweight = 1";
+         bn = "*** missing *** assuming puweight = 1";
       }
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Pileup weight (%s)",basename.c_str()));
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Pileup weight (%s)",bn.c_str()));
    }
    
    if ( puweights_ )
@@ -378,3 +372,18 @@ void BaseAnalyser::scale(const float & scale)
 {
    scale_ = scale;
 }
+
+std::string BaseAnalyser::basename(const std::string & name)
+{
+   std::string bn = "";
+   std::vector<std::string> paths;
+   if ( name != "" )
+   {
+      boost::split(paths, name, boost::is_any_of("/"));
+      bn = paths.back();
+   }
+   return bn;
+
+   
+}
+
