@@ -27,10 +27,13 @@ int main(int argc, char ** argv)
       if ( ! analyser.selectionJetId()          )   continue;  // selection  : jet identification 
       if ( ! analyser.selectionJetPileupId()    )   continue;  // selection  : jet Pileup identification 
       if ( ! analyser.selectionNJets()          )   continue;  // selection  : number of jets 
+      
+      // the lines below will only be executed if rank <= nJetsMin
       if ( ! analyser.selectionJet(1)           )   continue;  // selection  : jet1 pt and eta 
       if ( ! analyser.selectionJet(2)           )   continue;  // selection  : jet2 pt and eta 
       if ( ! analyser.selectionJetDphi(1,2)     )   continue;  // selection  : delta_phi_jets (1,2) [or  MIN(neg): analyser.selectionJetDphi(1,2,-2.0) / MAX(pos): analyser.selectionJetDphi(1,2,+2.0)]
-// HISTOGRAMS
+      
+   // HISTOGRAMS
       analyser.fillJetHistograms("selection01");               // histograms : jets fill
       
    }  //end event loop
