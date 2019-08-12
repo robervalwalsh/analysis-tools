@@ -86,7 +86,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Jets.puId"                    , po::value <std::string>               (&jetspuid_)        -> default_value("loose")                  , "Jets pileup id criteria for all jets")
          ("Jets.flavours"                , po::value <bool>                      (&usejetsflv_)      -> default_value(false)                    , "For splitting results accoding to jet flavour")
          ("Jets.extendedFlavours"        , po::value <bool>                      (&usejetsextflv_)   -> default_value(false)                    , "For splitting results accoding to jet extended flavour")
-         ("Jets.n"                       , po::value <int>                       (&njets_)           -> default_value(-1)                        , "Minimum number of jets")
+         ("Jets.n"                       , po::value <int>                       (&njets_)           -> default_value(-1)                       , "Minimum number of jets")
          ("Jets.nMin"                    , po::value <int>                       (&njetsmin_)        -> default_value(0)                        , "Minimum number of jets")
          ("Jets.nMax"                    , po::value <int>                       (&njetsmax_)        -> default_value(-1)                       , "Maximum number of jets");
                                                                                                                                                 
