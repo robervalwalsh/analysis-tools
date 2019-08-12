@@ -56,7 +56,7 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
    if ( config_->jerPtRes() != "" && config_->jerSF() != "" && genjetsanalysis_ ) // FIXME: check if files exist
    {
       jerinfo_ = analysis_->jetResolutionInfo(config_->jerPtRes(),config_->jerSF());
-      applyjer_ = ( jerinfo_ != nullptr );
+      applyjer_ = ( jerinfo_ != nullptr && jetsanalysis_ );
    }
    
    if ( config_->isMC() )
@@ -95,7 +95,6 @@ bool JetAnalyser::analysisWithJets()
    {
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet collection: %s",(config_->jetsCollection()).c_str()));
    }
-        
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    
@@ -979,16 +978,27 @@ ScaleFactors JetAnalyser::btagSF(const int & r, const std::string & wp)
 
 void JetAnalyser::actionApplyJER()
 {
-   if ( ! applyjer_ )  return;  // will not apply btag SF
    
    ++cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"JER smearing");
-   
-   
-   for ( auto & j : selectedJets_ )
+   if ( applyjer_ )
    {
-      j -> applyJER(*jerinfo_,0.2);
+      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      {
+         std::string bnpt = basename(config_->jerPtRes());
+         std::string bnsf = basename(config_->jerSF());
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JER smearing (%s,%s)",bnpt.c_str(),bnsf.c_str()));
+      }
+      for ( auto & j : selectedJets_ )
+      {
+         j -> applyJER(*jerinfo_,0.2);
+      }
+   }
+   else
+   {
+      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      {
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"JER smearing (*** missing ***)");
+      }
    }
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
