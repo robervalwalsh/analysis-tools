@@ -60,11 +60,8 @@ bool Analyser::event(const int & i)
    weight_ = 1.;  // reset weight at the beginning of the event analysis
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
-   if ( config_->isMC() )
-   {
-      this -> generatorWeight();
-      this -> actionApplyPileupWeight();
-   }
+   this -> generatorWeight();
+   this -> actionApplyPileupWeight();
    
    if ( config_->runmin_ > 0 && analysis_->run() < config_->runmin_ ) return false;
    if ( config_->runmax_ > 0 && analysis_->run() > config_->runmax_ ) return false;
@@ -96,14 +93,14 @@ void Analyser::generatorWeight()
    
    ++cutflow_;
    float weight = analysis_->genWeight();
-   if ( ! config_->fullWeight() )
+   if ( config_->fullWeight() )
    {
-      float sign =  (weight > 0) ? 1 : ((weight < 0) ? -1 : 0);
-      weight_ *= sign;
+      weight_ *= weight;
    }
    else
    {
-      weight_ *= weight;
+      float sign =  (weight > 0) ? 1 : ((weight < 0) ? -1 : 0);
+      weight_ *= sign;
    }
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
