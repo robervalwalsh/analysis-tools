@@ -41,9 +41,6 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
    // Jets
    jetsanalysis_  = ( analysis_->addTree<Jet> ("Jets",config_->jetsCollection()) != nullptr );
    
-   genjetsanalysis_ = false; // should I move to BaseAnalyser???
-   if ( config_->isMC() )  genjetsanalysis_  = ( analysis_->addTree<GenJet> ("GenJets",config_->genJetsCollection()) != nullptr );
-   
    applyjer_ = false;
    
    if ( config_->btagsf_ != "" )
@@ -53,7 +50,7 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
       bsf_reader_["tight"]  = analysis_->btagCalibration(config_->btagalgo_, config_->btagsf_, "tight");
    }
    
-   if ( config_->jerPtRes() != "" && config_->jerSF() != "" && genjetsanalysis_ ) // FIXME: check if files exist
+   if ( config_->jerPtRes() != "" && config_->jerSF() != "" && this->genJetsAnalysis() ) // FIXME: check if files exist
    {
       jerinfo_ = analysis_->jetResolutionInfo(config_->jerPtRes(),config_->jerSF());
       applyjer_ = ( jerinfo_ != nullptr && jetsanalysis_ );
@@ -113,14 +110,8 @@ bool JetAnalyser::analysisWithJets()
       jets->associatePartons(particles,0.4,1.,config_->pythia8());
    }
    
-   if ( genjetsanalysis_ )
+   if ( this->genJetsAnalysis() )
    {
-      ++cutflow_;
-      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
-      {
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Open GenJet collection: %s",(config_->genJetsCollection()).c_str()));
-      }
-      h1_["cutflow"] -> Fill(cutflow_,weight_);
       auto genjets = analysis_->collection<GenJet>("GenJets");
       jets->addGenJets(genjets);
    }

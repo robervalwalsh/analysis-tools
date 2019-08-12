@@ -48,7 +48,8 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    weight_   = 1.;
    xsection_ = -1.;
    genpartsanalysis_ = false;
-   
+   genjetsanalysis_  = false;
+    
    // the heavy stuff
    config_   = std::make_shared<Config>(argc,argv);
    analysis_ = std::make_shared<Analysis>(config_->ntuplesList(),config_->eventInfo());
@@ -76,6 +77,8 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
          puweights_ = analysis_->pileupWeights(config_->pileupWeights());
       // gen part analysis
       genpartsanalysis_  = ( analysis_->addTree<GenParticle> ("GenParticles",config_->genParticlesCollection()) != nullptr );
+      // gen jets analysis
+      genjetsanalysis_  = ( analysis_->addTree<GenJet> ("GenJets",config_->genJetsCollection()) != nullptr );
       // cutflow init for MC
       std::string genweight_type = "sign of weights";
       if ( config_->fullGenWeight() ) genweight_type = "full weights";
@@ -284,6 +287,11 @@ std::shared_ptr<TFile> BaseAnalyser::output()
 bool  BaseAnalyser::genParticlesAnalysis() const
 {
    return genpartsanalysis_;
+}
+
+bool  BaseAnalyser::genJetsAnalysis() const
+{
+   return genjetsanalysis_;
 }
 
 float BaseAnalyser::crossSection() const

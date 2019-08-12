@@ -79,6 +79,7 @@ namespace analysis {
             std::map<std::string, std::shared_ptr<TH2F> > h2_;
             
             bool genpartsanalysis_; 
+            bool genjetsanalysis_;
             
             // pileup weight
             std::shared_ptr<PileupWeight> puweights_;
@@ -140,6 +141,7 @@ namespace analysis {
             
             // genparticle collection
             bool genParticlesAnalysis() const;
+            bool genJetsAnalysis() const;
             
             // pileup
             std::shared_ptr<PileupWeight> pileupWeights() const;
