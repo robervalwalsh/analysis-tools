@@ -59,10 +59,10 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Info.json"                    , po::value <std::string>               (&json_)            -> default_value("no_json.txt")            ,"JSON file for data")
          ("Info.output"                  , po::value <std::string>               (&outputRoot_)      -> default_value("histograms.root")        ,"Output root file")
          ("Info.seedFile"                , po::value <std::string>               (&seedfile_)        -> default_value("no_seed.txt")            ,"File with seed value for random numbers")
-         ("Info.blindAnalysis"           , po::value <bool>                      (&blind_)           -> default_value(false)                     ,"Flag for blind analysis")
+         ("Info.blindAnalysis"           , po::value <bool>                      (&blind_)           -> default_value(false)                    ,"Flag for blind analysis")
          ("Info.nloMC"                   , po::value <bool>                      (&nlo_)             -> default_value(false)                    ,"Flag for NLO MC samples")
          ("Info.isMC"                    , po::value <bool>                      (&isMC_)            -> default_value(true)                     ,"Flag for MC dataset")
-         ("Info.fullWeight"              , po::value <bool>                      (&fullweight_)      -> default_value(false)                    ,"Flag for full weight of MC samples, otherwise only sign")
+         ("Info.fullGenWeight"           , po::value <bool>                      (&fullgenweight_)   -> default_value(false)                    ,"Flag for full gen weight of MC samples, otherwise only sign")
          ("Info.signalRegion"            , po::value <bool>                      (&signalregion_)    -> default_value(true)                     ,"Flag for signal region")
          ("Info.eventsMax"               , po::value <int>                       (&nevtmax_)         -> default_value(-1)                       , "Maximum number of events")
          ("Info.seed"                    , po::value <int>                       (&seed_)            -> default_value(-1)                       , "Seed value for random numbers");
@@ -343,7 +343,7 @@ bool               Config::isMC()             const { return isMC_; }
 bool               Config::signalRegion()     const { return signalregion_; }
 bool               Config::blind()            const { return blind_; }
 bool               Config::nlo()              const { return nlo_; }
-bool               Config::fullWeight()       const { return fullweight_; }
+bool               Config::fullGenWeight()    const { return fullgenweight_; }
 int                Config::workflow()         const { return workflow_; }
 int                Config::index()            const { return index_; }
 float              Config::scale()            const { return scale_; }

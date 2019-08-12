@@ -80,7 +80,7 @@ namespace analysis {
             bool blind() const;
             bool override() const;
             bool nlo() const;
-            bool fullWeight() const;
+            bool fullGenWeight() const;
             int  workflow() const;
             int  index() const;
             
@@ -255,7 +255,7 @@ namespace analysis {
             bool blind_;
             bool override_;
             bool nlo_;
-            bool fullweight_;
+            bool fullgenweight_;
             int workflow_;
             int index_;
             
