@@ -38,7 +38,7 @@ int main(int argc, char ** argv)
       
    // BTAG
       if ( ! analyser.selectionBJet(1)          )   continue;
-//      if ( ! analyser.selectionBJet(2)          )   continue;
+      if ( ! analyser.selectionBJet(2)          )   continue;
    // HISTOGRAMS
       analyser.fillJetHistograms("selection02");               // histograms : jets fill
       
