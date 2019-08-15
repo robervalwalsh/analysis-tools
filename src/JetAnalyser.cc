@@ -183,12 +183,15 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
       h1_[Form("qglikelihood_jet%d_%s", j+1,label.c_str())]  = std::make_shared<TH1F>(Form("qglikelihood_jet%d", j+1) , Form("qglikelihood_jet%d_%s", j+1,label.c_str()) , 200 , 0, 1 );
       h1_[Form("nconstituents_jet%d_%s", j+1,label.c_str())]  = std::make_shared<TH1F>(Form("nconstituents_jet%d", j+1) , Form("nconstituents_jet%d_%s", j+1,label.c_str()) , 200 , 0, 200 );
       // pt distributions separate for barrel and endcap, minus and plus sides and overlaps
-      h1_[Form("pt_jet%d_me_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_me"  , j+1) , Form("pt_jet%d_me_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
-      h1_[Form("pt_jet%d_pe_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_pe"  , j+1) , Form("pt_jet%d_pe_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
-      h1_[Form("pt_jet%d_mb_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_mb"  , j+1) , Form("pt_jet%d_mb_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
-      h1_[Form("pt_jet%d_pb_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_pb"  , j+1) , Form("pt_jet%d_pb_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
-      h1_[Form("pt_jet%d_mbe_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_mbe"  , j+1) , Form("pt_jet%d_mbe_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
-      h1_[Form("pt_jet%d_pbe_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_pbe"  , j+1) , Form("pt_jet%d_pbe_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
+      if ( config_-> histogramJetsRegionSplit() )
+      {
+         h1_[Form("pt_jet%d_me_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_me"  , j+1) , Form("pt_jet%d_me_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
+         h1_[Form("pt_jet%d_pe_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_pe"  , j+1) , Form("pt_jet%d_pe_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
+         h1_[Form("pt_jet%d_mb_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_mb"  , j+1) , Form("pt_jet%d_mb_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
+         h1_[Form("pt_jet%d_pb_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_pb"  , j+1) , Form("pt_jet%d_pb_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
+         h1_[Form("pt_jet%d_mbe_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_mbe"  , j+1) , Form("pt_jet%d_mbe_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
+         h1_[Form("pt_jet%d_pbe_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d_pbe"  , j+1) , Form("pt_jet%d_pbe_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
+      }
       
       h1_[Form("pt_jet%d_%s"  , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d p_{T} [GeV]",j+1));
       h1_[Form("eta_jet%d_%s" , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d  #eta",j+1));
@@ -762,12 +765,15 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
       h1_[Form("pt_jet%d_%s",j+1,label.c_str())]   -> Fill(selectedJets_[j]->pt(),weight_);
       // barrel and endcap pt distributions
       float eta = selectedJets_[j]->eta();
-      if ( eta < -1.4 )               h1_[Form("pt_jet%d_me_%s"  , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
-      if ( eta >  1.4 )               h1_[Form("pt_jet%d_pe_%s"  , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
-      if ( eta <  0.0 && eta > -1.0 ) h1_[Form("pt_jet%d_mb_%s"  , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
-      if ( eta >  0.0 && eta <  1.0 ) h1_[Form("pt_jet%d_pb_%s"  , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
-      if ( eta < -1.0 && eta > -1.4 ) h1_[Form("pt_jet%d_mbe_%s" , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
-      if ( eta >  1.0 && eta <  1.4 ) h1_[Form("pt_jet%d_pbe_%s" , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
+      if ( config_-> histogramJetsRegionSplit() )
+      {
+         if ( eta < -1.4 )               h1_[Form("pt_jet%d_me_%s"  , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
+         if ( eta >  1.4 )               h1_[Form("pt_jet%d_pe_%s"  , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
+         if ( eta <  0.0 && eta > -1.0 ) h1_[Form("pt_jet%d_mb_%s"  , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
+         if ( eta >  0.0 && eta <  1.0 ) h1_[Form("pt_jet%d_pb_%s"  , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
+         if ( eta < -1.0 && eta > -1.4 ) h1_[Form("pt_jet%d_mbe_%s" , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
+         if ( eta >  1.0 && eta <  1.4 ) h1_[Form("pt_jet%d_pbe_%s" , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(),weight_);
+      }
       
       //
       h1_[Form("eta_jet%d_%s",j+1,label.c_str())]  -> Fill(selectedJets_[j]->eta(),weight_);
