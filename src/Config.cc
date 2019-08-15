@@ -84,8 +84,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Jets.jets"                    , po::value <std::string>               (&jetsCol_)         -> default_value("")                       , "Name of the jets collection")
          ("Jets.id"                      , po::value <std::string>               (&jetsid_)          -> default_value("tight")                  , "Jets id criteria for all jets")
          ("Jets.puId"                    , po::value <std::string>               (&jetspuid_)        -> default_value("loose")                  , "Jets pileup id criteria for all jets")
-         ("Jets.flavours"                , po::value <bool>                      (&usejetsflv_)      -> default_value(false)                    , "For splitting results accoding to jet flavour")
-         ("Jets.extendedFlavours"        , po::value <bool>                      (&usejetsextflv_)   -> default_value(false)                    , "For splitting results accoding to jet extended flavour")
+         ("Jets.extendedFlavour"         , po::value <bool>                      (&usejetsextflv_)   -> default_value(false)                    , "For splitting results accoding to jet extended flavour")
          ("Jets.n"                       , po::value <int>                       (&njets_)           -> default_value(-1)                       , "Minimum number of jets")
          ("Jets.nMin"                    , po::value <int>                       (&njetsmin_)        -> default_value(0)                        , "Minimum number of jets")
          ("Jets.nMax"                    , po::value <int>                       (&njetsmax_)        -> default_value(-1)                       , "Maximum number of jets")
@@ -98,14 +97,14 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          
       // jets                                                                                        
       opt_cfg_.add_options()                                                                         
-         ("Histograms.Jets.splitRegions" , po::value <bool>                      (&histjets_rsplit_) -> default_value(false)                    , "Split jets histograms into barrel, barrel-endcap overlap, endcap");
+         ("Histograms.Jets.splitRegions" , po::value <bool>                      (&histjets_rsplit_) -> default_value(false)                    , "Split jets histograms into barrel, barrel-endcap overlap, endcap")
+         ("Histograms.Jets.flavour"      , po::value <bool>                      (&histjets_flavour_)-> default_value(false)                    , "Split jets histograms per flavour");
          
                                                                                                                                                 
       // dijets                                                                                                                                 
       opt_cfg_.add_options()                                                                                                                    
          ("Dijets.ranks"                 , po::value<std::vector<int> >          (&dijet_ranks_)     -> multitoken()                            , "Ranks of the jets to construct and select the diject")
-         ("Dijets.dijets"                , po::value <bool>                      (&dodijet_ )        -> default_value(false)                    , "Combine all jets in dijet objects")
-         ("Dijets.flavours"              , po::value <bool>                      (&dodijet_flav_)    -> default_value(false)                    , "Combine jets in dijet objects split by flavour combination");
+         ("Dijets.dijets"                , po::value <bool>                      (&dodijet_ )        -> default_value(false)                    , "Combine all jets in dijet objects");
                                                                                                                                                 
       // btagging                                                                                                                               
       opt_cfg_.add_options()                                                                                                                    
@@ -272,9 +271,6 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          l1tjetsCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , l1tjetsCol_.c_str()     );
          l1tmuonsCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , l1tmuonsCol_.c_str()    );
          
-         usejetsflv_ = ( usejetsflv_ || usejetsextflv_   );  // if extended is enabled, flavour must be enabled
-         dodijet_    = ( dodijet_    || dodijet_flav_ );  // if flavour is enabled dijet must be enabled
-         
          if ( njetsmax_ < njetsmin_ ) njetsmax_ = -1;
          if ( njetsmin_ < 0 && njetsmax_ > 0 ) njetsmin_ = 0;
          
@@ -384,10 +380,8 @@ std::vector<float> Config::jetsBtagProbLight()  const { return jetsbtagproblight
 bool               Config::bRegression()        const { return bregression_; }
 std::string        Config::nonBtagWP()          const { return nonbtagwp_; }
 int                Config::nonBtagJet()         const { return nonbtagjet_; }
-bool               Config::useJetsFlavour()     const { return usejetsflv_; }
 bool               Config::useJetsExtendedFlavour() const { return usejetsextflv_; }
 bool               Config::doDijet()            const { return dodijet_ ; }
-bool               Config::doDijetFlavour()     const { return dodijet_flav_; }
 
 // muons
 std::string        Config::muonsCollection()    const { return muonsCol_; }
@@ -458,3 +452,4 @@ float Config::max()        const { return max_; }
 
 // Histograms
 bool  Config::histogramJetsRegionSplit() const { return histjets_rsplit_ ; }
+bool  Config::histogramJetsPerFlavour()  const { return histjets_flavour_ ; }

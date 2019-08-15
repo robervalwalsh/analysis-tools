@@ -119,7 +119,6 @@ namespace analysis {
             bool bRegression() const;
             std::string nonBtagWP()  const;
             int   nonBtagJet() const;
-            bool useJetsFlavour() const;
             bool useJetsExtendedFlavour() const;
             bool doDijet() const;
             bool doDijetFlavour() const;
@@ -173,6 +172,7 @@ namespace analysis {
             
          // histograms
             bool histogramJetsRegionSplit() const;
+            bool histogramJetsPerFlavour() const;
 
             
          // ========================
@@ -313,10 +313,8 @@ namespace analysis {
             std::vector<float> jetsbtagproblight_;
             
             //
-            bool usejetsflv_;
             bool usejetsextflv_;
             bool dodijet_;
-            bool dodijet_flav_;
             
             std::vector<int> dijet_ranks_;
             
@@ -373,6 +371,7 @@ namespace analysis {
             
          // histograms
             bool histjets_rsplit_;
+            bool histjets_flavour_;
 
                         
          private:

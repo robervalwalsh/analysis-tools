@@ -224,7 +224,7 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
       h2_[Form("pt_eta_jet%d_%s"  , j+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d p_{T} [GeV]",j+1));
       h2_[Form("pt_eta_jet%d_%s"  , j+1,label.c_str())] -> GetYaxis() -> SetTitle(Form("Jet %d  #eta",j+1));
       
-      if ( config_->isMC() && ( config_->useJetsFlavour() || config_->useJetsExtendedFlavour() ) )
+      if ( config_->isMC() && config_->histogramJetsPerFlavour() )
       {
          for ( auto & flv : flavours_ ) // flavour dependent histograms
          {
@@ -267,7 +267,7 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
 
          }
       }
-      if ( config_->doDijet() || config_->doDijetFlavour() )  // dijet histograms
+      if ( config_->doDijet()  )  // dijet histograms
       {
          for ( int k = j+1; k < n && j < n; ++k )
          {
@@ -291,7 +291,7 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
             h1_[Form("phi_jet%d%d_%s"    , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("Jet %d + Jet %d  #phi",j+1,k+1));
             h1_[Form("m_jet%d%d_%s"      , j+1,k+1,label.c_str())] -> GetXaxis() -> SetTitle(Form("M_{%d%d} [GeV]",j+1,k+1));
             
-            if ( config_->isMC() && config_->doDijetFlavour() )
+            if ( config_->isMC() && config_->histogramJetsPerFlavour() )
             {
                for ( auto & flv1 : flavours_ )
                {
@@ -803,44 +803,24 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
          h1_[Form("btag_bb_jet%d_%s"   , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfbb")   ,weight_); 
          h1_[Form("btag_lepb_jet%d_%s" , j+1,label.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dflepb") ,weight_); 
          
-//          mybtag = selectedJets_[j]->btag("btag_dflight");
-//          mybtaglog = 1.e-7;
-//          if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
-//          h1_[Form("btaglog_light_jet%d_%s", j+1,label.c_str())]  -> Fill(mybtaglog ,weight_);
-//          mybtag = selectedJets_[j]->btag("btag_dfg");
-//          mybtaglog = 1.e-7;
-//          if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
-//          h1_[Form("btaglog_g_jet%d_%s"    , j+1,label.c_str())]  -> Fill(mybtaglog ,weight_); 
-//          mybtag = selectedJets_[j]->btag("btag_dfc");
-//          mybtaglog = 1.e-7;
-//          if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
-//          h1_[Form("btaglog_c_jet%d_%s"    , j+1,label.c_str())]  -> Fill(mybtaglog ,weight_); 
-//          mybtag = selectedJets_[j]->btag("btag_dfb");
-//          mybtaglog = 1.e-7;
-//          if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
-//          h1_[Form("btaglog_b_jet%d_%s"    , j+1,label.c_str())]  -> Fill(mybtaglog ,weight_); 
-//          mybtag = selectedJets_[j]->btag("btag_dfbb");
-//          mybtaglog = 1.e-7;
-//          if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
-//          h1_[Form("btaglog_bb_jet%d_%s"   , j+1,label.c_str())]  -> Fill(mybtaglog ,weight_); 
-//          mybtag = selectedJets_[j]->btag("btag_dflepb");
-//          mybtaglog = 1.e-7;
-//          if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
-//          h1_[Form("btaglog_lepb_jet%d_%s" , j+1,label.c_str())]  -> Fill(mybtaglog ,weight_); 
 
       }
       // 2D histograms
       h2_[Form("pt_eta_jet%d_%s"  , j+1,label.c_str())] -> Fill(selectedJets_[j]->pt(), selectedJets_[j]->eta(), weight_);
       
-      if ( config_->isMC() && ( config_ -> useJetsFlavour() || config_ -> useJetsExtendedFlavour() ))
+      
+      if ( config_->isMC() && config_->histogramJetsPerFlavour() )
       {
          std::string flv = "udsg";
-         if ( config_ -> useJetsFlavour() )
+         if ( ! config_ -> useJetsExtendedFlavour() )
          {
             if ( abs(selectedJets_[j]->flavour()) == 4 ) flv = "c"; 
             if ( abs(selectedJets_[j]->flavour()) == 5 ) flv = "b"; 
          }
-         if ( config_ -> useJetsExtendedFlavour() ) flv = selectedJets_[j]->extendedFlavour();
+         else
+         {
+            flv = selectedJets_[j]->extendedFlavour();
+         }
          // 1D histograms
          h1_[Form("pt_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->pt(),weight_);
          h1_[Form("eta_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->eta(),weight_);
@@ -865,37 +845,13 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
             h1_[Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dfbb")   ,weight_); 
             h1_[Form("btag_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  -> Fill(selectedJets_[j]->btag("btag_dflepb") ,weight_); 
             
-//             mybtag = selectedJets_[j]->btag("btag_dflight");
-//             mybtaglog = 1.e-7;
-//             if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
-//             h1_[Form("btag_light_jet%d_%s_%s", j+1,label.c_str(),flv.c_str())]  -> Fill(mybtaglog ,weight_);
-//             mybtag = selectedJets_[j]->btag("btag_dfg");
-//             mybtaglog = 1.e-7;
-//             if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
-//             h1_[Form("btag_g_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(mybtaglog ,weight_); 
-//             mybtag = selectedJets_[j]->btag("btag_dfc");
-//             mybtaglog = 1.e-7;
-//             if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
-//             h1_[Form("btag_c_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(mybtaglog ,weight_); 
-//             mybtag = selectedJets_[j]->btag("btag_dfb");
-//             mybtaglog = 1.e-7;
-//             if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
-//             h1_[Form("btag_b_jet%d_%s_%s"    , j+1,label.c_str(),flv.c_str())]  -> Fill(mybtaglog ,weight_); 
-//             mybtag = selectedJets_[j]->btag("btag_dfbb");
-//             mybtaglog = 1.e-7;
-//             if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
-//             h1_[Form("btag_bb_jet%d_%s_%s"   , j+1,label.c_str(),flv.c_str())]  -> Fill(mybtaglog ,weight_); 
-//             mybtag = selectedJets_[j]->btag("btag_dflepb");
-//             mybtaglog = 1.e-7;
-//             if ( mybtag > 0 ) mybtaglog = -log(1.-mybtag);
-//             h1_[Form("btag_lepb_jet%d_%s_%s" , j+1,label.c_str(),flv.c_str())]  -> Fill(mybtaglog ,weight_); 
             
          }
          // 2D histograms
          h2_[Form("pt_eta_jet%d_%s_%s"  , j+1,label.c_str(),flv.c_str())] -> Fill(selectedJets_[j]->pt(), selectedJets_[j]->eta(), weight_);
       }
       
-      if ( config_ -> doDijet() || config_->doDijetFlavour() )
+      if ( config_ -> doDijet() )
       {
          for ( int k = j+1; k < n && j < n; ++k )
          {
@@ -917,18 +873,18 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
             {
                h1_[Form("m_jet%d%d_%s",j+1,k+1,label.c_str())]  -> Fill(0.,weight_);
             }
-            if ( config_->isMC() && config_->doDijetFlavour() )
+            if ( config_->isMC() && config_->histogramJetsPerFlavour() )
             {
                std::string flv1 = "udsg";
                std::string flv2 = "udsg";
-               if ( config_ -> useJetsFlavour() )
+               if ( ! config_ -> useJetsExtendedFlavour() )
                {
                   if ( abs(selectedJets_[j]->flavour()) == 4 ) flv1 = "c"; 
                   if ( abs(selectedJets_[j]->flavour()) == 5 ) flv1 = "b"; 
                   if ( abs(selectedJets_[k]->flavour()) == 4 ) flv2 = "c"; 
                   if ( abs(selectedJets_[k]->flavour()) == 5 ) flv2 = "b"; 
                }
-               if ( config_ -> useJetsExtendedFlavour() )
+               else
                {
                   flv1 = selectedJets_[j]->extendedFlavour();
                   flv2 = selectedJets_[k]->extendedFlavour();
