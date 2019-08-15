@@ -95,6 +95,11 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Jets.dEtaMin"                 , po::value <float>                     (&jetsdetamin_)     -> default_value(-1.)                      , "Minimum delta eta between jets")
          ("Jets.dPhiMin"                 , po::value <float>                     (&jetsdphimin_)     -> default_value(-1.)                      , "Minimum delta phi between jets")
          ("Jets.dPhiMax"                 , po::value <float>                     (&jetsdphimax_)     -> default_value(-1.)                      , "Maximum delta phi between jets");
+         
+      // jets                                                                                        
+      opt_cfg_.add_options()                                                                         
+         ("Histograms.Jets.splitRegions" , po::value <bool>                      (&histjets_rsplit_) -> default_value(false)                    , "Split jets histograms into barrel, barrel-endcap overlap, endcap");
+         
                                                                                                                                                 
       // dijets                                                                                                                                 
       opt_cfg_.add_options()                                                                                                                    
@@ -451,3 +456,5 @@ int   Config::n()          const { return n_;   }
 float Config::min()        const { return min_; }
 float Config::max()        const { return max_; }
 
+// Histograms
+bool  Config::histogramJetsRegionSplit() const { return histjets_rsplit_ ; }

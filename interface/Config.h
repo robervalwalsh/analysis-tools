@@ -171,6 +171,10 @@ namespace analysis {
             float min() const;
             float max() const;
             
+         // histograms
+            bool histogramJetsRegionSplit() const;
+
+            
          // ========================
          
          // analysis control
@@ -366,6 +370,9 @@ namespace analysis {
          // output tree
             
             bool do_tree_;
+            
+         // histograms
+            bool histjets_rsplit_;
 
                         
          private:
