@@ -227,8 +227,6 @@ namespace analysis {
             std::vector<float>  qgmax_;
 
             std::string btagalgo_;
-            std::string btagwp_;
-            //float btagwp_;
 
 
             std::string hltPath_;
