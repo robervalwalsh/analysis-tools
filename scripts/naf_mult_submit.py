@@ -182,10 +182,10 @@ if ntuples:
       if config:
          copyfile(tmpdir+"/"+os.path.basename(config),exedir+"/"+os.path.basename(config))      
 #         condorcmd = "condor_mult_submit.csh" + " " + jobid + " " + args.exe + " " + os.path.basename(config)
-         condorcmd = "condor_mult_submit.csh job " + args.exe + " " + os.path.basename(config)
+         condorcmd = "condor_job_prep.csh job " + args.exe + " " + os.path.basename(config)
       else:
 #         condorcmd = "condor_mult_submit.csh" + " " + jobid + " " + args.exe
-         condorcmd = "condor_mult_submit.csh job "+ args.exe
+         condorcmd = "condor_job_prep.csh job "+ args.exe
       # make the submissions
       os.chdir(exedir)
       jobf = open('./seed.txt', 'w+')
@@ -206,10 +206,20 @@ else:
    jobf = open('./seed.txt', 'w+')
    print >> jobf, 1
    jobf.close()
-   condorcmd = "condor_mult_submit.csh job_0000" + " " + os.path.basename(args.exe)
+   condorcmd = "condor_submit.csh job_0000" + " " + os.path.basename(args.exe)
    os.system(condorcmd)
    os.chdir(cwd)
-         
+
+
+## NOW DO SUBMISSION    
+os.chdir(maindir)
+if config:
+   condorcmd = "condor_mult_submit.csh job " + args.exe + " " + os.path.basename(config)
+else:
+   condorcmd = "condor_mult_submit.csh job "+ args.exe
+os.system(condorcmd)
+os.chdir(cwd)
+     
 # remove the temporary directory
 os.chdir(cwd)
 if ntuples: 

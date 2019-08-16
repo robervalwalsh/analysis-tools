@@ -1,6 +1,9 @@
 #!/bin/csh
 
-set config = "job.submit" 
+set config = "job.mult.submit" 
+
+set dirlist = `/bin/ls -1 | grep job_`
+
 # condor job submission configuration
 cat > $config << EOF
 getenv              = True
@@ -9,8 +12,13 @@ output              = ${1}_\$(Process)_\$(Cluster).out
 error               = ${1}_\$(Process)_\$(Cluster).err
 log                 = ${1}_\$(Process)_\$(Cluster).log
 environment         = "LD_LIBRARY_PATH_STORED=$LD_LIBRARY_PATH"
-queue
 EOF
+
+foreach d ( $dirlist )
+   echo "Initialdir     = $d" >> $config
+   echo "queue"  >> $config
+   echo  >> $config
+end
 
 # condor job submission script
 if ( $#argv == 2 ) then
@@ -30,4 +38,4 @@ endif
 
 # Jetzt geht's los
 chmod u+x $1.sh
-#condor_submit $config
+condor_submit $config
