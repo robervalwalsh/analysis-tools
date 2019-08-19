@@ -342,6 +342,7 @@ void BaseAnalyser::actionApplyPileupWeight(const int & var)
       weight_ *= 1;
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
+   this -> fillPileupHistogram();
 }
 
 void BaseAnalyser::pileupHistogram()
@@ -361,11 +362,11 @@ void BaseAnalyser::pileupHistogram()
 }
 void BaseAnalyser::fillPileupHistogram()
 {
-   ++cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"*** Fill true pileup histrogram");
-   
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
+//    ++cutflow_;
+//    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+//       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"*** Fill true pileup histrogram");
+//    
+//    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    h1_["pileup"] -> Fill(analysis_->nTruePileup());
    h1_["pileup_w"] -> Fill(analysis_->nTruePileup(),this->pileupWeight(analysis_->nTruePileup(),0));

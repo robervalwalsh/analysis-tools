@@ -38,8 +38,8 @@ Analyser::Analyser(int argc, char * argv[]) : BaseAnalyser(argc,argv),  // not s
                                               TriggerAnalyser(argc,argv),
                                               JetAnalyser(argc,argv),
                                               MuonAnalyser(argc,argv)
-
 {
+   this -> pileupHistogram();
 }
 
 Analyser::~Analyser()
