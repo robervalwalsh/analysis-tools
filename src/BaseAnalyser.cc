@@ -54,6 +54,13 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    config_   = std::make_shared<Config>(argc,argv);
    analysis_ = std::make_shared<Analysis>(config_->ntuplesList(),config_->eventInfo());
    
+   // output file
+   if ( config_->outputRoot_ != "" )
+   {
+      hout_= std::make_shared<TFile>(config_->outputRoot_.c_str(),"recreate",Form("%s %s %s",argv[0],argv[1],argv[2]));
+      hout_ -> cd();
+   }
+   
    seed_ = analysis_ ->seed(config_->seedFile());
    
    // Workflow
@@ -89,13 +96,6 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    
    // JSON for data   
    if( isData_ && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
-   
-   // output file
-   if ( config_->outputRoot_ != "" )
-   {
-      hout_= std::make_shared<TFile>(config_->outputRoot_.c_str(),"recreate",Form("%s %s %s",argv[0],argv[1],argv[2]));
-      hout_ -> cd();
-   }
    
 }
 
