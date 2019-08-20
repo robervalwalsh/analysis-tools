@@ -61,7 +61,6 @@ bool Analyser::event(const int & i)
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    this -> generatorWeight();
-   this -> actionApplyPileupWeight();
    
    if ( config_->runmin_ > 0 && analysis_->run() < config_->runmin_ ) return false;
    if ( config_->runmax_ > 0 && analysis_->run() > config_->runmax_ ) return false;
