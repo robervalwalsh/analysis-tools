@@ -140,7 +140,22 @@ cwd = os.getcwd()
 if os.path.exists(cwd+"/"+maindir):
    print maindir + "already exists. Rename or remove it and then resubmit"
    quit()
-os.mkdir(maindir)
+   
+splitcwd = cwd.split('/')
+newcwd = ''
+if splitcwd[1] == 'afs':
+   newcwd = '/nfs/dust/cms/user'
+   for d in splitcwd[5:]:
+      newcwd += '/'+d
+   print newcwd
+
+if newcwd != '':
+   maindir = newcwd+'/'+maindir
+   os.makedirs(maindir)
+   lncmd = 'ln -s ' + maindir
+   os.system(lncmd)
+else:
+   os.mkdir(maindir)
 
 # splitting the file list
 if ntuples:
