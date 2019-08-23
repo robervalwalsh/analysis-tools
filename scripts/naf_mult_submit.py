@@ -2,6 +2,7 @@
 import os
 import glob
 import re
+import sys
 from argparse import ArgumentParser
 from shutil import copyfile, rmtree, move
 from time import sleep
@@ -147,21 +148,19 @@ if splitcwd[1] == 'afs':
    newcwd = '/nfs/dust/cms/user'
    for d in splitcwd[5:]:
       newcwd += '/'+d
-   print newcwd
+   print('nfs directory:',newcwd)
 
 if newcwd != '':
    maindir = newcwd+'/'+maindir
    os.makedirs(maindir)
    lncmd = 'ln -s ' + maindir
    os.system(lncmd)
-   if maindir[-1] == '/':
-      maindir = maindir[:-1]
-   maindir_mother = re.sub('/'+maindir.split('/')[-1],'',maindir)
-   lncmd = 'ln -s ' + maindir_mother + ' histograms'
-   os.system(lncmd)
+   if not os.path.exists('histograms'):
+      ln2cmd = 'ln -s ' + newcwd + ' histograms'
+      os.system(ln2cmd)
 else:
    os.mkdir(maindir)
-
+   
 # splitting the file list
 if ntuples:
    pid = os.getpid()
