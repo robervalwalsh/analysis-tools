@@ -650,8 +650,6 @@ bool JetAnalyser::selectionBJet(const int & r )
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
-   this -> actionApplyBtagSF(r);
-   
    return true;
 }
 
