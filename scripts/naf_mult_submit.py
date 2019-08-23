@@ -154,6 +154,11 @@ if newcwd != '':
    os.makedirs(maindir)
    lncmd = 'ln -s ' + maindir
    os.system(lncmd)
+   if maindir[-1] == '/':
+      maindir = maindir[:-1]
+   maindir_mother = re.sub('/'+maindir.split('/')[-1],'',maindir)
+   lncmd = 'ln -s ' + maindir_mother + ' histograms'
+   os.system(lncmd)
 else:
    os.mkdir(maindir)
 
