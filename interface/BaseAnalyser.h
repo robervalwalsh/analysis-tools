@@ -56,7 +56,6 @@ namespace analysis {
          
             // ----------member data ---------------------------
          protected:
-            void actionApplyPileupWeight(const int & var = 0);
             // main objects
             std::shared_ptr<Analysis> analysis_;
             std::shared_ptr<Config>   config_;
@@ -155,6 +154,7 @@ namespace analysis {
             
             std::string basename(const std::string &);
 
+            void actionApplyPileupWeight(const int & var = 0);
 
       };
    }
