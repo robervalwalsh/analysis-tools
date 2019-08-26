@@ -9,9 +9,9 @@ set config = "job.submit"
 cat > $config << EOF
 getenv              = True
 executable          = ${1}.sh
-output              = ${1}_\$(Cluster)_\$(Process).out
-error               = ${1}_\$(Cluster)_\$(Process).err
-log                 = ${1}_\$(Cluster)_\$(Process).log
+output              = ${1}_\$(Process)_\$(Cluster).out
+error               = ${1}_\$(Process)_\$(Cluster).err
+log                 = ${1}_\$(Process)_\$(Cluster).log
 environment         = "LD_LIBRARY_PATH_STORED=$LD_LIBRARY_PATH"
 queue
 EOF
