@@ -175,6 +175,11 @@ BaseAnalyser::~BaseAnalyser()
    std::cout << exe_ << " finished!" << std::endl;
    printf("%s\n", std::string(100,'_').c_str());
    std::cout << std::endl;
+   
+   std::ofstream finished;
+   finished.open("finished.txt");
+   finished << exe_ << "\n";
+   finished.close();
 }
 
 
