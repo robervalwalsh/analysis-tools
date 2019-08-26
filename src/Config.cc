@@ -380,6 +380,7 @@ std::string        Config::nonBtagWP()          const { return nonbtagwp_; }
 int                Config::nonBtagJet()         const { return nonbtagjet_; }
 bool               Config::useJetsExtendedFlavour() const { return usejetsextflv_; }
 bool               Config::doDijet()            const { return dodijet_ ; }
+int                Config::nBJetsMin()          const { return nbjetsmin_; }
 
 // muons
 std::string        Config::muonsCollection()    const { return muonsCol_; }

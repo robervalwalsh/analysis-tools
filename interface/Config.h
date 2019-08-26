@@ -122,6 +122,8 @@ namespace analysis {
             bool useJetsExtendedFlavour() const;
             bool doDijet() const;
             bool doDijetFlavour() const;
+            int nBJetsMin() const;
+
             
          // muons
             std::string muonsCollection() const;
@@ -192,7 +194,6 @@ namespace analysis {
 
             // btag SF csv file
             std::string btagsf_;
-            int nbjetsmin_;
             std::vector<float> jetsbtagmin_;
 
 
@@ -350,6 +351,7 @@ namespace analysis {
             float btagwpmedium_;
             float btagwptight_;
             float btagwpxxx_;
+            int nbjetsmin_;
             
          // general
             float massmin_;
