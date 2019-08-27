@@ -156,8 +156,18 @@ BaseAnalyser::~BaseAnalyser()
    
    for ( auto h : h1_ )
    {
-      if ( h.first == "cutflow" || h.first == "pileup" || h.first == "pileup_w" ) continue;
+      if ( h.first == "cutflow" || h.first == "pileup" || h.first == "pileup_w" )    continue;
       if ( doscale ) h.second -> Scale(scale);
+      bool is_empty =  ( h.second -> GetEntries() != 0 || h.second -> GetSumOfWeights() != 0 );
+      if ( is_empty )
+         continue;
+      
+   }
+   for ( auto h : h2_ )
+   {
+      if ( doscale ) h.second -> Scale(scale);
+      bool is_empty =  ( h.second -> GetEntries() != 0 || h.second -> GetSumOfWeights() != 0 );
+      if ( is_empty ) continue;
    }
    workflow();
    if ( hout_ )
@@ -165,7 +175,7 @@ BaseAnalyser::~BaseAnalyser()
       std::cout << std::endl;
       std::cout << "output root file: " << config_->outputRoot_ << std::endl;
       hout_ -> cd();
-      hout_->Write();
+      hout_ -> Write();
 //      hout_->Close();
    }   
    
