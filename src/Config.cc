@@ -116,7 +116,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("BTag.tight"                   , po::value <float>                     (&btagwptight_)     -> default_value(-10000)                   ,"BTag working point TIGHT")
          ("BTag.user"                    , po::value <float>                     (&btagwpxxx_)       -> default_value(-10000)                   ,"BTag working point USER-defined")
          ("BTag.nMin"                    , po::value <int>                       (&nbjetsmin_)       -> default_value(-1)                        ,"Minimum number of btgaged jets")
-         ("nonBtagJet"                   , po::value <int>                       (&nonbtagjet_)      -> default_value(-1)                       ,"non-Btag Jet");
+         ("BTag.nonBtagJet"              , po::value <int>                       (&nonbtagjet_)      -> default_value(-1)                       ,"non-Btag Jet");
                                                                                                                                                 
       // muons                                                                                                                                  
       opt_cfg_.add_options()                                                                                                                    
