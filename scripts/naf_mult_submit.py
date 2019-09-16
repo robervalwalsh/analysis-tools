@@ -2,6 +2,7 @@
 import os
 import glob
 import re
+import sys
 from argparse import ArgumentParser
 from shutil import copyfile, rmtree, move
 from time import sleep
@@ -140,8 +141,26 @@ cwd = os.getcwd()
 if os.path.exists(cwd+"/"+maindir):
    print maindir + "already exists. Rename or remove it and then resubmit"
    quit()
-os.mkdir(maindir)
+   
+splitcwd = cwd.split('/')
+newcwd = ''
+if splitcwd[1] == 'afs':
+   newcwd = '/nfs/dust/cms/user'
+   for d in splitcwd[5:]:
+      newcwd += '/'+d
+   print('nfs directory:',newcwd)
 
+if newcwd != '':
+   maindir = newcwd+'/'+maindir
+   os.makedirs(maindir)
+   lncmd = 'ln -s ' + maindir
+   os.system(lncmd)
+   if not os.path.exists('histograms'):
+      ln2cmd = 'ln -s ' + newcwd + ' histograms'
+      os.system(ln2cmd)
+else:
+   os.mkdir(maindir)
+   
 # splitting the file list
 if ntuples:
    pid = os.getpid()
@@ -182,10 +201,10 @@ if ntuples:
       if config:
          copyfile(tmpdir+"/"+os.path.basename(config),exedir+"/"+os.path.basename(config))      
 #         condorcmd = "condor_mult_submit.csh" + " " + jobid + " " + args.exe + " " + os.path.basename(config)
-         condorcmd = "condor_mult_submit.csh job " + args.exe + " " + os.path.basename(config)
+         condorcmd = "condor_job_prep.csh job " + args.exe + " " + os.path.basename(config)
       else:
 #         condorcmd = "condor_mult_submit.csh" + " " + jobid + " " + args.exe
-         condorcmd = "condor_mult_submit.csh job "+ args.exe
+         condorcmd = "condor_job_prep.csh job "+ args.exe
       # make the submissions
       os.chdir(exedir)
       jobf = open('./seed.txt', 'w+')
@@ -206,10 +225,20 @@ else:
    jobf = open('./seed.txt', 'w+')
    print >> jobf, 1
    jobf.close()
-   condorcmd = "condor_mult_submit.csh job_0000" + " " + os.path.basename(args.exe)
+   condorcmd = "condor_submit.csh job_0000" + " " + os.path.basename(args.exe)
    os.system(condorcmd)
    os.chdir(cwd)
-         
+
+
+## NOW DO SUBMISSION    
+os.chdir(maindir)
+if config:
+   condorcmd = "condor_mult_submit.csh job " + args.exe + " " + os.path.basename(config)
+else:
+   condorcmd = "condor_mult_submit.csh job "+ args.exe
+os.system(condorcmd)
+os.chdir(cwd)
+     
 # remove the temporary directory
 os.chdir(cwd)
 if ntuples: 

@@ -53,18 +53,17 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
       // analysis info
       opt_cfg_.add_options()
          ("Info.ntuplesList"             , po::value <std::string>               (&inputlist_)       -> default_value("rootFileList.txt")       ,"File with list of ntuples")
-         ("Info.process"                 , po::value <std::string>               (&process_)         -> default_value("MssmHbb")                ,"File with list of ntuples")
+         ("Info.process"                 , po::value <std::string>               (&process_)         -> default_value("MssmHbb")                ,"Process of ntuples")
          ("Info.events"                  , po::value <std::string>               (&eventsdir_)       -> default_value("Events")                 ,"Name of the events directory")
          ("Info.eventInfo"               , po::value <std::string>               (&eventinfo_)       -> default_value("EventInfo")              ,"EventInfo directory in the tree")
          ("Info.json"                    , po::value <std::string>               (&json_)            -> default_value("no_json.txt")            ,"JSON file for data")
          ("Info.output"                  , po::value <std::string>               (&outputRoot_)      -> default_value("histograms.root")        ,"Output root file")
          ("Info.seedFile"                , po::value <std::string>               (&seedfile_)        -> default_value("no_seed.txt")            ,"File with seed value for random numbers")
-         ("Info.blindAnalysis"           , po::value <bool>                      (&blind_)           -> default_value(true)                     ,"Flag for blind analysis")
+         ("Info.blindAnalysis"           , po::value <bool>                      (&blind_)           -> default_value(false)                    ,"Flag for blind analysis")
          ("Info.nloMC"                   , po::value <bool>                      (&nlo_)             -> default_value(false)                    ,"Flag for NLO MC samples")
          ("Info.isMC"                    , po::value <bool>                      (&isMC_)            -> default_value(true)                     ,"Flag for MC dataset")
-         ("Info.fullWeight"              , po::value <bool>                      (&fullweight_)      -> default_value(false)                    ,"Flag for full weight of MC samples, otherwise only sign")
+         ("Info.fullGenWeight"           , po::value <bool>                      (&fullgenweight_)   -> default_value(false)                    ,"Flag for full gen weight of MC samples, otherwise only sign")
          ("Info.signalRegion"            , po::value <bool>                      (&signalregion_)    -> default_value(true)                     ,"Flag for signal region")
-         ("Info.workflow"                , po::value <int>                       (&workflow_)        -> default_value(1)                        , "Workflow index defined by user")
          ("Info.eventsMax"               , po::value <int>                       (&nevtmax_)         -> default_value(-1)                       , "Maximum number of events")
          ("Info.seed"                    , po::value <int>                       (&seed_)            -> default_value(-1)                       , "Seed value for random numbers");
                                                                                                                                                 
@@ -82,31 +81,41 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Jets.ptMin"                   , po::value <std::vector<float> >       (&jetsptmin_)       -> multitoken()                            , "Mimium pt of the jets")
          ("Jets.ptMax"                   , po::value <std::vector<float> >       (&jetsptmax_)       -> multitoken()                            , "Maximum pt of the jets")
          ("Jets.etaMax"                  , po::value <std::vector<float> >       (&jetsetamax_)      -> multitoken()                            , "Maximum |eta| of the jets")
-         ("Jets.jets"                    , po::value <std::string>               (&jetsCol_)         -> default_value("updatedPatJets")         , "Name of the jets collection")
+         ("Jets.jets"                    , po::value <std::string>               (&jetsCol_)         -> default_value("")                       , "Name of the jets collection")
          ("Jets.id"                      , po::value <std::string>               (&jetsid_)          -> default_value("tight")                  , "Jets id criteria for all jets")
          ("Jets.puId"                    , po::value <std::string>               (&jetspuid_)        -> default_value("loose")                  , "Jets pileup id criteria for all jets")
-         ("Jets.flavours"                , po::value <bool>                      (&usejetsflv_)      -> default_value(false)                    , "For splitting results accoding to jet flavour")
-         ("Jets.extendedFlavours"        , po::value <bool>                      (&usejetsextflv_)   -> default_value(false)                    , "For splitting results accoding to jet extended flavour")
+         ("Jets.extendedFlavour"         , po::value <bool>                      (&usejetsextflv_)   -> default_value(false)                    , "For splitting results accoding to jet extended flavour")
+         ("Jets.n"                       , po::value <int>                       (&njets_)           -> default_value(-1)                       , "Minimum number of jets")
          ("Jets.nMin"                    , po::value <int>                       (&njetsmin_)        -> default_value(0)                        , "Minimum number of jets")
-         ("Jets.nMax"                    , po::value <int>                       (&njetsmax_)        -> default_value(-1)                       , "Maximum number of jets");
+         ("Jets.nMax"                    , po::value <int>                       (&njetsmax_)        -> default_value(-1)                       , "Maximum number of jets")
+         ("Jets.dRMin"                   , po::value <float>                     (&jetsdrmin_)       -> default_value(-1.)                      , "Minimum delta R between jets")
+         ("Jets.dRMax"                   , po::value <float>                     (&jetsdrmax_)       -> default_value(-1.)                      , "Maximum delta R between jets")
+         ("Jets.dEtaMax"                 , po::value <float>                     (&jetsdetamax_)     -> default_value(-1.)                      , "Maximum delta eta between jets")
+         ("Jets.dEtaMin"                 , po::value <float>                     (&jetsdetamin_)     -> default_value(-1.)                      , "Minimum delta eta between jets")
+         ("Jets.dPhiMin"                 , po::value <float>                     (&jetsdphimin_)     -> default_value(-1.)                      , "Minimum delta phi between jets")
+         ("Jets.dPhiMax"                 , po::value <float>                     (&jetsdphimax_)     -> default_value(-1.)                      , "Maximum delta phi between jets");
+         
+      // histograms                                                                                        
+      opt_cfg_.add_options()                                                                         
+         ("Histograms.Jets.splitRegions" , po::value <bool>                      (&histjets_rsplit_) -> default_value(false)                    , "Split jets histograms into barrel, barrel-endcap overlap, endcap")
+         ("Histograms.Jets.flavour"      , po::value <bool>                      (&histjets_flavour_)-> default_value(false)                    , "Split jets histograms per flavour");
+         
                                                                                                                                                 
       // dijets                                                                                                                                 
       opt_cfg_.add_options()                                                                                                                    
          ("Dijets.ranks"                 , po::value<std::vector<int> >          (&dijet_ranks_)     -> multitoken()                            , "Ranks of the jets to construct and select the diject")
-         ("Dijets.dijets"                , po::value <bool>                      (&dodijet_ )        -> default_value(false)                    , "Combine all jets in dijet objects")
-         ("Dijets.flavours"              , po::value <bool>                      (&dodijet_flav_)    -> default_value(false)                    , "Combine jets in dijet objects split by flavour combination");
+         ("Dijets.dijets"                , po::value <bool>                      (&dodijet_ )        -> default_value(false)                    , "Combine all jets in dijet objects");
                                                                                                                                                 
       // btagging                                                                                                                               
       opt_cfg_.add_options()                                                                                                                    
          ("BTag.wp"                      , po::value <std::vector<std::string> > (&jetsbtagwp_)      -> multitoken()                            ,"Jets btag minimum (with '-' means maximum)")
          ("BTag.algorithm"               , po::value <std::string>               (&btagalgo_)        -> default_value("csvivf")                 ,"BTag algorithm")
-         ("BTag.workingPoint"            , po::value <std::string>               (&btagwp_)          -> default_value("tight")                  ,"BTag working point")
          ("BTag.nonBtagWP"               , po::value <std::string>               (&nonbtagwp_)       -> default_value("")                       ,"non-Btag working point")
          ("BTag.loose"                   , po::value <float>                     (&btagwploose_)     -> default_value(-10000)                   ,"BTag working point LOOSE")
          ("BTag.medium"                  , po::value <float>                     (&btagwpmedium_)    -> default_value(-10000)                   ,"BTag working point MEDIUM")
          ("BTag.tight"                   , po::value <float>                     (&btagwptight_)     -> default_value(-10000)                   ,"BTag working point TIGHT")
          ("BTag.user"                    , po::value <float>                     (&btagwpxxx_)       -> default_value(-10000)                   ,"BTag working point USER-defined")
-         ("BTag.nMin"                    , po::value <int>                       (&nbjetsmin_)       -> default_value(0)                        ,"Minimum number of btgaged jets")
+         ("BTag.nMin"                    , po::value <int>                       (&nbjetsmin_)       -> default_value(-1)                        ,"Minimum number of btgaged jets")
          ("nonBtagJet"                   , po::value <int>                       (&nonbtagjet_)      -> default_value(-1)                       ,"non-Btag Jet");
                                                                                                                                                 
       // muons                                                                                                                                  
@@ -142,8 +151,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
                                                                                                                                                 
       // generator level                                                                                                                        
       opt_cfg_.add_options()                                                                                                                    
-         ("Generator.genParticles"       , po::value <std::string>               (&genpartsCol_)     -> default_value("prunedGenParticles")     , "Name of the gen particle collection")
-         ("Generator.genJets"            , po::value <std::string>               (&genjetsCol_)      -> default_value("slimmedGenJets")         , "Name of the gen jets collection");
+         ("Generator.genParticles"       , po::value <std::string>               (&genpartsCol_)     -> default_value("")                       , "Name of the gen particle collection")
+         ("Generator.genJets"            , po::value <std::string>               (&genjetsCol_)      -> default_value("")                       , "Name of the gen jets collection");
                                                                                                                                                 
                                                                                                                                                 
       // general                                                                                                                                
@@ -158,6 +167,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("User.massMax"                 , po::value <float>                     (&massmax_)         -> default_value(-1.)                      , "Cut on a mass, max value")
          ("User.min"                     , po::value <float>                     (&min_)             -> default_value(-1.)                      , "some minimum value")  
          ("User.max"                     , po::value <float>                     (&max_)             -> default_value(-1.)                      , "some maximum value")
+         ("User.scale"                   , po::value <float>                     (&scale_)           -> default_value(-1.)                      , "Overall scale for histograms")  
+         ("User.workflow"                , po::value <int>                       (&workflow_)        -> default_value(1)                        , "Workflow index defined by user")
          ("User.prescale"                , po::value <int>                       (&prescale_)        -> default_value(1)                        , "Prescale factor")  
          ("User.n"                       , po::value <int>                       (&n_)               -> default_value(-1)                       , "Some integer")
          ("User.index"                   , po::value <int>                       (&index_)           -> default_value(-1)                       , "Some User index for user");
@@ -201,7 +212,6 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("crossSectionTree",po::value <std::string> (&xsectiontree_)->default_value(""),"Tree containing cross sections")
          ("crossSectionType",po::value <std::string> (&xsectiontype_)->default_value("crossSection"),"Type of cross section")
          ("crossSection",po::value <float> (&xsection_)->default_value(-1.), "Cross section")  
-         ("scale",po::value <float> (&scale_)->default_value(-1.), "Overall scale for histograms")  
          ("luminosity",po::value <float> (&lumi_)->default_value(-1.), "Luminosity in pb-1 to scale histograms")   
          ("nLumiSections",po::value <int> (&nlumis_)->default_value(-1), "Number of lumi sections processed")
          ("runMin",po::value <int> (&runmin_)->default_value(-1), "Minimum run number")
@@ -241,7 +251,6 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          po::notify(vm);
          boost::algorithm::to_lower(jetsid_);
          std::transform(btagalgo_.begin(), btagalgo_.end(), btagalgo_.begin(), ::tolower);
-         std::transform(btagwp_.begin(), btagwp_.end(), btagwp_.begin(), ::tolower);
          if ( jerptres_ != "" )  jerptres_ = Form("%s/%s", datapath.c_str(), jerptres_.c_str());
          if ( jersf_    != "" )  jersf_    = Form("%s/%s", datapath.c_str(), jersf_.c_str()   );
          if ( btagsf_   != "" )  btagsf_   = Form("%s/%s", datapath.c_str(), btagsf_.c_str()  );
@@ -249,15 +258,25 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          eventinfo_     =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , eventinfo_.c_str()      );
          triggerCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , triggerCol_.c_str()     );
          triggerObjDir_ =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , triggerObjDir_.c_str()  );
-         jetsCol_       =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , jetsCol_.c_str()        );
-         muonsCol_      =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , muonsCol_.c_str()       );
-         genpartsCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , genpartsCol_.c_str()    );
-         genjetsCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , genjetsCol_.c_str()     );
+         if ( jetsCol_ != "" )
+            jetsCol_       =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , jetsCol_.c_str()        );
+         if ( muonsCol_ != "" )
+            muonsCol_      =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , muonsCol_.c_str()       );
+         if ( genpartsCol_ != "" )
+            genpartsCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , genpartsCol_.c_str()    );
+         if ( genjetsCol_ != "" )
+            genjetsCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , genjetsCol_.c_str()     );
          l1tjetsCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , l1tjetsCol_.c_str()     );
          l1tmuonsCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , l1tmuonsCol_.c_str()    );
          
-         usejetsflv_ = ( usejetsflv_ || usejetsextflv_   );  // if extended is enabled, flavour must be enabled
-         dodijet_    = ( dodijet_    || dodijet_flav_ );  // if flavour is enabled dijet must be enabled
+         if ( njetsmax_ < njetsmin_ ) njetsmax_ = -1;
+         if ( njetsmin_ < 0 && njetsmax_ > 0 ) njetsmin_ = 0;
+         
+         if ( njets_ >= 0 )
+         {
+            njetsmin_ = njets_;
+            njetsmax_ = njets_;
+         }
       }
       catch(po::error& e)
       { 
@@ -310,6 +329,9 @@ void Config::loadOptions()
    
 }
 
+//
+std::string        Config::configFile()       const { return cfg_; }
+
 // analysis info
 std::string        Config::ntuplesList()      const { return inputlist_; }
 std::string        Config::eventInfo()        const { return eventinfo_; }
@@ -322,7 +344,7 @@ bool               Config::isMC()             const { return isMC_; }
 bool               Config::signalRegion()     const { return signalregion_; }
 bool               Config::blind()            const { return blind_; }
 bool               Config::nlo()              const { return nlo_; }
-bool               Config::fullWeight()       const { return fullweight_; }
+bool               Config::fullGenWeight()    const { return fullgenweight_; }
 int                Config::workflow()         const { return workflow_; }
 int                Config::index()            const { return index_; }
 float              Config::scale()            const { return scale_; }
@@ -337,6 +359,7 @@ bool               Config::override()          const { return override_; }
 std::string        Config::jetsCollection()     const { return jetsCol_; }
 int                Config::nJetsMin()           const { return njetsmin_; }
 int                Config::nJetsMax()           const { return njetsmax_; }
+int                Config::nJets()              const { return njets_; }
 std::vector<float> Config::jetsPtMin()          const { return jetsptmin_; }
 std::vector<float> Config::jetsPtMax()          const { return jetsptmax_; }
 std::vector<float> Config::jetsEtaMax()         const { return jetsetamax_; }
@@ -355,10 +378,9 @@ std::vector<float> Config::jetsBtagProbLight()  const { return jetsbtagproblight
 bool               Config::bRegression()        const { return bregression_; }
 std::string        Config::nonBtagWP()          const { return nonbtagwp_; }
 int                Config::nonBtagJet()         const { return nonbtagjet_; }
-bool               Config::useJetsFlavour()     const { return usejetsflv_; }
 bool               Config::useJetsExtendedFlavour() const { return usejetsextflv_; }
 bool               Config::doDijet()            const { return dodijet_ ; }
-bool               Config::doDijetFlavour()     const { return dodijet_flav_; }
+int                Config::nBJetsMin()          const { return nbjetsmin_; }
 
 // muons
 std::string        Config::muonsCollection()    const { return muonsCol_; }
@@ -427,3 +449,6 @@ int   Config::n()          const { return n_;   }
 float Config::min()        const { return min_; }
 float Config::max()        const { return max_; }
 
+// Histograms
+bool  Config::histogramJetsRegionSplit() const { return histjets_rsplit_ ; }
+bool  Config::histogramJetsPerFlavour()  const { return histjets_flavour_ ; }

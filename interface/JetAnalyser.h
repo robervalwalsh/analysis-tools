@@ -50,7 +50,6 @@ namespace analysis {
             int n_hjets_;
             
             bool jetsanalysis_;
-            bool genjetsanalysis_;
             bool applyjer_;
             
             std::map<std::string, std::shared_ptr<BTagCalibrationReader> >bsf_reader_;
@@ -95,10 +94,13 @@ namespace analysis {
             virtual bool selectionNonBJet(const int &);
             virtual bool onlineJetMatching(const int &);
             virtual bool onlineBJetMatching(const int &);
-            virtual void jetHistograms(const int & n = 1, const std::string & label = "x");
+            virtual void jetHistograms(const int & n, const std::string & label = "x");
+            virtual void jetHistograms(const std::string & label = "x");
             virtual void fillJetHistograms(const std::string & label = "x");
+            virtual void fillJetHistograms(const int & r = -1, const std::string & label = "x", const float & sf = 1.,const bool & workflow = false);
             virtual void actionApplyJER();
-            virtual void actionApplyBtagSF(const int &);
+            virtual float actionApplyBtagSF(const int &, const bool & global_weight = true);
+            virtual float getBtagSF(const int &);
             virtual void actionApplyBjetRegression();
             virtual void jetSwap(const int &, const int &);
             virtual bool selectionJetQGlikelihood(const int &, const float &);

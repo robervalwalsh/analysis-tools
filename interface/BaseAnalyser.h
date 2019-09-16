@@ -78,6 +78,7 @@ namespace analysis {
             std::map<std::string, std::shared_ptr<TH2F> > h2_;
             
             bool genpartsanalysis_; 
+            bool genjetsanalysis_;
             
             // pileup weight
             std::shared_ptr<PileupWeight> puweights_;
@@ -139,18 +140,21 @@ namespace analysis {
             
             // genparticle collection
             bool genParticlesAnalysis() const;
+            bool genJetsAnalysis() const;
             
             // pileup
             std::shared_ptr<PileupWeight> pileupWeights() const;
             float pileupWeight(const float & truepu, const int & var) const;
             float trueInteractions() const;
-            void actionApplyPileupWeight(const int & var = 0);
             
             void pileupHistogram();
             void fillPileupHistogram();
             
             void scale(const float &);
+            
+            std::string basename(const std::string &);
 
+            void actionApplyPileupWeight(const int & var = 0);
 
       };
    }
