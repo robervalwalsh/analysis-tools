@@ -1429,4 +1429,18 @@ bool JetAnalyser::selectionBJetProbLight(const int & r )
    return true;
 }
 
+float JetAnalyser::btagEfficiency(const int & r)
+{
+   float eff = 1;
+   auto btageff = this -> btagEfficiencies();
+   int j = r-1;
+   
+   return eff;
+   
+}
 
+void JetAnalyser::actionApplyBtagEfficiencyWeight(const int & r)
+{
+   weight_ *= btagEfficiency(r);
+   
+}
