@@ -73,6 +73,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Corrections.Jets.jerPtRes"    , po::value <std::string>               (&jerptres_)        -> default_value("")                       , "JER pT resolution file")
          ("Corrections.Jets.jerSF"       , po::value <std::string>               (&jersf_)           -> default_value("")                       , "JER SF file")
          ("Corrections.BTag.SF"          , po::value <std::string>               (&btagsf_)          -> default_value("")                       , "b-tagging scale factor in CSV format")
+         ("Corrections.BTag.Efficiencies", po::value <std::string>               (&btageff_)         -> default_value("")                       , "b-tagging efficiencies in root file")
          ("Corrections.Jets.bRegression" , po::value <bool>                      (&bregression_)     -> default_value(false)                    , "Apply b jet energy regression")
          ("Corrections.force"            , po::value <bool>                      (&apply_correct_)   -> default_value(false)                    , "Apply corrections internally when above are defined");
                                                                                                      
@@ -254,6 +255,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          if ( jerptres_ != "" )  jerptres_ = Form("%s/%s", datapath.c_str(), jerptres_.c_str());
          if ( jersf_    != "" )  jersf_    = Form("%s/%s", datapath.c_str(), jersf_.c_str()   );
          if ( btagsf_   != "" )  btagsf_   = Form("%s/%s", datapath.c_str(), btagsf_.c_str()  );
+         if ( btageff_  != "" )  btageff_  = Form("%s/%s", datapath.c_str(), btageff_.c_str() );
          if ( puweight_ != "" )  puweight_ = Form("%s/%s", datapath.c_str(), puweight_.c_str());
          eventinfo_     =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , eventinfo_.c_str()      );
          triggerCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , triggerCol_.c_str()     );
@@ -412,6 +414,7 @@ int                Config::seed()               const { return seed_;     }
 bool               Config::pythia8()            const { return pythia8_;  }
 
 // btag
+std::string        Config::btagEfficiencies()             const  { return btageff_; }
 float              Config::btagWP(const std::string & wp) const
 {
    if ( wp == "loose"  ) return btagwploose_ ;

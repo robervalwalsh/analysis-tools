@@ -176,6 +176,8 @@ namespace analysis {
             bool histogramJetsRegionSplit() const;
             bool histogramJetsPerFlavour() const;
 
+         // btag
+            std::string btagEfficiencies() const;
             
          // ========================
          
@@ -195,9 +197,6 @@ namespace analysis {
             // btag SF csv file
             std::string btagsf_;
             std::vector<float> jetsbtagmin_;
-
-
-
 
             // additional cuts of unidentified objects or for extra selections
             int nmin_;
@@ -352,6 +351,9 @@ namespace analysis {
             float btagwptight_;
             float btagwpxxx_;
             int nbjetsmin_;
+            // btag efficiency
+            std::string btageff_;
+
             
          // general
             float massmin_;
