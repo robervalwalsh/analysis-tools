@@ -18,6 +18,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include "TString.h"
 // 
 // user include files
 #include "Analysis/Tools/interface/BaseAnalyser.h"
@@ -96,6 +97,21 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    
    // JSON for data   
    if( isData_ && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
+   
+   // btag efficiencies
+   if ( config_->btagEfficiencies() != "" )
+   {
+      TFile f(config_->btagEfficiencies().c_str(),"old");
+      auto list = f.GetListOfKeys();
+      for ( int i = 0; i < list -> GetSize(); ++i)
+      {
+         TString item(list -> At(i) -> GetName());
+         if ( ! item.BeginsWith("eff_")) continue;
+         item.Remove(0,4);
+         btageff_[item.Data()] = std::shared_ptr<TGraphAsymmErrors>((TGraphAsymmErrors*)f.Get(("eff_"+item).Data()));
+      }
+      f.Close();
+   }
    
 }
 
@@ -416,3 +432,7 @@ std::string BaseAnalyser::basename(const std::string & name)
    
 }
 
+std::map<std::string, std::shared_ptr<TGraphAsymmErrors> > BaseAnalyser::btagEfficiencies() const
+{
+   return btageff_;
+}
