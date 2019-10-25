@@ -32,7 +32,7 @@
 #include "TFile.h"
 #include "TH1.h"
 #include "TH2.h"
-
+#include "TGraphAsymmErrors.h"
 
 namespace po = boost::program_options;
 
@@ -76,6 +76,9 @@ namespace analysis {
             std::shared_ptr<TFile> hout_;
             std::map<std::string, std::shared_ptr<TH1F> > h1_;
             std::map<std::string, std::shared_ptr<TH2F> > h2_;
+            
+            // btag efficiencies
+            std::map<std::string, std::shared_ptr<TGraphAsymmErrors> > btageff_;
             
             bool genpartsanalysis_; 
             bool genjetsanalysis_;
@@ -155,6 +158,8 @@ namespace analysis {
             std::string basename(const std::string &);
 
             void actionApplyPileupWeight(const int & var = 0);
+            
+            std::map<std::string, std::shared_ptr<TGraphAsymmErrors> > btagEfficiencies() const;
 
       };
    }
