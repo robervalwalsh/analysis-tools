@@ -1,16 +1,3 @@
-/**\class BaseAnalyser BaseAnalyser.cc Analysis/Tools/src/BaseAnalyser.cc
-
- Description: A base class for analyser
-
- Implementation:
-     [Notes on implementation]
-*/
-//
-// Original Author:  Roberval Walsh
-//         Created:  6 Sep 2018
-//
-//
-
 // system include files
 #include "boost/program_options.hpp"
 #include "boost/algorithm/string.hpp"
