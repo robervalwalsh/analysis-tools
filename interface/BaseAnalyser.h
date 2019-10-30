@@ -6,7 +6,7 @@
 // Package:    Analysis/Tools
 // Class:      Analysis
 // 
-/**\class BaseAnalyser BaseAnalyser.cc Analysis/Tools/src/BaseAnalyser.cc
+/**
 
  Description: A base class for analyser
 
@@ -47,8 +47,9 @@ namespace analysis {
       class BaseAnalyser {
          
          public:
-            /// constructors
+            /// constructor
             BaseAnalyser();
+            /// constructor
             BaseAnalyser(int argc, char * argv[]);
             /// desctructor
            ~BaseAnalyser();
@@ -56,28 +57,30 @@ namespace analysis {
          
             // ----------member data ---------------------------
          protected:
-            // main objects
+            /// Analysis objects
             std::shared_ptr<Analysis> analysis_;
+            /// Config objects
             std::shared_ptr<Config>   config_;
             
-            // selection
+            /// Cutflow index
             int cutflow_;
             
-            // seed value
+            /// seed value
             int seed_;
             
-            // event weight
+            /// event weight
             float weight_;
             
-            // cross section
+            /// cross section
             float xsection_;
             
-            // output root file
+            /// output root file
             std::shared_ptr<TFile> hout_;
+            /// 1D histograms mapping
             std::map<std::string, std::shared_ptr<TH1F> > h1_;
+            /// 2D histograms mapping
             std::map<std::string, std::shared_ptr<TH2F> > h2_;
             
-            // btag efficiencies
             std::map<std::string, std::shared_ptr<TGraphAsymmErrors> > btageff_;
             
             bool genpartsanalysis_; 
@@ -110,14 +113,16 @@ namespace analysis {
             int nEvents();
             
             
-            /// returns 1D histograms
+            /// returns all 1D histograms
             std::map<std::string, std::shared_ptr<TH1F> > histograms();
-            /// returns a given histogram
+            /// returns a given 1D histogram
             std::shared_ptr<TH1F> histogram(const std::string &);
             
             /// print out the cut flow
             void workflow();
+            /// get cutflow index
             int  cutflow();
+            /// set cutflow index
             void cutflow(const int &);
             
             // Actions
@@ -126,39 +131,55 @@ namespace analysis {
             /// create n histograms of a given type
             virtual void histograms(const std::string &, const int &);
                
-            /// others
+            /// returns a seed for random number generator
             int  seed();
+            /// reads a file containing a seed and returns the seed or -1 if fails 
             int  seed(const std::string &);
+            /// sets a seed for random number generators
             void seed(const int &);
             
-            /// event weight
+            /// returns event weight
             float weight();
+            /// sets event weight
             void weight(const float &);
             
-            // cross section
+            /// returns cross section
             float crossSection() const;
             
-            // output root file
+            /// returns pointer to output root file
             std::shared_ptr<TFile> output();
             
-            // genparticle collection
+            /// returns whether analysis of gen particles can be done
             bool genParticlesAnalysis() const;
+            /// returns whether analysis of gen jets can be done
             bool genJetsAnalysis() const;
             
-            // pileup
+            /// returns pointer to pileup weights (MC-only)
             std::shared_ptr<PileupWeight> pileupWeights() const;
+            /// returns pileup weight given the true pileup and uncertainty variation in values of sigma
             float pileupWeight(const float & truepu, const int & var) const;
+            /// returns true number of interactions
             float trueInteractions() const;
             
+            /// creates pileup histogram
             void pileupHistogram();
+            /// fills pileup histogram
             void fillPileupHistogram();
             
+            /// sets a scale
             void scale(const float &);
             
+            /// returns the basename of a path
             std::string basename(const std::string &);
-
+            
+            /// apply pileup weight given a systematic variation
             void actionApplyPileupWeight(const int & var = 0);
             
+            /**
+            btag efficiencies
+            
+            Given as TGraphAsymmErrors for each flavour
+            */
             std::map<std::string, std::shared_ptr<TGraphAsymmErrors> > btagEfficiencies() const;
 
       };
