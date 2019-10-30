@@ -4,9 +4,9 @@
 // -*- C++ -*-
 //
 // Package:    Analysis/Tools
-// Class:      Analysis
+// Class:      xxx
 // 
-/**\class Analysis MuonAnalyser.cc Analysis/Tools/src/MuonAnalyser.cc
+/**\class xxx MuonAnalyser.cc Analysis/Tools/src/MuonAnalyser.cc
 
  Description: [one line class summary]
 

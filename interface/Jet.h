@@ -6,7 +6,7 @@
 // Package:    Analysis/Tools
 // Class:      Jet
 // 
-/**\class Jet Jet.cc Analysis/Tools/src/Jet.cc
+/**\class xxx Jet.cc Analysis/Tools/src/Jet.cc
 
  Description: [one line class summary]
 

@@ -4,9 +4,9 @@
 // -*- C++ -*-
 //
 // Package:    Analysis/Tools
-// Class:      Analysis
+// Class:      xxx
 // 
-/**\class Analysis Analyser.cc Analysis/Tools/src/Analyser.cc
+/**\class xxx Analyser.cc Analysis/Tools/src/Analyser.cc
 
  Description: [one line class summary]
 

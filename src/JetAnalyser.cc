@@ -1,15 +1,4 @@
-/**\class JetAnalyser JetAnalyser.cc Analysis/Tools/src/JetAnalyser.cc
-
- Description: [one line class summary]
-
- Implementation:
-     [Notes on implementation]
-*/
-//
-// Original Author:  Roberval Walsh Bastos Rangel
-//         Created:  Mon, 20 Oct 2014 14:24:08 GMT
-//
-//
+#include "Analysis/Tools/interface/JetAnalyser.h"
 
 // system include files
 #include "boost/program_options.hpp"
@@ -21,7 +10,6 @@
 // 
 // user include files
 #include "Analysis/Tools/interface/Composite.h"
-#include "Analysis/Tools/interface/JetAnalyser.h"
 
 //
 // class declaration

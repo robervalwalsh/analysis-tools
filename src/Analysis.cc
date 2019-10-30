@@ -1,3 +1,4 @@
+#include "Analysis/Tools/interface/Analysis.h"
 // system include files
 #include <iostream>
 #include <fstream>
@@ -5,7 +6,6 @@
 //
 // user include files
 #include "TKey.h"
-#include "Analysis/Tools/interface/Analysis.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>

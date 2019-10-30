@@ -4,9 +4,9 @@
 // -*- C++ -*-
 //
 // Package:    Analysis/Tools
-// Class:      Analysis
+// Class:      JetAnalyser
 // 
-/**\class Analysis JetAnalyser.cc Analysis/Tools/src/JetAnalyser.cc
+/**\class xxx JetAnalyser.h Analysis/Tools/interface/JetAnalyser.h
 
  Description: [one line class summary]
 

@@ -4,9 +4,9 @@
 // -*- C++ -*-
 //
 // Package:    Analysis/Tools
-// Class:      Analysis
+// Class:      xxx
 // 
-/**\class Analysis PileupWeight.cc Analysis/Tools/src/PileupWeight.cc
+/**\class xxx PileupWeight.cc Analysis/Tools/src/PileupWeight.cc
 
  Description: [one line class summary]
 

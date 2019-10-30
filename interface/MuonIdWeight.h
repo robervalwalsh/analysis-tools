@@ -4,9 +4,9 @@
 // -*- C++ -*-
 //
 // Package:    Analysis/Tools
-// Class:      Analysis
+// Class:      xxx
 // 
-/**\class Analysis MuonIdWeight.cc Analysis/Tools/src/MuonIdWeight.cc
+/**\class xxx MuonIdWeight.cc Analysis/Tools/src/MuonIdWeight.cc
 
  Description: [one line class summary]
 
