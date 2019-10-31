@@ -6,7 +6,7 @@
 // Package:    Analysis/Tools
 // Class:      Muon
 // 
-/**\class Muon Muon.cc Analysis/Tools/src/Muon.cc
+/**\class xxx Muon.cc Analysis/Tools/src/Muon.cc
 
  Description: [one line class summary]
 
