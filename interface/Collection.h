@@ -6,7 +6,7 @@
 // Package:    Analysis/Tools
 // Class:      Collection
 // 
-/**\class Collection Collection.cc Analysis/Tools/src/Collection.cc
+/**\class xxx Collection.h Analysis/Tools/interface/Collection.h
 
  Description: [one line class summary]
 

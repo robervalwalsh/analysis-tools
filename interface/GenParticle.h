@@ -6,7 +6,7 @@
 // Package:    Analysis/Tools
 // Class:      GenParticle
 // 
-/**\class GenParticle GenParticle.cc Analysis/Tools/src/GenParticle.cc
+/**\class xxx GenParticle.cc Analysis/Tools/src/GenParticle.cc
 
  Description: [one line class summary]
 

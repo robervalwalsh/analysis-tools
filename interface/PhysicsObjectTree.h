@@ -6,7 +6,7 @@
 // Package:    Analysis/Tools
 // Class:      PhysicsObjectTree
 //
-/**\class PhysicsObjectTree PhysicsObjectTree.cc Analysis/Tools/src/PhysicsObjectTree.cc
+/**\class xxx PhysicsObjectTree.cc Analysis/Tools/src/PhysicsObjectTree.cc
 
  Description: [one line class summary]
 

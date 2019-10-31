@@ -1,16 +1,3 @@
-/**\class PileupWeight PileupWeight.cc Analysis/Tools/src/PileupWeight.cc
-
- Description: [one line class summary]
-
- Implementation:
-     [Notes on implementation]
-*/
-//
-// Original Author:  Roberval Walsh Bastos Rangel
-//         Created:  Mon, 20 Oct 2014 14:24:08 GMT
-//
-//
-
 // system include files
 // user include files
 #include "Analysis/Tools/interface/PileupWeight.h"

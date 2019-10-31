@@ -1,15 +1,3 @@
-/**\class MuonIdWeight MuonIdWeight.cc Analysis/Tools/src/MuonIdWeight.cc
-
- Description: [one line class summary]
-
- Implementation:
-     [Notes on implementation]
-*/
-//
-// Original Author:  Antonio Vagnerini
-//
-//
-
 // system include files
 // user include files
 #include "Analysis/Tools/interface/MuonIdWeight.h"

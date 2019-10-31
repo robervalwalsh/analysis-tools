@@ -4,9 +4,9 @@
 // -*- C++ -*-
 //
 // Package:    Analysis/Tools
-// Class:      Analysis
+// Class:      TriggerAnalyser
 // 
-/**\class Analysis TriggerAnalyser.cc Analysis/Tools/src/TriggerAnalyser.cc
+/**\class xxx TriggerAnalyser.h Analysis/Tools/interface/TriggerAnalyser.h
 
  Description: [one line class summary]
 

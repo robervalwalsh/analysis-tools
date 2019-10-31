@@ -1,16 +1,4 @@
-/**\class Analysis Analysis.cc Analysis/Tools/src/Analysis.cc
-
- Description: [one line class summary]
-
- Implementation:
-     [Notes on implementation]
-*/
-//
-// Original Author:  Roberval Walsh Bastos Rangel
-//         Created:  Mon, 20 Oct 2014 14:24:08 GMT
-//
-//
-
+#include "Analysis/Tools/interface/Analysis.h"
 // system include files
 #include <iostream>
 #include <fstream>
@@ -18,18 +6,17 @@
 //
 // user include files
 #include "TKey.h"
-#include "Analysis/Tools/interface/Analysis.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-using namespace analysis;
-using namespace analysis::tools;
-
 //
 // class declaration
 //
+
+using namespace analysis;
+using namespace analysis::tools;
 
 //
 // constructors and destructor

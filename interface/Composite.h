@@ -6,7 +6,7 @@
 // Package:    Analysis/Tools
 // Class:      Composite
 // 
-/**\class Composite Composite.cc Analysis/Tools/src/Composite.cc
+/**\class xxx Composite.h Analysis/Tools/interface/Composite.h
 
  Description: [one line class summary]
 
