@@ -109,6 +109,9 @@ namespace analysis {
             std::string jerPtRes() const;
             std::string jerSF() const;
             std::string l1tJetsCollection() const; 
+            
+            std::string btagAlgorithm() const;
+            std::string btagScaleFactors() const;
             std::vector<std::string> jetsBtagWP() const;
             std::vector<float> jetsBtagProbB() const;
             std::vector<float> jetsBtagProbBB() const;
@@ -123,7 +126,21 @@ namespace analysis {
             bool doDijet() const;
             bool doDijetFlavour() const;
             int nBJetsMin() const;
+            
+            std::vector<float>  jetsQGmin() const;
+            std::vector<float>  jetsQGmax() const;
 
+            
+            
+         // jet-jet                      
+            float jetsDetaMax()          const;
+            float jetsDetaMin()          const;
+            float jetsDphiMax()          const;
+            float jetsDphiMin()          const;
+            float jetsDrMax()            const;
+            float jetsDrMin()            const;
+            float jetsPtImbalanceMax()   const;
+            float jetsPtImbalanceMin()   const;
             
          // muons
             std::string muonsCollection() const;
@@ -195,7 +212,6 @@ namespace analysis {
 
 
             // btag SF csv file
-            std::string btagsf_;
             std::vector<float> jetsbtagmin_;
 
             // additional cuts of unidentified objects or for extra selections
@@ -205,12 +221,6 @@ namespace analysis {
             std::vector<float> ptmax_;
             std::vector<float> etamax_;
 
-            float jetsdrmin_;
-            float jetsdrmax_;
-            float jetsdetamax_;
-            float jetsdetamin_;
-            float jetsdphimin_;
-            float jetsdphimax_;
             
 
             float drmin_;
@@ -219,15 +229,6 @@ namespace analysis {
             float detamin_;
             float dphimin_;
             float dphimax_;
-
-            float ptimbalmax_;
-            float ptimbalmin_;
-            
-            std::vector<float>  qgmin_;
-            std::vector<float>  qgmax_;
-
-            std::string btagalgo_;
-
 
             std::string hltPath_;
             std::string l1Seed_;
@@ -293,12 +294,29 @@ namespace analysis {
             std::string jetsid_;
             std::string jetspuid_;
             
+            std::vector<float>  qgmin_;
+            std::vector<float>  qgmax_;
+            
+            float jetsdetamax_;
+            float jetsdetamin_;
+            float jetsdphimin_;
+            float jetsdphimax_;
+            float jetsdrmin_;
+            float jetsdrmax_;
+            float jetsptimbalmax_;
+            float jetsptimbalmin_;
+            
             // JER resolution and scale factors from txt file
             std::string jerptres_;
             std::string jersf_;
             //
             std::string l1tjetsCol_; 
             //
+            // 
+            std::string btagalgo_;
+            std::string btagsf_;
+
+
             std::vector<std::string> jetsbtagwp_;
             std::string nonbtagwp_;
             int nonbtagjet_;
