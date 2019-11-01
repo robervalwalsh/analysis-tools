@@ -168,8 +168,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("ptMin", po::value<std::vector<float> >(&ptmin_)->multitoken(),"Mimium pt of an object")
          ("ptMax", po::value<std::vector<float> >(&ptmax_)->multitoken(),"Maximum pt of an object")
          ("etaMax", po::value<std::vector<float> >(&etamax_)->multitoken(),"Maximum |eta| of an object")
-         ("ptImbalanceMin",po::value <float> (&ptimbalmin_)->default_value(-1),"Minimum relative imbalance between two candidates")
-         ("ptImbalanceMax",po::value <float> (&ptimbalmax_)->default_value(-1),"Maximum relative imbalance between two candidates");
+         ("ptImbalanceMin",po::value <float> (&jetsptimbalmin_)->default_value(-1),"Minimum relative imbalance between two candidates")
+         ("ptImbalanceMax",po::value <float> (&jetsptimbalmax_)->default_value(-1),"Maximum relative imbalance between two candidates");
       
          
       opt_cfg_.add_options()
@@ -357,6 +357,8 @@ std::string        Config::jetsPuId()           const { return jetspuid_; }
 std::string        Config::jerPtRes()           const { return jerptres_; }
 std::string        Config::jerSF()              const { return jersf_; }
 std::string        Config::l1tJetsCollection()  const { return l1tjetsCol_; } 
+std::string        Config::btagAlgorithm()      const { return btagalgo_; } 
+std::string        Config::btagScaleFactors()   const { return btagsf_; } 
 std::vector<std::string> Config::jetsBtagWP()   const { return jetsbtagwp_; }
 std::vector<float> Config::jetsBtagProbB()      const { return jetsbtagprobb_; }
 std::vector<float> Config::jetsBtagProbBB()     const { return jetsbtagprobbb_; }
@@ -370,6 +372,19 @@ int                Config::nonBtagJet()         const { return nonbtagjet_; }
 bool               Config::useJetsExtendedFlavour() const { return usejetsextflv_; }
 bool               Config::doDijet()            const { return dodijet_ ; }
 int                Config::nBJetsMin()          const { return nbjetsmin_; }
+
+std::vector<float>  Config::jetsQGmin() const { return qgmin_; }
+std::vector<float>  Config::jetsQGmax() const { return qgmax_; }
+
+// jet-jet
+float Config::jetsDetaMax()         const { return jetsdetamax_; }
+float Config::jetsDetaMin()         const { return jetsdetamin_; }
+float Config::jetsDphiMax()         const { return jetsdphimax_; }
+float Config::jetsDphiMin()         const { return jetsdphimin_; }
+float Config::jetsDrMax()           const { return jetsdrmax_;   }
+float Config::jetsDrMin()           const { return jetsdrmin_;   }
+float Config::jetsPtImbalanceMax()  const { return jetsptimbalmax_;  }
+float Config::jetsPtImbalanceMin()  const { return jetsptimbalmin_;  }
 
 // muons
 std::string        Config::muonsCollection()    const { return muonsCol_; }
