@@ -374,27 +374,30 @@ bool JetAnalyser::selectionJet(const int & r, const float & pt_min, const float 
 }
 
 
-bool JetAnalyser::selectionJetDeta(const int & j1, const int & j2, const float & delta)
+bool JetAnalyser::selectionJetDeta(const int & r1, const int & r2, const float & delta)
 {
-   if ( j1 > config_->nJetsMin() ||  j2 > config_->nJetsMin() ) return true;
+   if ( r1 > config_->nJetsMin() ||  r2 > config_->nJetsMin() ) return true;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
    {
       if ( delta > 0 )
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Deta(jet %d, jet %d) < %4.2f",j1,j2,fabs(delta)));
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Deta(jet %d, jet %d) < %4.2f",r1,r2,fabs(delta)));
       else
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Deta(jet %d, jet %d) > %4.2f",j1,j2,fabs(delta)));
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Deta(jet %d, jet %d) > %4.2f",r1,r2,fabs(delta)));
    }
    
+   
+   int j1 = r1-1;
+   int j2 = r2-1;
    
    if ( delta > 0 )
    {
-      if ( fabs(selectedJets_[j1-1]->eta() - selectedJets_[j2-1]->eta()) > fabs(delta) ) return false;
+      if ( fabs(selectedJets_[j1]->eta() - selectedJets_[j2]->eta()) > fabs(delta) ) return false;
    }
    else
    {
-      if ( fabs(selectedJets_[j1-1]->eta() - selectedJets_[j2-1]->eta()) < fabs(delta) ) return false;
+      if ( fabs(selectedJets_[j1]->eta() - selectedJets_[j2]->eta()) < fabs(delta) ) return false;
    }
 
         
@@ -403,7 +406,7 @@ bool JetAnalyser::selectionJetDeta(const int & j1, const int & j2, const float &
    return true;
    
 }
-bool JetAnalyser::selectionJetDeta(const int & j1, const int & j2)
+bool JetAnalyser::selectionJetDeta(const int & r1, const int & r2)
 {
    bool ok = true;
    if (config_->jetsdetamax_ < 0 )
@@ -412,7 +415,7 @@ bool JetAnalyser::selectionJetDeta(const int & j1, const int & j2)
    }
    else
    {
-      ok = ok && selectionJetDeta(j1,j2,config_->jetsdetamax_);
+      ok = ok && selectionJetDeta(r1,r2,config_->jetsdetamax_);
    }
    
    if (config_->jetsdetamin_ < 0 )
@@ -421,32 +424,35 @@ bool JetAnalyser::selectionJetDeta(const int & j1, const int & j2)
    }
    else
    {
-      ok = ok && selectionJetDeta(j1,j2,-1*config_->jetsdetamin_);
+      ok = ok && selectionJetDeta(r1,r2,-1*config_->jetsdetamin_);
    }
    return ok;
    
 }
 
-bool JetAnalyser::selectionJetDphi(const int & j1, const int & j2, const float & delta)
+bool JetAnalyser::selectionJetDphi(const int & r1, const int & r2, const float & delta)
 {
-   if ( j1 > config_->nJetsMin() ||  j2 > config_->nJetsMin() ) return true;
+   if ( r1 > config_->nJetsMin() ||  r2 > config_->nJetsMin() ) return true;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
    {
       if ( delta > 0 )
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Dphi(jet %d, jet %d) < %4.2f",j1,j2,fabs(delta)));
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Dphi(jet %d, jet %d) < %4.2f",r1,r2,fabs(delta)));
       else
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Dphi(jet %d, jet %d) > %4.2f",j1,j2,fabs(delta)));
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Dphi(jet %d, jet %d) > %4.2f",r1,r2,fabs(delta)));
    }
+   
+   int j1 = r1-1;
+   int j2 = r2-1;
    
    if ( delta > 0 )
    {
-      if ( fabs(selectedJets_[j1-1]->deltaPhi(*selectedJets_[j2-1])) > fabs(delta) ) return false;
+      if ( fabs(selectedJets_[j1]->deltaPhi(*selectedJets_[j2])) > fabs(delta) ) return false;
    }
    else
    {
-      if ( fabs(selectedJets_[j1-1]->deltaPhi(*selectedJets_[j2-1])) < fabs(delta) ) return false;
+      if ( fabs(selectedJets_[j1]->deltaPhi(*selectedJets_[j2])) < fabs(delta) ) return false;
    }
         
    h1_["cutflow"] -> Fill(cutflow_,weight_);
@@ -454,7 +460,7 @@ bool JetAnalyser::selectionJetDphi(const int & j1, const int & j2, const float &
    return true;
    
 }
-bool JetAnalyser::selectionJetDphi(const int & j1, const int & j2)
+bool JetAnalyser::selectionJetDphi(const int & r1, const int & r2)
 {
    bool ok = true;
    if (config_->jetsdphimax_ < 0 )
@@ -463,7 +469,7 @@ bool JetAnalyser::selectionJetDphi(const int & j1, const int & j2)
    }
    else
    {
-      ok = ok && selectionJetDphi(j1,j2,config_->jetsdphimax_);
+      ok = ok && selectionJetDphi(r1,r2,config_->jetsdphimax_);
    }
    
    if (config_->jetsdphimin_ < 0 )
@@ -472,35 +478,36 @@ bool JetAnalyser::selectionJetDphi(const int & j1, const int & j2)
    }
    else
    {
-      ok = ok && selectionJetDphi(j1,j2,-1*config_->jetsdphimin_);
+      ok = ok && selectionJetDphi(r1,r2,-1*config_->jetsdphimin_);
    }
    return ok;
    
 }
 
 
-bool JetAnalyser::selectionJetDr(const int & j1, const int & j2, const float & delta)
+bool JetAnalyser::selectionJetDr(const int & r1, const int & r2, const float & delta)
 {
-   if ( j1 > config_->nJetsMin() ||  j2 > config_->nJetsMin() ) return true;
+   if ( r1 > config_->nJetsMin() ||  r2 > config_->nJetsMin() ) return true;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
    {
       if ( delta > 0 ) 
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DR(jet %d, jet %d) < %4.2f",j1,j2,fabs(delta)));
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DR(jet %d, jet %d) < %4.2f",r1,r2,fabs(delta)));
       else
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DR(jet %d, jet %d) > %4.2f",j1,j2,fabs(delta)));
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DR(jet %d, jet %d) > %4.2f",r1,r2,fabs(delta)));
    }
-        
    
+   int j1 = r1-1;
+   int j2 = r2-1;
    
    if ( delta > 0 )
    {
-      if ( selectedJets_[j1-1]->deltaR(*selectedJets_[j2-1]) > fabs(delta) ) return false;
+      if ( selectedJets_[j1]->deltaR(*selectedJets_[j2]) > fabs(delta) ) return false;
    }
    else
    {
-      if ( selectedJets_[j1-1]->deltaR(*selectedJets_[j2-1]) < fabs(delta) ) return false;
+      if ( selectedJets_[j1]->deltaR(*selectedJets_[j2]) < fabs(delta) ) return false;
    }
 
       
@@ -510,7 +517,7 @@ bool JetAnalyser::selectionJetDr(const int & j1, const int & j2, const float & d
    
 }
 
-bool JetAnalyser::selectionJetDr(const int & j1, const int & j2)
+bool JetAnalyser::selectionJetDr(const int & r1, const int & r2)
 {
    bool ok = true;
    if (config_->jetsdrmax_ < 0 )
@@ -519,7 +526,7 @@ bool JetAnalyser::selectionJetDr(const int & j1, const int & j2)
    }
    else
    {
-      ok = ok && selectionJetDr(j1,j2,config_->jetsdrmax_);
+      ok = ok && selectionJetDr(r1,r2,config_->jetsdrmax_);
    }
    
    if (config_->jetsdrmin_ < 0 )
@@ -528,9 +535,64 @@ bool JetAnalyser::selectionJetDr(const int & j1, const int & j2)
    }
    else
    {
-      ok = ok && selectionJetDr(j1,j2,-1*config_->jetsdrmin_);
+      ok = ok && selectionJetDr(r1,r2,-1*config_->jetsdrmin_);
    }
    return ok;
+}
+
+bool JetAnalyser::selectionJetPtImbalance(const int & r1, const int & r2, const float & delta)
+{
+   if ( r1 > config_->nJetsMin() ||  r2 > config_->nJetsMin() ) return true;
+   
+   ++cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      if ( delta > 0 )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DpT(jet %d, jet %d)/jet %d pT < %4.2f",r1,r2,r1,fabs(delta)));
+      else
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DpT(jet %d, jet %d)/jet %d pT > %4.2f",r1,r2,r1,fabs(delta)));
+   }
+   
+   int j1 = r1-1;
+   int j2 = r2-1;
+   
+   if ( delta > 0 )
+   {
+      if ( fabs(selectedJets_[j1]->pt() - selectedJets_[j2]->pt())/selectedJets_[j1]->pt() > fabs(delta) ) return false;
+   }
+   else
+   {
+      if ( fabs(selectedJets_[j1]->pt() - selectedJets_[j2]->pt())/selectedJets_[j1]->pt() < fabs(delta) ) return false;
+   }
+
+        
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+    
+   return true;
+   
+}
+bool JetAnalyser::selectionJetPtImbalance(const int & r1, const int & r2)
+{
+   bool ok = true;
+   if (config_->ptimbalmax_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetPtImbalance(r1,r2,config_->ptimbalmax_);
+   }
+   
+   if (config_->ptimbalmin_ < 0 )
+   {
+      ok = ok && true;
+   }
+   else
+   {
+      ok = ok && selectionJetPtImbalance(r1,r2,-1*config_->ptimbalmin_);
+   }
+   return ok;
+   
 }
 
 
@@ -1082,59 +1144,6 @@ void JetAnalyser::jetSwap(const int & r1, const int & r2)
 }
 
 
-
-bool JetAnalyser::selectionJetPtImbalance(const int & j1, const int & j2, const float & delta)
-{
-   if ( j1 > config_->nJetsMin() ||  j2 > config_->nJetsMin() ) return true;
-   
-   ++cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
-   {
-      if ( delta > 0 )
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DpT(jet %d, jet %d)/jet %d pT < %4.2f",j1,j2,j1,fabs(delta)));
-      else
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DpT(jet %d, jet %d)/jet %d pT > %4.2f",j1,j2,j1,fabs(delta)));
-   }
-   
-   
-   if ( delta > 0 )
-   {
-      if ( fabs(selectedJets_[j1-1]->pt() - selectedJets_[j2-1]->pt())/selectedJets_[j1-1]->pt() > fabs(delta) ) return false;
-   }
-   else
-   {
-      if ( fabs(selectedJets_[j1-1]->pt() - selectedJets_[j2-1]->pt())/selectedJets_[j1-1]->pt() < fabs(delta) ) return false;
-   }
-
-        
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
-    
-   return true;
-   
-}
-bool JetAnalyser::selectionJetPtImbalance(const int & j1, const int & j2)
-{
-   bool ok = true;
-   if (config_->ptimbalmax_ < 0 )
-   {
-      ok = ok && true;
-   }
-   else
-   {
-      ok = ok && selectionJetPtImbalance(j1,j2,config_->ptimbalmax_);
-   }
-   
-   if (config_->ptimbalmin_ < 0 )
-   {
-      ok = ok && true;
-   }
-   else
-   {
-      ok = ok && selectionJetPtImbalance(j1,j2,-1*config_->ptimbalmin_);
-   }
-   return ok;
-   
-}
 
 bool JetAnalyser::selectionJetQGlikelihood(const int & r, const float & cut)
 {

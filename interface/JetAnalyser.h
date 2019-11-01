@@ -74,18 +74,28 @@ namespace analysis {
             
             // Actions
             virtual bool analysisWithJets();
-            /// Given the ranking 'r' of a jet, it returns whether the jet passes the pt_min and |eta_max|, optionally pt_max, where the values of the thresholds  pt_min and |eta_max|, pt_max come from the the configuration file
+            /// Given the ranking 'r' of a jet, it returns whether the jet passes the pt_min and |eta_max|, optionally pt_max, where the values of the thresholds  pt_min and |eta_max|, pt_max are passed by configuration file
             virtual bool selectionJet(const int & r);
             /// Given the ranking 'r' of a jet, it returns whether the jet passes the pt_min and |eta_max|, optionally pt_max, where the values of the thresholds  pt_min and |eta_max|, pt_max (opt) are passed as arguments
             virtual bool selectionJet(const int & r, const float & pt_min, const float &eta_max, const float &pt_max=-1. );
-            virtual bool selectionJetDeta(const int &, const int &, const float &);
-            virtual bool selectionJetDeta(const int &, const int &);
-            virtual bool selectionJetDphi(const int &, const int &, const float &);
-            virtual bool selectionJetDphi(const int &, const int &);
-            virtual bool selectionJetDr(const int &, const int &, const float &);
-            virtual bool selectionJetDr(const int &, const int &);
-            virtual bool selectionJetPtImbalance(const int &, const int &, const float &);
-            virtual bool selectionJetPtImbalance(const int &, const int &);
+            /// Given the rankings r1 and r2 of two jets, it returns whether the jets passes the delta_eta selection; the threshold delta is passed by the configuration file
+            virtual bool selectionJetDeta(const int & r1, const int &r2);
+            /// Given the rankings r1 and r2 of two jets, it returns whether the jets passes the delta_eta selection; the threshold delta is passed as an argument (if delta <= 0, |delta| = delta_min; else |delta| = delta_max )
+            virtual bool selectionJetDeta(const int & r1, const int & r2, const float & delta);
+            /// Given the rankings r1 and r2 of two jets, it returns whether the jets passes the delta_phi selection; the threshold delta is passed by the configuration file
+            virtual bool selectionJetDphi(const int & r1, const int & r2);
+            /// Given the rankings r1 and r2 of two jets, it returns whether the jets passes the delta_phi selection; the threshold delta is passed as an argument (if delta <= 0, |delta| = delta_min; else |delta| = delta_max )
+            virtual bool selectionJetDphi(const int & r1, const int & r2, const float & delta);
+            /// Given the rankings r1 and r2 of two jets, it returns whether the jets passes the delta_R selection; the threshold delta is passed by the configuration file
+            virtual bool selectionJetDr(const int & r1, const int & r2);
+            /// Given the rankings r1 and r2 of two jets, it returns whether the jets passes the delta_R selection; the threshold delta is passed as an argument (if delta <= 0, |delta| = delta_min; else |delta| = delta_max )
+            virtual bool selectionJetDr(const int & r1, const int & r2, const float & delta);
+            /// Given the rankings r1 and r2 of two jets, it returns whether the jets passes the pt imbalance selection; the threshold delta is passed by the configuration file
+            virtual bool selectionJetPtImbalance(const int & r1, const int & r2);
+            /// Given the rankings r1 and r2 of two jets, it returns whether the jets passes the pt imbalance selection; the threshold delta is passed as an argument (if delta <= 0, |delta| = delta_min; else |delta| = delta_max )
+            virtual bool selectionJetPtImbalance(const int & r1, const int & r2, const float & delta);
+            
+            
             virtual bool selectionJetId();
             virtual bool selectionJetPileupId();
             virtual bool selectionNJets();
