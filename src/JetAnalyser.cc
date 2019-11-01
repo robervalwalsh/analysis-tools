@@ -330,28 +330,42 @@ float JetAnalyser::btag(const Jet & jet, const std::string & algo)
 bool JetAnalyser::selectionJet(const int & r)
 {
    if ( r > config_->nJetsMin() ) return true;
+   int j = r-1;
+   
+   float pt_min = config_->jetsPtMin()[j];
+   float pt_max = -1.;
+   float eta_max = config_->jetsEtaMax()[j];
+   
+   if ( config_->jetsPtMax().size() > 0 && config_->jetsPtMax()[j] > config_->jetsPtMin()[j] ) pt_max = config_->jetsPtMax()[j];
+   
+   bool isgood = this -> selectionJet(r,pt_min,eta_max,pt_max);
+   
+   return isgood;
+}
+
+bool JetAnalyser::selectionJet(const int & r, const float & pt_min, const float &eta_max, const float &pt_max)
+{
+   if ( r > config_->nJetsMin() ) return true;
    ++cutflow_;
    bool isgood = true;
    int j = r-1;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
    {
-      if ( config_->jetsPtMax().size() > 0 && config_->jetsPtMax()[j] > config_->jetsPtMin()[j] )
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f GeV and pt < %5.1f GeV and |eta| < %3.1f",r,config_->jetsPtMin()[j], config_->jetsPtMax()[j],config_->jetsEtaMax()[j] ));
+      if ( pt_max > pt_min )
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f GeV and pt < %5.1f GeV and |eta| < %3.1f",r,pt_min, pt_max, eta_max ));
       else
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f GeV and |eta| < %3.1f",r,config_->jetsPtMin()[j], config_->jetsEtaMax()[j] ));
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f GeV and |eta| < %3.1f",r,pt_min, eta_max ));
    }
    
-//   if ( selectedJets_.size() == 0 ) isgood = (isgood && selectionJetId());
-//   if ( !isgood || (int)selectedJets_.size() < r ) return false;
    if ( (int)selectedJets_.size() < r ) return false;
    
    // kinematic selection
-   if ( selectedJets_[j] -> pt() < config_->jetsPtMin()[j]           && !(config_->jetsPtMin()[j] < 0) ) return false;
-   if ( fabs(selectedJets_[j] -> eta()) > config_->jetsEtaMax()[j]   && !(config_->jetsEtaMax()[j] < 0) ) return false;
+   if ( selectedJets_[j] -> pt() < pt_min           && !(pt_min < 0) ) return false;
+   if ( fabs(selectedJets_[j] -> eta()) > eta_max   && !(eta_max < 0) ) return false;
    if ( config_->jetsPtMax().size() > 0 )
    {
-      if ( selectedJets_[j] -> pt() > config_->jetsPtMax()[j] && !(config_->jetsPtMax()[j] < config_->jetsPtMin()[j]) )   return false;
+      if ( selectedJets_[j] -> pt() > pt_max && !(pt_max < pt_min ) )  return false;
    }
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);

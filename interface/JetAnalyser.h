@@ -61,16 +61,23 @@ namespace analysis {
          private:
                
          public:
+            /// vector of pointers of the selectedJets
             std::vector< std::shared_ptr<Jet> > selectedJets();
+            /// vector of pointers of all jets from the "Jets" collection
             std::vector< std::shared_ptr<Jet> > jets();
-            float btag(const Jet & , const std::string & );
+            
+            /// Returns the btag value of the jet for a given btag algorithm
+            float btag(const Jet & jet, const std::string & algo);
          
-            // Sets
-            void jets(const std::string &);
+            /// Creates the "Jets" collection
+            void jets(const std::string & col);
             
             // Actions
             virtual bool analysisWithJets();
-            virtual bool selectionJet(const int &);
+            /// Given the ranking 'r' of a jet, it returns whether the jet passes the pt_min and |eta_max|, optionally pt_max, where the values of the thresholds  pt_min and |eta_max|, pt_max come from the the configuration file
+            virtual bool selectionJet(const int & r);
+            /// Given the ranking 'r' of a jet, it returns whether the jet passes the pt_min and |eta_max|, optionally pt_max, where the values of the thresholds  pt_min and |eta_max|, pt_max (opt) are passed as arguments
+            virtual bool selectionJet(const int & r, const float & pt_min, const float &eta_max, const float &pt_max=-1. );
             virtual bool selectionJetDeta(const int &, const int &, const float &);
             virtual bool selectionJetDeta(const int &, const int &);
             virtual bool selectionJetDphi(const int &, const int &, const float &);
