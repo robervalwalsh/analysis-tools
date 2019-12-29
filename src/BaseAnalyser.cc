@@ -6,7 +6,7 @@
 #include <fstream>
 #include <vector>
 #include "TString.h"
-// 
+//
 // user include files
 #include "Analysis/Tools/interface/BaseAnalyser.h"
 
@@ -28,39 +28,39 @@ BaseAnalyser::BaseAnalyser()
 BaseAnalyser::BaseAnalyser(int argc, char * argv[])
 {
    TH1::SetDefaultSumw2();
-   
+
    exe_ = std::string(argv[0]);
-   
+
    // some inits
    scale_    = -1.;
    weight_   = 1.;
    xsection_ = -1.;
    genpartsanalysis_ = false;
    genjetsanalysis_  = false;
-    
+
    // the heavy stuff
    config_   = std::make_shared<Config>(argc,argv);
    analysis_ = std::make_shared<Analysis>(config_->ntuplesList(),config_->eventInfo());
-   
+
    // output file
    if ( config_->outputRoot_ != "" )
    {
       hout_= std::make_shared<TFile>(config_->outputRoot_.c_str(),"recreate",Form("%s %s %s",argv[0],argv[1],argv[2]));
       hout_ -> cd();
    }
-   
+
    seed_ = analysis_ ->seed(config_->seedFile());
-   
+
    // Workflow
    h1_["cutflow"] = std::make_shared<TH1F>("workflow",Form("Workflow #%d",config_->workflow()), 100,0,100);
-      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" ) 
+      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" )
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(1,"Total events read");
-      
-   
+
+
 //   isMC_ = config_->isMC();
    isMC_ = analysis_->isMC();
    isData_ = !isMC_;
-   
+
    // Some MC-only stuff
    if ( isMC_ )
    {
@@ -79,12 +79,12 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
       if ( config_->fullGenWeight() ) genweight_type = "full weights";
       if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(2)) == "" )
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(2,Form("Generated weighted events (%s)",genweight_type.c_str()));
-      
+
    }
-   
-   // JSON for data   
+
+   // JSON for data
    if( isData_ && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
-   
+
    // btag efficiencies
    if ( config_->btagEfficiencies() != "" )
    {
@@ -99,7 +99,7 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
       }
       f.Close();
    }
-   
+
 }
 
 BaseAnalyser::~BaseAnalyser()
@@ -118,7 +118,7 @@ BaseAnalyser::~BaseAnalyser()
    }
    float fevts =  h1_["cutflow"] -> GetBinContent(lastbin);
    // overall scale
-   float scale = 1.; 
+   float scale = 1.;
    bool doscale = false;
    if ( scale_ > 0. )  // superseeds the scale from config
    {
@@ -142,7 +142,7 @@ BaseAnalyser::~BaseAnalyser()
       }
       h1_["cutflow"] -> Fill(lastbin,fevts*scale);
    }
-    
+
 //    // scale to luminosity
 //    if ( config_->isMC() && config_ -> luminosity() > 0. && config_ -> scale() < 0. )
 //    {
@@ -155,8 +155,8 @@ BaseAnalyser::~BaseAnalyser()
 //       }
 //       h1_["cutflow"] -> Fill(lastbin,fevts*scale);
 //    }
-   
-   
+
+
    for ( auto h : h1_ )
    {
       if ( h.first == "cutflow" || h.first == "pileup" || h.first == "pileup_w" )    continue;
@@ -164,7 +164,7 @@ BaseAnalyser::~BaseAnalyser()
       bool is_empty =  ( h.second -> GetEntries() != 0 || h.second -> GetSumOfWeights() != 0 );
       if ( is_empty )
          continue;
-      
+
    }
    for ( auto h : h2_ )
    {
@@ -180,15 +180,15 @@ BaseAnalyser::~BaseAnalyser()
       hout_ -> cd();
       hout_ -> Write();
 //      hout_->Close();
-   }   
-   
+   }
+
 //   std::string cutflow = "Cutflow " + config_->outputRoot_;
 //   std::system(cutflow.c_str());
-   
+
    std::cout << exe_ << " finished!" << std::endl;
    printf("%s\n", std::string(100,'_').c_str());
    std::cout << std::endl;
-   
+
    std::ofstream finished;
    finished.open("finished.txt");
    finished << exe_ << "\n";
@@ -203,6 +203,8 @@ BaseAnalyser::~BaseAnalyser()
 
 bool BaseAnalyser::event(const int & i) { return true; }
 void BaseAnalyser::histograms(const std::string & s, const int & i) { }
+void BaseAnalyser::fillAnalyserTree() { }
+void BaseAnalyser::analyserTree() { }
 
 std::shared_ptr<Analysis> BaseAnalyser::analysis()
 {
@@ -223,12 +225,12 @@ int BaseAnalyser::nEvents()
 
 std::shared_ptr<TH1F> BaseAnalyser::histogram(const std::string & hname)
 {
-   if ( h1_.find(hname) == h1_.end() ) 
+   if ( h1_.find(hname) == h1_.end() )
    {
       std::cout << "-e- BaseAnalyser::H1F(const string & hname) -> no histogram with hname = " << hname << std::endl;
       return nullptr;
    }
-   
+
    return h1_[hname];
 }
 
@@ -265,10 +267,10 @@ void BaseAnalyser::workflow()
          rni = h1_["cutflow"]-> GetBinContent(i)/h1_["cutflow"]->GetBinContent(i-1);
          printf("| %2d - %-83s |    %10.1f |   %16.4f |     %16.4f |\n",i-1,label.c_str(),n,rn1,rni);
       }
-      
+
    }
    printf("+%s+\n", std::string(150,'-').c_str());
-   
+
 }
 
 int  BaseAnalyser::seed()
@@ -324,23 +326,23 @@ std::shared_ptr<PileupWeight>  BaseAnalyser::pileupWeights() const
 
 float BaseAnalyser::pileupWeight(const float & truepu, const int & var) const
 {
-   if ( ! puweights_ ) return 1.;   
+   if ( ! puweights_ ) return 1.;
    return puweights_->weight(truepu,var);
 }
 
 float BaseAnalyser::trueInteractions() const
 {
    if ( ! config_->isMC() ) return -1;
-    
+
    return float(analysis_->nTruePileup());
 }
 
 void BaseAnalyser::actionApplyPileupWeight(const int & var)
 {
    if ( ! config_->isMC() ) return;
-   
+
    ++cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
    {
       std::string bn;
       if ( puweights_ )
@@ -353,12 +355,12 @@ void BaseAnalyser::actionApplyPileupWeight(const int & var)
       }
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Pileup weight (%s)",bn.c_str()));
    }
-   
+
    if ( puweights_ )
       weight_ *= this->pileupWeight(analysis_->nTruePileup(),var);
    else
       weight_ *= 1;
-   
+
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    this -> fillPileupHistogram();
 }
@@ -376,16 +378,16 @@ void BaseAnalyser::pileupHistogram()
       h1_["pileup"] = std::make_shared<TH1F>("pileup" , "pileup" , 100 , 0 , 100 );
       h1_["pileup_w"] = std::make_shared<TH1F>("pileup_w" , "weighted pileup" , 100 , 0 , 100 );
    }
-   
+
 }
 void BaseAnalyser::fillPileupHistogram()
 {
 //    ++cutflow_;
-//    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+//    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
 //       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"*** Fill true pileup histrogram");
-//    
+//
 //    h1_["cutflow"] -> Fill(cutflow_,weight_);
-   
+
    h1_["pileup"] -> Fill(analysis_->nTruePileup());
    h1_["pileup_w"] -> Fill(analysis_->nTruePileup(),this->pileupWeight(analysis_->nTruePileup(),0));
 }
@@ -416,7 +418,7 @@ std::string BaseAnalyser::basename(const std::string & name)
    }
    return bn;
 
-   
+
 }
 
 std::map<std::string, std::shared_ptr<TGraphAsymmErrors> > BaseAnalyser::btagEfficiencies() const

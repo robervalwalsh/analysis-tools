@@ -134,6 +134,9 @@ namespace analysis {
             virtual bool event(const int &);
             /// create n histograms of a given type
             virtual void histograms(const std::string &, const int &);
+            // root tree
+            virtual void fillAnalyserTree();
+            virtual void analyserTree();
 
             /// returns a seed for random number generator
             int  seed();
@@ -186,9 +189,6 @@ namespace analysis {
             */
             std::map<std::string, std::shared_ptr<TGraphAsymmErrors> > btagEfficiencies() const;
 
-            // root tree
-            void fillAnalyserTree();
-            void analyserTree();
 
 
       };
