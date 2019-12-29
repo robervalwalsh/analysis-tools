@@ -203,8 +203,8 @@ BaseAnalyser::~BaseAnalyser()
 
 bool BaseAnalyser::event(const int & i) { return true; }
 void BaseAnalyser::histograms(const std::string & s, const int & i) { }
-void BaseAnalyser::fillAnalyserTree() { }
-void BaseAnalyser::analyserTree() { }
+void BaseAnalyser::fillTrees(const std::string & tree) { }
+void BaseAnalyser::trees(const std::string & tree) { }
 
 std::shared_ptr<Analysis> BaseAnalyser::analysis()
 {

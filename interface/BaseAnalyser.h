@@ -135,8 +135,8 @@ namespace analysis {
             /// create n histograms of a given type
             virtual void histograms(const std::string &, const int &);
             // root tree
-            virtual void fillAnalyserTree();
-            virtual void analyserTree();
+            virtual void fillTrees(const std::string &);
+            virtual void trees(const std::string &);
 
             /// returns a seed for random number generator
             int  seed();
