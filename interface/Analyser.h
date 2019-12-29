@@ -5,7 +5,7 @@
 //
 // Package:    Analysis/Tools
 // Class:      xxx
-// 
+//
 /**\class xxx Analyser.cc Analysis/Tools/src/Analyser.cc
 
  Description: [one line class summary]
@@ -23,7 +23,7 @@
 #include <memory>
 #include <vector>
 #include <string>
-// 
+//
 // user include files
 #include "Analysis/Tools/interface/TriggerAnalyser.h"
 #include "Analysis/Tools/interface/JetAnalyser.h"
@@ -37,32 +37,32 @@
 namespace analysis {
    namespace tools {
 
-      class Analyser : 
+      class Analyser :
             public analysis::tools::TriggerAnalyser,
             public analysis::tools::JetAnalyser,
             public analysis::tools::MuonAnalyser
 
       {
-         
+
          public:
             /// constructors
             Analyser();
             Analyser(int argc, char * argv[]);
             /// desctructor
            ~Analyser();
-           
-         
+
+
             // ----------member data ---------------------------
          protected:
-         
+
          private:
-            
+
          public:
             // Actions
             virtual bool event(const int &);
-         
+
             void generatorWeight();
-               
+
             virtual bool muonJet(const int & );
 
       };
