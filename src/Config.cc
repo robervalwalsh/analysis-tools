@@ -5,9 +5,9 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-// 
+//
 // user include files
-#include "TString.h" 
+#include "TString.h"
 #include "Analysis/Tools/interface/Config.h"
 
 //
@@ -36,7 +36,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
       opt_cmd_.add_options()
          ("help,h","Show help messages")
          ("config,c",po::value<std::string>(&cfg_),"Configuration file name");
-      
+
       // analysis info
       opt_cfg_.add_options()
          ("Info.ntuplesList"             , po::value <std::string>               (&inputlist_)       -> default_value("rootFileList.txt")       ,"File with list of ntuples")
@@ -52,10 +52,12 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Info.fullGenWeight"           , po::value <bool>                      (&fullgenweight_)   -> default_value(false)                    ,"Flag for full gen weight of MC samples, otherwise only sign")
          ("Info.signalRegion"            , po::value <bool>                      (&signalregion_)    -> default_value(true)                     ,"Flag for signal region")
          ("Info.eventsMax"               , po::value <int>                       (&nevtmax_)         -> default_value(-1)                       , "Maximum number of events")
+         ("Info.doTree"                  , po::value <bool>                      (&do_tree_)         -> default_value(false)                     ,"Flag for output tree")
+         ("Info.outputTree"              , po::value <std::string>               (&out_tree_)        -> default_value("")                        ,"Output tree name")
          ("Info.seed"                    , po::value <int>                       (&seed_)            -> default_value(-1)                       , "Seed value for random numbers");
-                                                                                                                                                
-      // Corrections                                                                                                                            
-      opt_cfg_.add_options()                                                                                                                    
+
+      // Corrections
+      opt_cfg_.add_options()
          ("Corrections.Pileup.reweight"  , po::value <std::string>               (&puweight_)        -> default_value("")                       , "Root file containing pileup weights")
          ("Corrections.Jets.jerPtRes"    , po::value <std::string>               (&jerptres_)        -> default_value("")                       , "JER pT resolution file")
          ("Corrections.Jets.jerSF"       , po::value <std::string>               (&jersf_)           -> default_value("")                       , "JER SF file")
@@ -63,9 +65,9 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Corrections.BTag.Efficiencies", po::value <std::string>               (&btageff_)         -> default_value("")                       , "b-tagging efficiencies in root file")
          ("Corrections.Jets.bRegression" , po::value <bool>                      (&bregression_)     -> default_value(false)                    , "Apply b jet energy regression")
          ("Corrections.force"            , po::value <bool>                      (&apply_correct_)   -> default_value(false)                    , "Apply corrections internally when above are defined");
-                                                                                                     
-      // jets                                                                                        
-      opt_cfg_.add_options()                                                                         
+
+      // jets
+      opt_cfg_.add_options()
          ("Jets.ptMin"                   , po::value <std::vector<float> >       (&jetsptmin_)       -> multitoken()                            , "Mimium pt of the jets")
          ("Jets.ptMax"                   , po::value <std::vector<float> >       (&jetsptmax_)       -> multitoken()                            , "Maximum pt of the jets")
          ("Jets.etaMax"                  , po::value <std::vector<float> >       (&jetsetamax_)      -> multitoken()                            , "Maximum |eta| of the jets")
@@ -82,20 +84,20 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Jets.dEtaMin"                 , po::value <float>                     (&jetsdetamin_)     -> default_value(-1.)                      , "Minimum delta eta between jets")
          ("Jets.dPhiMin"                 , po::value <float>                     (&jetsdphimin_)     -> default_value(-1.)                      , "Minimum delta phi between jets")
          ("Jets.dPhiMax"                 , po::value <float>                     (&jetsdphimax_)     -> default_value(-1.)                      , "Maximum delta phi between jets");
-         
-      // histograms                                                                                        
-      opt_cfg_.add_options()                                                                         
+
+      // histograms
+      opt_cfg_.add_options()
          ("Histograms.Jets.splitRegions" , po::value <bool>                      (&histjets_rsplit_) -> default_value(false)                    , "Split jets histograms into barrel, barrel-endcap overlap, endcap")
          ("Histograms.Jets.flavour"      , po::value <bool>                      (&histjets_flavour_)-> default_value(false)                    , "Split jets histograms per flavour");
-         
-                                                                                                                                                
-      // dijets                                                                                                                                 
-      opt_cfg_.add_options()                                                                                                                    
+
+
+      // dijets
+      opt_cfg_.add_options()
          ("Dijets.ranks"                 , po::value<std::vector<int> >          (&dijet_ranks_)     -> multitoken()                            , "Ranks of the jets to construct and select the diject")
          ("Dijets.dijets"                , po::value <bool>                      (&dodijet_ )        -> default_value(false)                    , "Combine all jets in dijet objects");
-                                                                                                                                                
-      // btagging                                                                                                                               
-      opt_cfg_.add_options()                                                                                                                    
+
+      // btagging
+      opt_cfg_.add_options()
          ("BTag.wp"                      , po::value <std::vector<std::string> > (&jetsbtagwp_)      -> multitoken()                            ,"Jets btag minimum (with '-' means maximum)")
          ("BTag.algorithm"               , po::value <std::string>               (&btagalgo_)        -> default_value("csvivf")                 ,"BTag algorithm")
          ("BTag.nonBtagWP"               , po::value <std::string>               (&nonbtagwp_)       -> default_value("")                       ,"non-Btag working point")
@@ -105,25 +107,25 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("BTag.user"                    , po::value <float>                     (&btagwpxxx_)       -> default_value(-10000)                   ,"BTag working point USER-defined")
          ("BTag.nMin"                    , po::value <int>                       (&nbjetsmin_)       -> default_value(-1)                        ,"Minimum number of btgaged jets")
          ("BTag.nonBtagJet"              , po::value <int>                       (&nonbtagjet_)      -> default_value(-1)                       ,"non-Btag Jet");
-                                                                                                                                                
-      // muons                                                                                                                                  
-      opt_cfg_.add_options()                                                                                                                    
+
+      // muons
+      opt_cfg_.add_options()
          ("Muons.ptMin"                  , po::value<std::vector<float> >        (&muonsptmin_)      -> multitoken()                            , "Mimium pt of the muons")
          ("Muons.ptMax"                  , po::value<std::vector<float> >        (&muonsptmax_)      -> multitoken()                            , "Maximum pt of the muons")
          ("Muons.etaMax"                 , po::value<std::vector<float> >        (&muonsetamax_)     -> multitoken()                            , "Maximum |eta| of the muons")
-         ("Muons.muons"                  , po::value <std::string>               (&muonsCol_)        -> default_value("slimmedMuons")           , "Name of the muons collection")      
+         ("Muons.muons"                  , po::value <std::string>               (&muonsCol_)        -> default_value("slimmedMuons")           , "Name of the muons collection")
          ("Muons.id"                     , po::value <std::string>               (&muonsid_)         -> default_value("LOOSE")                  , "muons id criteria for all muons")
          ("Muons.nMin"                   , po::value <int>                       (&nmuonsmin_)       -> default_value(0)                        , "Minimum number of muons")
          ("Muons.nMax"                   , po::value <int>                       (&nmuonsmax_)       -> default_value(-1)                       , "Maximum number of muons");
-                                                                                                                                                
-      // trigger                                                                                                                                
-      opt_cfg_.add_options()                                                                                                                    
+
+      // trigger
+      opt_cfg_.add_options()
          ("Trigger.hltPath"              , po::value <std::string>               (&hltPath_)         -> default_value("")                       , "HLT path name")
          ("Trigger.l1Seed"               , po::value <std::string>               (&l1Seed_)          -> default_value("")                       , "L1 seed name")
          ("Trigger.results"              , po::value <std::string>               (&triggerCol_)      -> default_value("TriggerResults")         , "Name of the trigger results collection");
-                                                                                                                                                
-      // trigger objects                                                                                                                        
-      opt_cfg_.add_options()                                                                                                                    
+
+      // trigger objects
+      opt_cfg_.add_options()
          ("Trigger.Objects.directory"    , po::value<std::string>                (&triggerObjDir_)   -> default_value("slimmedPatTrigger")      , "Name of the trigger objects directory")
          ("Trigger.Objects.BTag.Calo"    , po::value<std::string>                (&trgObjsBJets_)    -> default_value("")                       , "Trigger objects for btag jets")
          ("Trigger.Objects.Jets.L1"      , po::value<std::string>                (&trgObjsL1Jets_)   -> default_value("")                       , "Trigger objects for L1 jets")
@@ -131,20 +133,20 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Trigger.Objects.Jets.PF"      , po::value<std::string>                (&trgObjsPFJets_)   -> default_value("")                       , "Trigger objects for PF jets")
          ("Trigger.Objects.Muons.L1"     , po::value<std::string>                (&trgObjsL1Muons_)  -> default_value("")                       , "Trigger objects for L1 muons")
          ("Trigger.Objects.Muons.L3"     , po::value<std::string>                (&trgObjsL3Muons_)  -> default_value("")                       , "Trigger objects for L3 muons");
-                                                                                                                                                
-      // L1 trigger                                                                                                                             
-      opt_cfg_.add_options()                                                                                                                    
+
+      // L1 trigger
+      opt_cfg_.add_options()
          ("L1T.jets"                     , po::value <std::string>               (&l1tjetsCol_)      -> default_value("l1tJets")                , "Name of the L1T jets collection")
          ("L1T.muons"                    , po::value <std::string>               (&l1tmuonsCol_)     -> default_value("l1tMuons")               , "Name of the L1T muons collection");
-                                                                                                                                                
-      // generator level                                                                                                                        
-      opt_cfg_.add_options()                                                                                                                    
+
+      // generator level
+      opt_cfg_.add_options()
          ("Generator.genParticles"       , po::value <std::string>               (&genpartsCol_)     -> default_value("")                       , "Name of the gen particle collection")
          ("Generator.genJets"            , po::value <std::string>               (&genjetsCol_)      -> default_value("")                       , "Name of the gen jets collection");
-                                                                                                                                                
-                                                                                                                                                
-      // general                                                                                                                                
-      opt_cfg_.add_options()                                                                                                                    
+
+
+      // general
+      opt_cfg_.add_options()
          ("User.dRMin"                   , po::value <float>                     (&drmin_)           -> default_value(-1.)                      , "Minimum delta R between candidates")
          ("User.dRMax"                   , po::value <float>                     (&drmax_)           -> default_value(-1.)                      , "Maximum delta R between candidates")
          ("User.dEtaMax"                 , po::value <float>                     (&detamax_)         -> default_value(-1.)                      , "Maximum delta eta between candidates")
@@ -153,14 +155,14 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("User.dPhiMax"                 , po::value <float>                     (&dphimax_)         -> default_value(-1.)                      , "Maximum delta phi between candidates")
          ("User.massMin"                 , po::value <float>                     (&massmin_)         -> default_value(-1.)                      , "Cut on a mass, min value")
          ("User.massMax"                 , po::value <float>                     (&massmax_)         -> default_value(-1.)                      , "Cut on a mass, max value")
-         ("User.min"                     , po::value <float>                     (&min_)             -> default_value(-1.)                      , "some minimum value")  
+         ("User.min"                     , po::value <float>                     (&min_)             -> default_value(-1.)                      , "some minimum value")
          ("User.max"                     , po::value <float>                     (&max_)             -> default_value(-1.)                      , "some maximum value")
-         ("User.scale"                   , po::value <float>                     (&scale_)           -> default_value(-1.)                      , "Overall scale for histograms")  
+         ("User.scale"                   , po::value <float>                     (&scale_)           -> default_value(-1.)                      , "Overall scale for histograms")
          ("User.workflow"                , po::value <int>                       (&workflow_)        -> default_value(1)                        , "Workflow index defined by user")
-         ("User.prescale"                , po::value <int>                       (&prescale_)        -> default_value(1)                        , "Prescale factor")  
+         ("User.prescale"                , po::value <int>                       (&prescale_)        -> default_value(1)                        , "Prescale factor")
          ("User.n"                       , po::value <int>                       (&n_)               -> default_value(-1)                       , "Some integer")
          ("User.index"                   , po::value <int>                       (&index_)           -> default_value(-1)                       , "Some User index for user");
-            
+
       // others
       opt_cfg_.add_options()
          ("nMin",po::value <int> (&nmin_)->default_value(0),"Minimum number objects")
@@ -170,8 +172,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("etaMax", po::value<std::vector<float> >(&etamax_)->multitoken(),"Maximum |eta| of an object")
          ("ptImbalanceMin",po::value <float> (&jetsptimbalmin_)->default_value(-1),"Minimum relative imbalance between two candidates")
          ("ptImbalanceMax",po::value <float> (&jetsptimbalmax_)->default_value(-1),"Maximum relative imbalance between two candidates");
-      
-         
+
+
       opt_cfg_.add_options()
          ("qgMin", po::value<std::vector<float> >(&qgmin_)->multitoken(),"Minimum value for q-g likelihood")
          ("qgMax", po::value<std::vector<float> >(&qgmax_)->multitoken(),"Maximum value for q-g likelihood")
@@ -195,33 +197,32 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("efficiencyMinAI",po::value <float> (&eff_min_ai_)->default_value(-1.),"Min value for AI Cuts efficiency")
          ("discriminatorMaxAI",po::value <float> (&disc_max_ai_)->default_value(-1001.),"Max value for AI discriminator")
          ("discriminatorMinAI",po::value <float> (&disc_min_ai_)->default_value(-1001.),"Min value for AI discriminator");
-      
+
       opt_cfg_.add_options()
          ("crossSectionTree",po::value <std::string> (&xsectiontree_)->default_value(""),"Tree containing cross sections")
          ("crossSectionType",po::value <std::string> (&xsectiontype_)->default_value("crossSection"),"Type of cross section")
-         ("crossSection",po::value <float> (&xsection_)->default_value(-1.), "Cross section")  
-         ("luminosity",po::value <float> (&lumi_)->default_value(-1.), "Luminosity in pb-1 to scale histograms")   
+         ("crossSection",po::value <float> (&xsection_)->default_value(-1.), "Cross section")
+         ("luminosity",po::value <float> (&lumi_)->default_value(-1.), "Luminosity in pb-1 to scale histograms")
          ("nLumiSections",po::value <int> (&nlumis_)->default_value(-1), "Number of lumi sections processed")
          ("runMin",po::value <int> (&runmin_)->default_value(-1), "Minimum run number")
          ("runMax",po::value <int> (&runmax_)->default_value(-1), "Maximum run number")
          ("pythia8",po::value <bool> (&pythia8_)->default_value(true),"Flag for Pythia8 or other recent generators MC")
          ("erasLumi", po::value<std::vector<float> >(&eraslumi_)->multitoken(),"Lumi of an era")
          ("eras", po::value<std::vector<std::string> >(&eras_)->multitoken(),"Era of data taking");
-         
-      
+
+
       // analysis control
       opt_cfg_.add_options()
-         ("doTree",po::value <bool> (&do_tree_)->default_value(false),"Flag for output")
          ("override",po::value <bool> (&override_)->default_value(true),"Flag to be used to override procedure, e.g. a selection");
-      
-      
-            
-      po::variables_map vm; 
+
+
+
+      po::variables_map vm;
       try
       {
          po::store(po::parse_command_line(argc, argv, opt_cmd_), vm); // can throw
          // --help option
-         
+
          if ( vm.count("help") )
          {
             std::cout << "SimpleBjetsAnalysis macro" << std::endl
@@ -229,7 +230,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
                       << opt_cfg_ << std::endl;
          }
          po::notify(vm);
-         
+
          std::ifstream cfg_s(cfg_.c_str());
          po::store(po::parse_config_file(cfg_s, opt_cfg_), vm); // can throw
          if ( vm.count("config") )
@@ -257,10 +258,13 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
             genjetsCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , genjetsCol_.c_str()     );
          l1tjetsCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , l1tjetsCol_.c_str()     );
          l1tmuonsCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , l1tmuonsCol_.c_str()    );
-         
+
+         if ( do_tree_ && out_tree_ == "" ) out_tree_ = "tree";
+         if ( out_tree_ != "" ) do_tree_ = true;
+
          if ( njetsmax_ < njetsmin_ ) njetsmax_ = -1;
          if ( njetsmin_ < 0 && njetsmax_ > 0 ) njetsmin_ = 0;
-         
+
          if ( njets_ >= 0 )
          {
             njetsmin_ = njets_;
@@ -268,19 +272,19 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          }
       }
       catch(po::error& e)
-      { 
-         std::cerr << "ERROR: " << e.what() << std::endl << std::endl; 
+      {
+         std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
          std::cerr << opt_cmd_ << std::endl;
          throw std::exception();
-      } 
-      
+      }
+
    }
-   catch(std::exception& e) 
-   { 
-      std::cerr << "ERROR: " << e.what() << std::endl << std::endl; 
+   catch(std::exception& e)
+   {
+      std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
       throw std::exception();
-   } 
-   
+   }
+
 }
 
 Config::~Config()
@@ -309,13 +313,13 @@ po::options_description  & Config::optionsCFG()
 void Config::loadOptions()
 {
    po::variables_map vm;
-   po::store(po::parse_command_line(argc_, argv_, opt_cmd_), vm); 
+   po::store(po::parse_command_line(argc_, argv_, opt_cmd_), vm);
    po::notify(vm);
    std::ifstream cfg_s(cfg_.c_str());
    po::store(po::parse_config_file(cfg_s, opt_cfg_), vm); // can throw
    po::notify(vm);
-   
-   
+
+
 }
 
 //
@@ -356,9 +360,9 @@ std::string        Config::jetsId()             const { return jetsid_; }
 std::string        Config::jetsPuId()           const { return jetspuid_; }
 std::string        Config::jerPtRes()           const { return jerptres_; }
 std::string        Config::jerSF()              const { return jersf_; }
-std::string        Config::l1tJetsCollection()  const { return l1tjetsCol_; } 
-std::string        Config::btagAlgorithm()      const { return btagalgo_; } 
-std::string        Config::btagScaleFactors()   const { return btagsf_; } 
+std::string        Config::l1tJetsCollection()  const { return l1tjetsCol_; }
+std::string        Config::btagAlgorithm()      const { return btagalgo_; }
+std::string        Config::btagScaleFactors()   const { return btagsf_; }
 std::vector<std::string> Config::jetsBtagWP()   const { return jetsbtagwp_; }
 std::vector<float> Config::jetsBtagProbB()      const { return jetsbtagprobb_; }
 std::vector<float> Config::jetsBtagProbBB()     const { return jetsbtagprobbb_; }
@@ -394,7 +398,7 @@ std::vector<float> Config::muonsPtMin()         const { return muonsptmin_; }
 std::vector<float> Config::muonsPtMax()         const { return muonsptmax_; }
 std::vector<float> Config::muonsEtaMax()        const { return muonsetamax_; }
 std::string        Config::muonsId()            const { return muonsid_; }
-std::string        Config::l1tMuonsCollection() const { return l1tmuonsCol_; } 
+std::string        Config::l1tMuonsCollection() const { return l1tmuonsCol_; }
 
 // trigger
 std::string        Config::triggerResults()         const { return triggerCol_; }
@@ -409,7 +413,7 @@ std::string        Config::triggerObjectsPFJets()   const { return trgObjsPFJets
 std::string        Config::genJetsCollection()       const { return genjetsCol_; }
 std::string        Config::genParticlesCollection()  const { return genpartsCol_; }
 
-// seed 
+// seed
 std::string        Config::seedFile()           const { return seedfile_; }
 int                Config::seed()               const { return seed_;     }
 
@@ -423,11 +427,11 @@ float              Config::btagWP(const std::string & wp) const
    if ( wp == "medium" ) return btagwpmedium_;
    if ( wp == "tight"  ) return btagwptight_ ;
    if ( wp == "xxx"    ) return btagwpxxx_;
-   
+
    return -100.;
 }
- 
-// User stuff            
+
+// User stuff
 float Config::massMin() const { return massmin_; }
 float Config::massMax() const { return massmax_; }
 
@@ -445,8 +449,8 @@ float Config::discriminatorMinAI() const { return disc_min_ai_; }
 float Config::efficiencyMinAI()    const { return eff_min_ai_ ; }
 
 // output tree
-bool Config::doTree() const { return do_tree_; 
-}
+bool Config::doTree() const { return do_tree_; }
+std::string Config::outputTree() const { return out_tree_; }
 
 // User options
 int   Config::prescale()   const { return prescale_; }

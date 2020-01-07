@@ -54,6 +54,16 @@ namespace analysis {
 
             // ----------member data ---------------------------
          protected:
+            // tree variables
+            int t_evt_;
+            int t_ls_;
+            int t_run_;
+            // jets
+            int t_njets_;
+            static const int ncandsmax_ = 100;
+            float t_jetpt_[ncandsmax_];
+
+
 
          private:
 
@@ -64,6 +74,9 @@ namespace analysis {
             void generatorWeight();
 
             virtual bool muonJet(const int & );
+
+            virtual void createTree();
+            virtual void fillTree();
 
       };
    }
