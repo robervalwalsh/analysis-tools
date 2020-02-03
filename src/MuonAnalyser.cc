@@ -48,6 +48,14 @@ bool MuonAnalyser::analysisWithMuons()
    onlineMatchedMuons_.clear();
    if ( ! muonsanalysis_ ) return false;
    
+   ++cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Open Muon collection: %s",(config_->muonsCollection()).c_str()));
+   }
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   
    if ( config_->triggerObjectsL1Muons() != "" )
       analysis_->match<Muon,TriggerObject>("Muons",config_->triggerObjectsL1Muons(),0.3);
    if ( config_->triggerObjectsL3Muons() != "" )
@@ -214,7 +222,7 @@ bool MuonAnalyser::onlineMuonMatching()
    auto muon = std::begin(selectedMuons_);
    while ( muon != std::end(selectedMuons_) )
    {
-      if ( !((*muon)->matched(config_->triggerObjectsL3Muons()) && (*muon)->matched(config_->triggerObjectsL3Muons()) ))
+      if ( !((*muon)->matched(config_->triggerObjectsL1Muons()) && (*muon)->matched(config_->triggerObjectsL3Muons()) ))
          muon = selectedMuons_.erase(muon);
       else
          ++muon;
