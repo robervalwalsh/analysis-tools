@@ -214,7 +214,7 @@ bool MuonAnalyser::onlineMuonMatching()
    auto muon = std::begin(selectedMuons_);
    while ( muon != std::end(selectedMuons_) )
    {
-      if ( !((*muon)->matched(config_->triggerObjectsL3Muons()) && (*muon)->matched(config_->triggerObjectsL3Muons()) ))
+      if ( !((*muon)->matched(config_->triggerObjectsL1Muons()) && (*muon)->matched(config_->triggerObjectsL3Muons()) ))
          muon = selectedMuons_.erase(muon);
       else
          ++muon;
