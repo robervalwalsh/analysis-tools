@@ -13,7 +13,7 @@ int main(int argc, char ** argv)
    
    Analyser analyser(argc,argv);
    
-   analyser.pileupHistogram();
+//   analyser.pileupHistogram();
    
    TRandom3 * rnd = new TRandom3();
    
