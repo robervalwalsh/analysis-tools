@@ -1,1 +1,2 @@
-/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC/Fall17/ntuplizer_94X_mc_2017_fall17-v4/SUSYGluGluToBBHToBB_M-350_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/190114_170316/0000/ntuple_1-1.root
+/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC/Autumn18/ntuplizer_102X_mc_2018_autumn18-v3/QCD_Pt-120to170_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/200405_204851/0000/ntuple_1.root
+/pnfs/desy.de/cms/tier2/store/user/rwalsh/Analysis/Ntuples/MC/Autumn18/ntuplizer_102X_mc_2018_autumn18-v3/QCD_Pt-120to170_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/200405_204851/0000/ntuple_2.root
