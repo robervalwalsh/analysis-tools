@@ -1,6 +1,8 @@
 #ifndef Analysis_Tools_Utilities_h
 #define Analysis_Tools_Utilities_h
 
+// Original code: CMSSW_10_2_22 - CondFormats/JetMETObjects/interface/Utilities.h
+
 #include <stdexcept>
 #include <cstdlib>
 #include <sstream>
@@ -96,8 +98,7 @@ namespace std
     result_type operator()(const argument_type& t) const
     {
       const uint32_t& b = reinterpret_cast<const uint32_t&>(std::get<0>(t));
-      const result_type& result = reinterpret_cast<const result_type&>(b);
-      return result;
+      return static_cast<result_type>(b);
     } 
   };
   //Overloaded verions of std::hash for tuples

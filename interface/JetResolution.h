@@ -1,5 +1,7 @@
-#ifndef JetResolution_h
-#define JetResolution_h
+#ifndef Analysis_Tools_JetResolution_h
+#define Analysis_Tools_JetResolution_h
+
+// Original code: CMSSW_10_2_22 - JetMETCorrections/Modules/interface/JetResolution.h
 
 // If you want to use the JER code in standalone mode, you'll need to create a new define named 'STANDALONE'. If you use gcc for compiling, you'll need to add
 // -DSTANDALONE to the command line
@@ -39,7 +41,9 @@ namespace JME {
                 // Empty
             }
 
-            float getScaleFactor(const JetParameters& parameters, Variation variation = Variation::NOMINAL) const;
+            float getScaleFactor(const JetParameters& parameters,
+                                 Variation variation = Variation::NOMINAL,
+                                 std::string uncertaintySource = "") const;
 
             void dump() const {
                 m_object->dump();
