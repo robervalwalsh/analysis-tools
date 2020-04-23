@@ -1,5 +1,5 @@
-#ifndef BTagEntry_H
-#define BTagEntry_H
+#ifndef Analysis_Tools_BTagEntry_H
+#define Analysis_Tools_BTagEntry_H
 
 /**
  *
@@ -19,6 +19,7 @@
 #include <TF1.h>
 #include <TH1.h>
 
+// From CMSSW_10_2_22 CondTools/BTau/test/BTagCalibrationStandalone.h
 
 class BTagEntry
 {

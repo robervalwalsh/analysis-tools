@@ -1,6 +1,8 @@
 #ifndef Analysis_Tools_JetResolutionObject_h
 #define Analysis_Tools_JetResolutionObject_h
 
+// Original code: CMSSW_10_2_22 - CondFormats/JetMETObjects/interface/JetResolutionObject.h
+
 // If you want to use the JER code in standalone mode, you'll need to create a new define named 'STANDALONE'. If you use gcc for compiling, you'll need to add
 // -DSTANDALONE to the command line
 // In standalone mode, no reference to CMSSW exists, so the only way to retrieve resolutions and scale factors are from text files.
@@ -178,6 +180,10 @@ namespace JME {
                         return m_variables.size();
                     }
 
+                    const std::vector<std::string>& getParametersName() const { return m_parameters_name; }
+
+                    size_t nParameters() const { return m_parameters_name.size(); }
+
                     std::string getFormulaString() const {
                         return m_formula_str;
                     }
@@ -195,6 +201,7 @@ namespace JME {
                     std::shared_ptr<TFormula> m_formula COND_TRANSIENT;
                     std::vector<Binning> m_bins COND_TRANSIENT;
                     std::vector<Binning> m_variables COND_TRANSIENT;
+                    std::vector<std::string> m_parameters_name COND_TRANSIENT;
 
                     COND_SERIALIZABLE;
             };
