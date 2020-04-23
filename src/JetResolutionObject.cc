@@ -1,3 +1,5 @@
+// Original code: CMSSW_10_2_22 - CondFormats/JetMETObjects/src/JetResolutionObject.cc
+
 #include "Analysis/Tools/interface/JetResolutionObject.h"
 #include "Analysis/Tools/interface/Utilities.h"
 #include <exception>
@@ -157,15 +159,32 @@ namespace JME {
         std::string formula_str_lower = m_formula_str;
         std::transform(formula_str_lower.begin(), formula_str_lower.end(), formula_str_lower.begin(), ::tolower);
 
-        if (formula_str_lower == "none")
-            m_formula_str = "";
+        if (formula_str_lower == "none") {
+          m_formula_str = "";
+
+          if ((tokens.size() > n_bins + n_variables + 3) && (std::atoi(tokens[n_bins + n_variables + 3].c_str()))) {
+            size_t n_parameters = std::stoul(tokens[n_bins + n_variables + 3]);
+
+            if (tokens.size() < (1 + n_bins + 1 + n_variables + 1 + 1 + n_parameters)) {
+              throwException(edm::errors::ConfigFileReadError, "Invalid file format. Please check.");
+            }
+
+            for (size_t i = 0; i < n_parameters; i++) {
+              m_formula_str += tokens[n_bins + n_variables + 4 + i] + " ";
+            }
+          }
+        }
 
         init();
     }
 
     void JetResolutionObject::Definition::init() {
-        if (!m_formula_str.empty())
+        if (!m_formula_str.empty()) {
+         if (m_formula_str.find(' ') == std::string::npos)
             m_formula = std::make_shared<TFormula>("jet_resolution_formula", m_formula_str.c_str());
+         else
+          m_parameters_name = getTokens(m_formula_str);
+        }
         for (const auto& bin: m_bins_name) {
             const auto& b = JetParameters::binning_to_string.right.find(bin);
             if (b == JetParameters::binning_to_string.right.cend()) {
@@ -392,4 +411,3 @@ namespace JME {
         return formula.EvalPar(variables_);
     }
 }
-
