@@ -18,8 +18,8 @@ scram b -j4 USER_CXXFLAGS="-Wno-misleading-indentation"
 ```
 
 :zzz: The `USER_CXXFLAGS="-Wno-misleading-indentation"` prevents a large number of warnings
-from misleading identation in modules of the boost library. User can also define an
-environment variable, of course, before compiling
+from misleading identation in modules of the boost library. User can also define the
+environment variable below in `.bashrc` or every time after the command `cmsenv`
 ```bash
 export USER_CXXFLAGS="-Wno-misleading-indentation"
 ```
