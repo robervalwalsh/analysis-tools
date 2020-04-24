@@ -122,8 +122,8 @@ namespace analysis {
             virtual void jetSwap(const int &, const int &);
             virtual bool selectionJetQGlikelihood(const int &, const float &);
             virtual bool selectionJetQGlikelihood(const int &);
-            virtual void actionApplyBtagEfficiencyWeight(const int &);
-            virtual float btagEfficiency(const int &);
+//            virtual void actionApplyBtagEfficiencyWeight(const int &);
+//            virtual float btagEfficiency(const int &);
 
       };
    }
