@@ -52,7 +52,7 @@ namespace analysis {
             /// constructor
             BaseAnalyser(int argc, char * argv[]);
             /// desctructor
-           ~BaseAnalyser();
+           virtual ~BaseAnalyser();
 
 
             // ----------member data ---------------------------
