@@ -81,19 +81,19 @@ float Jet::jerPtResolution(const JetResolution & jer) const
 }
 float Jet::jerSF(const JetResolutionScaleFactor & jersf) const
 {
-   JetParameters pars = {{JME::Binning::JetEta, this->eta()}};
+   JetParameters pars = {{JME::Binning::JetPt, this->pt()},{JME::Binning::JetEta, this->eta()}};
    float sf = jersf.getScaleFactor(pars);
    return sf;
 }
 float Jet::jerSFdown(const JetResolutionScaleFactor & jersf) const
 {
-   JetParameters pars = {{JME::Binning::JetEta, this->eta()}};
+   JetParameters pars = {{JME::Binning::JetPt, this->pt()},{JME::Binning::JetEta, this->eta()}};
    float sf = jersf.getScaleFactor(pars,Variation::DOWN);
    return sf;
 }
 float Jet::jerSFup(const JetResolutionScaleFactor & jersf) const
 {
-   JetParameters pars = {{JME::Binning::JetEta, this->eta()}};
+   JetParameters pars = {{JME::Binning::JetPt, this->pt()},{JME::Binning::JetEta, this->eta()}};
    float sf = jersf.getScaleFactor(pars,Variation::UP);
    return sf;
 }

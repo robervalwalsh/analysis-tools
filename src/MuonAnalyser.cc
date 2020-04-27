@@ -25,7 +25,7 @@ MuonAnalyser::MuonAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
 {
    // Physics objects
    // Muons
-   muonsanalysis_  = ( analysis_->addTree<Muon> ("Muons",config_->muonsCollection()) != nullptr );
+   muonsanalysis_  = ( analysis_->addTree<Muon> ("Muons",config_->muonsCollection()) != nullptr  && config_ -> nMuonsMin() > 0 );
    
 }
 
@@ -51,7 +51,7 @@ bool MuonAnalyser::analysisWithMuons()
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
    {
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Open Muon collection: %s",(config_->muonsCollection()).c_str()));
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Using Muon collection: %s",(config_->muonsCollection()).c_str()));
    }
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
@@ -130,7 +130,10 @@ bool MuonAnalyser::selectionMuon(const int & r)
 bool MuonAnalyser::selectionMuons()
 {
    // selectedMuons will be composed of muons with the lowest pt threshold
+
+   if ( ! muonsanalysis_ ) return true;  // will skip this selection
    
+      
    bool isgood = true;
    ++cutflow_;
 //    
@@ -172,12 +175,14 @@ bool MuonAnalyser::selectionMuons()
 
 bool MuonAnalyser::selectionMuonId()
 {
+   if ( ! muonsanalysis_ ) return true;  // will skip this selection
+   
    ++cutflow_;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("MuonId: %s",config_->muonsId().c_str()));
    
-   if ( ! muonsanalysis_ ) return false;
+//   if ( ! muonsanalysis_ ) return false;
    
    auto muon = std::begin(selectedMuons_);
    while ( muon != std::end(selectedMuons_) )
@@ -197,6 +202,9 @@ bool MuonAnalyser::selectionMuonId()
 
 bool MuonAnalyser::selectionNMuons()
 {
+   if ( ! muonsanalysis_ ) return true;  // will skip this selection
+   
+   
    ++cutflow_;
    
    if  ((int)selectedMuons_.size() < config_->nMuonsMin()) return false;
@@ -213,6 +221,8 @@ bool MuonAnalyser::selectionNMuons()
 
 bool MuonAnalyser::onlineMuonMatching()
 {
+   if ( ! muonsanalysis_ ) return true;  // will skip this selection
+   
    if ( config_->triggerObjectsL1Muons() == "" && config_->triggerObjectsL3Muons() == ""  ) return true;
    
    ++cutflow_;

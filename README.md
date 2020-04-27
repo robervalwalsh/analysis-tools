@@ -2,11 +2,12 @@
 
 **Core codes for the DESY CMS MSSM Higgs -> bb analysis framework**
 
-* [Compilation](#compilation)
+* [Installation](#installation)
 * [Calibrations](#calibrations)
 * [Ntuples](#ntuples)
+* [Example](#example)
 
-## Compilation
+## Installation
 
 The codes as well as the ntuples are independent of CMSSW. However, in order to compile it uses `scram`.
 So the latest version in any architecture should be fine. 
@@ -43,3 +44,16 @@ The lists of ntuples files can be obtained from the [analysis-ntuples](https://g
 cd $CMSSW_BASE/src/Analysis/Tools/test
 git clone https://github.com/desy-cms/analysis-ntuples.git ntuples
 ```
+
+## Example
+
+A simple example macro can be found in [Analysis/Tools/bin/AnalyserSimpleExample.cc](bin/AnalyserSimpleExample.cc).
+The example is a simple offline and online dijet selection (+ muon selection in the semileptonic case)
+using signal MC samples and triggers from 2017 and 2018 periods. The macro uses a configuration file as
+input. Configuration files are avaialble for both the all-hadronic and semileptonic cases for both 2017
+and 2018 periods:
+* [analyser_example_allhad_2017.cfg](test/analyser_example_allhad_2017.cfg)
+* [analyser_example_allhad_2018.cfg](test/analyser_example_allhad_2018.cfg)
+* [analyser_example_semilep_2017.cfg](test/analyser_example_semilep_2017.cfg)
+* [analyser_example_semilep_2018.cfg](test/analyser_example_semilep_2018.cfg)
+

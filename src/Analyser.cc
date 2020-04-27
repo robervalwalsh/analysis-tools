@@ -61,7 +61,7 @@ bool Analyser::event(const int & i)
       ++cutflow_;
       if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
       {
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Open GenParticles collection: %s",(config_->genParticlesCollection()).c_str()));
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Using GenParticles collection: %s",(config_->genParticlesCollection()).c_str()));
       }
       h1_["cutflow"] -> Fill(cutflow_,weight_);
    }
@@ -71,7 +71,7 @@ bool Analyser::event(const int & i)
       ++cutflow_;
       if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
       {
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Open GenJets collection: %s",(config_->genJetsCollection()).c_str()));
+         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Using GenJets collection: %s",(config_->genJetsCollection()).c_str()));
       }
       h1_["cutflow"] -> Fill(cutflow_,weight_);
    }
@@ -104,6 +104,9 @@ void Analyser::generatorWeight()
 
 bool Analyser::muonJet(const int & r)
 {
+   
+   if ( ! muonsanalysis_ ) return true;  // will skip this selection
+
    int j = r-1;
    ++ cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
