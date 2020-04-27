@@ -29,7 +29,7 @@ int main(int argc, char * argv[])
    Analysis analysis(inputlist_);
    
    // btag
-   float btagmin = btagMin(btagwp_);
+//   float btagmin = btagMin(btagwp_);
    // b-tag scale factors
    // inputs from the config file test/analysis_bjetsv2.cfg
    // btagalgo_ = "deepcsv";
