@@ -14,56 +14,38 @@ int main(int argc, char ** argv)
    
    Analyser analyser(argc,argv);
    
-   // you can always get the ususal analysis class
-   auto analysis = analyser.analysis();
-   
 // HISTOGRAMS   
    // create some predefined jet histograms
-   analyser.jetHistograms(2,"dijet");
+   analyser.jetHistograms(2,"initial");
+   analyser.jetHistograms(2,"final");
    // create some predefined muon histograms
    // muon histograms still not available
    
-   // get a map with all TH1F histograms pointers
-   std::map<std::string, std::shared_ptr<TH1F> > histos = analyser.histograms();
-
    for ( int i = 0 ; i < analyser.nEvents() ; ++i )
    {
       if ( ! analyser.event(i)                  )   continue;
       
-// TRIGGER selection
-      if ( ! analyser.selectionHLT()            )   continue;
-      if ( ! analyser.selectionL1 ()            )   continue;  // to be used mainly in case of "OR" of seeds
-      
+// PILEUP RE-WEIGHT
+      analyser.actionApplyPileupWeight();   
+         
 // MUONS pre-selection
       // muon identification selection
       if ( ! analyser.selectionMuonId()         )   continue;
       if ( ! analyser.selectionNMuons()         )   continue;
-      // if you need the selected muons explicitly - be careful where you use it
-      std::vector< std::shared_ptr<Muon> > selmuon = analyser.selectedMuons();
         
 // JETS pre-selection 
       // jet identification selection
       if ( ! analyser.selectionJetId()          )   continue;
       if ( ! analyser.selectionJetPileupId()    )   continue;
       if ( ! analyser.selectionNJets()          )   continue;
-      // if you need the selected jets explicitly - be careful where you use it
-      std::vector< std::shared_ptr<Jet> > seljets = analyser.selectedJets();
       
-// CORRECTIONS to pre-selected jets
+      analyser.fillJetHistograms("initial");
+     
+// CORRECTIONS
    // b energy regression
-      if ( analyser.config()->bRegression() )
-         analyser.actionApplyBjetRegression();
-      
-   // MC-only jet corrections
-      if ( analyser.config()->isMC() )
-      {
-      // apply btag SF
-         analyser.actionApplyBtagSF(1);
-         analyser.actionApplyBtagSF(2);
-         
-      // jet energy resolution to all selected jets
-         analyser.actionApplyJER();
-      }
+      if ( analyser.config()->bRegression() )  analyser.actionApplyBjetRegression();
+   // Jet energy resolution smearing
+      analyser.actionApplyJER();
       
 // MAIN SELECTION
    // JETS
@@ -73,25 +55,26 @@ int main(int argc, char ** argv)
       // delta R jet selection
       if ( ! analyser.selectionJetDr(1,2)      )   continue;
       // btag of two leading jets
-      if ( ! analyser.selectionBJet(1)         )   continue;
-      if ( ! analyser.selectionBJet(2)         )   continue;
-      // jets 1 and 2 matching to online jets
-      if ( ! analyser.onlineJetMatching(1)     )   continue;
-      if ( ! analyser.onlineJetMatching(2)     )   continue;
-      // dije mass selection
-      if ( ! analyser.selectionDiJetMass(1,2)  )   continue;
+      if ( ! analyser.selectionBJet(1)         )   continue;  analyser.actionApplyBtagSF(1);
+      if ( ! analyser.selectionBJet(2)         )   continue;  analyser.actionApplyBtagSF(2);
       
    // MUON
       // muon kinematic selection
       if ( ! analyser.selectionMuons()         )   continue;
-      // muon trigger matching - at least nmin offline muons matched to online objects
+      
+// TRIGGER selection
+      if ( ! analyser.selectionL1 ()           )   continue;  // to be used mainly in case of "OR" of seeds
+      if ( ! analyser.selectionHLT()           )   continue;
+      // jets 1 and 2 matching to online jets and btag
+      if ( ! analyser.onlineJetMatching(1)     )   continue;
+      if ( ! analyser.onlineBJetMatching(1)    )   continue;
+      if ( ! analyser.onlineJetMatching(2)     )   continue;
+      if ( ! analyser.onlineBJetMatching(2)    )   continue;
+      // muon trigger matching
       if ( ! analyser.onlineMuonMatching()     )   continue;
       
-   // MUONJET
-      if ( ! analyser.muonJet(1)               )   continue;
-
 // HISTOGRAMS
-      analyser.fillJetHistograms("dijet");
+      analyser.fillJetHistograms("final");
       
    }  //end event loop
 } // end main
