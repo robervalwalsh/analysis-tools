@@ -240,9 +240,9 @@ std::map<std::string, std::shared_ptr<TH1F> > BaseAnalyser::histograms()
 
 void BaseAnalyser::workflow()
 {
-   printf("+%s+\n", std::string(150,'-').c_str());
-   printf("| %-88s |    %10s |   %16s |   %16s |\n",h1_["cutflow"] -> GetTitle(),"n events","ratio wrt first","ratio wrt previous");
-   printf("+%s+\n", std::string(150,'-').c_str());
+   printf("+%s+\n", std::string(170,'-').c_str());
+   printf("| %-108s |    %10s |   %16s |   %16s |\n",h1_["cutflow"] -> GetTitle(),"n events","ratio wrt first","ratio wrt previous");
+   printf("+%s+\n", std::string(170,'-').c_str());
    int firstbin = 2;
    for ( int i = 1; i <= h1_["cutflow"] ->GetNbinsX(); ++i )
    {
@@ -254,20 +254,20 @@ void BaseAnalyser::workflow()
       float rni = 0;
       if ( i == 1 )
       {
-         printf("| %-88s |    %10.1f |   %16s |  %19s |\n",label.c_str(),n,"-","-");
+         printf("| %-108s |    %10.1f |   %16s |  %19s |\n",label.c_str(),n,"-","-");
       }
       else if ( i == 2 )
       {
-         printf("| %2d - %-83s |    %10.1f |   %16.4f |  %19s |\n",i-1,label.c_str(),n,rn1,"-");
+         printf("| %2d - %-103s |    %10.1f |   %16.4f |  %19s |\n",i-1,label.c_str(),n,rn1,"-");
       }
       else
       {
          rni = h1_["cutflow"]-> GetBinContent(i)/h1_["cutflow"]->GetBinContent(i-1);
-         printf("| %2d - %-83s |    %10.1f |   %16.4f |     %16.4f |\n",i-1,label.c_str(),n,rn1,rni);
+         printf("| %2d - %-103s |    %10.1f |   %16.4f |     %16.4f |\n",i-1,label.c_str(),n,rn1,rni);
       }
       
    }
-   printf("+%s+\n", std::string(150,'-').c_str());
+   printf("+%s+\n", std::string(170,'-').c_str());
    
 }
 
