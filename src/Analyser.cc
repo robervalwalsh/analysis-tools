@@ -104,6 +104,9 @@ void Analyser::generatorWeight()
 
 bool Analyser::muonJet(const int & r)
 {
+   
+   if ( ! muonsanalysis_ ) return true;  // will skip this selection
+
    int j = r-1;
    ++ cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
