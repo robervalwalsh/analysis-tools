@@ -1008,7 +1008,7 @@ ScaleFactors JetAnalyser::btagSF(const int & r, const std::string & wp)
 
 void JetAnalyser::actionApplyJER()
 {
-   if ( ! jetsanalysis_ ) return;
+   if ( ! jetsanalysis_ ||  ! isMC_ ) return;
    ++cutflow_;
    if ( applyjer_ )
    {
