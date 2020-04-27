@@ -111,7 +111,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Muons.ptMin"                  , po::value<std::vector<float> >        (&muonsptmin_)      -> multitoken()                            , "Mimium pt of the muons")
          ("Muons.ptMax"                  , po::value<std::vector<float> >        (&muonsptmax_)      -> multitoken()                            , "Maximum pt of the muons")
          ("Muons.etaMax"                 , po::value<std::vector<float> >        (&muonsetamax_)     -> multitoken()                            , "Maximum |eta| of the muons")
-         ("Muons.muons"                  , po::value <std::string>               (&muonsCol_)        -> default_value("slimmedMuons")           , "Name of the muons collection")      
+         ("Muons.muons"                  , po::value <std::string>               (&muonsCol_)        -> default_value("")           , "Name of the muons collection")      
          ("Muons.id"                     , po::value <std::string>               (&muonsid_)         -> default_value("LOOSE")                  , "muons id criteria for all muons")
          ("Muons.nMin"                   , po::value <int>                       (&nmuonsmin_)       -> default_value(0)                        , "Minimum number of muons")
          ("Muons.nMax"                   , po::value <int>                       (&nmuonsmax_)       -> default_value(-1)                       , "Maximum number of muons");
