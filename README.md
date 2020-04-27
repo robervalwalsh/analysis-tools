@@ -5,6 +5,7 @@
 * [Installation](#installation)
 * [Calibrations](#calibrations)
 * [Ntuples](#ntuples)
+* [Example](#example)
 
 ## Installation
 
