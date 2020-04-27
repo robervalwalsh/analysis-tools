@@ -1,11 +1,22 @@
-# Analysis/Tools
+# Analysis/Tools package
 
-**Core codes for the DESY CMS MSSM Higgs -> bb analysis framework**
+**Core analysis framework of the DESY CMS Higgs -> bb group**
+
+:warning: This package is supposed to contain only general codes to be used for analysis.
+Codes for specific analysis must be developed in dedicated packages/repositories, e.g.
+for the MSSM Hbb analyses one can use for developments the package
+[Analysis/MssmHbb](https://github.com/desy-cms/analysis-mssmhbb),
+which is currently under construction.
+
 
 * [Installation](#installation)
 * [Calibrations](#calibrations)
 * [Ntuples](#ntuples)
 * [Example](#example)
+
+
+##
+
 
 ## Installation
 
