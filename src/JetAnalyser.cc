@@ -78,7 +78,7 @@ bool JetAnalyser::analysisWithJets()
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
    {
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Open Jet collection: %s",(config_->jetsCollection()).c_str()));
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Using Jet collection: %s",(config_->jetsCollection()).c_str()));
    }
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    

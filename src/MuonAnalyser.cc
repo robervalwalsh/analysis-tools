@@ -51,7 +51,7 @@ bool MuonAnalyser::analysisWithMuons()
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
    {
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Open Muon collection: %s",(config_->muonsCollection()).c_str()));
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Using Muon collection: %s",(config_->muonsCollection()).c_str()));
    }
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
