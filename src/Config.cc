@@ -98,13 +98,13 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
       opt_cfg_.add_options()                                                                                                              
          ("BTag.wp"                      , po::value <std::vector<std::string> > (&jetsbtagwp_)      -> multitoken()                      ,"Jets btag minimum (with '-' means maximum)")
          ("BTag.algorithm"               , po::value <std::string>               (&btagalgo_)        -> default_value("csvivf")           ,"BTag algorithm")
-         ("BTag.nonBtagWP"               , po::value <std::string>               (&nonbtagwp_)       -> default_value("")                 ,"non-Btag working point")
+         ("BTag.revBtagWP"               , po::value <std::string>               (&revbtagwp_)       -> default_value("")                 ,"non-Btag working point")
          ("BTag.loose"                   , po::value <float>                     (&btagwploose_)     -> default_value(-10000)             ,"BTag working point LOOSE")
          ("BTag.medium"                  , po::value <float>                     (&btagwpmedium_)    -> default_value(-10000)             ,"BTag working point MEDIUM")
          ("BTag.tight"                   , po::value <float>                     (&btagwptight_)     -> default_value(-10000)             ,"BTag working point TIGHT")
          ("BTag.user"                    , po::value <float>                     (&btagwpxxx_)       -> default_value(-10000)             ,"BTag working point USER-defined")
          ("BTag.nMin"                    , po::value <int>                       (&nbjetsmin_)       -> default_value(-1)                  ,"Minimum number of btgaged jets")
-         ("BTag.nonBtagJet"              , po::value <int>                       (&nonbtagjet_)      -> default_value(-1)                 ,"non-Btag Jet");
+         ("BTag.revBtagJet"              , po::value <int>                       (&revbtagjet_)      -> default_value(-1)                 ,"non-Btag Jet");
                                                                                                                                           
       // muons                                                                                                                            
       opt_cfg_.add_options()                                                                                                              
@@ -363,8 +363,8 @@ std::vector<float> Config::jetsBtagProbC()      const { return jetsbtagprobc_; }
 std::vector<float> Config::jetsBtagProbG()      const { return jetsbtagprobg_; }
 std::vector<float> Config::jetsBtagProbLight()  const { return jetsbtagproblight_; }
 bool               Config::bRegression()        const { return bregression_; }
-std::string        Config::nonBtagWP()          const { return nonbtagwp_; }
-int                Config::nonBtagJet()         const { return nonbtagjet_; }
+std::string        Config::revBtagWP()          const { return revbtagwp_; }
+int                Config::revBtagJet()         const { return revbtagjet_; }
 bool               Config::useJetsExtendedFlavour() const { return usejetsextflv_; }
 bool               Config::doDijet()            const { return dodijet_ ; }
 int                Config::nBJetsMin()          const { return nbjetsmin_; }
