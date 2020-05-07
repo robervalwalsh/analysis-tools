@@ -26,6 +26,7 @@ Config::Config()
 // Main constructor
 Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configuration")
 {
+   std::string toolspath = Form("%s/src/Analysis/Tools",getenv("CMSSW_BASE"));
    std::string datapath = Form("%s/src/Analysis/Tools/data",getenv("CMSSW_BASE"));
    argc_ = argc;
    argv_ = argv;
@@ -235,6 +236,10 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          po::notify(vm);
          boost::algorithm::to_lower(jetsid_);
          std::transform(btagalgo_.begin(), btagalgo_.end(), btagalgo_.begin(), ::tolower);
+         
+//         inputlist_ = Form("%s/test/%s", toolspath.c_str(), inputlist_.c_str());
+         
+         if ( json_     != "no_json.txt" ) json_ = Form("%s/%s", datapath.c_str(), json_.c_str());
          if ( jerptres_ != "" )  jerptres_ = Form("%s/%s", datapath.c_str(), jerptres_.c_str());
          if ( jersf_    != "" )  jersf_    = Form("%s/%s", datapath.c_str(), jersf_.c_str()   );
          if ( btagsf_   != "" )  btagsf_   = Form("%s/%s", datapath.c_str(), btagsf_.c_str()  );
