@@ -1,0 +1,12 @@
+__init__.py
+*.pyc
+.*.swp
+.#*
+#*#
+*~
+._*
+.ipynb_checkpoints
+ntuples
+calibrations
+tmp
+scratch*
