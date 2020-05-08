@@ -1,4 +1,4 @@
-# Analysis/Tools package
+# Analysis/Tools
 
 **Core Analysis Framework of the DESY CMS Higgs -> bb group**
 
