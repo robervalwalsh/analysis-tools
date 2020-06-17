@@ -240,7 +240,7 @@ void Jet::applyBjetRegression()
    float pt  = p4_.Pt()*this->bRegCorr();
    float eta = p4_.Eta();
    float phi = p4_.Phi();
-   float e   = p4_.E();
+   float e   = p4_.E()*this->bRegCorr();
    p4_.SetPtEtaPhiE(pt,eta,phi,e);
 }
       
