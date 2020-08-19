@@ -385,3 +385,24 @@ std::map<std::string, std::shared_ptr<TGraphAsymmErrors> > BaseAnalyser::btagEff
 {
    return btageff_;
 }
+
+
+void BaseAnalyser::generatorWeight()
+{
+   if ( ! config_->isMC() ) return;
+   
+   ++cutflow_;
+   float weight = analysis_->genWeight();
+   if ( config_->fullGenWeight() )
+   {
+      weight_ *= weight;
+   }
+   else
+   {
+      float sign =  (weight > 0) ? 1 : ((weight < 0) ? -1 : 0);
+      weight_ *= sign;
+   }
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+}
+
