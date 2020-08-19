@@ -86,24 +86,26 @@ namespace analysis {
             bool genpartsanalysis_;
             bool genjetsanalysis_;
 
-            // pileup weight
+            /// pileup weight
             std::shared_ptr<PileupWeight> puweights_;
+            /// true pileup
             bool istruepu_;
 
-            // overall scaling
+            /// overall scaling
             float scale_;
 
-            //
+            /// flag for MC sample
             bool isMC_;
+            /// flag for DATA sample
             bool isData_;
 
-            // output tree
+            /// output tree
             std::shared_ptr<TTree> analyser_tree_;
 
 
          private:
 
-            // name of the executable
+            /// name of the executable
             std::string exe_;
 
          public:
@@ -186,9 +188,10 @@ namespace analysis {
             */
             std::map<std::string, std::shared_ptr<TGraphAsymmErrors> > btagEfficiencies() const;
 
-            // root tree
-            void fillAnalyserTree();
+            /// root tree
             void analyserTree();
+            /// fill root tree
+            void fillAnalyserTree();
 
 
       };

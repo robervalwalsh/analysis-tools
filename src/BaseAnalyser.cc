@@ -57,7 +57,6 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(1,"Total events read");
       
    
-//   isMC_ = config_->isMC();
    isMC_ = analysis_->isMC();
    isData_ = !isMC_;
    
