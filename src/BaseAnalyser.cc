@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <stdlib.h>
 #include "TString.h"
 // 
 // user include files
@@ -158,16 +159,26 @@ BaseAnalyser::~BaseAnalyser()
       bool is_empty =  ( h.second -> GetEntries() != 0 || h.second -> GetSumOfWeights() != 0 );
       if ( is_empty ) continue;
    }
-   workflow();
+   
    if ( hout_ )
    {
-      std::cout << std::endl;
-      std::cout << "output root file: " << config_->outputRoot() << std::endl;
+//      std::cout << std::endl;
+//      std::cout << "output root file: " << config_->outputRoot() << std::endl;
       hout_ -> cd();
       hout_ -> Write();
-//      hout_->Close();
+      hout_->Close();
+      // print workflow using the Workflow macro
+      try
+      {
+         system(Form("Workflow %s",config_->outputRoot().c_str()));
+      }
+      catch(...)
+      {
+         std::cout << "Problems with Workflow macro or the output file, no summary printed" << std::endl;
+      }
    }   
    
+   std::cout << std::endl;
    std::cout << exe_ << " finished!" << std::endl;
    printf("%s\n", std::string(100,'_').c_str());
    std::cout << std::endl;
@@ -176,6 +187,7 @@ BaseAnalyser::~BaseAnalyser()
    finished.open("finished.txt");
    finished << exe_ << "\n";
    finished.close();
+   
 }
 
 
@@ -220,38 +232,6 @@ std::map<std::string, std::shared_ptr<TH1F> > BaseAnalyser::histograms()
    return h1_;
 }
 
-
-void BaseAnalyser::workflow()
-{
-   printf("+%s+\n", std::string(170,'-').c_str());
-   printf("| %-108s |    %10s |   %16s |   %16s |\n",h1_["cutflow"] -> GetTitle(),"n events","ratio wrt first","ratio wrt previous");
-   printf("+%s+\n", std::string(170,'-').c_str());
-   int firstbin = 2;
-   for ( int i = 1; i <= h1_["cutflow"] ->GetNbinsX(); ++i )
-   {
-      std::string label = std::string(h1_["cutflow"]->GetXaxis()->GetBinLabel(i));
-      if ( label == "" ) continue;
-//      if ( firstbin < 0 ) firstbin = i;
-      float n = h1_["cutflow"]->GetBinContent(i);
-      float rn1 = h1_["cutflow"]->GetBinContent(i)/h1_["cutflow"]->GetBinContent(firstbin);
-      float rni = 0;
-      if ( i == 1 )
-      {
-         printf("| %2d - %-103s |    %10.1f |   %16s |  %19s |\n",i-1,label.c_str(),n,"-","-");
-      }
-      else if ( i == 2 )
-      {
-         printf("| %2d - %-103s |    %10.1f |   %16.4f |  %19s |\n",i-1,label.c_str(),n,rn1,"-");
-      }
-      else
-      {
-         rni = h1_["cutflow"]-> GetBinContent(i)/h1_["cutflow"]->GetBinContent(i-1);
-         printf("| %2d - %-103s |    %10.1f |   %16.4f |     %16.4f |\n",i-1,label.c_str(),n,rn1,rni);
-      }
-   }
-   printf("+%s+\n", std::string(170,'-').c_str());
-   
-}
 
 int  BaseAnalyser::seed()
 {
