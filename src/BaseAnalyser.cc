@@ -143,19 +143,6 @@ BaseAnalyser::~BaseAnalyser()
       h1_["cutflow"] -> Fill(lastbin,fevts*scale);
    }
     
-//    // scale to luminosity
-//    if ( config_->isMC() && config_ -> luminosity() > 0. && config_ -> scale() < 0. )
-//    {
-//       float nwevts = h1_["cutflow"] -> GetBinContent(2);
-//       float genlumi = nwevts/xsection_;
-//       scale = config_->luminosity()/genlumi;
-//       if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(lastbin+1)) == "" )
-//       {
-//          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(lastbin+1,Form("Number of events after scaling to luminosity = %8.3f/pb",config_->luminosity()));
-//       }
-//       h1_["cutflow"] -> Fill(lastbin,fevts*scale);
-//    }
-   
    
    for ( auto h : h1_ )
    {
@@ -181,9 +168,6 @@ BaseAnalyser::~BaseAnalyser()
       hout_ -> Write();
 //      hout_->Close();
    }   
-   
-//   std::string cutflow = "Cutflow " + config_->outputRoot_;
-//   std::system(cutflow.c_str());
    
    std::cout << exe_ << " finished!" << std::endl;
    printf("%s\n", std::string(100,'_').c_str());
