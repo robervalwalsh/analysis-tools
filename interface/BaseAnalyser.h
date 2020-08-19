@@ -146,6 +146,9 @@ namespace analysis {
             float weight();
             /// sets event weight
             void weight(const float &);
+            
+            /// generator weight
+            void generatorWeight();
 
             /// returns cross section
             float crossSection() const;
