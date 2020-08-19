@@ -43,9 +43,9 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    analysis_ = std::make_shared<Analysis>(config_->ntuplesList(),config_->eventInfo());
    
    // output file
-   if ( config_->outputRoot_ != "" )
+   if ( config_->outputRoot() != "" )
    {
-      hout_= std::make_shared<TFile>(config_->outputRoot_.c_str(),"recreate",Form("%s %s %s",argv[0],argv[1],argv[2]));
+      hout_= std::make_shared<TFile>(config_->outputRoot().c_str(),"recreate",Form("%s %s %s",argv[0],argv[1],argv[2]));
       hout_ -> cd();
    }
    
@@ -83,7 +83,7 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    }
    
    // JSON for data   
-   if( isData_ && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
+   if( isData_ && config_->json() != "" ) analysis_->processJsonFile(config_->json());
    
    // btag efficiencies
    if ( config_->btagEfficiencies() != "" )
@@ -163,7 +163,7 @@ BaseAnalyser::~BaseAnalyser()
    if ( hout_ )
    {
       std::cout << std::endl;
-      std::cout << "output root file: " << config_->outputRoot_ << std::endl;
+      std::cout << "output root file: " << config_->outputRoot() << std::endl;
       hout_ -> cd();
       hout_ -> Write();
 //      hout_->Close();
