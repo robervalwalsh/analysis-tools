@@ -54,7 +54,7 @@ bool Analyser::event(const int & i)
 
    if (! config_->isMC() ) 
    {
-       auto json = basename(config_->json_);
+       auto json = basename(config_->json());
        ++cutflow_;
        if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
        {

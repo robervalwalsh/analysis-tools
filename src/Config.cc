@@ -463,3 +463,7 @@ float Config::max()        const { return max_; }
 // Histograms
 bool  Config::histogramJetsRegionSplit() const { return histjets_rsplit_ ; }
 bool  Config::histogramJetsPerFlavour()  const { return histjets_flavour_ ; }
+
+
+std::string Config::outputRoot() const { return outputRoot_ ; }
+std::string Config::json() const { return json_ ; }

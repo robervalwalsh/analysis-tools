@@ -43,9 +43,9 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    analysis_ = std::make_shared<Analysis>(config_->ntuplesList(),config_->eventInfo());
    
    // output file
-   if ( config_->outputRoot_ != "" )
+   if ( config_->outputRoot() != "" )
    {
-      hout_= std::make_shared<TFile>(config_->outputRoot_.c_str(),"recreate",Form("%s %s %s",argv[0],argv[1],argv[2]));
+      hout_= std::make_shared<TFile>(config_->outputRoot().c_str(),"recreate",Form("%s %s %s",argv[0],argv[1],argv[2]));
       hout_ -> cd();
    }
    
@@ -57,7 +57,6 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(1,"Total events read");
       
    
-//   isMC_ = config_->isMC();
    isMC_ = analysis_->isMC();
    isData_ = !isMC_;
    
@@ -83,7 +82,7 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    }
    
    // JSON for data   
-   if( isData_ && config_->json_ != "" ) analysis_->processJsonFile(config_->json_);
+   if( isData_ && config_->json() != "" ) analysis_->processJsonFile(config_->json());
    
    // btag efficiencies
    if ( config_->btagEfficiencies() != "" )
@@ -143,19 +142,6 @@ BaseAnalyser::~BaseAnalyser()
       h1_["cutflow"] -> Fill(lastbin,fevts*scale);
    }
     
-//    // scale to luminosity
-//    if ( config_->isMC() && config_ -> luminosity() > 0. && config_ -> scale() < 0. )
-//    {
-//       float nwevts = h1_["cutflow"] -> GetBinContent(2);
-//       float genlumi = nwevts/xsection_;
-//       scale = config_->luminosity()/genlumi;
-//       if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(lastbin+1)) == "" )
-//       {
-//          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(lastbin+1,Form("Number of events after scaling to luminosity = %8.3f/pb",config_->luminosity()));
-//       }
-//       h1_["cutflow"] -> Fill(lastbin,fevts*scale);
-//    }
-   
    
    for ( auto h : h1_ )
    {
@@ -176,14 +162,11 @@ BaseAnalyser::~BaseAnalyser()
    if ( hout_ )
    {
       std::cout << std::endl;
-      std::cout << "output root file: " << config_->outputRoot_ << std::endl;
+      std::cout << "output root file: " << config_->outputRoot() << std::endl;
       hout_ -> cd();
       hout_ -> Write();
 //      hout_->Close();
    }   
-   
-//   std::string cutflow = "Cutflow " + config_->outputRoot_;
-//   std::system(cutflow.c_str());
    
    std::cout << exe_ << " finished!" << std::endl;
    printf("%s\n", std::string(100,'_').c_str());
