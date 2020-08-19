@@ -124,8 +124,6 @@ namespace analysis {
             /// returns a given 1D histogram
             std::shared_ptr<TH1F> histogram(const std::string &);
 
-            /// print out the cut flow
-            void workflow();
             /// get cutflow index
             int  cutflow();
             /// set cutflow index
