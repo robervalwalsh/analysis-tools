@@ -345,6 +345,7 @@ float JetAnalyser::btag(const Jet & jet, const std::string & algo)
 bool JetAnalyser::selectionJet(const int & r)
 {
    if ( r > config_->nJetsMin() ) return true;
+   isgoodevent_ = false;
    int j = r-1;
    
    float pt_min = config_->jetsPtMin()[j];
@@ -353,16 +354,16 @@ bool JetAnalyser::selectionJet(const int & r)
    
    if ( config_->jetsPtMax().size() > 0 && config_->jetsPtMax()[j] > config_->jetsPtMin()[j] ) pt_max = config_->jetsPtMax()[j];
    
-   bool isgood = this -> selectionJet(r,pt_min,eta_max,pt_max);
+   isgoodevent_ = this -> selectionJet(r,pt_min,eta_max,pt_max);
    
-   return isgood;
+   return isgoodevent_;
 }
 
 bool JetAnalyser::selectionJet(const int & r, const float & pt_min, const float &eta_max, const float &pt_max)
 {
    if ( r > config_->nJetsMin() ) return true;
+   isgoodevent_ = false;
    ++cutflow_;
-   bool isgood = true;
    int j = r-1;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
@@ -385,13 +386,15 @@ bool JetAnalyser::selectionJet(const int & r, const float & pt_min, const float 
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
-   return isgood;
+   isgoodevent_ = true;
+   return true;
 }
 
 
 bool JetAnalyser::selectionJetDeta(const int & r1, const int & r2, const float & delta)
 {
    if ( r1 > config_->nJetsMin() ||  r2 > config_->nJetsMin() ) return true;
+   isgoodevent_ = false;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
@@ -418,6 +421,7 @@ bool JetAnalyser::selectionJetDeta(const int & r1, const int & r2, const float &
         
    h1_["cutflow"] -> Fill(cutflow_,weight_);
     
+   isgoodevent_ = true;
    return true;
    
 }
@@ -441,6 +445,7 @@ bool JetAnalyser::selectionJetDeta(const int & r1, const int & r2)
    {
       ok = ok && selectionJetDeta(r1,r2,-1*config_->jetsDetaMin());
    }
+   isgoodevent_ = ok;
    return ok;
    
 }
@@ -448,6 +453,7 @@ bool JetAnalyser::selectionJetDeta(const int & r1, const int & r2)
 bool JetAnalyser::selectionJetDphi(const int & r1, const int & r2, const float & delta)
 {
    if ( r1 > config_->nJetsMin() ||  r2 > config_->nJetsMin() ) return true;
+   isgoodevent_ = false;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
@@ -472,6 +478,7 @@ bool JetAnalyser::selectionJetDphi(const int & r1, const int & r2, const float &
         
    h1_["cutflow"] -> Fill(cutflow_,weight_);
     
+   isgoodevent_ = true;
    return true;
    
 }
@@ -495,6 +502,7 @@ bool JetAnalyser::selectionJetDphi(const int & r1, const int & r2)
    {
       ok = ok && selectionJetDphi(r1,r2,-1*config_->jetsDphiMin());
    }
+   isgoodevent_ = ok;
    return ok;
    
 }
@@ -503,6 +511,7 @@ bool JetAnalyser::selectionJetDphi(const int & r1, const int & r2)
 bool JetAnalyser::selectionJetDr(const int & r1, const int & r2, const float & delta)
 {
    if ( r1 > config_->nJetsMin() ||  r2 > config_->nJetsMin() ) return true;
+   isgoodevent_ = false;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
@@ -528,6 +537,7 @@ bool JetAnalyser::selectionJetDr(const int & r1, const int & r2, const float & d
       
    h1_["cutflow"] -> Fill(cutflow_,weight_);
     
+   isgoodevent_ = true;
    return true;
    
 }
@@ -552,12 +562,14 @@ bool JetAnalyser::selectionJetDr(const int & r1, const int & r2)
    {
       ok = ok && selectionJetDr(r1,r2,-1*config_->jetsDrMin());
    }
+   isgoodevent_ = ok;
    return ok;
 }
 
 bool JetAnalyser::selectionJetPtImbalance(const int & r1, const int & r2, const float & delta)
 {
    if ( r1 > config_->nJetsMin() ||  r2 > config_->nJetsMin() ) return true;
+   isgoodevent_ = false;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
@@ -583,6 +595,7 @@ bool JetAnalyser::selectionJetPtImbalance(const int & r1, const int & r2, const 
         
    h1_["cutflow"] -> Fill(cutflow_,weight_);
     
+   isgoodevent_ = true;
    return true;
    
 }
@@ -606,6 +619,7 @@ bool JetAnalyser::selectionJetPtImbalance(const int & r1, const int & r2)
    {
       ok = ok && selectionJetPtImbalance(r1,r2,-1*config_->jetsPtImbalanceMin());
    }
+   isgoodevent_ = ok;
    return ok;
    
 }
@@ -624,6 +638,7 @@ std::vector< std::shared_ptr<Jet> > JetAnalyser::selectedJets()
 
 bool JetAnalyser::selectionJetId()
 {
+   isgoodevent_ = false;
    if ( ! jetsanalysis_ ) return false;
    
    ++cutflow_;
@@ -642,11 +657,13 @@ bool JetAnalyser::selectionJetId()
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
 bool JetAnalyser::selectionJetPileupId()
 {
+   isgoodevent_ = false;
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JetPileupId: %s",config_->jetsPuId().c_str()));
@@ -668,6 +685,7 @@ bool JetAnalyser::selectionJetPileupId()
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 
 }
@@ -675,6 +693,7 @@ bool JetAnalyser::selectionJetPileupId()
 bool JetAnalyser::selectionNJets()
 {
    if ( config_->nJetsMin() < 0 ) return true;
+   isgoodevent_ = false;
    
    ++cutflow_;
    
@@ -706,6 +725,7 @@ bool JetAnalyser::selectionNJets()
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
    
 }
@@ -714,6 +734,7 @@ bool JetAnalyser::selectionNJets()
 bool JetAnalyser::selectionBJet(const int & r )
 {
    if ( config_->nJetsMin() < config_->nBJetsMin() || config_->nBJetsMin() < 1 || r > config_->nBJetsMin() ||  (int)(config_->jetsBtagWP()).size() < config_->nBJetsMin() ) return true;
+   isgoodevent_ = false;
    
    if ( ! config_->signalRegion() && r == config_->revBtagJet() ) return this->selectionNonBJet(r);
       
@@ -729,6 +750,7 @@ bool JetAnalyser::selectionBJet(const int & r )
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
@@ -738,7 +760,8 @@ bool JetAnalyser::selectionNonBJet(const int & r )
    int j = r-1;
 
    if ( config_->btagWP(config_->revBtagWP()) < 0 ) return true; // there is no selection here, so will not update the cutflow
-
+   isgoodevent_ = false;
+   
    ++ cutflow_;
    
    if ( r > config_->nBJetsMin() ) 
@@ -755,6 +778,7 @@ bool JetAnalyser::selectionNonBJet(const int & r )
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;   
    return true;
 }
 
@@ -764,6 +788,7 @@ bool JetAnalyser::onlineJetMatching(const int & r)
    int j = r-1;
    if ( config_->triggerObjectsL1Jets() == "" && config_->triggerObjectsCaloJets() == "" && config_->triggerObjectsPFJets() == "") return true;
    if ( config_->nJetsMin() < 0 ) return true;
+   isgoodevent_ = false;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -788,6 +813,7 @@ bool JetAnalyser::onlineJetMatching(const int & r)
 
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
@@ -796,6 +822,7 @@ bool JetAnalyser::onlineBJetMatching(const int & r)
 {
    int j = r-1;
    if ( config_->triggerObjectsBJets() == "" ) return true;
+   isgoodevent_ = false;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -818,6 +845,7 @@ bool JetAnalyser::onlineBJetMatching(const int & r)
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
@@ -1108,6 +1136,7 @@ bool JetAnalyser::selectionDiJetMass(const int & r1, const int & r2)
    float min = config_->massMin();
    float max = config_->massMax();
    if ( min < 0. && max < 0. ) return true;
+   isgoodevent_ = false;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
@@ -1136,6 +1165,7 @@ bool JetAnalyser::selectionDiJetMass(const int & r1, const int & r2)
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
@@ -1164,6 +1194,7 @@ void JetAnalyser::jetSwap(const int & r1, const int & r2)
 
 bool JetAnalyser::selectionJetQGlikelihood(const int & r, const float & cut)
 {
+   isgoodevent_ = false;
    int j = r-1;
    
    ++cutflow_;
@@ -1186,6 +1217,7 @@ bool JetAnalyser::selectionJetQGlikelihood(const int & r, const float & cut)
         
    h1_["cutflow"] -> Fill(cutflow_,weight_);
     
+   isgoodevent_ = true;
    return true;
    
 }
@@ -1211,6 +1243,7 @@ bool JetAnalyser::selectionJetQGlikelihood(const int & r)
    {
       ok = ok && selectionJetQGlikelihood(r,-1*config_->jetsQGmin()[j] );
    }
+   isgoodevent_ = ok;
    return ok;
    
 }
@@ -1223,6 +1256,7 @@ bool JetAnalyser::selectionBJetProbB(const int & r )
    float wp = config_->jetsBtagProbB()[j];
    std::string algo = config_->btagAlgorithm();
    if ( fabs(wp) > 1 ) return true; // there is no selection here, so will not update the cutflow
+   isgoodevent_ = false;
    
    ++ cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -1254,6 +1288,7 @@ bool JetAnalyser::selectionBJetProbB(const int & r )
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
@@ -1267,6 +1302,7 @@ bool JetAnalyser::selectionBJetProbBB(const int & r )
    float wp = config_->jetsBtagProbBB()[j];
    std::string algo = config_->btagAlgorithm();
    if ( fabs(wp) > 1 ) return true; // there is no selection here, so will not update the cutflow
+   isgoodevent_ = false;
    
    ++ cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -1298,6 +1334,7 @@ bool JetAnalyser::selectionBJetProbBB(const int & r )
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
@@ -1308,6 +1345,7 @@ bool JetAnalyser::selectionBJetProbLepB(const int & r )
    float wp = config_->jetsBtagProbLepB()[j];
    std::string algo = config_->btagAlgorithm();
    if ( fabs(wp) > 1 || algo == "deepcsv" ) return true; // there is no selection here, so will not update the cutflow
+   isgoodevent_ = false;
    
    ++ cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -1334,6 +1372,7 @@ bool JetAnalyser::selectionBJetProbLepB(const int & r )
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
@@ -1346,6 +1385,7 @@ bool JetAnalyser::selectionBJetProbC(const int & r )
    float wp = config_->jetsBtagProbC()[j];
    std::string algo = config_->btagAlgorithm();
    if ( fabs(wp) > 1 ) return true; // there is no selection here, so will not update the cutflow
+   isgoodevent_ = false;
    
    ++ cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -1377,6 +1417,7 @@ bool JetAnalyser::selectionBJetProbC(const int & r )
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
@@ -1387,6 +1428,7 @@ bool JetAnalyser::selectionBJetProbG(const int & r )
    float wp = config_->jetsBtagProbG()[j];
    std::string algo = config_->btagAlgorithm();
    if ( fabs(wp) > 1 || algo == "deepcsv" ) return true; // there is no selection here, so will not update the cutflow
+   isgoodevent_ = false;
    
    ++ cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -1413,6 +1455,7 @@ bool JetAnalyser::selectionBJetProbG(const int & r )
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
@@ -1423,6 +1466,7 @@ bool JetAnalyser::selectionBJetProbLight(const int & r )
    float wp = config_->jetsBtagProbLight()[j];
    std::string algo = config_->btagAlgorithm();
    if ( fabs(wp) > 1 ) return true; // there is no selection here, so will not update the cutflow
+   isgoodevent_ = false;
    
    ++ cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -1454,6 +1498,7 @@ bool JetAnalyser::selectionBJetProbLight(const int & r )
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = false;
    return true;
 }
 

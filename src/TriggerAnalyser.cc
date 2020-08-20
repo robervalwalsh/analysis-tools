@@ -68,6 +68,7 @@ bool TriggerAnalyser::selectionTrigger() // Maybe not use this, use selectionHLT
 bool TriggerAnalyser::selectionHLT()
 {
    if ( config_->hltPath_ == "" ) return true;
+   isgoodevent_ = false;
    
    ++cutflow_;
    if ( ! analysis_->triggerResult(config_->hltPath_) ) return false;
@@ -77,12 +78,14 @@ bool TriggerAnalyser::selectionHLT()
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
 
+   isgoodevent_ = true;
    return true;
 }
 
 bool TriggerAnalyser::selectionL1()
 {
    if ( config_->l1Seed_ == "" ) return true;
+   isgoodevent_ = false;
    
    ++cutflow_;
    if ( ! analysis_->triggerResult(config_->l1Seed_)  ) return false;
@@ -92,6 +95,7 @@ bool TriggerAnalyser::selectionL1()
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
 
+   isgoodevent_ = true;
    return true;
 }
 

@@ -41,16 +41,17 @@ Analyser::~Analyser()
 
 bool Analyser::event(const int & i)
 {
-   bool ok = true;
+//   bool ok = true;
    analysis_->event(i);
    cutflow_ = 0;
    weight_ = 1.;  // reset weight at the beginning of the event analysis
+   isgoodevent_ = true;
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    this -> generatorWeight();
    
-   if ( config_->runmin_ > 0 && analysis_->run() < config_->runmin_ ) return false;
-   if ( config_->runmax_ > 0 && analysis_->run() > config_->runmax_ ) return false;
+   if ( config_->runmin_ > 0 && analysis_->run() < config_->runmin_ ) { isgoodevent_ = false; return false; }
+   if ( config_->runmax_ > 0 && analysis_->run() > config_->runmax_ ) { isgoodevent_ = false; return false; }
 
    if (! config_->isMC() ) 
    {
@@ -60,8 +61,8 @@ bool Analyser::event(const int & i)
        {
          h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Certified data: %s",json.c_str()));
        }
-       ok = analysis_->selectJson();
-       if ( ! ok ) return false;
+       isgoodevent_ = analysis_->selectJson();
+       if ( ! isgoodevent_ ) return false;
        h1_["cutflow"] -> Fill(cutflow_,weight_);
    }
    
@@ -89,7 +90,7 @@ bool Analyser::event(const int & i)
    analysisWithMuons();
       
     
-   return ok;
+   return isgoodevent_;
    
 }
 

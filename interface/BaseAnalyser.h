@@ -104,6 +104,9 @@ namespace analysis {
             
             /// output folder exists
             bool outfolderexists_;
+            
+            /// event is good
+            bool isgoodevent_;
 
 
          private:
@@ -200,6 +203,7 @@ namespace analysis {
             void analyserTree();
             /// fill root tree
             void fillAnalyserTree();
+            
 
 
       };

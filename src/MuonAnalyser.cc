@@ -106,7 +106,7 @@ void MuonAnalyser::muonHistograms(const std::string & obj, const int & n)
 
 bool MuonAnalyser::selectionMuon(const int & r)
 {
-   bool isgood = true;
+   isgoodevent_ = false;
    ++cutflow_;
    int m = r-1;
    
@@ -124,17 +124,17 @@ bool MuonAnalyser::selectionMuon(const int & r)
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
-   return isgood;
+   isgoodevent_ = true;
+   return true;
 }
 
 bool MuonAnalyser::selectionMuons()
 {
    // selectedMuons will be composed of muons with the lowest pt threshold
 
-   if ( ! muonsanalysis_ ) return true;  // will skip this selection
+   if ( ! muonsanalysis_ ) return true;  // will skip this selection      
+   isgoodevent_ = false;
    
-      
-   bool isgood = true;
    ++cutflow_;
 //    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
@@ -168,7 +168,8 @@ bool MuonAnalyser::selectionMuons()
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
 //    
-   return isgood;
+   isgoodevent_ = true;
+   return true;
 }
 
 
@@ -176,6 +177,7 @@ bool MuonAnalyser::selectionMuons()
 bool MuonAnalyser::selectionMuonId()
 {
    if ( ! muonsanalysis_ ) return true;  // will skip this selection
+   isgoodevent_ = false;
    
    ++cutflow_;
    
@@ -197,12 +199,14 @@ bool MuonAnalyser::selectionMuonId()
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
 bool MuonAnalyser::selectionNMuons()
 {
    if ( ! muonsanalysis_ ) return true;  // will skip this selection
+   isgoodevent_ = false;
    
    
    ++cutflow_;
@@ -214,6 +218,7 @@ bool MuonAnalyser::selectionNMuons()
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
    
 }
@@ -224,6 +229,7 @@ bool MuonAnalyser::onlineMuonMatching()
    if ( ! muonsanalysis_ ) return true;  // will skip this selection
    
    if ( config_->triggerObjectsL1Muons() == "" && config_->triggerObjectsL3Muons() == ""  ) return true;
+   isgoodevent_ = false;
    
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -242,6 +248,7 @@ bool MuonAnalyser::onlineMuonMatching()
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
@@ -249,6 +256,7 @@ bool MuonAnalyser::onlineL1MuonMatching(const int & r)
 {
    int j = r-1;
    if ( config_->triggerObjectsL1Muons() == "" ) return true;
+   isgoodevent_ = false;
    
    ++cutflow_;
    
@@ -270,6 +278,7 @@ bool MuonAnalyser::onlineL1MuonMatching(const int & r)
       
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
@@ -277,6 +286,7 @@ bool MuonAnalyser::onlineL3MuonMatching(const int & r)
 {
    int j = r-1;
    if ( config_->triggerObjectsL3Muons() == "" ) return true;
+   isgoodevent_ = false;
    
    ++cutflow_;
    
@@ -298,6 +308,7 @@ bool MuonAnalyser::onlineL3MuonMatching(const int & r)
       
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   isgoodevent_ = true;
    return true;
 }
 
