@@ -47,7 +47,7 @@ namespace analysis {
             std::vector< std::shared_ptr<Jet> > selectedJets_;
             
             // number of histogrammed jets
-            int n_hjets_;
+            std::map<std::string,int> n_hjets_;
             
             bool jetsanalysis_;
             bool applyjer_;
@@ -111,8 +111,8 @@ namespace analysis {
             virtual bool selectionNonBJet(const int &);
             virtual bool onlineJetMatching(const int &);
             virtual bool onlineBJetMatching(const int &);
-            virtual void jetHistograms(const int & n, const std::string & label = "x");
-            virtual void jetHistograms(const std::string & label = "x");
+            virtual void jetHistograms(const std::string & label = "x", const int & n = 0 );
+//            virtual void jetHistograms(const std::string & label = "x");
             virtual void fillJetHistograms(const std::string & label = "x");
             virtual void fillJetHistograms(const int & r = -1, const std::string & label = "x", const float & sf = 1.,const bool & workflow = false);
             virtual void actionApplyJER();

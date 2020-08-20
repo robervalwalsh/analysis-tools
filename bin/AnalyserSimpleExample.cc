@@ -16,8 +16,8 @@ int main(int argc, char ** argv)
    
 // HISTOGRAMS   
    // create some predefined jet histograms
-   analyser.jetHistograms(2,"initial");
-   analyser.jetHistograms(2,"final");
+   analyser.jetHistograms("initial",2);
+   analyser.jetHistograms("final",2);
    // create some predefined muon histograms
    // muon histograms still not available
    

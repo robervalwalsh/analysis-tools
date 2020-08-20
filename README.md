@@ -234,8 +234,8 @@ If one wants to select muons depending on their ranking, then one can use, like 
 
 Histograms can be predefined in the `Analyser`, e.g. for jets one can use the method `jetHistograms`, which receives the arguments `number of jets`, which must be at most the minimum number of jets required, and a name of a directory. One can create as many directories as needed and fill the histograms at different steps of the analysis workflow, e.g. before the event loop:
 ```cpp
-   analyser.jetHistograms(2,"initial");
-   analyser.jetHistograms(2,"final");
+   analyser.jetHistograms("initial",2);
+   analyser.jetHistograms("final",2);
 ```
 then within the event loop:
 ```cpp

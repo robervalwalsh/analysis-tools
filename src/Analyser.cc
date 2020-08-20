@@ -115,3 +115,7 @@ bool Analyser::muonJet(const int & r)
    
 }
 
+void Analyser::histograms(const std::string & s)
+{
+   
+}

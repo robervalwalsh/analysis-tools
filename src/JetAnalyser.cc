@@ -117,17 +117,32 @@ void JetAnalyser::jets(const std::string & col)
    analysis_->addTree<Jet> ("Jets",col);
 }
 
-void JetAnalyser::jetHistograms( const std::string & label )
+// void JetAnalyser::jetHistograms( const std::string & label )
+// {
+//    this -> jetHistograms(config_->nJetsMin(), label);
+// }
+void JetAnalyser::jetHistograms( const std::string & label, const int & n )
 {
-   this -> jetHistograms(config_->nJetsMin(), label);
-}
-void JetAnalyser::jetHistograms( const int & n, const std::string & label )
-{
-   this->output()->cd();
-   this->output()->mkdir(label.c_str());
-   this->output()->cd(label.c_str());
+   n_hjets_[label] = 0;
+   if ( n < 1 )
+   {
+      if  ( config_->nJetsMin() > 0 )
+      {
+         n_hjets_[label] = config_->nJetsMin();
+      }
+      else
+      {
+         return;
+      }
+   }
+   else 
+   {
+      n_hjets_[label] = n;
+   }
    
-   n_hjets_ = n;
+   this->output()->cd();
+   this->makeDirectory(label.c_str());
+   this->output()->cd(label.c_str());
    
    h1_[Form("jet_hist_weight_%s",label.c_str())] = std::make_shared<TH1F>(Form("jet_hist_weight_%s",label.c_str()) , Form("jet_hist_weight_%s",label.c_str()) ,1 , 0. , 1. );
    
@@ -160,7 +175,7 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
    for ( int i = 0; i<nbins_btag+1; ++i)   {  bins_btag.push_back(size*i);  ++counter; }
    
    
-   for ( int j = 0; j < n; ++j ) // loop over jets
+   for ( int j = 0; j < n_hjets_[label]; ++j ) // loop over jets
    {
       // 1D histograms
       h1_[Form("pt_jet%d_%s"  , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("pt_jet%d"  , j+1) , Form("pt_jet%d_%s"  , j+1,label.c_str()) ,1500 , 0   , 1500  );
@@ -257,7 +272,7 @@ void JetAnalyser::jetHistograms( const int & n, const std::string & label )
       }
       if ( config_->doDijet()  )  // dijet histograms
       {
-         for ( int k = j+1; k < n && j < n; ++k )
+         for ( int k = j+1; k < n_hjets_[label] && j < n_hjets_[label]; ++k )
          {
             h1_[Form("dptrel_jet%d%d_%s" , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dptrel_jet%d%d" , j+1,k+1) , Form("dptrel_jet%d%d_%s" , j+1,k+1,label.c_str()) ,1000 , 0,1 );
             h1_[Form("dpt_jet%d%d_%s"    , j+1,k+1,label.c_str())]  = std::make_shared<TH1F>(Form("dpt_jet%d%d" , j+1,k+1)    , Form("dpt_jet%d%d_%s"    , j+1,k+1,label.c_str()) ,1000 , 0,1000 );
@@ -808,6 +823,8 @@ bool JetAnalyser::onlineBJetMatching(const int & r)
 
 void JetAnalyser::fillJetHistograms(const std::string & label)
 {
+   if ( n_hjets_[label] < 1 ) return;
+   
    this->output()->cd();
    ++ cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
@@ -815,7 +832,7 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
    
    this->output()->cd(label.c_str());
    
-   int n = n_hjets_;
+   int n = n_hjets_[label];
    
    if ( n > config_->nJetsMin() ) n = config_->nJetsMin();
    
@@ -886,7 +903,7 @@ void JetAnalyser::fillJetHistograms(const std::string & label)
 
 void JetAnalyser::fillJetHistograms(const int & r, const std::string & label, const float & sf, const bool & workflow)
 {
-   if ( r < 1 || r > n_hjets_ ) return;
+   if ( r < 1 || r > n_hjets_[label] ) return;
    
    if ( workflow ) // BE CAREFUL with this
    {

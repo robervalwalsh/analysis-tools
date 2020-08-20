@@ -38,6 +38,7 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    xsection_ = -1.;
    genpartsanalysis_ = false;
    genjetsanalysis_  = false;
+   outfolderexists_  = false;
     
    // the heavy stuff
    config_   = std::make_shared<Config>(argc,argv);
@@ -197,7 +198,7 @@ BaseAnalyser::~BaseAnalyser()
 // ------------ method called for each event  ------------
 
 bool BaseAnalyser::event(const int & i) { return true; }
-void BaseAnalyser::histograms(const std::string & s, const int & i) { }
+void BaseAnalyser::histograms(const std::string & s) { }
 
 std::shared_ptr<Analysis> BaseAnalyser::analysis()
 {
@@ -406,3 +407,21 @@ void BaseAnalyser::generatorWeight()
    
 }
 
+bool BaseAnalyser::makeDirectory(const std::string & label)
+{
+   if ( outfolderexists_ ) return true;
+   
+   this->output()->cd();
+   for ( int i = 0; i < this->output()->GetListOfKeys()->GetSize() ; ++i )
+   {
+      if ( this->output()->GetListOfKeys()->At(i)->IsFolder() && this->output()->GetListOfKeys()->At(i)->GetName() == label.c_str() )
+      {
+         outfolderexists_ = true;
+         break;
+      }
+   }
+   if ( ! outfolderexists_ ) this->output()->mkdir(label.c_str());
+   
+   return outfolderexists_;
+   
+}

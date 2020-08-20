@@ -19,8 +19,8 @@ int main(int argc, char ** argv)
    
 // HISTOGRAMS   
    // create some predefined jet histograms
-   analyser.jetHistograms(2,"jets");
-   analyser.jetHistograms(2,"btag_jets");
+   analyser.jetHistograms("jets",2);
+   analyser.jetHistograms("btag_jets",2);
    
    for ( int i = 0 ; i < analyser.nEvents() ; ++i )
    {

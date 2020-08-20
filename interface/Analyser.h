@@ -62,6 +62,7 @@ namespace analysis {
             virtual bool event(const int &);
          
             virtual bool muonJet(const int & );
+            virtual void histograms(const std::string &);
 
       };
    }
