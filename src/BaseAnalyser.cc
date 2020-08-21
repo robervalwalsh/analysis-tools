@@ -39,6 +39,7 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    genpartsanalysis_ = false;
    genjetsanalysis_  = false;
    outfolderexists_  = false;
+   firstevent_ = true;
     
    // the heavy stuff
    config_   = std::make_shared<Config>(argc,argv);
@@ -199,6 +200,7 @@ BaseAnalyser::~BaseAnalyser()
 
 bool BaseAnalyser::event(const int & i) { return true; }
 void BaseAnalyser::histograms(const std::string & s) { }
+void BaseAnalyser::fillHistograms(const std::string & s) { }
 
 std::shared_ptr<Analysis> BaseAnalyser::analysis()
 {

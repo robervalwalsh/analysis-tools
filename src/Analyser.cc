@@ -27,6 +27,7 @@ Analyser::Analyser(int argc, char * argv[]) : BaseAnalyser(argc,argv),  // not s
                                               MuonAnalyser(argc,argv)
 {
    this -> pileupHistogram();
+   this -> histograms("final_selection");
 }
 
 Analyser::~Analyser()
@@ -41,6 +42,11 @@ Analyser::~Analyser()
 
 bool Analyser::event(const int & i)
 {
+   if ( !firstevent_ && isgoodevent_ )
+   {
+      this->fillHistograms("final_selection");
+   }
+   firstevent_ = false;
 //   bool ok = true;
    analysis_->event(i);
    cutflow_ = 0;
@@ -118,5 +124,11 @@ bool Analyser::muonJet(const int & r)
 
 void Analyser::histograms(const std::string & s)
 {
-   
+   this->makeDirectory(s);
+   if ( jetsanalysis_ ) this -> jetHistograms(s);
+}
+
+void Analyser::fillHistograms(const std::string & s)
+{
+   if ( analysisWithJets() ) this -> fillJetHistograms(s);
 }

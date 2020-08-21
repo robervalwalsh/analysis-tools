@@ -107,6 +107,9 @@ namespace analysis {
             
             /// event is good
             bool isgoodevent_;
+            
+            /// first event
+            bool firstevent_;
 
 
          private:
@@ -141,6 +144,8 @@ namespace analysis {
             /// create histograms in a directory
 //            virtual void histograms(const std::string &, const int &);
             virtual void histograms(const std::string &);
+            /// fill histograms in a directory
+            virtual void fillHistograms(const std::string &);
             
             /// output folder exists
             bool makeDirectory(const std::string &);
