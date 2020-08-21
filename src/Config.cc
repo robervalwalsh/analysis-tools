@@ -273,6 +273,16 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
             njetsmin_ = njets_;
             njetsmax_ = njets_;
          }
+         
+         // default values in case not defined by user
+         if ( (int)jetsptmin_.size() < njetsmin_ )
+         {
+            for ( int j = (int)jetsptmin_.size(); j < njetsmin_ ; ++j ) jetsptmin_.push_back(0.);
+         }
+         if ( (int)jetsetamax_.size() < njetsmin_ )
+         {
+            for ( int j = (int)jetsetamax_.size(); j < njetsmin_ ; ++j ) jetsetamax_.push_back(10);
+         }
       }
       catch(po::error& e)
       { 
