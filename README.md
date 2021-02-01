@@ -97,7 +97,7 @@ optional arguments:
 
 e.g.
 ```bash
-naf_submit.py -e MssmHbbAnalysis -c mssmhbb_2017.cfg -x 2
+naf_submit.py -e AnalyserSimpleExample -c analyser_example_semilep_2018.cfg -x 2
 ```
 
 
