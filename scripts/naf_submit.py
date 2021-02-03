@@ -3,6 +3,7 @@ import os
 import glob
 import re
 from argparse import ArgumentParser
+from argparse import HelpFormatter
 from shutil import copyfile, rmtree, move
 from time import sleep
 
@@ -93,7 +94,7 @@ def basenameConfigParameter( config, name ):
 # --- main code ---
 
 # parsing arguments
-parser = ArgumentParser()
+parser = ArgumentParser(prog='naf_submit.py', formatter_class=lambda prog: HelpFormatter(prog,indent_increment=6,max_help_position=80,width=280), description='Prepare and submit jobs to NAF HTCondor batch system')
 parser.add_argument("-e", "--exe", dest="exe", help="Executable")
 parser.add_argument("-n", "--ntuples", dest="ntuples", help="List of ntuples file")
 parser.add_argument("-x", "--nfiles", dest="nfiles", type=int, default=1, help="Number of ntuple files per job")
