@@ -99,8 +99,8 @@ parser.add_argument("-n", "--ntuples", dest="ntuples", help="List of ntuples fil
 parser.add_argument("-x", "--nfiles", dest="nfiles", type=int, default=1, help="Number of ntuple files per job")
 parser.add_argument("-c", "--config", dest="config", help="Configuration file")
 parser.add_argument("-j", "--json", dest="json", help="JSON file with certified data")
-parser.add_argument("--eventsMax", dest="events_max", help="override the maximum number of events in the config file")
-parser.add_argument("--test", dest="test", help="for tests only! produce given number of jobs, do not submit")
+parser.add_argument("--events", dest="events_max", help="override eventsMax in the config file")
+parser.add_argument("--test", dest="njobs", help="produce njobs, no automatic submission")
 args = parser.parse_args()
 if not args.exe:
    print "nothing to be done" 
@@ -110,7 +110,7 @@ ntuples = args.ntuples
 json = args.json
 config = args.config
 events_max = args.events_max
-test = args.test
+test = args.njobs
 
 if test:
    print('TEST MODE:', test, 'jobs')
