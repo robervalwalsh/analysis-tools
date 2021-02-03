@@ -16,7 +16,8 @@ which is currently under construction.
 * [Calibrations](#calibrations)
 * [Ntuples](#ntuples)
 * [Example](#example)
-* [Detailed description](#detailed-description)
+* [NAF Submission](#naf-submission)
+* [Example Detailed Description](#example-detailed-description)
 
 
 
