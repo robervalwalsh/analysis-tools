@@ -100,6 +100,7 @@ parser.add_argument("-x", "--nfiles", dest="nfiles", type=int, default=1, help="
 parser.add_argument("-c", "--config", dest="config", help="Configuration file")
 parser.add_argument("-j", "--json", dest="json", help="JSON file with certified data")
 parser.add_argument("--eventsMax", dest="events_max", help="override the maximum number of events in the config file")
+parser.add_argument("--test", dest="test", help="for tests only! produce given number of jobs, do not submit")
 args = parser.parse_args()
 if not args.exe:
    print "nothing to be done" 
@@ -109,6 +110,10 @@ ntuples = args.ntuples
 json = args.json
 config = args.config
 events_max = args.events_max
+test = args.test
+
+if test:
+   print('TEST MODE:', test, 'jobs')
 
 configNtuples = None
 # get parameter from configuration 
@@ -184,7 +189,12 @@ if ntuples:
    os.chdir(cwd)
 
    # loop over the splitted files, each will correspond to a job on the NAF
-   for f in files:
+   
+   for i,f in enumerate(files):
+      if test:
+         if i >= int(test):
+            os.chdir(cwd)
+            break
       jobnum = os.path.splitext(f)[0][-4:]
       jobid = "job_"+jobnum
       exedir = maindir+"/"+jobid
@@ -203,8 +213,9 @@ if ntuples:
       jobf = open('./seed.txt', 'w+')
       print >> jobf, int(jobnum)+1
       jobf.close()
-      print "Submitting ",jobid,"..."
-      os.system(condorcmd)
+      print "Creating ",jobid,"..."
+      if not test:
+         os.system(condorcmd)
       sleep(0.2)
       # back to original directory
       os.chdir(cwd)
