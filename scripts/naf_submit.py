@@ -99,6 +99,7 @@ parser.add_argument("-n", "--ntuples", dest="ntuples", help="List of ntuples fil
 parser.add_argument("-x", "--nfiles", dest="nfiles", type=int, default=1, help="Number of ntuple files per job")
 parser.add_argument("-c", "--config", dest="config", help="Configuration file")
 parser.add_argument("-j", "--json", dest="json", help="JSON file with certified data")
+parser.add_argument("--eventsMax", dest="events_max", help="override the maximum number of events in the config file")
 args = parser.parse_args()
 if not args.exe:
    print "nothing to be done" 
@@ -107,6 +108,7 @@ if not args.exe:
 ntuples = args.ntuples
 json = args.json
 config = args.config
+events_max = args.events_max
 
 configNtuples = None
 # get parameter from configuration 
@@ -126,7 +128,7 @@ if config:
       ntp_path = os.getenv('CMSSW_BASE')
       ntp_path += "/src/Analysis/Tools/data/calibrations/"
       configJson[1] = configJson[1].replace("tools:",ntp_path)
-      
+            
    if not json:
       if configJson:
          json = configJson[1]
@@ -170,6 +172,9 @@ if ntuples:
       # ntuples list
       createConfigParameter(os.path.basename(config),'ntuplesList')
       replaceConfigParameter(os.path.basename(config), 'ntuplesList', os.path.basename(ntuples))
+      if events_max:
+         replaceConfigParameter(os.path.basename(config), 'eventsMax', events_max)
+
    
    splitcmd = "split.csh" + " " + str(args.nfiles) + " " + os.path.basename(ntuples)
    os.system(splitcmd)
