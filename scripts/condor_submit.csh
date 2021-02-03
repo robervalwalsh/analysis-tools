@@ -30,4 +30,4 @@ endif
 
 # Jetzt geht's los
 chmod u+x $1.sh
-condor_submit $config
+#condor_submit $config
