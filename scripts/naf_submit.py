@@ -214,8 +214,9 @@ if ntuples:
       print >> jobf, int(jobnum)+1
       jobf.close()
       print "Creating ",jobid,"..."
+      os.system(condorcmd)
       if not test:
-         os.system(condorcmd)
+         os.system('condor_submit job.submit')
       sleep(0.2)
       # back to original directory
       os.chdir(cwd)
