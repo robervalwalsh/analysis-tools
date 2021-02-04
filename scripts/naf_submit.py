@@ -100,6 +100,7 @@ parser.add_argument("-n", "--ntuples", dest="ntuples", help="List of ntuples fil
 parser.add_argument("-x", "--nfiles", dest="nfiles", type=int, default=1, help="Number of ntuple files per job")
 parser.add_argument("-c", "--config", dest="config", help="Configuration file")
 parser.add_argument("-j", "--json", dest="json", help="JSON file with certified data")
+parser.add_argument("-l", "--label", dest="label", help="user label for the submission")
 parser.add_argument("--events", dest="events_max", help="override eventsMax in the config file")
 parser.add_argument("--test", dest="njobs", help="produce njobs, no automatic submission")
 args = parser.parse_args()
@@ -130,11 +131,12 @@ if config:
          print "*error* You must define the parameter ntuplesList in your configuration."
          quit()
    configJson    = getConfigParameter( config, "json" )
-   if 'tools:' in configJson[1]:
-      ntp_path = os.getenv('CMSSW_BASE')
-      ntp_path += "/src/Analysis/Tools/data/calibrations/"
-      configJson[1] = configJson[1].replace("tools:",ntp_path)
-            
+   if configJson:
+      if 'tools:' in configJson[1]:
+         ntp_path = os.getenv('CMSSW_BASE')
+         ntp_path += "/src/Analysis/Tools/data/calibrations/"
+         configJson[1] = configJson[1].replace("tools:",ntp_path)
+
    if not json:
       if configJson:
          json = configJson[1]
@@ -153,6 +155,8 @@ if json:
 maindir = "Condor_"+os.path.basename(args.exe)
 if config:
    maindir = maindir+"_"+ os.path.splitext(os.path.basename(config))[0]
+if args.label:
+   maindir += '_'+args.label
 cwd = os.getcwd()
 if os.path.exists(cwd+"/"+maindir):
    print maindir + "already exists. Rename or remove it and then resubmit"
