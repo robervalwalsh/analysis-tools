@@ -114,6 +114,9 @@ config = args.config
 events_max = args.events_max
 test = args.njobs
 
+configMC = getConfigParameter( config, "isMC" )
+isMC = configMC[1] == 'true'
+
 if test:
    print('TEST MODE:', test, 'jobs')
 
@@ -130,10 +133,13 @@ if config:
       if not ntuples:
          print "*error* You must define the parameter ntuplesList in your configuration."
          quit()
-   configJson    = getConfigParameter( config, "json" )
-   if not json:
-      if configJson:
-         json = configJson[1]
+   if not isMC:
+      configJson    = getConfigParameter( config, "json" )
+      if not json:
+         if configJson:
+            json = configJson[1]
+   else:
+      json = None
       
 # checking if require files exist
 if ntuples:
