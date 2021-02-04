@@ -197,7 +197,7 @@ if ntuples:
    
    for i,f in enumerate(files):
       if test:
-         if i >= int(test):
+         if i >= int(test) and int(test)>=0:
             os.chdir(cwd)
             break
       jobnum = os.path.splitext(f)[0][-4:]
