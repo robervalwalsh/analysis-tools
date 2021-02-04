@@ -131,12 +131,6 @@ if config:
          print "*error* You must define the parameter ntuplesList in your configuration."
          quit()
    configJson    = getConfigParameter( config, "json" )
-   if configJson:
-      if 'tools:' in configJson[1]:
-         ntp_path = os.getenv('CMSSW_BASE')
-         ntp_path += "/src/Analysis/Tools/data/calibrations/"
-         configJson[1] = configJson[1].replace("tools:",ntp_path)
-
    if not json:
       if configJson:
          json = configJson[1]
@@ -147,7 +141,7 @@ if ntuples:
       print "Ntuples list file does not exist"
       quit()
 if json:
-   if not os.path.isfile(json):      
+   if (not 'tools:' in json) and (not os.path.isfile(json)):      
       print "Json  file does not exist"
       quit()
       
@@ -207,7 +201,8 @@ if ntuples:
       # moving stuff to the proper directories
       move(tmpdir+"/"+f,exedir+"/"+os.path.basename(ntuples))
       if json:
-         copyfile(json, exedir+"/"+os.path.basename(json))
+         if not 'tools:' in json:
+            copyfile(json, exedir+"/"+os.path.basename(json))
       if config:
          copyfile(tmpdir+"/"+os.path.basename(config),exedir+"/"+os.path.basename(config))      
          condorcmd = "condor_scripts.csh" + " " + jobid + " " + args.exe + " " + os.path.basename(config)
