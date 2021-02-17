@@ -353,12 +353,12 @@ def status():
    jobs_dir.sort()
    jobs_dir = [ x for x in jobs_dir if 'job_' in x ]
    print(' ')
-   print('                    ***  Status of submission  ***')
+   print('                          ***  Status of submission  ***')
    print('\n  '+submission_dir)
    print(' ')
-   print('  ------------------------------------------------------------------------------')
+   print('  ---------------------------------------------------------------------------------')
    print('     job        finished       running       submitted       aborted       error')
-   print('  ------------------------------------------------------------------------------')
+   print('  ---------------------------------------------------------------------------------')
    for jj in jobs_dir:
       j = submission_dir+'/'+jj
       js = get_job_status(j)
@@ -383,7 +383,7 @@ def status():
       print('  '+jj+'         '+finished+'              '+running+'              '+submitted+'              '+aborted+'            '+error)
    if len(jobs_dir) == 0:
       print('  No jobs to be checked!')
-   print('  ------------------------------------------------------------------------------')
+   print('  ---------------------------------------------------------------------------------')
    print('\n  N.B.: Good *finished* jobs will no longer appear in future "--status" calls')
    
 
