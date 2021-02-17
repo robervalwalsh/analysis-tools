@@ -325,7 +325,7 @@ def get_job_status(jobdir):
    job_status['termination'] = False
    job_status['execution'] = False
    job_status['abortion'] = False
-   job_status['error'] = False
+   job_status['error'] = True
    log = get_job_log(jobdir)
    if not log:
       return job_status
@@ -336,11 +336,12 @@ def get_job_status(jobdir):
       if re.search('Job executing on host',l):
          job_status['execution'] = True
       if re.search('Job terminated.',l):
-         job_status['termination'] = True
+         job_status['termination'] = True         
       if re.search('Job was evicted',l) or re.search('Job was aborted',l):
          job_status['abortion'] = True
-      if job_status['termination'] and not re.search('Normal termination (return value 0)',l):
-         job_status['error'] = True
+      if re.search('return value 0',l):
+         job_status['error'] = False
+      
    return job_status  
          
        
@@ -373,7 +374,12 @@ def status():
       if js['termination']:
          finished = 'x'
          if not js['abortion'] and not js['error']:
-            move(j,finished_dir)
+            # search for finished.txt before moving job dir, guarantee that all everything finished
+            if os.path.isfile(j+'/finished.txt'):
+               sleep(1)
+               move(j,finished_dir)
+            else:
+               finished = '?'
       elif js['execution'] and not js['abortion'] and not js['error']:
          running = 'x'
       elif js['submission'] and not js['abortion'] and not js['error']:
