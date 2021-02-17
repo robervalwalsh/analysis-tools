@@ -405,7 +405,7 @@ parser.add_argument("-l", "--label", dest="label", help="user label for the subm
 parser.add_argument("--events", dest="events_max", default="-1", help="override eventsMax in the config file (default = -1)")
 parser.add_argument("--test", dest="njobs", help="produce njobs, no automatic submission")
 parser.add_argument("--status", dest="status", help="status of a given submission")
-parser.add_argument("--resubmit", dest="resubmit", help="resubmit aborted jobs")
+parser.add_argument("--resubmit", dest="resubmit", help="resubmit aborted and finished-with-error jobs")
 args = parser.parse_args()
 
    
