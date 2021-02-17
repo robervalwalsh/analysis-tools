@@ -370,12 +370,13 @@ def status():
       error = '0'
       if js['error']:
          error = '!'
-      if js['termination'] and not js['abortion'] and not js['error']:
+      if js['termination']:
          finished = 'x'
-         move(j,finished_dir)
-      elif js['execution'] and not js['abortion']:
+         if not js['abortion'] and not js['error']:
+            move(j,finished_dir)
+      elif js['execution'] and not js['abortion'] and not js['error']:
          running = 'x'
-      elif js['submission'] and not js['abortion']:
+      elif js['submission'] and not js['abortion'] and not js['error']:
          submitted = 'x'
       if js['abortion']:
          aborted = 'x'
