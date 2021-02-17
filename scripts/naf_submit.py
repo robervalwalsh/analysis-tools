@@ -368,25 +368,27 @@ def status():
       running = ' '
       submitted = ' '
       aborted = ' '
-      error = '0'
-      if js['error']:
-         error = '!'
+      error = '\u2705'  # check
+      if js['error'] and not js['abortion']:
+         error = '\u274C' # red x
       if js['termination']:
-         finished = 'x'
+         finished = '\u2705'  # check
+         if js['error']:
+            finished = '\u2705'
          if not js['abortion'] and not js['error']:
             # search for finished.txt before moving job dir, guarantee that all everything finished
             if os.path.isfile(j+'/finished.txt'):
                sleep(1)
                move(j,finished_dir)
             else:
-               finished = '?'
+               finished = '\u26A0\uFE0F ' # interrogation \u2753 or 
       elif js['execution'] and not js['abortion'] and not js['error']:
-         running = 'x'
+         running = '\u2705'
       elif js['submission'] and not js['abortion'] and not js['error']:
-         submitted = 'x'
+         submitted = '\u2705'
       if js['abortion']:
-         aborted = 'x'
-      print('  '+jj+'         '+finished+'              '+running+'              '+submitted+'              '+aborted+'            '+error)
+         aborted = '\u274C'  # exclamation
+      print('  '+jj+'         '+finished+'              '+running+'              '+submitted+'             '+aborted+'            '+error)
    if len(jobs_dir) == 0:
       print('  No jobs to be checked!')
    print('  ---------------------------------------------------------------------------------')
