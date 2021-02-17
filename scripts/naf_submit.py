@@ -325,6 +325,7 @@ def get_job_status(jobdir):
    job_status['termination'] = False
    job_status['execution'] = False
    job_status['abortion'] = False
+   job_status['error'] = False
    log = get_job_log(jobdir)
    if not log:
       return job_status
@@ -334,10 +335,12 @@ def get_job_status(jobdir):
          job_status['submission'] = True
       if re.search('Job executing on host',l):
          job_status['execution'] = True
-      if re.search('Job terminated',l):
+      if re.search('Job terminated.',l):
          job_status['termination'] = True
       if re.search('Job was evicted',l) or re.search('Job was aborted',l):
          job_status['abortion'] = True
+      if job_status['termination'] and not re.search('Normal termination (return value 0)',l):
+         job_status['error'] = True
    return job_status  
          
        
@@ -365,9 +368,9 @@ def status():
       submitted = ' '
       aborted = ' '
       error = '0'
-      if je:
+      if js['error']:
          error = '!'
-      if js['termination'] and not js['abortion']:
+      if js['termination'] and not js['abortion'] and not js['error']:
          finished = 'x'
          move(j,finished_dir)
       elif js['execution'] and not js['abortion']:
@@ -380,8 +383,13 @@ def status():
    if len(jobs_dir) == 0:
       print('  No jobs to be checked!')
    print('  ------------------------------------------------------------------------------')
-   print('\n  N.B.: *finished* jobs will no longer appear in future "--status" calls')
+   print('\n  N.B.: Good *finished* jobs will no longer appear in future "--status" calls')
    
+
+def resubmit():
+   submission_dir = args.resubmit
+   
+
 
 # --- main code ---
 
@@ -396,11 +404,14 @@ parser.add_argument("-l", "--label", dest="label", help="user label for the subm
 parser.add_argument("--events", dest="events_max", default="-1", help="override eventsMax in the config file (default = -1)")
 parser.add_argument("--test", dest="njobs", help="produce njobs, no automatic submission")
 parser.add_argument("--status", dest="status", help="status of a given submission")
+parser.add_argument("--resubmit", dest="resubmit", help="resubmit aborted jobs")
 args = parser.parse_args()
 
    
 if args.status:
    status()
+elif args.resubmit:
+   resubmit()
 else:
    if not args.exe and not args.config:
       print("nothing to be done")
