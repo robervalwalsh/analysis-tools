@@ -268,6 +268,10 @@ def submission():
       if not test:
          os.chdir(cwd+'/'+maindir)
          os.system('condor_submit jobs.submit')
+        
+      sleep(2)
+      os.chdir(cwd)
+      status(maindir)
    
    else:
       exedir = maindir+"/job_0000"
@@ -358,7 +362,7 @@ def status(submission_dir, failed_only=False):
    jobs_dir = [ x for x in jobs_dir if 'job_' in x ]
    jobs_dir.sort()
    print(' ')
-   header = '                          ***  Status of jobs  ***'
+   header = '                          ***  STATUS OF JOBS  ***'
    if failed_only:
       header = '                          ***  FAILED JOBS  ***'
    print(header)
