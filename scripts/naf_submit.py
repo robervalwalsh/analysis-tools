@@ -489,19 +489,19 @@ parser.add_argument("-j", "--json", dest="json", help="JSON file with certified 
 parser.add_argument("-l", "--label", dest="label", help="user label for the submission")
 parser.add_argument("--events", dest="events_max", default="-1", help="override eventsMax in the config file (default = -1)")
 parser.add_argument("--test", dest="njobs", help="produce njobs, no automatic submission")
-parser.add_argument("--status", dest="status", help="status of a given submission")
-parser.add_argument("--resubmit", dest="resubmit", help="resubmit aborted and finished-with-error jobs")
-parser.add_argument("--resubmit_expert", dest="resubmit_expert", help="*** expert only ***: resubmit available jobs")
+parser.add_argument("--status", dest="status_dir", help="given a condor directory, returns the status of the jobs")
+parser.add_argument("--resubmit", dest="resub_dir", help="given a condor directory, resubmits aborted and finished-with-error jobs")
+parser.add_argument("--resubmit_expert", dest="resub_expert", help="*** expert only ***: given a condor directory, resubmits available jobs")
 args = parser.parse_args()
 
 dash = '  ----------------------------------------------------------------------------------------------------------'
    
-if args.status:
-   status(args.status)
-elif args.resubmit:
-   resubmit(args.resubmit)
-elif args.resubmit_expert:
-   resubmit_expert(args.resubmit_expert)
+if args.status_dir:
+   status(args.status_dir)
+elif args.resub_dir:
+   resubmit(args.resub_dir)
+elif args.resub_expert:
+   resubmit_expert(args.resub_expert)
 else:
    if not args.exe and not args.config:
       print("nothing to be done")
