@@ -497,10 +497,21 @@ args = parser.parse_args()
 dash = '  ----------------------------------------------------------------------------------------------------------'
    
 if args.status_dir:
+   if not os.path.exists(args.status_dir):
+      print("Directory", args.status_dir, "does not exist")
+      quit()
    status(args.status_dir)
+      
+
 elif args.resub_dir:
+   if not os.path.exists(args.resub_dir):
+      print("Directory", args.resub_dir, "does not exist")
+      quit()
    resubmit(args.resub_dir)
 elif args.resub_expert:
+   if not os.path.exists(args.resub_expert):
+      print("Directory", args.resub_expert, "does not exist")
+      quit()
    resubmit_expert(args.resub_expert)
 else:
    if not args.exe and not args.config:
