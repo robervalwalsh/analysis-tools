@@ -7,6 +7,8 @@ from argparse import HelpFormatter
 from shutil import copyfile, rmtree, move
 from time import sleep
 
+from colors import bcolors
+
 # --- functions ---
 def getConfigParameter( config, parameter ):
    p = None
@@ -191,7 +193,9 @@ def submission():
       maindir += '_'+args.label
    cwd = os.getcwd()
    if os.path.exists(cwd+"/"+maindir):
-      print (maindir,"already exists. Rename or remove it and then resubmit")
+      print ('')
+      print (bcolors.FAIL,'>>>>>>',  maindir,"already exists. Rename or remove it and then resubmit",bcolors.ENDC)
+      status(maindir)
       quit()
    os.mkdir(maindir)
    os.mkdir(maindir+'/finished_jobs')
