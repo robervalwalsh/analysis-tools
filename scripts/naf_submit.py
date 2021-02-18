@@ -456,9 +456,7 @@ def resubmit_expert(submission_dir):
 #   submission_dir = args.resubmit_expert
    os.chdir(submission_dir)
    print(' ')
-   print('                       ***  Resubmit jobs (EXPERT)  ***')
-   print('\n  '+submission_dir)
-   print(' ')
+   print('   ***  Resubmit jobs (EXPERT)  ***')
    print(dash)
    confirmed = confirm()
    if not confirmed:
