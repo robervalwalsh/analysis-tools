@@ -326,9 +326,12 @@ def get_job_status(jobdir):
    job_status['execution'] = False
    job_status['abortion'] = False
    job_status['error'] = True
+   job_status['jobid'] = ' '
    log = get_job_log(jobdir)
    if not log:
       return job_status
+   logname = os.path.basename(log)
+   job_status['jobid'] = logname.split('.')[0].split('_')[1] + '.' + logname.split('.')[0].split('_')[2]
    f = open(log,'r')
    for l in f:
       if re.search('Job submitted from host',l):
@@ -347,19 +350,24 @@ def get_job_status(jobdir):
        
    
 
-def status():
-   submission_dir = args.status
+def status(submission_dir, failed_only=False):
+   failed_jobs = 0
+#   submission_dir = args.status
    finished_dir = submission_dir+'/finished_jobs'
    jobs_dir = os.listdir(submission_dir)
-   jobs_dir.sort()
    jobs_dir = [ x for x in jobs_dir if 'job_' in x ]
+   jobs_dir.sort()
    print(' ')
-   print('                          ***  Status of submission  ***')
-   print('\n  '+submission_dir)
+   header = '                          ***  Status of jobs  ***'
+   if failed_only:
+      header = '                          ***  FAILED JOBS  ***'
+   print(header)
+   print('\n   '+submission_dir)
    print(' ')
-   print('  ---------------------------------------------------------------------------------')
-   print('     job        finished       running       submitted       aborted       error')
-   print('  ---------------------------------------------------------------------------------')
+   dash= '  ----------------------------------------------------------------------------------------------------------'
+   print(dash)
+   print('     job        finished       running       submitted       aborted       error       condor_id (latest)')
+   print(dash)
    for jj in jobs_dir:
       j = submission_dir+'/'+jj
       js = get_job_status(j)
@@ -369,11 +377,12 @@ def status():
       submitted = ' '
       aborted = ' '
       error = ' '  # check
+      jobid = js['jobid']
       if js['termination']:
          finished = '\u2705'  # check
-         error = '\u2705'  # check
-         if js['error']:
-            finished = '\u2705'
+         error = '\u2705 '  # check
+#         if js['error']:
+#            finished = '\u2705'
          if js['error'] and not js['abortion']:
             error = '\u274C' # red x
          if not js['abortion'] and not js['error']:
@@ -383,25 +392,89 @@ def status():
                move(j,finished_dir)
             else:
                finished = '\u26A0\uFE0F ' # warning 
-      elif js['execution'] and not js['abortion'] and not js['error']:
+#      elif js['execution'] and not js['abortion'] and not js['error']:
+      elif js['execution'] and not js['abortion']:
          running = '\u2705'
-      elif js['submission'] and not js['abortion'] and not js['error']:
+      elif js['submission'] and not js['abortion']:
          submitted = '\u2705'
       if js['abortion']:
-         aborted = '\u274C'  # exclamation
+         aborted = '\u274C '  # red cross
          
       if not ( js['submission'] or js['termination'] or js['execution'] or js['abortion'] ):
          submitted = '\u26A0\uFE0F ' # warning
-      print('   '+jj+'        '+finished+'              '+running+'              '+submitted+'            '+aborted+'            '+error)
+      if js['abortion'] or ( js['termination'] and js['error']):
+         failed_jobs +=1
+      if failed_only and (not (js['abortion'] or ( js['termination'] and js['error']))):
+            continue
+      print('   '+jj+'        '+finished+'              '+running+'              '+submitted+'              '+aborted+'           '+error+'            '+jobid)
    if len(jobs_dir) == 0:
       print('  No jobs to be checked!')
-   print('  ---------------------------------------------------------------------------------')
-   print('\n  N.B.: Good *finished* jobs will no longer appear in future "--status" calls')
+   print(dash)
+   if not failed_only:
+      print('\n  N.B.: Good *finished* jobs will no longer appear in future "--status" calls')
+      
+   return failed_jobs
+   
+# resubmit jobs according to their status
+def resubmit(submission_dir):
+   failed_jobs = status(submission_dir,True)
+   if failed_jobs == 0:
+      return
+   jobs_dir = os.listdir(submission_dir)
+   jobs_dir = [ x for x in jobs_dir if 'job_' in x ]
+   jobs_dir.sort()
+   cwd = os.getcwd()
+   print(' ')
+   print('   ***  Resubmit failed jobs  ***')
+   print(dash)
+   confirmed = confirm()
+   if not confirmed:
+      print(dash)
+      print(' ')
+      return
+   for jj in jobs_dir:
+      j = submission_dir+'/'+jj
+      js = get_job_status(j)
+      if js['abortion'] or ( js['termination'] and js['error'] ):
+         os.chdir(j)
+         os.system('condor_submit job.submit')
+         os.chdir(cwd)
+   print(dash)
+   print(' ')
+   os.chdir(cwd)
+   sleep(2)
+   status(submission_dir)
+   
+   
+   
+# resubmit jobs expert mode
+def resubmit_expert(submission_dir):
+   cwd = os.getcwd()
+#   submission_dir = args.resubmit_expert
+   os.chdir(submission_dir)
+   print(' ')
+   print('                       ***  Resubmit jobs (EXPERT)  ***')
+   print('\n  '+submission_dir)
+   print(' ')
+   print(dash)
+   confirmed = confirm()
+   if not confirmed:
+      print(dash)
+      print(' ')
+      return
+   os.system('condor_submit jobs.submit')
+   print(dash)
+   print(' ')
+   os.chdir(cwd)
+   sleep(2)
+   status(submission_dir)
    
 
-def resubmit():
-   submission_dir = args.resubmit
-   
+def confirm():
+    answer = " "
+    while answer not in ["y", "n", ""]:
+        answer = input("   Please confirm this action (Y/[N])? ").lower()
+    return (answer == "y" or answer != "")
 
 
 # --- main code ---
@@ -418,13 +491,17 @@ parser.add_argument("--events", dest="events_max", default="-1", help="override 
 parser.add_argument("--test", dest="njobs", help="produce njobs, no automatic submission")
 parser.add_argument("--status", dest="status", help="status of a given submission")
 parser.add_argument("--resubmit", dest="resubmit", help="resubmit aborted and finished-with-error jobs")
+parser.add_argument("--resubmit_expert", dest="resubmit_expert", help="*** expert only ***: resubmit available jobs")
 args = parser.parse_args()
 
+dash = '  ----------------------------------------------------------------------------------------------------------'
    
 if args.status:
-   status()
+   status(args.status)
 elif args.resubmit:
-   resubmit()
+   resubmit(args.resubmit)
+elif args.resubmit_expert:
+   resubmit_expert(args.resubmit_expert)
 else:
    if not args.exe and not args.config:
       print("nothing to be done")
