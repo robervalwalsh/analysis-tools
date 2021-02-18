@@ -449,6 +449,9 @@ def resubmit(submission_dir):
    
 # resubmit jobs expert mode
 def resubmit_expert(submission_dir):
+   failed_jobs = status(submission_dir,True)
+   if failed_jobs == 0:
+      return
    cwd = os.getcwd()
 #   submission_dir = args.resubmit_expert
    os.chdir(submission_dir)
@@ -480,36 +483,43 @@ def confirm():
 # --- main code ---
 
 # parsing arguments
-parser = ArgumentParser(prog='naf_submit.py', formatter_class=lambda prog: HelpFormatter(prog,indent_increment=6,max_help_position=80,width=280), description='Prepare, submit and check jobs to NAF HTCondor batch system')
-parser.add_argument("--exe"    , "-e"  , dest="exe"                                 , help="Executable")
-parser.add_argument("--config" , "-c"  , dest="config"                              , help="Configuration file")
-parser.add_argument("--ntuples", "-n"  , dest="ntuples"                             , help="List of ntuples file")
-parser.add_argument("--nfiles" , "-x"  , dest="nfiles"         , type=int, default=1, help="Number of ntuple files per job")
-parser.add_argument("--json"   , "-j"  , dest="json"                                , help="JSON file with certified data")
-parser.add_argument("--label"  , "-l"  , dest="label"                               , help="user label for the submission")
-parser.add_argument("--events"         , dest="events_max"     , default="-1"       , help="override eventsMax in the config file (default = -1)")
-parser.add_argument("--test"           , dest="njobs"                               , help="produce njobs, no automatic submission")
-parser.add_argument("--dir"            , dest="dir"                                 , help="an existing condor directory")
-parser.add_argument("--status"         , dest="status"         , action="store_true", help="returns the status of the jobs in --dir")
-parser.add_argument("--resubmit"       , dest="resubmit"       , action="store_true", help="resubmits aborted and finished-with-error jobs in --dir")
-parser.add_argument("--resubmit_expert", dest="resubmit_expert", action="store_true", help="*** expert only ***: resubmits available jobs in --dir")
+parser = ArgumentParser(prog='naf_submit.py', formatter_class=lambda prog: HelpFormatter(prog,indent_increment=6,max_help_position=80,width=280), description='Prepare, submit and check jobs to NAF HTCondor batch system',add_help=True)
+parser_submission = parser.add_argument_group('submission','prepare and submit jobs')
+
+parser_submission.add_argument("--exe"    , "-e"  , dest="exe"                                 , help="Executable  (REQUIRED)")
+parser_submission.add_argument("--config" , "-c"  , dest="config"                              , help="Configuration file  (REQUIRED)")
+parser_submission.add_argument("--ntuples", "-n"  , dest="ntuples"                             , help="List of ntuples file")
+parser_submission.add_argument("--nfiles" , "-x"  , dest="nfiles"         , type=int, default=1, help="Number of ntuple files per job")
+parser_submission.add_argument("--json"   , "-j"  , dest="json"                                , help="JSON file with certified data")
+parser_submission.add_argument("--label"  , "-l"  , dest="label"                               , help="user label for the submission")
+parser_submission.add_argument("--events"         , dest="events_max"     , default="-1"       , help="override eventsMax in the config file (default = -1)")
+parser_submission.add_argument("--test"           , dest="njobs"                               , help="*** expert only ***:produce njobs, no automatic submission")
+
+
+parser_status = parser.add_argument_group('status','show and modify status')
+parser_status.add_argument("--dir"            , dest="dir"                                 , help="an existing condor directory  (REQUIRED)")
+parser_status.add_argument("--status"         , dest="status"         , action="store_true", help="-> returns the status of the jobs in --dir")
+parser_status.add_argument("--resubmit"       , dest="resubmit"       , action="store_true", help="-> resubmits aborted and finished-with-error jobs in --dir")
+parser_status.add_argument("--expert"         , dest="expert"         , action="store_true", help="   -> *** expert mode ***")
 args = parser.parse_args()
 
 dash = '  ----------------------------------------------------------------------------------------------------------'
    
-if args.dir and args.status:
+if args.dir:
    if not os.path.exists(args.dir):
       print("Directory", args.dir, "does not exist")
       quit()
    if args.status:
       status(args.dir)
-   elif args.resub_dir:
-      resubmit(args.resub_dir)
-   elif args.resub_expert:
-      resubmit_expert(args.resub_expert)
+   elif args.resubmit and not args.expert:
+      resubmit(args.dir)
+   elif args.resubmit and args.expert:
+      resubmit_expert(args.dir)
+   else:
+      parser.print_help()
 else:
    if not args.exe and not args.config:
-      print("nothing to be done")
+      parser.print_help()
       quit()
    submission()
    
