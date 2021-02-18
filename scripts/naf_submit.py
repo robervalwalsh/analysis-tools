@@ -480,39 +480,33 @@ def confirm():
 # --- main code ---
 
 # parsing arguments
-parser = ArgumentParser(prog='naf_submit.py', formatter_class=lambda prog: HelpFormatter(prog,indent_increment=6,max_help_position=80,width=280), description='Prepare and submit jobs to NAF HTCondor batch system')
-parser.add_argument("--exe"    , "-e"  , dest="exe"         , help="Executable")
-parser.add_argument("--ntuples", "-n"  , dest="ntuples"     , help="List of ntuples file")
-parser.add_argument("--nfiles" , "-x"  , dest="nfiles"      , type=int, default=1, help="Number of ntuple files per job")
-parser.add_argument("--config" , "-c"  , dest="config"      , help="Configuration file")
-parser.add_argument("--json"   , "-j"  , dest="json"        , help="JSON file with certified data")
-parser.add_argument("--label"  , "-l"  , dest="label"       , help="user label for the submission")
-parser.add_argument("--events"         , dest="events_max"  , default="-1", help="override eventsMax in the config file (default = -1)")
-parser.add_argument("--test"           , dest="njobs"       , help="produce njobs, no automatic submission")
-parser.add_argument("--status"         , dest="status_dir"  , help="given a condor directory, returns the status of the jobs")
-parser.add_argument("--resubmit"       , dest="resub_dir"   , help="given a condor directory, resubmits aborted and finished-with-error jobs")
-parser.add_argument("--resubmit_expert", dest="resub_expert", help="*** expert only ***: given a condor directory, resubmits available jobs")
+parser = ArgumentParser(prog='naf_submit.py', formatter_class=lambda prog: HelpFormatter(prog,indent_increment=6,max_help_position=80,width=280), description='Prepare, submit and check jobs to NAF HTCondor batch system')
+parser.add_argument("--exe"    , "-e"  , dest="exe"                                 , help="Executable")
+parser.add_argument("--config" , "-c"  , dest="config"                              , help="Configuration file")
+parser.add_argument("--ntuples", "-n"  , dest="ntuples"                             , help="List of ntuples file")
+parser.add_argument("--nfiles" , "-x"  , dest="nfiles"         , type=int, default=1, help="Number of ntuple files per job")
+parser.add_argument("--json"   , "-j"  , dest="json"                                , help="JSON file with certified data")
+parser.add_argument("--label"  , "-l"  , dest="label"                               , help="user label for the submission")
+parser.add_argument("--events"         , dest="events_max"     , default="-1"       , help="override eventsMax in the config file (default = -1)")
+parser.add_argument("--test"           , dest="njobs"                               , help="produce njobs, no automatic submission")
+parser.add_argument("--dir"            , dest="dir"                                 , help="an existing condor directory")
+parser.add_argument("--status"         , dest="status"         , action="store_true", help="returns the status of the jobs in --dir")
+parser.add_argument("--resubmit"       , dest="resubmit"       , action="store_true", help="resubmits aborted and finished-with-error jobs in --dir")
+parser.add_argument("--resubmit_expert", dest="resubmit_expert", action="store_true", help="*** expert only ***: resubmits available jobs in --dir")
 args = parser.parse_args()
 
 dash = '  ----------------------------------------------------------------------------------------------------------'
    
-if args.status_dir:
-   if not os.path.exists(args.status_dir):
-      print("Directory", args.status_dir, "does not exist")
+if args.dir and args.status:
+   if not os.path.exists(args.dir):
+      print("Directory", args.dir, "does not exist")
       quit()
-   status(args.status_dir)
-      
-
-elif args.resub_dir:
-   if not os.path.exists(args.resub_dir):
-      print("Directory", args.resub_dir, "does not exist")
-      quit()
-   resubmit(args.resub_dir)
-elif args.resub_expert:
-   if not os.path.exists(args.resub_expert):
-      print("Directory", args.resub_expert, "does not exist")
-      quit()
-   resubmit_expert(args.resub_expert)
+   if args.status:
+      status(args.dir)
+   elif args.resub_dir:
+      resubmit(args.resub_dir)
+   elif args.resub_expert:
+      resubmit_expert(args.resub_expert)
 else:
    if not args.exe and not args.config:
       print("nothing to be done")
