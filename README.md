@@ -145,7 +145,7 @@ is created, one can use the status options, e.g.
 naf_submit.py --dir Condor_AnalyserSimpleExample_analyser_example_semilep_2018 --status
 ```
 
-will display a table like that
+will display a table like this
 
 
 ```
