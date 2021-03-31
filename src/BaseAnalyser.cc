@@ -406,3 +406,41 @@ void BaseAnalyser::generatorWeight()
    
 }
 
+bool BaseAnalyser::l1TriggerEmulation(const std::string & name, const int & nmin, const float & ptmin, const float & etamax, const std::string & newname)
+{
+   l1trg_emul_[newname] = true;
+   std::shared_ptr< Collection<TriggerObject> > objects = analysis_->collection<TriggerObject>(name);
+   
+   std::vector<TriggerObject> new_objects;
+   
+   
+   for ( int i = 0 ; i < objects->size() ; ++i )
+   {
+      TriggerObject obj = objects->at(i);
+      if ( obj.pt() >= ptmin && fabs(obj.eta()) <= etamax ) 
+      {
+         new_objects.push_back(obj);
+      }
+   }
+   
+   l1trg_emul_[newname] = ( (int)new_objects.size() >= nmin );
+      
+   Collection<TriggerObject> new_collection(new_objects,newname);
+   analysis_->addCollection(new_collection);
+   
+   return l1trg_emul_[newname];
+   
+   
+   
+}
+
+
+std::map<std::string,bool> BaseAnalyser::l1TriggerEmulated()
+{
+   return l1trg_emul_;
+}
+
+bool BaseAnalyser::l1TriggerEmulated(const std::string & name)
+{
+   return l1trg_emul_[name];
+}

@@ -55,9 +55,25 @@ bool MuonAnalyser::analysisWithMuons()
    }
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
+   auto analysis = this->analysis();
+   
+   std::shared_ptr< Collection<TriggerObject> > l1muons = analysis->collection<TriggerObject>(config_->triggerObjectsL1Muons());
    
    if ( config_->triggerObjectsL1Muons() != "" )
-      analysis_->match<Muon,TriggerObject>("Muons",config_->triggerObjectsL1Muons(),config_->triggerMatchL1MuonsDrMax());
+   {
+      std::string triggerObjectsL1Muons = config_->triggerObjectsL1Muons();
+      if ( config_->triggerEmulateL1Muons() != "" &&  config_->triggerEmulateL1MuonsNMin() > 0 )
+      {
+         int nmin = config_->triggerEmulateL1MuonsNMin();
+         float ptmin = config_->triggerEmulateL1MuonsPtMin();
+         float etamax = config_->triggerEmulateL1MuonsEtaMax();
+         std::string newL1Muons = config_->triggerEmulateL1Muons();
+         l1TriggerEmulation(triggerObjectsL1Muons,nmin,ptmin,etamax,newL1Muons);
+         triggerObjectsL1Muons = newL1Muons;
+      }
+      analysis_->match<Muon,TriggerObject>("Muons",triggerObjectsL1Muons,config_->triggerMatchL1MuonsDrMax());
+      
+   }
    if ( config_->triggerObjectsL3Muons() != "" )
       analysis_->match<Muon,TriggerObject>("Muons",config_->triggerObjectsL3Muons(),config_->triggerMatchL3MuonsDrMax());
 

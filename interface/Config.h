@@ -163,6 +163,12 @@ namespace analysis {
             std::string triggerObjectsPFJets()   const;  
             
             
+            std::string triggerEmulateL1Muons()  const;
+            int triggerEmulateL1MuonsNMin()      const;
+            float triggerEmulateL1MuonsPtMin()   const;
+            float triggerEmulateL1MuonsEtaMax()  const;
+            
+            
          // matching trigger objects
             float triggerMatchL1MuonsDrMax()       const;
             float triggerMatchL3MuonsDrMax()       const;              
@@ -366,6 +372,12 @@ namespace analysis {
             std::string trgObjsL1Jets_;
             std::string trgObjsCaloJets_;
             std::string trgObjsPFJets_;
+            
+         // trigger emulation
+            std::string l1muonemul_;
+            int         l1muonemulnmin_;
+            float       l1muonemulptmin_;
+            float       l1muonemuletamax_;
             
             float matchTrgL1MuonsDrMax_;
             float matchTrgL3MuonsDrMax_;

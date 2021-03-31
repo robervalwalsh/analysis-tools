@@ -56,6 +56,8 @@ namespace analysis {
             virtual bool selectionHLT();
             virtual bool selectionL1();
             
+            virtual bool selectionL1Emulated(const bool & , const bool &);
+            
             std::vector< std::shared_ptr<TriggerObject> > triggerObjectsL1Jets();
             std::vector< std::shared_ptr<TriggerObject> > triggerObjectsCaloJets();
             std::vector< std::shared_ptr<TriggerObject> > triggerObjectsPFJets();

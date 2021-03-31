@@ -124,6 +124,13 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Trigger.hltPath"              , po::value <std::string>               (&hltPath_)         -> default_value("")                 , "HLT path name")
          ("Trigger.l1Seed"               , po::value <std::string>               (&l1Seed_)          -> default_value("")                 , "L1 seed name")
          ("Trigger.results"              , po::value <std::string>               (&triggerCol_)      -> default_value("TriggerResults")   , "Name of the trigger results collection");
+      
+      // trigger emulation
+      opt_cfg_.add_options()
+         ("Trigger.Emulate.Muons.L1.seed"         , po::value <std::string>               (&l1muonemul_)       -> default_value("")                 , "Name of emulated L1 muon trigger")            
+         ("Trigger.Emulate.Muons.L1.nMin"         , po::value <int>                       (&l1muonemulnmin_)   -> default_value(-1)                 , "Minimum number of emulated L1 muon trigger objects")
+         ("Trigger.Emulate.Muons.L1.ptMin"        , po::value <float>                     (&l1muonemulptmin_)  -> default_value(0)                  , "Minimum pt of emulated L1 muon trigger objects")
+         ("Trigger.Emulate.Muons.L1.etaMax"       , po::value <float>                     (&l1muonemuletamax_) -> default_value(10)                 , "Maximum |eta|s of emulated L1 muon trigger objects");
                                                                                                                                           
       // trigger objects                                                                                                                  
       opt_cfg_.add_options()                                                                                                              
@@ -483,3 +490,11 @@ bool  Config::histogramJetsPerFlavour()  const { return histjets_flavour_ ; }
 
 std::string Config::outputRoot() const { return outputRoot_ ; }
 std::string Config::json() const { return json_ ; }
+
+
+// trigger emulation
+std::string  Config::triggerEmulateL1Muons()       const { return l1muonemul_       ; }
+int         Config::triggerEmulateL1MuonsNMin()   const { return l1muonemulnmin_   ; }
+float       Config::triggerEmulateL1MuonsPtMin()  const { return l1muonemulptmin_  ; }
+float       Config::triggerEmulateL1MuonsEtaMax() const { return l1muonemuletamax_ ; }
+

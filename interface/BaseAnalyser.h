@@ -101,6 +101,9 @@ namespace analysis {
 
             /// output tree
             std::shared_ptr<TTree> analyser_tree_;
+            
+            /// emulated triggers
+            std::map<std::string,bool> l1trg_emul_;
 
 
          private:
@@ -193,6 +196,15 @@ namespace analysis {
             void analyserTree();
             /// fill root tree
             void fillAnalyserTree();
+
+            /// emulate l1 trigger
+            virtual bool l1TriggerEmulation(const std::string &, const int &, const float &, const float &, const std::string & );
+            
+            /// return status of all emulated l1 triggers
+            std::map<std::string, bool> l1TriggerEmulated();
+            
+            /// return status of an emulated l1 trigger 
+            bool l1TriggerEmulated(const std::string &);
 
 
       };
