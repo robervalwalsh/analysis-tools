@@ -46,22 +46,13 @@ bool MuonAnalyser::analysisWithMuons()
    muons_.clear();
    selectedMuons_.clear();
    onlineMatchedMuons_.clear();
-   if ( ! muonsanalysis_ ) return false;
    
-   ++cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
-   {
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Using Muon collection: %s",(config_->muonsCollection()).c_str()));
-   }
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
-   
-   auto analysis = this->analysis();
-   
-   std::shared_ptr< Collection<TriggerObject> > l1muons = analysis->collection<TriggerObject>(config_->triggerObjectsL1Muons());
-   
+   // trigger emulation
+   // L1 muons
+   std::string triggerObjectsL1Muons;
    if ( config_->triggerObjectsL1Muons() != "" )
    {
-      std::string triggerObjectsL1Muons = config_->triggerObjectsL1Muons();
+      triggerObjectsL1Muons = config_->triggerObjectsL1Muons();
       if ( config_->triggerEmulateL1Muons() != "" &&  config_->triggerEmulateL1MuonsNMin() > 0 )
       {
          int nmin = config_->triggerEmulateL1MuonsNMin();
@@ -71,9 +62,25 @@ bool MuonAnalyser::analysisWithMuons()
          l1TriggerEmulation(triggerObjectsL1Muons,nmin,ptmin,etamax,newL1Muons);
          triggerObjectsL1Muons = newL1Muons;
       }
+   }
+   
+   
+   if ( ! muonsanalysis_ ) return false;
+   
+   ++cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
+   {
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Using Muon collection: %s",(config_->muonsCollection()).c_str()));
+   }
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
+   
+   if ( config_->triggerObjectsL1Muons() != "" )
+   {
       analysis_->match<Muon,TriggerObject>("Muons",triggerObjectsL1Muons,config_->triggerMatchL1MuonsDrMax());
       
    }
+   
    if ( config_->triggerObjectsL3Muons() != "" )
       analysis_->match<Muon,TriggerObject>("Muons",config_->triggerObjectsL3Muons(),config_->triggerMatchL3MuonsDrMax());
 
