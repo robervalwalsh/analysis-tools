@@ -59,8 +59,24 @@ bool MuonAnalyser::analysisWithMuons()
          float ptmin = config_->triggerEmulateL1MuonsPtMin();
          float etamax = config_->triggerEmulateL1MuonsEtaMax();
          std::string newL1Muons = config_->triggerEmulateL1Muons();
-         l1TriggerEmulation(triggerObjectsL1Muons,nmin,ptmin,etamax,newL1Muons);
+         triggerEmulation(triggerObjectsL1Muons,nmin,ptmin,etamax,newL1Muons);
          triggerObjectsL1Muons = newL1Muons;
+      }
+   }
+   
+   // L3 muons
+   std::string triggerObjectsL3Muons;
+   if ( config_->triggerObjectsL3Muons() != "" )
+   {
+      triggerObjectsL3Muons = config_->triggerObjectsL3Muons();
+      if ( config_->triggerEmulateL3Muons() != "" &&  config_->triggerEmulateL3MuonsNMin() > 0 )
+      {
+         int nmin = config_->triggerEmulateL3MuonsNMin();
+         float ptmin = config_->triggerEmulateL3MuonsPtMin();
+         float etamax = config_->triggerEmulateL3MuonsEtaMax();
+         std::string newL3Muons = config_->triggerEmulateL3Muons();
+         triggerEmulation(triggerObjectsL3Muons,nmin,ptmin,etamax,newL3Muons);
+         triggerObjectsL3Muons = newL3Muons;
       }
    }
    
@@ -82,7 +98,9 @@ bool MuonAnalyser::analysisWithMuons()
    }
    
    if ( config_->triggerObjectsL3Muons() != "" )
-      analysis_->match<Muon,TriggerObject>("Muons",config_->triggerObjectsL3Muons(),config_->triggerMatchL3MuonsDrMax());
+   {
+      analysis_->match<Muon,TriggerObject>("Muons",triggerObjectsL3Muons,config_->triggerMatchL3MuonsDrMax());
+   }
 
    auto muons = analysis_->collection<Muon>("Muons");
    for ( int j = 0 ; j < muons->size() ; ++j )  muons_.push_back(std::make_shared<Muon>(muons->at(j)));

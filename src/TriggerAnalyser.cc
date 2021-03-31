@@ -61,8 +61,9 @@ bool TriggerAnalyser::selectionTrigger() // Maybe not use this, use selectionHLT
    bool hlt = selectionHLT();
    bool l1  = selectionL1();
    bool l1emul = selectionL1Emulated(l1,hlt);
+   bool l3emul = selectionL3Emulated(l1,hlt);
    
-   return (hlt && l1 && l1emul);
+   return (hlt && l1 && l1emul && l3emul);
    
 }
 
@@ -112,7 +113,32 @@ bool TriggerAnalyser::selectionL1Emulated(const bool & l1, const bool & hlt)
    
    
    if ( ! ( l1 && hlt ) ) return false;
-   if ( ! l1TriggerEmulated(name) ) return false;
+   if ( ! triggerEmulated(name) ) return false;
+   
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+
+   
+   return true;
+}
+
+
+bool TriggerAnalyser::selectionL3Emulated(const bool & l1, const bool & hlt)
+{
+   if (! ( config_->triggerEmulateL3Muons() != "" &&  config_->triggerEmulateL3MuonsNMin() > 0 )) return true;
+   
+   ++cutflow_;
+   
+   std::string name = config_->triggerEmulateL3Muons();
+   int nmin = config_->triggerEmulateL3MuonsNMin();
+   float ptmin = config_->triggerEmulateL3MuonsPtMin();
+   float etamax = config_->triggerEmulateL3MuonsEtaMax();
+   
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("%s (emulated: n >= %d, pT >= %4.1f GeV, |eta| <= %4.1f)",name.c_str(),nmin,ptmin,etamax));
+   
+   
+   if ( ! ( l1 && hlt ) ) return false;
+   if ( ! triggerEmulated(name) ) return false;
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
 
