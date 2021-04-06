@@ -136,7 +136,7 @@ namespace analysis {
             /// set cutflow index
             void cutflow(const int &);
             /// create and update cutflow entry in the cutflow histogram 
-            void cutflow(const std::string &);
+            void cutflow(const std::string & label, const bool & ok = true);
 
             // Actions
             /// event entry to be readout and processed
