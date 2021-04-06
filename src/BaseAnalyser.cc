@@ -69,7 +69,15 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
          xsection_ = analysis_->crossSection(config_->crossSectionType());
       // Pileup weights
       if ( config_->pileupWeights() != "" )
+      {
          puweights_ = analysis_->pileupWeights(config_->pileupWeights());
+         puw_label_ = basename(config_->pileupWeights());
+      }
+      else
+      {
+         puw_label_ = "*** missing *** assuming puweight = 1";
+      }
+
       // gen part analysis
       genpartsanalysis_  = ( analysis_->addTree<GenParticle> ("GenParticles",config_->genParticlesCollection()) != nullptr );
       // gen jets analysis
@@ -300,28 +308,14 @@ float BaseAnalyser::trueInteractions() const
 void BaseAnalyser::actionApplyPileupWeight(const int & var)
 {
    if ( ! config_->isMC() ) return;
-   
-   ++cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-   {
-      std::string bn;
-      if ( puweights_ )
-      {
-         bn = basename(config_->pileupWeights());
-      }
-      else
-      {
-         bn = "*** missing *** assuming puweight = 1";
-      }
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Pileup weight (%s)",bn.c_str()));
-   }
-   
+      
    if ( puweights_ )
       weight_ *= this->pileupWeight(analysis_->nTruePileup(),var);
    else
       weight_ *= 1;
    
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   cutflow(puw_label_);
+   
    this -> fillPileupHistogram();
 }
 
@@ -360,6 +354,17 @@ int BaseAnalyser::cutflow()
 void BaseAnalyser::cutflow(const int & c)
 {
    cutflow_ = c;
+}
+
+void BaseAnalyser::cutflow(const std::string & label)
+{
+   ++cutflow_;
+   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
+   {
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,label.c_str());
+   }
+   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   
 }
 
 void BaseAnalyser::scale(const float & scale)
