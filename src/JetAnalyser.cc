@@ -415,31 +415,24 @@ bool JetAnalyser::selectionJetDeta(const int & r1, const int & r2)
 bool JetAnalyser::selectionJetDphi(const int & r1, const int & r2, const float & delta)
 {
    if ( r1 > config_->nJetsMin() ||  r2 > config_->nJetsMin() ) return true;
+
+   bool isgood = true;
    
-   ++cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
-   {
-      if ( delta > 0 )
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Dphi(jet %d, jet %d) < %4.2f",r1,r2,fabs(delta)));
-      else
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Dphi(jet %d, jet %d) > %4.2f",r1,r2,fabs(delta)));
-   }
+   std::string label = Form("Dphi(jet %d, jet %d) < %4.2f",r1,r2,fabs(delta));
+   if ( delta < 0 )
+      label = Form("Dphi(jet %d, jet %d) > %4.2f",r1,r2,fabs(delta));
    
    int j1 = r1-1;
    int j2 = r2-1;
    
    if ( delta > 0 )
-   {
-      if ( fabs(selectedJets_[j1]->deltaPhi(*selectedJets_[j2])) > fabs(delta) ) return false;
-   }
+      isgood = ( fabs(selectedJets_[j1]->deltaPhi(*selectedJets_[j2])) < fabs(delta) );
    else
-   {
-      if ( fabs(selectedJets_[j1]->deltaPhi(*selectedJets_[j2])) < fabs(delta) ) return false;
-   }
+      isgood = ( fabs(selectedJets_[j1]->deltaPhi(*selectedJets_[j2])) > fabs(delta) );
         
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   cutflow(label,isgood);
     
-   return true;
+   return isgood;
    
 }
 bool JetAnalyser::selectionJetDphi(const int & r1, const int & r2)
@@ -470,32 +463,24 @@ bool JetAnalyser::selectionJetDphi(const int & r1, const int & r2)
 bool JetAnalyser::selectionJetDr(const int & r1, const int & r2, const float & delta)
 {
    if ( r1 > config_->nJetsMin() ||  r2 > config_->nJetsMin() ) return true;
+
+   bool isgood = true;
    
-   ++cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
-   {
-      if ( delta > 0 ) 
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DR(jet %d, jet %d) < %4.2f",r1,r2,fabs(delta)));
-      else
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("DR(jet %d, jet %d) > %4.2f",r1,r2,fabs(delta)));
-   }
-   
+   std::string label = Form("DR(jet %d, jet %d) < %4.2f",r1,r2,fabs(delta));
+   if ( delta < 0 )
+      label = Form("DR(jet %d, jet %d) > %4.2f",r1,r2,fabs(delta));
+      
    int j1 = r1-1;
    int j2 = r2-1;
    
    if ( delta > 0 )
-   {
-      if ( selectedJets_[j1]->deltaR(*selectedJets_[j2]) > fabs(delta) ) return false;
-   }
+      isgood = ( selectedJets_[j1]->deltaR(*selectedJets_[j2]) < fabs(delta) );
    else
-   {
-      if ( selectedJets_[j1]->deltaR(*selectedJets_[j2]) < fabs(delta) ) return false;
-   }
+      isgood = ( selectedJets_[j1]->deltaR(*selectedJets_[j2]) > fabs(delta) );
 
-      
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   cutflow(label,isgood);
     
-   return true;
+   return isgood;
    
 }
 
@@ -591,11 +576,10 @@ std::vector< std::shared_ptr<Jet> > JetAnalyser::selectedJets()
 
 bool JetAnalyser::selectionJetId()
 {
-   if ( ! jetsanalysis_ ) return false;
+   if ( ! jetsanalysis_ ) return true;
    
-   ++cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JetId: %s",config_->jetsId().c_str()));
+   bool isgood = true;
+   std::string label = Form("JetId: %s",config_->jetsId().c_str());
    
    auto jet = std::begin(selectedJets_);
    while ( jet != std::end(selectedJets_) )
@@ -605,24 +589,21 @@ bool JetAnalyser::selectionJetId()
       else
          ++jet;
    }
-   if ( selectedJets_.size() == 0 ) return false;
+   isgood = ( selectedJets_.size() > 0 );
    
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   cutflow(label,isgood);
    
-   return true;
+   return isgood;
 }
 
 bool JetAnalyser::selectionJetPileupId()
 {
-   ++cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("JetPileupId: %s",config_->jetsPuId().c_str()));
+   if ( ! jetsanalysis_ ) return true;
    
-   
-   if ( ! jetsanalysis_ ) return false;
+   bool isgood = true;
+   std::string label = Form("JetPileupId: %s",config_->jetsPuId().c_str());
    
    auto jet = std::begin(selectedJets_);
-   
    while ( jet != std::end(selectedJets_) )
    {
       if ( ! (*jet)->pileupJetIdFullId(config_->jetsPuId()) )
@@ -631,11 +612,11 @@ bool JetAnalyser::selectionJetPileupId()
          ++jet;
    }
    
-   if ( selectedJets_.size() == 0 ) return false;
+   isgood = ( selectedJets_.size() > 0 );
    
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   cutflow(label,isgood);
    
-   return true;
+   return isgood;
 
 }
 
@@ -643,37 +624,36 @@ bool JetAnalyser::selectionNJets()
 {
    if ( config_->nJetsMin() < 0 ) return true;
    
-   ++cutflow_;
-   
-   bool first = ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" );
+   bool isgood = true;
+   std::string label;
    
    if ( config_->nJetsMax() <= 0 )
    {
-      if ( first )  h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("NJets >= %d",config_->nJetsMin()));
-      if ((int)selectedJets_.size() < config_->nJetsMin()) return false;
+      label = Form("NJets >= %d",config_->nJetsMin());
+      isgood = ((int)selectedJets_.size() >= config_->nJetsMin());
    }
    else if ( config_->nJets() >= 0 )
    {
-      if ( first )  h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("NJets = %d",config_->nJets()));
-      if ((int)selectedJets_.size() != config_->nJets()) return false;
+      label = Form("NJets = %d",config_->nJets());
+      isgood = ((int)selectedJets_.size() == config_->nJets());
    }
    else
    {
       if ( config_->nJetsMin() == 0 )
       {
-         if ( first )  h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("NJets <= %d",config_->nJetsMax()));
-         if ((int)selectedJets_.size() > config_->nJetsMax()) return false;
+         label = Form("NJets <= %d",config_->nJetsMax());
+         isgood = ((int)selectedJets_.size() <= config_->nJetsMax());
       }
       else
       {
-         if ( first )  h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("%d <= NJets <= %d",config_->nJetsMin(),config_->nJetsMax()));
-         if  ((int)selectedJets_.size() < config_->nJetsMin() || (int)selectedJets_.size() > config_->nJetsMax()) return false;
+         label = Form("%d <= NJets <= %d",config_->nJetsMin(),config_->nJetsMax());
+         isgood =  ((int)selectedJets_.size() >= config_->nJetsMin() && (int)selectedJets_.size() <= config_->nJetsMax());
       }
    }
    
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   cutflow(label,isgood);
    
-   return true;
+   return isgood;
    
 }
 
