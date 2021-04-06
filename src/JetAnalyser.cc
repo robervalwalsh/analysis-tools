@@ -75,13 +75,7 @@ bool JetAnalyser::analysisWithJets()
    selectedJets_.clear();
    if ( ! jetsanalysis_ ) return false;
    
-   ++cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
-   {
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Using Jet collection: %s",(config_->jetsCollection()).c_str()));
-   }
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
-   
+   cutflow(Form("Using Jet collection: %s",(config_->jetsCollection()).c_str()));
    
    
    analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsL1Jets(),config_-> triggerMatchL1JetsDrMax());
@@ -346,29 +340,25 @@ bool JetAnalyser::selectionJet(const int & r)
 bool JetAnalyser::selectionJet(const int & r, const float & pt_min, const float &eta_max, const float &pt_max)
 {
    if ( r > config_->nJetsMin() ) return true;
-   ++cutflow_;
+   if ( (int)selectedJets_.size() < r ) return false; // is this correct?
+   
    bool isgood = true;
+   
+   std::string label = Form("Jet %d: pt > %5.1f GeV and |eta| < %3.1f",r,pt_min, eta_max );
+   if ( pt_max > pt_min )
+      label = Form("Jet %d: pt > %5.1f GeV and pt < %5.1f GeV and |eta| < %3.1f",r,pt_min, pt_max, eta_max );
+   
    int j = r-1;
    
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
-   {
-      if ( pt_max > pt_min )
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f GeV and pt < %5.1f GeV and |eta| < %3.1f",r,pt_min, pt_max, eta_max ));
-      else
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Jet %d: pt > %5.1f GeV and |eta| < %3.1f",r,pt_min, eta_max ));
-   }
-   
-   if ( (int)selectedJets_.size() < r ) return false;
-   
    // kinematic selection
-   if ( selectedJets_[j] -> pt() < pt_min           && !(pt_min < 0) ) return false;
-   if ( fabs(selectedJets_[j] -> eta()) > eta_max   && !(eta_max < 0) ) return false;
+   if ( selectedJets_[j] -> pt() < pt_min           && !(pt_min < 0) )  isgood = false;
+   if ( fabs(selectedJets_[j] -> eta()) > eta_max   && !(eta_max < 0) ) isgood = false;
    if ( config_->jetsPtMax().size() > 0 )
    {
-      if ( selectedJets_[j] -> pt() > pt_max && !(pt_max < pt_min ) )  return false;
+      if ( selectedJets_[j] -> pt() > pt_max && !(pt_max < pt_min ) )   isgood = false;
    }
    
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   cutflow(label,isgood);
    
    return isgood;
 }
@@ -378,34 +368,26 @@ bool JetAnalyser::selectionJetDeta(const int & r1, const int & r2, const float &
 {
    if ( r1 > config_->nJetsMin() ||  r2 > config_->nJetsMin() ) return true;
    
-   ++cutflow_;
-   if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" )
-   {
-      if ( delta > 0 )
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Deta(jet %d, jet %d) < %4.2f",r1,r2,fabs(delta)));
-      else
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,Form("Deta(jet %d, jet %d) > %4.2f",r1,r2,fabs(delta)));
-   }
+   bool isgood = true;
    
+   std::string label = Form("Deta(jet %d, jet %d) < %4.2f",r1,r2,fabs(delta));
+   if ( delta < 0 )
+      label = Form("Deta(jet %d, jet %d) > %4.2f",r1,r2,fabs(delta));
    
    int j1 = r1-1;
    int j2 = r2-1;
    
    if ( delta > 0 )
-   {
-      if ( fabs(selectedJets_[j1]->eta() - selectedJets_[j2]->eta()) > fabs(delta) ) return false;
-   }
+      isgood = ( fabs(selectedJets_[j1]->eta() - selectedJets_[j2]->eta()) < fabs(delta) );
    else
-   {
-      if ( fabs(selectedJets_[j1]->eta() - selectedJets_[j2]->eta()) < fabs(delta) ) return false;
-   }
+      isgood = ( fabs(selectedJets_[j1]->eta() - selectedJets_[j2]->eta()) > fabs(delta) );
 
-        
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
+   cutflow(label,isgood);    
     
-   return true;
+   return isgood;
    
 }
+
 bool JetAnalyser::selectionJetDeta(const int & r1, const int & r2)
 {
    bool ok = true;
