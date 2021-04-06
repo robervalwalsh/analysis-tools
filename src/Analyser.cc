@@ -45,9 +45,18 @@ bool Analyser::event(const int & i)
    analysis_->event(i);
    cutflow_ = 0;
    weight_ = 1.;  // reset weight at the beginning of the event analysis
+  
+   cutflow("Total events read"); 
    
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
-   this -> generatorWeight();
+   // Generator weight
+   if ( isMC_ )
+   {
+      this -> generatorWeight();
+      std::string genweight_type = "sign of weights";
+      if ( config_->fullGenWeight() ) genweight_type = "full weights";
+      
+      cutflow(Form("Generated weighted events (%s)",genweight_type.c_str()));
+   }
    
    if ( config_->runmin_ > 0 && analysis_->run() < config_->runmin_ ) return false;
    if ( config_->runmax_ > 0 && analysis_->run() > config_->runmax_ ) return false;
@@ -62,14 +71,10 @@ bool Analyser::event(const int & i)
    }
    
    if ( this->genParticlesAnalysis() )
-   {
       cutflow(Form("Using GenParticles collection: %s",(config_->genParticlesCollection()).c_str()));
-   }
    
    if ( this->genJetsAnalysis() )
-   {
       cutflow(Form("Using GenJets collection: %s",(config_->genJetsCollection()).c_str()));
-   }
 
    analysisWithJets();
    analysisWithMuons();

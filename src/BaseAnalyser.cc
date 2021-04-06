@@ -54,8 +54,6 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
    
    // Workflow
    h1_["cutflow"] = std::make_shared<TH1F>("workflow",Form("Workflow #%d",config_->workflow()), 100,0,100);
-      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(1)) == "" ) 
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(1,"Total events read");
       
    
    isMC_ = analysis_->isMC();
@@ -82,11 +80,6 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[])
       genpartsanalysis_  = ( analysis_->addTree<GenParticle> ("GenParticles",config_->genParticlesCollection()) != nullptr );
       // gen jets analysis
       genjetsanalysis_  = ( analysis_->addTree<GenJet> ("GenJets",config_->genJetsCollection()) != nullptr );
-      // cutflow init for MC
-      std::string genweight_type = "sign of weights";
-      if ( config_->fullGenWeight() ) genweight_type = "full weights";
-      if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(2)) == "" )
-         h1_["cutflow"] -> GetXaxis()-> SetBinLabel(2,Form("Generated weighted events (%s)",genweight_type.c_str()));
       
    }
    
@@ -336,11 +329,6 @@ void BaseAnalyser::pileupHistogram()
 }
 void BaseAnalyser::fillPileupHistogram()
 {
-//    ++cutflow_;
-//    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-//       h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,"*** Fill true pileup histrogram");
-//    
-//    h1_["cutflow"] -> Fill(cutflow_,weight_);
    
    h1_["pileup"] -> Fill(analysis_->nTruePileup());
    h1_["pileup_w"] -> Fill(analysis_->nTruePileup(),this->pileupWeight(analysis_->nTruePileup(),0));
@@ -396,7 +384,6 @@ void BaseAnalyser::generatorWeight()
 {
    if ( ! config_->isMC() ) return;
    
-   ++cutflow_;
    float weight = analysis_->genWeight();
    if ( config_->fullGenWeight() )
    {
@@ -407,8 +394,7 @@ void BaseAnalyser::generatorWeight()
       float sign =  (weight > 0) ? 1 : ((weight < 0) ? -1 : 0);
       weight_ *= sign;
    }
-   h1_["cutflow"] -> Fill(cutflow_,weight_);
-   
+      
 }
 
 bool BaseAnalyser::triggerEmulation(const std::string & name, const int & nmin, const float & ptmin, const float & etamax, const std::string & newname)
