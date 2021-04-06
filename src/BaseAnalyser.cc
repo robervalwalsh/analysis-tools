@@ -356,7 +356,7 @@ void BaseAnalyser::cutflow(const int & c)
    cutflow_ = c;
 }
 
-bool BaseAnalyser::cutflow(const std::string & label, const bool & ok)
+void BaseAnalyser::cutflow(const std::string & label, const bool & ok)
 {
    ++cutflow_;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 

@@ -89,7 +89,7 @@ bool Analyser::muonJet(const int & r)
    int j = r-1;
    auto jet = selectedJets_[j];
    jet -> addMuon(selectedMuons_);
-   bool isMuonJet = jet -> muon();
+   bool isMuonJet = (jet -> muon() != nullptr);
    cutflow(Form("Jet %d: Jet-muon association",r),isMuonJet);
    
    return isMuonJet;
