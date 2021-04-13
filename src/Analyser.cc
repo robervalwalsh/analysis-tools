@@ -43,7 +43,7 @@ bool Analyser::event(const int & i)
 {
    bool ok = true;
    analysis_->event(i);
-   cutflow_ = 0;
+   cutflow_ = -1;
    weight_ = 1.;  // reset weight at the beginning of the event analysis
   
    cutflow("Total events read"); 
