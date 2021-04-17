@@ -179,6 +179,26 @@ namespace analysis {
             float       triggerEmulateL3MuonsEtaMax() const;
 
 
+            /// L1 jet trigger emulation
+            std::string triggerEmulateL1Jets()       const;
+            int         triggerEmulateL1JetsNMin()   const;
+            float       triggerEmulateL1JetsPtMin()  const;
+            float       triggerEmulateL1JetsEtaMax() const;
+            
+            /// Calo jet trigger emulation
+            std::string triggerEmulateCaloJets()       const;
+            int         triggerEmulateCaloJetsNMin()   const;
+            float       triggerEmulateCaloJetsPtMin()  const;
+            float       triggerEmulateCaloJetsEtaMax() const;
+            
+            
+            /// PF jet trigger emulation
+            std::string triggerEmulatePFJets()       const;
+            int         triggerEmulatePFJetsNMin()   const;
+            float       triggerEmulatePFJetsPtMin()  const;
+            float       triggerEmulatePFJetsEtaMax() const;
+            
+            
          // matching trigger objects
             float triggerMatchL1MuonsDrMax()       const;
             float triggerMatchL3MuonsDrMax()       const;
@@ -398,6 +418,24 @@ namespace analysis {
             int         l3muonemulnmin_;
             float       l3muonemulptmin_;
             float       l3muonemuletamax_;
+
+         /// L1 jet trigger emulation
+            std::string l1jetemul_;
+            int         l1jetemulnmin_;
+            float       l1jetemulptmin_;
+            float       l1jetemuletamax_;
+
+         /// Calo jet trigger emulation
+            std::string calojetemul_;
+            int         calojetemulnmin_;
+            float       calojetemulptmin_;
+            float       calojetemuletamax_;
+
+         /// PF jet trigger emulation
+            std::string pfjetemul_;
+            int         pfjetemulnmin_;
+            float       pfjetemulptmin_;
+            float       pfjetemuletamax_;
 
             float matchTrgL1MuonsDrMax_;
             float matchTrgL3MuonsDrMax_;

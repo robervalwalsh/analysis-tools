@@ -73,14 +73,68 @@ bool JetAnalyser::analysisWithJets()
 {
    jets_.clear();
    selectedJets_.clear();
+   
+   // trigger emulation
+   // L1 jets
+   std::string triggerObjectsL1Jets;
+   if ( config_->triggerObjectsL1Jets() != "" )
+   {
+      triggerObjectsL1Jets = config_->triggerObjectsL1Jets();
+      if ( config_->triggerEmulateL1Jets() != "" &&  config_->triggerEmulateL1JetsNMin() > 0 )
+      {
+         int nmin = config_->triggerEmulateL1JetsNMin();
+         float ptmin = config_->triggerEmulateL1JetsPtMin();
+         float etamax = config_->triggerEmulateL1JetsEtaMax();
+         std::string newL1Jets = config_->triggerEmulateL1Jets();
+         triggerEmulation(triggerObjectsL1Jets,nmin,ptmin,etamax,newL1Jets);
+         triggerObjectsL1Jets = newL1Jets;
+      }
+   }
+   
+   // Calo jets
+   std::string triggerObjectsCaloJets;
+   if ( config_->triggerObjectsCaloJets() != "" )
+   {
+      triggerObjectsCaloJets = config_->triggerObjectsCaloJets();
+      if ( config_->triggerEmulateCaloJets() != "" &&  config_->triggerEmulateCaloJetsNMin() > 0 )
+      {
+         int nmin = config_->triggerEmulateCaloJetsNMin();
+         float ptmin = config_->triggerEmulateCaloJetsPtMin();
+         float etamax = config_->triggerEmulateCaloJetsEtaMax();
+         std::string newCaloJets = config_->triggerEmulateCaloJets();
+         triggerEmulation(triggerObjectsCaloJets,nmin,ptmin,etamax,newCaloJets);
+         triggerObjectsCaloJets = newCaloJets;
+      }
+   }
+
+   // PF jets
+   std::string triggerObjectsPFJets;
+   if ( config_->triggerObjectsPFJets() != "" )
+   {
+      triggerObjectsPFJets = config_->triggerObjectsPFJets();
+      if ( config_->triggerEmulatePFJets() != "" &&  config_->triggerEmulatePFJetsNMin() > 0 )
+      {
+         int nmin = config_->triggerEmulatePFJetsNMin();
+         float ptmin = config_->triggerEmulatePFJetsPtMin();
+         float etamax = config_->triggerEmulatePFJetsEtaMax();
+         std::string newPFJets = config_->triggerEmulatePFJets();
+         triggerEmulation(triggerObjectsPFJets,nmin,ptmin,etamax,newPFJets);
+         triggerObjectsPFJets = newPFJets;
+      }
+   }
+
+   
    if ( ! jetsanalysis_ ) return false;
    
    cutflow(Form("Using Jet collection: %s",(config_->jetsCollection()).c_str()));
    
    
-   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsL1Jets(),config_-> triggerMatchL1JetsDrMax());
-   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsCaloJets(),config_-> triggerMatchCaloJetsDrMax());
-   analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsPFJets(),config_-> triggerMatchPFJetsDrMax());
+   if ( config_->triggerObjectsL1Jets() != "" )
+      analysis_->match<Jet,TriggerObject>("Jets",triggerObjectsL1Jets,config_-> triggerMatchL1JetsDrMax());
+   if ( config_->triggerObjectsCaloJets() != "" )
+      analysis_->match<Jet,TriggerObject>("Jets",triggerObjectsCaloJets,config_-> triggerMatchCaloJetsDrMax());
+   if ( config_->triggerObjectsPFJets() != "" )
+      analysis_->match<Jet,TriggerObject>("Jets",triggerObjectsPFJets,config_-> triggerMatchPFJetsDrMax());
    analysis_->match<Jet,TriggerObject>("Jets",config_->triggerObjectsBJets(),config_-> triggerMatchCaloBJetsDrMax());
 
    // std::shared_ptr< Collection<Jet> >
@@ -699,10 +753,21 @@ bool JetAnalyser::onlineJetMatching(const int & r)
    
    int j = r-1;
    
+   std::string triggerObjectsL1Jets = config_->triggerObjectsL1Jets();
+   if ( config_->triggerEmulateL1Jets() != "" &&  config_->triggerEmulateL1JetsNMin() > 0 )
+      triggerObjectsL1Jets = config_->triggerEmulateL1Jets();
+   std::string triggerObjectsCaloJets = config_->triggerObjectsCaloJets();
+   if ( config_->triggerEmulateCaloJets() != "" &&  config_->triggerEmulateCaloJetsNMin() > 0 )
+      triggerObjectsCaloJets = config_->triggerEmulateCaloJets();
+   std::string triggerObjectsPFJets = config_->triggerObjectsPFJets();
+   if ( config_->triggerEmulatePFJets() != "" &&  config_->triggerEmulatePFJetsNMin() > 0 )
+      triggerObjectsPFJets = config_->triggerEmulatePFJets();
+   
+   
    std::shared_ptr<Jet> jet = selectedJets_[j];
-   isgood = (           jet->matched(config_->triggerObjectsL1Jets()  ) );
-   isgood = ( isgood && jet->matched(config_->triggerObjectsCaloJets()) );
-   isgood = ( isgood && jet->matched(config_->triggerObjectsPFJets()  ) );
+   isgood = (           jet->matched(triggerObjectsL1Jets   ) );
+   isgood = ( isgood && jet->matched(triggerObjectsCaloJets ) );
+   isgood = ( isgood && jet->matched(triggerObjectsPFJets   ) );
 
    cutflow(label,isgood);
    

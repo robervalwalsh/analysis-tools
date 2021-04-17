@@ -80,8 +80,40 @@ bool TriggerAnalyser::selectionTrigger() // Maybe not use this, use selectionHLT
       float etamax = config_->triggerEmulateL3MuonsEtaMax();
       l3muon = selectionTriggerEmulated(l1,hlt,config_->triggerEmulateL3Muons(),nmin,ptmin,etamax);
    }
+      
+   // L1 jet trigger
+   bool l1jet = true;
+   if ( config_->triggerEmulateL1Jets() != "" &&  config_->triggerEmulateL1JetsNMin() > 0 && config_->triggerObjectsL1Jets() != "" )
+   {
+      int nmin = config_->triggerEmulateL1JetsNMin();
+      float ptmin = config_->triggerEmulateL1JetsPtMin();
+      float etamax = config_->triggerEmulateL1JetsEtaMax();
+      l1jet = selectionTriggerEmulated(l1,hlt,config_->triggerEmulateL1Jets(),nmin,ptmin,etamax);
+   }
    
-   bool emul = l1muon && l3muon;
+   // Calo jet trigger
+   bool calojet = true;
+   if ( config_->triggerEmulateCaloJets() != "" &&  config_->triggerEmulateCaloJetsNMin() > 0 && config_->triggerObjectsCaloJets() != "" )
+   {
+      int nmin = config_->triggerEmulateCaloJetsNMin();
+      float ptmin = config_->triggerEmulateCaloJetsPtMin();
+      float etamax = config_->triggerEmulateCaloJetsEtaMax();
+      calojet = selectionTriggerEmulated(l1,hlt,config_->triggerEmulateCaloJets(),nmin,ptmin,etamax);
+   }
+   
+   
+   // PF jet trigger
+   bool pfjet = true;
+   if ( config_->triggerEmulatePFJets() != "" &&  config_->triggerEmulatePFJetsNMin() > 0 && config_->triggerObjectsPFJets() != "" )
+   {
+      int nmin = config_->triggerEmulatePFJetsNMin();
+      float ptmin = config_->triggerEmulatePFJetsPtMin();
+      float etamax = config_->triggerEmulatePFJetsEtaMax();
+      pfjet = selectionTriggerEmulated(l1,hlt,config_->triggerEmulatePFJets(),nmin,ptmin,etamax);
+   }
+   
+   
+   bool emul = l1muon && l3muon && l1jet && calojet && pfjet;
    
    return (hlt && l1 && emul);
    

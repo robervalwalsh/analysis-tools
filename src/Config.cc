@@ -141,6 +141,27 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Trigger.Emulate.Muons.L3.ptMin"        , po::value <float>                     (&l3muonemulptmin_)  -> default_value(0)                  , "Minimum pt of emulated L3 muon trigger objects")
          ("Trigger.Emulate.Muons.L3.etaMax"       , po::value <float>                     (&l3muonemuletamax_) -> default_value(10)                 , "Maximum |eta|s of emulated L3 muon trigger objects");
 
+      // L1 jettrigger emulation
+      opt_cfg_.add_options()
+         ("Trigger.Emulate.Jets.L1.seed"         , po::value <std::string>               (&l1jetemul_)       -> default_value("")                 , "Name of emulated L1 Jet trigger")
+         ("Trigger.Emulate.Jets.L1.nMin"         , po::value <int>                       (&l1jetemulnmin_)   -> default_value(-1)                 , "Minimum number of emulated L1 Jet trigger objects")
+         ("Trigger.Emulate.Jets.L1.ptMin"        , po::value <float>                     (&l1jetemulptmin_)  -> default_value(0)                  , "Minimum pt of emulated L1 Jet trigger objects")
+         ("Trigger.Emulate.Jets.L1.etaMax"       , po::value <float>                     (&l1jetemuletamax_) -> default_value(10)                 , "Maximum |eta|s of emulated L1 Jet trigger objects");
+
+      // Calo jettrigger emulation
+      opt_cfg_.add_options()
+         ("Trigger.Emulate.Jets.Calo.seed"         , po::value <std::string>               (&calojetemul_)       -> default_value("")                 , "Name of emulated Calo Jet trigger")
+         ("Trigger.Emulate.Jets.Calo.nMin"         , po::value <int>                       (&calojetemulnmin_)   -> default_value(-1)                 , "Minimum number of emulated Calo Jet trigger objects")
+         ("Trigger.Emulate.Jets.Calo.ptMin"        , po::value <float>                     (&calojetemulptmin_)  -> default_value(0)                  , "Minimum pt of emulated Calo Jet trigger objects")
+         ("Trigger.Emulate.Jets.Calo.etaMax"       , po::value <float>                     (&calojetemuletamax_) -> default_value(10)                 , "Maximum |eta|s of emulated Calo Jet trigger objects");
+
+      // PF jettrigger emulation
+      opt_cfg_.add_options()
+         ("Trigger.Emulate.Jets.PF.seed"         , po::value <std::string>               (&pfjetemul_)       -> default_value("")                 , "Name of emulated PF Jet trigger")
+         ("Trigger.Emulate.Jets.PF.nMin"         , po::value <int>                       (&pfjetemulnmin_)   -> default_value(-1)                 , "Minimum number of emulated PF Jet trigger objects")
+         ("Trigger.Emulate.Jets.PF.ptMin"        , po::value <float>                     (&pfjetemulptmin_)  -> default_value(0)                  , "Minimum pt of emulated PF Jet trigger objects")
+         ("Trigger.Emulate.Jets.PF.etaMax"       , po::value <float>                     (&pfjetemuletamax_) -> default_value(10)                 , "Maximum |eta|s of emulated PF Jet trigger objects");
+
       // trigger objects
       opt_cfg_.add_options()
          ("Trigger.Objects.directory"    , po::value<std::string>                (&triggerObjDir_)   -> default_value("slimmedPatTrigger"), "Name of the trigger objects directory")
@@ -516,3 +537,29 @@ std::string  Config::triggerEmulateL3Muons()       const { return l3muonemul_   
 int          Config::triggerEmulateL3MuonsNMin()   const { return l3muonemulnmin_   ; }
 float        Config::triggerEmulateL3MuonsPtMin()  const { return l3muonemulptmin_  ; }
 float        Config::triggerEmulateL3MuonsEtaMax() const { return l3muonemuletamax_ ; }
+
+
+
+// L1 jet trigger emulation
+std::string  Config::triggerEmulateL1Jets()       const { return l1jetemul_       ; }
+int          Config::triggerEmulateL1JetsNMin()   const { return l1jetemulnmin_   ; }
+float        Config::triggerEmulateL1JetsPtMin()  const { return l1jetemulptmin_  ; }
+float        Config::triggerEmulateL1JetsEtaMax() const { return l1jetemuletamax_ ; }
+
+
+// Calo jet trigger emulation
+std::string  Config::triggerEmulateCaloJets()       const { return calojetemul_       ; }
+int          Config::triggerEmulateCaloJetsNMin()   const { return calojetemulnmin_   ; }
+float        Config::triggerEmulateCaloJetsPtMin()  const { return calojetemulptmin_  ; }
+float        Config::triggerEmulateCaloJetsEtaMax() const { return calojetemuletamax_ ; }
+
+// PF jet trigger emulation
+std::string  Config::triggerEmulatePFJets()       const { return pfjetemul_       ; }
+int          Config::triggerEmulatePFJetsNMin()   const { return pfjetemulnmin_   ; }
+float        Config::triggerEmulatePFJetsPtMin()  const { return pfjetemulptmin_  ; }
+float        Config::triggerEmulatePFJetsEtaMax() const { return pfjetemuletamax_ ; }
+
+
+
+
+
