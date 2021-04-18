@@ -400,20 +400,62 @@ void BaseAnalyser::generatorWeight()
 bool BaseAnalyser::triggerEmulation(const std::string & name, const int & nmin, const float & ptmin, const float & etamax, const std::string & newname)
 {
    trg_emul_[newname] = true;
-   std::shared_ptr< Collection<TriggerObject> > objects = analysis_->collection<TriggerObject>(name);
-   
    std::vector<TriggerObject> new_objects;
+      
    
-   
-   for ( int i = 0 ; i < objects->size() ; ++i )
+   if ( name != "l1tJets" && name != "l1tMuons" )
    {
-      TriggerObject obj = objects->at(i);
-      if ( obj.pt() >= ptmin && fabs(obj.eta()) <= etamax ) 
+      std::shared_ptr< Collection<TriggerObject> > objects = analysis_->collection<TriggerObject>(name);
+      
+      for ( int i = 0 ; i < objects->size() ; ++i )
       {
-         new_objects.push_back(obj);
+         TriggerObject obj = objects->at(i);
+         if ( obj.pt() >= ptmin && fabs(obj.eta()) <= etamax ) 
+         {
+            new_objects.push_back(obj);
+         }
       }
+      
    }
    
+   if ( name == "l1tJets" )
+   {
+      std::shared_ptr< Collection<L1TJet> > l1tjets = analysis_->collection<L1TJet>(name);
+
+      for ( int i = 0 ; i < l1tjets->size() ; ++i )
+      {
+         L1TJet l1tjet = l1tjets -> at(i);
+         float pt = l1tjet.pt();
+         float eta = l1tjet.eta();
+         float phi = l1tjet.phi();
+         float e = l1tjet.e();
+         TriggerObject obj(pt,eta,phi,e);
+         if ( obj.pt() >= ptmin && fabs(obj.eta()) <= etamax ) 
+         {
+            new_objects.push_back(obj);
+         }
+      }
+      
+   }
+   if ( name == "l1tMuons" )
+   {
+      std::shared_ptr< Collection<L1TMuon> > l1tmuons = analysis_->collection<L1TMuon>(name);
+      
+      for ( int i = 0 ; i < l1tmuons->size() ; ++i )
+      {
+         L1TMuon l1tmuon = l1tmuons -> at(i);
+         float pt = l1tmuon.pt();
+         float eta = l1tmuon.eta();
+         float phi = l1tmuon.phi();
+         float e = l1tmuon.e();
+         TriggerObject obj(pt,eta,phi,e);
+         if ( obj.pt() >= ptmin && fabs(obj.eta()) <= etamax ) 
+         {
+            new_objects.push_back(obj);
+         }
+      }
+      
+   }
    trg_emul_[newname] = ( (int)new_objects.size() >= nmin );
       
    Collection<TriggerObject> new_collection(new_objects,newname);
