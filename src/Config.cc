@@ -180,8 +180,8 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
 
       // L1 trigger
       opt_cfg_.add_options()
-         ("L1T.jets"                     , po::value <std::string>               (&l1tjetsCol_)      -> default_value("l1tJets")          , "Name of the L1T jets collection")
-         ("L1T.muons"                    , po::value <std::string>               (&l1tmuonsCol_)     -> default_value("l1tMuons")         , "Name of the L1T muons collection");
+         ("Trigger.L1T.Jets"                     , po::value <std::string>               (&l1tjetsCol_)      -> default_value("")          , "Name of the L1T jets collection")
+         ("Trigger.L1T.Muons"                    , po::value <std::string>               (&l1tmuonsCol_)     -> default_value("")         , "Name of the L1T muons collection");
 
       // generator level
       opt_cfg_.add_options()
@@ -305,8 +305,10 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
             genpartsCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , genpartsCol_.c_str()    );
          if ( genjetsCol_ != "" )
             genjetsCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , genjetsCol_.c_str()     );
-         l1tjetsCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , l1tjetsCol_.c_str()     );
-         l1tmuonsCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , l1tmuonsCol_.c_str()    );
+         if ( l1tjetsCol_ != "")
+            l1tjetsCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , l1tjetsCol_.c_str()     );
+         if ( l1tmuonsCol_ != "")
+            l1tmuonsCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , l1tmuonsCol_.c_str()    );
 
          if ( njetsmax_ < njetsmin_ ) njetsmax_ = -1;
          if ( njetsmin_ < 0 && njetsmax_ > 0 ) njetsmin_ = 0;
@@ -390,6 +392,9 @@ float              Config::scale()            const { return scale_; }
 std::vector<float> Config::erasLumi()         const { return eraslumi_; }
 std::vector<std::string> Config::eras()       const { return eras_; }
 std::string        Config::pileupWeights()    const { return puweight_; }
+
+std::string        Config::process()          const { return process_; }
+std::string        Config::eventsDir()        const { return eventsdir_; }
 
 // analysis control
 bool               Config::override()          const { return override_; }

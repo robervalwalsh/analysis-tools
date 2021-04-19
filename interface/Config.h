@@ -83,6 +83,9 @@ namespace analysis {
             bool fullGenWeight() const;
             int  workflow() const;
             int  index() const;
+            
+            std::string process() const;
+            std::string eventsDir() const;
 
             std::string seedFile() const;
             int seed() const;
@@ -245,7 +248,7 @@ namespace analysis {
          // ========================
 
          // analysis control
-            std::string eventsdir_;
+            
             int nlumis_;
             int runmin_;
             int runmax_;
@@ -294,6 +297,7 @@ namespace analysis {
             std::string inputlist_;
             std::string eventinfo_;
             std::string process_;
+            std::string eventsdir_;
             std::string xsectiontree_;
             std::string xsectiontype_;
             float xsection_;
