@@ -24,6 +24,7 @@ TriggerAnalyser::TriggerAnalyser()
 
 TriggerAnalyser::TriggerAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
 {
+
    triggeranalysis_ = false;
    if ( config_->triggerResults() != "" )
       triggeranalysis_  = analysis_->triggerResults(config_->triggerResults());
@@ -31,7 +32,8 @@ TriggerAnalyser::TriggerAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,ar
    if ( config_->triggerObjectsDir() != "" )
    {
       // online jets
-      analysis_->addTree<TriggerObject> (config_->triggerObjectsL1Jets()  ,Form("%s/%s", config_->triggerObjectsDir().c_str(),config_->triggerObjectsL1Jets().c_str()));
+      if ( config_->triggerObjectsL1Jets() != "l1tJets")
+         analysis_->addTree<TriggerObject> (config_->triggerObjectsL1Jets()  ,Form("%s/%s", config_->triggerObjectsDir().c_str(),config_->triggerObjectsL1Jets().c_str()));
       analysis_->addTree<TriggerObject> (config_->triggerObjectsCaloJets(),Form("%s/%s", config_->triggerObjectsDir().c_str(),config_->triggerObjectsCaloJets().c_str()));
       analysis_->addTree<TriggerObject> (config_->triggerObjectsPFJets()  ,Form("%s/%s", config_->triggerObjectsDir().c_str(),config_->triggerObjectsPFJets().c_str()));
       // online b jets
@@ -40,7 +42,15 @@ TriggerAnalyser::TriggerAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,ar
       analysis_->addTree<TriggerObject> (config_->triggerObjectsL1Muons(),Form("%s/%s",config_->triggerObjectsDir().c_str(),config_->triggerObjectsL1Muons().c_str()));
       analysis_->addTree<TriggerObject> (config_->triggerObjectsL3Muons(),Form("%s/%s",config_->triggerObjectsDir().c_str(),config_->triggerObjectsL3Muons().c_str()));
    }
-   
+   if ( config_ -> l1tJetsCollection() != "")
+   {
+      analysis_ -> addTree<L1TJet> ("l1tJets",config_ -> l1tJetsCollection());
+   }
+   if ( config_ -> l1tMuonsCollection() != "")
+   {
+      analysis_ -> addTree<L1TMuon> ("l1tMuons",config_ -> l1tMuonsCollection());
+   }
+
 }
 
 TriggerAnalyser::~TriggerAnalyser()
