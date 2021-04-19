@@ -150,14 +150,14 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
 
       // Calo jettrigger emulation
       opt_cfg_.add_options()
-         ("Trigger.Emulate.Jets.Calo.seed"         , po::value <std::string>               (&calojetemul_)       -> default_value("")                 , "Name of emulated Calo Jet trigger")
+         ("Trigger.Emulate.Jets.Calo.path"         , po::value <std::string>               (&calojetemul_)       -> default_value("")                 , "Name of emulated Calo Jet trigger")
          ("Trigger.Emulate.Jets.Calo.nMin"         , po::value <int>                       (&calojetemulnmin_)   -> default_value(-1)                 , "Minimum number of emulated Calo Jet trigger objects")
          ("Trigger.Emulate.Jets.Calo.ptMin"        , po::value <float>                     (&calojetemulptmin_)  -> default_value(0)                  , "Minimum pt of emulated Calo Jet trigger objects")
          ("Trigger.Emulate.Jets.Calo.etaMax"       , po::value <float>                     (&calojetemuletamax_) -> default_value(10)                 , "Maximum |eta|s of emulated Calo Jet trigger objects");
 
       // PF jettrigger emulation
       opt_cfg_.add_options()
-         ("Trigger.Emulate.Jets.PF.seed"         , po::value <std::string>               (&pfjetemul_)       -> default_value("")                 , "Name of emulated PF Jet trigger")
+         ("Trigger.Emulate.Jets.PF.path"         , po::value <std::string>               (&pfjetemul_)       -> default_value("")                 , "Name of emulated PF Jet trigger")
          ("Trigger.Emulate.Jets.PF.nMin"         , po::value <int>                       (&pfjetemulnmin_)   -> default_value(-1)                 , "Minimum number of emulated PF Jet trigger objects")
          ("Trigger.Emulate.Jets.PF.ptMin"        , po::value <float>                     (&pfjetemulptmin_)  -> default_value(0)                  , "Minimum pt of emulated PF Jet trigger objects")
          ("Trigger.Emulate.Jets.PF.etaMax"       , po::value <float>                     (&pfjetemuletamax_) -> default_value(10)                 , "Maximum |eta|s of emulated PF Jet trigger objects");
