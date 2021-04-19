@@ -26,6 +26,7 @@ TriggerAnalyser::TriggerAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,ar
 {
 
    triggeranalysis_ = false;
+   
    if ( config_->triggerResults() != "" )
       triggeranalysis_  = analysis_->triggerResults(config_->triggerResults());
    
@@ -44,11 +45,11 @@ TriggerAnalyser::TriggerAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,ar
    }
    if ( config_ -> l1tJetsCollection() != "")
    {
-      analysis_ -> addTree<L1TJet> ("l1tJets",config_ -> l1tJetsCollection());
+      l1tjetsanalysis_ = ( analysis_ -> addTree<L1TJet> ("l1tJets",config_ -> l1tJetsCollection()) != nullptr );
    }
    if ( config_ -> l1tMuonsCollection() != "")
    {
-      analysis_ -> addTree<L1TMuon> ("l1tMuons",config_ -> l1tMuonsCollection());
+      l1tmuonsanalysis_ = ( analysis_ -> addTree<L1TMuon> ("l1tMuons",config_ -> l1tMuonsCollection()) != nullptr );
    }
 
 }
@@ -231,3 +232,12 @@ std::vector< std::shared_ptr<TriggerObject> > TriggerAnalyser::triggerObjectsL3M
    return objects;
 }
 
+bool  TriggerAnalyser::l1tJetsAnalysis() const
+{
+   return l1tjetsanalysis_;
+}
+
+bool  TriggerAnalyser::l1tMuonsAnalysis() const
+{
+   return l1tmuonsanalysis_;
+}
