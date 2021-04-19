@@ -75,7 +75,13 @@ bool Analyser::event(const int & i)
    
    if ( this->genJetsAnalysis() )
       cutflow(Form("Using GenJets collection: %s",(config_->genJetsCollection()).c_str()));
+      
+   if ( this -> l1tJetsAnalysis() )
+      cutflow(Form("Using L1TJet collection: %s", (config_->l1tJetsCollection()).c_str()));
 
+    if ( this -> l1tMuonsAnalysis() )
+      cutflow(Form("Using L1TMuon collection: %s", (config_->l1tMuonsCollection()).c_str()));
+      
    analysisWithJets();
    analysisWithMuons();
       
