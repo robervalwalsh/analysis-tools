@@ -65,10 +65,6 @@ namespace analysis {
             
             /// multiple actions: perform muon Id, jet Id and jet pileup Id selections
             virtual bool preselection();
-            /// multiple actions: perform HLT and L1 selection
-            virtual bool triggerSelection();
-            
-
       };
    }
 }
