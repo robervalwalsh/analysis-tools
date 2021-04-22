@@ -13,19 +13,19 @@ bold = bcolors.BOLD
 endc = bcolors.ENDC
 
 
-def list_paths(cfg):
-   for path, path_info in sorted(cfg.items()):
+def list_paths(info):
+   for path, path_info in sorted(info.items()):
       print(f'  -> {path}')
    
 
-def list_path_info(cfg,path):
+def list_path_info(info,path):
    print(f'   {magenta}{bold}Path:{endc} {path}')
-   l1seeds = cfg[path]['l1seeds']
+   l1seeds = info[path]['l1seeds']
 #   print('   L1 seeds: ' + ', '.join([s for s in sorted(l1seeds)]))
    print(f'   {magenta}{bold}L1 Seeds:{endc}')
    for seed in sorted(l1seeds):
       print(f'     - {seed}')
-   trgobjs = cfg[path]['trgobjs']
+   trgobjs = info[path]['trgobjs']
    print(f'   {magenta}{bold}Trigger objects:{endc}')
    for obj in trgobjs:
       print(f'     - {obj}')
@@ -42,9 +42,9 @@ def list_versions(vdir):
 # --- main code ---
 
 # parsing arguments
-parser = ArgumentParser(prog='trigger_info.py', formatter_class=lambda prog: HelpFormatter(prog,indent_increment=6,max_help_position=80,width=280), description='Print trigger configuration info',add_help=True)
+parser = ArgumentParser(prog='trigger_info.py', formatter_class=lambda prog: HelpFormatter(prog,indent_increment=6,max_help_position=80,width=280), description='Print trigger info',add_help=True)
 parser.add_argument(dest="year"                                         , help="Year of data taking  (REQUIRED)")
-parser.add_argument("-v"  , dest="version"                              , help="Configuration version")
+parser.add_argument("-v"  , dest="version"                              , help="Ntuple production version")
 parser.add_argument("-p"  , dest="path"                                 , help="HLT path")
 
 args = parser.parse_args()
@@ -65,21 +65,28 @@ if not version or version == 'latest' or version == '-1':
    else:
       version = vs[-1]
 
+info_file  = f'{ntp_dir}/mssmhbb-{year}-v{version}/trigger_info.json'
+
+if not os.path.isfile(info_file):
+   print()
+   print(f'{red}{bold} File with trigger info does not exist! {endc}')
+   print(f'{info_file}')
+   print()
+   os.sys.exit()
+
 print('')
 print('--------------------------------------------------------')
 print(f' Trigger information for {year} ntuples v{version}')
 print('--------------------------------------------------------')
 
-cfg_file  = f'{ntp_dir}/mssmhbb-{year}-v{version}/trigger_config.json'
-
-with open(cfg_file) as f:
-   config = json.load(f)
+with open(info_file) as f:
+   info_data = json.load(f)
 
 if not args.path or args.path=='':
    print(f'{magenta}{bold}Listing all paths available:{endc}')
-   list_paths(config)
+   list_paths(info_data)
 else:
-   list_path_info(config,args.path)
+   list_path_info(info_data,args.path)
    
 print('--------------------------------------------------------')
 print('')
