@@ -40,15 +40,28 @@ Candidate::Candidate(const float & px, const float & py, const float & pz, const
    p4_.SetXYZM(px,py,pz,0.);
 }
 
+Candidate::Candidate(const TLorentzVector & p4, const float & q)
+{
+   q_ = q;
+   p4_ = p4;
+}
 
 Candidate::~Candidate()
 {
 }
 
+// operators
+Candidate Candidate::operator + (const Candidate & cand) const
+{
+    auto p4 = p4_+cand.p4();
+    auto q = q_+cand.q();
+    return Candidate(p4,q);
+}
 
 //
 // member functions
 //
+
 bool Candidate::matchTo(const std::vector<Candidate> * cands, const std::string & name, const float & deltar_max)
 {
    bool status = false;

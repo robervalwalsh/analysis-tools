@@ -45,9 +45,13 @@ namespace analysis {
             Candidate(const float & px, const float & py, const float & pz);
             /// constructor from 3-momentum and charge information
             Candidate(const float & px, const float & py, const float & pz, const float & q);
+            /// constructor from TLorentzVector and charge information
+            Candidate(const TLorentzVector & p4, const float & q);
             /// destructor
            virtual ~Candidate();
-
+           
+           /// overload operator + for candidates
+           Candidate operator + (const Candidate & cand) const;
            // Get
            /// returns the x component of the momentum
            float px()          const;
