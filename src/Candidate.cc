@@ -153,6 +153,11 @@ void Candidate::unmatch(const std::string & name)
     matched_[name] = nullptr;
 }
 
+float Candidate::matchedDeltaR(const std::string &name) const
+{
+   return this->deltaR(*(this->matched(name))) ;
+}
+
 // Sets
 void  Candidate::p4(const TLorentzVector & p4) { p4_ = p4; }
 void  Candidate::px(const float & px) { p4_.SetPx(px); }
@@ -186,6 +191,7 @@ void Candidate::printMatchedInfo(const std::string & name, const std::string & t
    else
    {
       std::cout << out << match << ": "; 
+      std::cout << "dR  = " << std::setw(10) << this->matchedDeltaR(name)  << " | ";
       std::cout << "pt  = " << std::setw(10) << match->pt()  << " | ";
       std::cout << "eta = " << std::setw(10) << match->eta() << " | ";
       std::cout << "phi = " << std::setw(10) << match->phi() << " \n ";

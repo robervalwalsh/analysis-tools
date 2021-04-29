@@ -92,6 +92,8 @@ namespace analysis {
            float deltaR(const Candidate & ) const;
            /// returns the deltaPhi between this and another candidate
            float deltaPhi(const Candidate & ) const;
+           /// returns the deltaR between this and matched candidate of the given collection
+           float matchedDeltaR(const std::string & ) const;
 
 
            // made below virtual as this may be different for MET, or vertex
