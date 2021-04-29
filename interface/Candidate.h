@@ -14,7 +14,7 @@
      [Notes on implementation]
 */
 //
-// Original Author:  Roberval Walsh Bastos Rangel
+// Original Author:  Roberval Walsh
 //         Created:  Mon, 20 Oct 2014 14:24:08 GMT
 //
 //
@@ -96,14 +96,18 @@ namespace analysis {
 
            // made below virtual as this may be different for MET, or vertex
            /// function to match this candidate to another object from a list of pointers with a name
-           virtual bool matchTo(const std::vector<Candidate> * cands, const std::string & name, const float & deltaR = 0.5);
-           virtual bool matchTo(const std::vector<Candidate> * cands, const std::string & name, const float & delta_pT, const float & deltaR);
+           virtual bool matchTo(const std::vector<Candidate> * cands, const std::string & name, const float & deltar_max = 0.5);
+           virtual bool matchTo(const std::vector<Candidate> * cands, const std::string & name, const float & deltar_max, const float & deltaptrel_max);
            /// returns the pointer to the matched candidate object
            const Candidate * matched(const std::string & name);
            /// returns the pointer to the matched candidate object
            const Candidate * matched(const std::string & name) const;
            /// unmatch a matched candidate object, i.e. set it to nullptr, useful to remove possible duplicated matching
            void unmatch(const std::string &);
+           /// print candidate kinematics
+           void print(const std::string & type="");
+           /// list all matches
+           void listMatchedNames();
          protected:
             // ----------member data ---------------------------
 

@@ -1,6 +1,7 @@
 // system include files
 //
 #include <iostream>
+#include <iomanip>
 // user include files
 #include "Analysis/Tools/interface/Candidate.h"
 
@@ -48,7 +49,7 @@ Candidate::~Candidate()
 //
 // member functions
 //
-bool Candidate::matchTo(const std::vector<Candidate> * cands, const std::string & name, const float & deltaR)
+bool Candidate::matchTo(const std::vector<Candidate> * cands, const std::string & name, const float & deltar_max)
 {
    bool status = false;
 
@@ -72,7 +73,7 @@ bool Candidate::matchTo(const std::vector<Candidate> * cands, const std::string 
       }
    }
 
-   if(minDeltaR < deltaR)
+   if(minDeltaR < deltar_max)
    {
      this->matched_[name]=nearcand;
      status = true;
@@ -85,7 +86,7 @@ bool Candidate::matchTo(const std::vector<Candidate> * cands, const std::string 
    return status;
 }
 
-bool Candidate::matchTo(const std::vector<Candidate> * cands, const std::string & name, const float & delta_pT, const float & deltaR)
+bool Candidate::matchTo(const std::vector<Candidate> * cands, const std::string & name, const float & deltar_max, const float & deltaptrel_max)
 {
    bool status = false;
 
@@ -98,9 +99,9 @@ bool Candidate::matchTo(const std::vector<Candidate> * cands, const std::string 
 
    const Candidate * cand = nullptr;
    const Candidate * nearcand = nullptr;
-   float minDeltaR = deltaR + 1; 		// Assign more real value;
+   float minDeltaR = deltar_max + 1; 		// Assign more real value;
    float dpT = 0.;
-   float dpTmin = delta_pT + 1;
+   float dpTmin = deltaptrel_max + 1;
    for ( size_t i = 0; i < cands->size() ; ++i )
    {
       cand = &(cands->at(i));
@@ -113,7 +114,7 @@ bool Candidate::matchTo(const std::vector<Candidate> * cands, const std::string 
       }
    }
 
-   if(minDeltaR < deltaR && dpTmin < delta_pT)
+   if(minDeltaR < deltar_max && dpTmin < deltaptrel_max)
    {
      this->matched_[name]=nearcand;
      status = true;
@@ -159,3 +160,24 @@ void  Candidate::py(const float & py) { p4_.SetPy(py); }
 void  Candidate::pz(const float & pz) { p4_.SetPy(pz); }
 void  Candidate::e (const float & e ) { p4_.SetE(e);   }
 void  Candidate::q (const float & q)  { q_ = q; }
+
+// print 
+void Candidate::print(const std::string & type)
+{
+   std::string out = type == "" ? "Candidate :" : type+" :"; 
+   std::cout << std::fixed << std::setprecision(5);
+   std::cout << out << this << ": "; 
+   std::cout << "pt  = " << std::setw(10) << this->pt()  << " | ";
+   std::cout << "eta = " << std::setw(10) << this->eta() << " | ";
+   std::cout << "phi = " << std::setw(10) << this->phi() << " \n ";
+   
+}
+
+void Candidate::listMatchedNames()
+{
+   std::cout << "List of names of matched candidates\n";
+   for ( auto const& match: matched_ )
+   {
+      std::cout << match.first << std::endl;
+   }
+}
