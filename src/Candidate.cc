@@ -140,6 +140,7 @@ float Candidate::mass() const { return p4_.M()  ; }
 int   Candidate::q()    const { return q_;   }
 float Candidate::deltaR(const Candidate &cand) const { return p4_.DeltaR(cand.p4()) ;}
 float Candidate::deltaPhi(const Candidate &cand) const { return p4_.DeltaPhi(cand.p4()) ;}
+float Candidate::deltaEta(const Candidate &cand) const { return fabs(this->eta()-cand.eta());}
 
 TLorentzVector Candidate::p4() const { return p4_; }
 TVector3       Candidate::p3() const { return p4_.Vect(); }
