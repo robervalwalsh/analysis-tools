@@ -8,7 +8,7 @@
 //
 /**\class xxx Candidate.h Analysis/Tools/interface/Candidate.h
 
- Description: [one line class summary]
+ Description: class of a simple particle candidate
 
  Implementation:
      [Notes on implementation]
