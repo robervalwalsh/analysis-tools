@@ -162,7 +162,7 @@ void  Candidate::e (const float & e ) { p4_.SetE(e);   }
 void  Candidate::q (const float & q)  { q_ = q; }
 
 // print 
-void Candidate::print(const std::string & type)
+void Candidate::printInfo(const std::string & type)
 {
    std::string out = type == "" ? "Candidate :" : type+" :"; 
    std::cout << std::fixed << std::setprecision(5);
@@ -172,6 +172,26 @@ void Candidate::print(const std::string & type)
    std::cout << "phi = " << std::setw(10) << this->phi() << " \n ";
    
 }
+
+void Candidate::printMatchedInfo(const std::string & name, const std::string & type)
+{
+   std::string out = (type == "") ? "Candidate" : type;
+   out += " matched to "+name+" :";
+   auto match = this->matched(name);
+   std::cout << std::fixed << std::setprecision(5);
+   if ( ! match )
+   {
+      std::cout << out << "  NO MATCHING" << std::endl;
+   }
+   else
+   {
+      std::cout << out << match << ": "; 
+      std::cout << "pt  = " << std::setw(10) << match->pt()  << " | ";
+      std::cout << "eta = " << std::setw(10) << match->eta() << " | ";
+      std::cout << "phi = " << std::setw(10) << match->phi() << " \n ";
+   }
+}
+
 
 void Candidate::listMatchedNames()
 {

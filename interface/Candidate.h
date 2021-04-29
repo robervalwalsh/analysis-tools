@@ -104,8 +104,10 @@ namespace analysis {
            const Candidate * matched(const std::string & name) const;
            /// unmatch a matched candidate object, i.e. set it to nullptr, useful to remove possible duplicated matching
            void unmatch(const std::string &);
-           /// print candidate kinematics
-           void print(const std::string & type="");
+           /// print candidate info
+           void printInfo(const std::string & type="");
+           /// print candidate matched info
+           void printMatchedInfo(const std::string & name, const std::string & type="");
            /// list all matches
            void listMatchedNames();
          protected:
