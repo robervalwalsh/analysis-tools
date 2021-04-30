@@ -52,6 +52,8 @@ namespace analysis {
            
            /// overload operator + for candidates
            Candidate operator + (const Candidate & cand) const;
+           /// overload operator + for candidates
+           Candidate & operator += (const Candidate & cand) ;
            // Get
            /// returns the x component of the momentum
            float px()          const;
@@ -77,6 +79,8 @@ namespace analysis {
            TLorentzVector p4() const;
            /// returns the 4-momentum (TVector3)
            TVector3       p3() const;
+           /// components
+           std::vector<const Candidate*> components() const;
 
            // Set
            /// sets the 4-momentum (TLorentzVector)
@@ -113,11 +117,14 @@ namespace analysis {
            /// unmatch a matched candidate object, i.e. set it to nullptr, useful to remove possible duplicated matching
            void unmatch(const std::string &);
            /// print candidate info
-           void printInfo(const std::string & type="");
+           void printInfo(const std::string & type="") const;
            /// print candidate matched info
-           void printMatchedInfo(const std::string & name, const std::string & type="");
+           void printMatchedInfo(const std::string & name, const std::string & type="") const;
            /// list all matches
-           void listMatchedNames();
+           void listMatchedNames() const;
+           
+           ///
+           void addComponent(const Candidate&);
          protected:
             // ----------member data ---------------------------
 
@@ -128,6 +135,9 @@ namespace analysis {
             TLorentzVector p4_;
             /// map of matched candidates
             std::map<std::string, const Candidate * > matched_;
+            
+            /// composite candidate
+            std::vector<const Candidate*> components_;
 
          private:
       };

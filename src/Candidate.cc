@@ -20,30 +20,35 @@ Candidate::Candidate()
 {
    q_ = 0;
    p4_.SetPtEtaPhiE(0.,0.,0.,0.);
+   components_.clear();
 }
 
 Candidate::Candidate(const float & pt, const float & eta, const float & phi, const float & e, const float & q)
 {
    q_ = q;
    p4_.SetPtEtaPhiE(pt,eta,phi,e);
+   components_.clear();
 }
 
 Candidate::Candidate(const float & px, const float & py, const float & pz)
 {
    q_ = 0;
    p4_.SetXYZM(px,py,pz,0.);
+   components_.clear();
 }
 
 Candidate::Candidate(const float & px, const float & py, const float & pz, const float & q)
 {
    q_ = q;
    p4_.SetXYZM(px,py,pz,0.);
+   components_.clear();
 }
 
 Candidate::Candidate(const TLorentzVector & p4, const float & q)
 {
    q_ = q;
    p4_ = p4;
+   components_.clear();
 }
 
 Candidate::~Candidate()
@@ -55,12 +60,34 @@ Candidate Candidate::operator + (const Candidate & cand) const
 {
     auto p4 = p4_+cand.p4();
     auto q = q_+cand.q();
-    return Candidate(p4,q);
+    Candidate sum(p4,q);
+    sum.addComponent(*this);
+    sum.addComponent(cand);
+    return sum;
 }
+
+// operators
+Candidate & Candidate::operator += (const Candidate & cand) 
+{
+    p4_+=cand.p4();
+    q_+=cand.q();
+    this->addComponent(cand);
+    return *this;
+}
+
 
 //
 // member functions
 //
+void Candidate::addComponent(const Candidate & cand)
+{
+   components_.push_back(&cand);
+}
+
+std::vector<const Candidate*> Candidate::components() const
+{
+   return components_;
+}
 
 bool Candidate::matchTo(const std::vector<Candidate> * cands, const std::string & name, const float & deltar_max)
 {
@@ -181,7 +208,7 @@ void  Candidate::e (const float & e ) { p4_.SetE(e);   }
 void  Candidate::q (const float & q)  { q_ = q; }
 
 // print 
-void Candidate::printInfo(const std::string & type)
+void Candidate::printInfo(const std::string & type) const
 {
    std::string out = type == "" ? "Candidate :" : type+" :"; 
    std::cout << std::fixed << std::setprecision(5);
@@ -192,7 +219,7 @@ void Candidate::printInfo(const std::string & type)
    
 }
 
-void Candidate::printMatchedInfo(const std::string & name, const std::string & type)
+void Candidate::printMatchedInfo(const std::string & name, const std::string & type) const
 {
    std::string out = (type == "") ? "Candidate" : type;
    out += " matched to "+name+" :";
@@ -213,7 +240,7 @@ void Candidate::printMatchedInfo(const std::string & name, const std::string & t
 }
 
 
-void Candidate::listMatchedNames()
+void Candidate::listMatchedNames() const
 {
    std::cout << "List of names of matched candidates\n";
    for ( auto const& match: matched_ )
