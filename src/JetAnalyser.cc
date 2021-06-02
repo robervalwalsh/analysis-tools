@@ -38,6 +38,11 @@ JetAnalyser::JetAnalyser(int argc, char * argv[]) : BaseAnalyser(argc,argv)
       bsf_reader_["tight"]  = analysis_->btagCalibration(config_->btagAlgorithm(), config_->btagScaleFactors(), "tight");
    }
    
+   if ( config_->btagEfficiencies() != "" )
+   {
+      btagEfficiencies_ = BTagEfficiencies(config_->btagEfficiencies());
+   }
+   
    if ( config_->jerPtRes() != "" && config_->jerSF() != "" && this->genJetsAnalysis() ) // FIXME: check if files exist
    {
       jerinfo_ = analysis_->jetResolutionInfo(config_->jerPtRes(),config_->jerSF());
@@ -1420,11 +1425,6 @@ bool JetAnalyser::selectionBJetProbLight(const int & r )
 //    
 // }
 
-// void JetAnalyser::actionApplyBtagEfficiencyWeight(const int & r)
-// {
-//    weight_ *= btagEfficiency(r);
-//    
-// }
 
 bool JetAnalyser::jetCorrections()
 {
@@ -1437,3 +1437,20 @@ bool JetAnalyser::jetCorrections()
       return true;
       
 }
+
+void JetAnalyser::actionApplyBtagEfficiency(const int & rank)
+{
+   if ( ! jetsanalysis_ ||  ! isMC_ ) return;
+   std::string label = Form("Jet %d: offline btag weight applied",rank);
+   int j = rank-1;
+   auto jet = selectedJets_[j];
+   if ( config_ -> useJetsExtendedFlavour() )
+      weight_ *= btagEfficiencies_.efficiency(jet->extendedFlavour(),jet->pt(),jet->eta());
+   else
+      weight_ *= btagEfficiencies_.efficiency(jet->flavour(),jet->pt(),jet->eta());
+   cutflow(label);
+}
+
+
+
+
