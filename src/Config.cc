@@ -46,7 +46,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("Info.process"                 , po::value <std::string>               (&process_)         -> default_value("MssmHbb")          ,"Process of ntuples")
          ("Info.events"                  , po::value <std::string>               (&eventsdir_)       -> default_value("Events")           ,"Name of the events directory")
          ("Info.eventInfo"               , po::value <std::string>               (&eventinfo_)       -> default_value("EventInfo")        ,"EventInfo directory in the tree")
-         ("Info.json"                    , po::value <std::string>               (&json_)            -> default_value("no_json.txt")      ,"JSON file for data")
+         ("Info.json"                    , po::value <std::string>               (&json_)            -> default_value("")                 ,"JSON file for data")
          ("Info.output"                  , po::value <std::string>               (&outputRoot_)      -> default_value("histograms.root")  ,"Output root file")
          ("Info.seedFile"                , po::value <std::string>               (&seedfile_)        -> default_value("no_seed.txt")      ,"File with seed value for random numbers")
          ("Info.blindAnalysis"           , po::value <bool>                      (&blind_)           -> default_value(false)              ,"Flag for blind analysis")
@@ -287,12 +287,12 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          {
             inputlist_.replace(0,6,ntuplepath+"/");
          }
-         if ( json_     != "no_json.txt" && json_.rfind("tools:",0) == 0     )    json_.replace(0,6,calibpath+"/");
-         if ( jerptres_ != ""            && jerptres_.rfind("tools:",0) == 0 )    jerptres_.replace(0,6,calibpath+"/");
-         if ( jersf_    != ""            && jersf_.rfind("tools:",0) == 0    )    jersf_.replace(0,6,calibpath+"/");
-         if ( btagsf_   != ""            && btagsf_.rfind("tools:",0) == 0   )    btagsf_.replace(0,6,calibpath+"/");
-         if ( btageff_  != ""            && btageff_.rfind("tools:",0) == 0  )    btageff_.replace(0,6,calibpath+"/");
-         if ( puweight_ != ""            && puweight_.rfind("tools:",0) == 0 )    puweight_.replace(0,6,calibpath+"/");
+         if ( json_     != ""  && json_.rfind("tools:",0) == 0     )    json_.replace(0,6,calibpath+"/");
+         if ( jerptres_ != ""  && jerptres_.rfind("tools:",0) == 0 )    jerptres_.replace(0,6,calibpath+"/");
+         if ( jersf_    != ""  && jersf_.rfind("tools:",0) == 0    )    jersf_.replace(0,6,calibpath+"/");
+         if ( btagsf_   != ""  && btagsf_.rfind("tools:",0) == 0   )    btagsf_.replace(0,6,calibpath+"/");
+         if ( btageff_  != ""  && btageff_.rfind("tools:",0) == 0  )    btageff_.replace(0,6,calibpath+"/");
+         if ( puweight_ != ""  && puweight_.rfind("tools:",0) == 0 )    puweight_.replace(0,6,calibpath+"/");
 
          eventinfo_     =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , eventinfo_.c_str()      );
          triggerCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , triggerCol_.c_str()     );
