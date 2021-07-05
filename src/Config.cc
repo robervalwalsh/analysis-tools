@@ -100,7 +100,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
       // btagging
       opt_cfg_.add_options()
          ("BTag.wp"                      , po::value <std::vector<std::string> > (&jetsbtagwp_)      -> multitoken()                      ,"Jets btag minimum (with '-' means maximum)")
-         ("BTag.algorithm"               , po::value <std::string>               (&btagalgo_)        -> default_value("csvivf")           ,"BTag algorithm")
+         ("BTag.algorithm"               , po::value <std::string>               (&btagalgo_)        -> default_value("")                 ,"BTag algorithm")
          ("BTag.loose"                   , po::value <float>                     (&btagwploose_)     -> default_value(-10000)             ,"BTag working point LOOSE")
          ("BTag.medium"                  , po::value <float>                     (&btagwpmedium_)    -> default_value(-10000)             ,"BTag working point MEDIUM")
          ("BTag.tight"                   , po::value <float>                     (&btagwptight_)     -> default_value(-10000)             ,"BTag working point TIGHT")
