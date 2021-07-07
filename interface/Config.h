@@ -289,6 +289,11 @@ namespace analysis {
             char ** argv_;
 
             std::string cfg_; // config file
+            
+            bool cmdl_mc_;
+            bool cmdl_data_;
+            std::string cmdl_inputlist_;
+            int cmdl_evtmax_;
 
             po::options_description opt_cmd_;
             po::options_description opt_cfg_;
