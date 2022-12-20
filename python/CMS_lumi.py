@@ -1,4 +1,5 @@
 import ROOT as rt
+import math
 
 # CMS_lumi
 #   Initiated by: Gautier Hamel de Monchenault (Saclay)
@@ -19,7 +20,8 @@ lumiTextOffset   = 0.2
 cmsTextSize      = 0.75
 cmsTextOffset    = 0.1
 
-relPosX    = 0.045
+relPosX    = 0.045 # todo: correct this for the width/height of the pad/canvas
+
 relPosY    = 0.035
 relExtraDY = 1.2
 
@@ -88,7 +90,7 @@ def CMS_lumi(pad,  iPeriod,  iPosX ):
     elif ( iPeriod==0 ):
         lumiText += lumi_sqrtS
             
-    print lumiText
+    # print(lumiText)
 
     latex = rt.TLatex()
     latex.SetNDC()
@@ -148,7 +150,9 @@ def CMS_lumi(pad,  iPeriod,  iPosX ):
                 latex.DrawLatex(posX_, posY_- relExtraDY*cmsTextSize*t, extraText)
     elif( writeExtraText ):
         if( iPosX==0):
-            posX_ =   l +  relPosX*(1-l-r)
+            canvas_w = pad.GetCanvas().GetWindowWidth()
+            canvas_h = pad.GetCanvas().GetWindowHeight()
+            posX_ =   l +  relPosX*(1-l-r) 
             posY_ =   1-t+lumiTextOffset*t
 
         latex.SetTextFont(extraTextFont)
