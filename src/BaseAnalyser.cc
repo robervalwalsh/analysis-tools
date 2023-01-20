@@ -29,6 +29,8 @@ BaseAnalyser::BaseAnalyser()
 BaseAnalyser::BaseAnalyser(int argc, char * argv[])
 {
    TH1::SetDefaultSumw2();
+
+   good_event_ = true;
    
    exe_ = std::string(argv[0]);
    
@@ -550,4 +552,9 @@ void BaseAnalyser::fill1DHistogram(const std::string & label, const std::string 
    this->output()->cd(label.c_str());
    h1_[hist_tag]->Fill(value, weight);
    this->output()->cd();
+}
+
+bool BaseAnalyser::goodEvent()
+{
+   return good_event_;
 }

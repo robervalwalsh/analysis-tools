@@ -27,6 +27,7 @@
 // user include files
 #include "boost/program_options.hpp"
 
+#include "Analysis/Tools/interface/Utils.h"
 #include "Analysis/Tools/interface/Analysis.h"
 #include "Analysis/Tools/interface/Config.h"
 #include "TFile.h"
@@ -111,6 +112,9 @@ namespace analysis {
             
             /// emulated triggers
             std::map<std::string,bool> trg_emul_;
+
+            ///
+            bool good_event_;
 
 
          private:
@@ -229,6 +233,8 @@ namespace analysis {
             /// fill added histogram 
             virtual void fill1DHistogram(const std::string & label, const std::string & name, const float & value, const float & weight = 1.);
 
+            ///
+            bool goodEvent();
 
 
       };

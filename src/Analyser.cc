@@ -40,6 +40,7 @@ Analyser::~Analyser()
 
 bool Analyser::event(const int & i)
 {
+   good_event_=true;
    bool ok = true;
    analysis_->event(i);
    cutflow_ = -1;
