@@ -77,7 +77,25 @@ namespace analysis {
       float utilsL1TMuonJetDeta(const float & m_eta, const float & j_eta);
       float utilsL1TMuonJetDphi(const float & phi1, const float & phi2);
       float utilsL1TMuonJetDr(const float & eta1, const float & phi1, const float & eta2, const float & phi2);
-      
+
+      enum class Jets
+      {
+         Jet1 = 1,
+         Jet2,
+         Jet3,
+         Jet4,
+         Jet5,
+         Jet6
+      };
+      enum class Muons
+      {
+         Muon1 = 1,
+         Muon2,
+         Muon3,
+         Muon4,
+         Muon5,
+         Muon6
+      };
    }
 }
 
