@@ -1,9 +1,66 @@
 import os
+import re
 import glob
-from ROOT import TFile, TH1F, TH2F, TGraphAsymmErrors, TH1
+from ROOT import TFile, TH1F, TH2F, TH1, TH2, TCanvas, TGraphAsymmErrors, TMultiGraph
+from scipy.stats import beta
 
+###################################################
 
+def efficiency(passed, total, cl=0.68, a=1, b=1):
+   """
+   Calculates the Bayesian interval for the efficiency given the number of passed events, total events and a prior probability ~Beta(a,b)
+   :param passed: number of passed events
+   :param total: number of total events
+   :param cl: confidence level
+   :param a: shape parameter of the prior Beta distribution
+   :param b: shape parameter of the prior Beta distribution
+   :return: efficiency and the lower and upper bound of the Bayesian interval
+   """
+   post = beta(a+passed, b+total-passed)
+   eff = float(passed)/float(total)
+   return eff, post.interval(cl)
 
+###################################################
+
+def lazy_file_reader(filepath):
+   """reads a text file in lazy mode
+   Args:
+       filepath (str): text file path
+   Yields:
+       str: line of the text file
+   Usage:
+       for line in lazy_file_reader(filepath):
+           print(line)
+   """
+   with open(filepath, 'r') as f:
+       for line in f:
+           yield line.strip('\n')
+
+###################################################
+
+def find_matches(regex_str, filepath):
+   """give a regex string and a text file to perform a match
+
+   Args:
+       regex_str (str): regex string
+       filepath (str): path of text file
+
+   Returns:
+       list: each element is tuple of groups of regex
+   """
+   regex = re.compile(regex_str)
+   matches = []
+   for line in lazy_file_reader(filepath):
+       match = regex.match(line)
+       if match:
+           matches.append(match.groups())
+
+   return matches
+
+###################################################
+
+ 
+###################################################
 class Process:
    def __init__(self,alias,directory):
       self.m_alias = alias
