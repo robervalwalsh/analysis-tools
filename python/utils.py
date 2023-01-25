@@ -3,6 +3,7 @@ import re
 import glob
 from ROOT import TFile, TH1F, TH2F, TH1, TH2, TCanvas, TGraphAsymmErrors, TMultiGraph
 from scipy.stats import beta
+import numpy as np
 
 ###################################################
 
@@ -59,6 +60,14 @@ def find_matches(regex_str, filepath):
 
 ###################################################
 
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+###################################################
+
+def sigmoid_derivative(x):
+    s = sigmoid(x)
+    return s * (1 - s)
  
 ###################################################
 class Process:
