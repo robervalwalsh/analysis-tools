@@ -18,8 +18,11 @@ def efficiency(passed, total, cl=0.68, a=1, b=1):
    :return: efficiency and the lower and upper bound of the Bayesian interval
    """
    post = beta(a+passed, b+total-passed)
-   eff = float(passed)/float(total)
-   return eff, post.interval(cl)
+   eff = np.divide(passed,total)
+   cl = post.interval(cl)
+   err_up = cl[1]-eff
+   err_low = eff-cl[0]
+   return eff, err_up, err_low
 
 ###################################################
 
