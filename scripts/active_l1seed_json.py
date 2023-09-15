@@ -40,7 +40,7 @@ import json
 from collections import defaultdict,OrderedDict
 import os
 from pathlib import Path
-from Analysis.Tools.external.toolbox import prompt_command, file_lines, print_markdown_table
+from Analysis.Tools.toolbox import prompt_command, file_lines, print_markdown_table
 from FWCore.PythonUtilities.LumiList import LumiList
 
 def create_lumi_json(psidxjson, lumis_dict):

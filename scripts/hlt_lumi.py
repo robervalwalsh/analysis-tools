@@ -4,7 +4,7 @@
 
 import argparse
 import os
-from Analysis.Tools.external.toolbox import prompt_command, print_markdown_table, parse_listfile
+from Analysis.Tools.toolbox import prompt_command, print_markdown_table, parse_listfile
 
 # default values
 NORMTAG = '/cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags/normtag_PHYSICS.json'
