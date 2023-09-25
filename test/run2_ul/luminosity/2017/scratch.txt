@@ -1,0 +1,18 @@
+# Lumi of all our triggers from 2017
+hlt_lumi.py \
+--json=certified/Cert_Run2017CDEF_13TeV_UL2017_Collisions17_GoldenJSON.txt \
+--triggers=triggers.txt \
+--output=triggers_lumi_2017.md
+
+# L1 seed active
+active_l1seed_json.py \
+--json certified/Cert_Run2017CDEF_13TeV_UL2017_Collisions17_GoldenJSON.txt \
+--hlt HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33_v* \
+--l1 L1_DoubleJet100er2p3_dEta_Max1p6
+
+# Luminosity of the full hadronic trigger with the L1 trigger double jet 100 active
+hlt_lumi.py \
+--json=Cert_Run2017CDEF_13TeV_UL2017_Collisions17_GoldenJSON_L1Active.txt \
+--triggers=HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33_v* \
+--output=Lumi_HLT_DoublePFJets100MaxDeta1p6_DoubleCaloBTagCSV_p33_L1Active.md
+
