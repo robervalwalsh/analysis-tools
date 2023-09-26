@@ -1,5 +1,30 @@
 #!/usr/bin/env python3
 
+# =============================================================================
+# Script Description:
+# This script performs various operations related to pileup analysis for 
+# HLT paths. It includes steps for calculating pileup weights,
+# merging histograms, and more. The script takes user-defined
+# parameters via command-line arguments to customize the analysis.
+#
+# Step 1: calculate the delivered and recorded luminosity per lumi section
+#         for given trigger path
+# Step 2: generate a new version of the pileup file
+# Step 3: calculate the pileup profiles of the given trigger path, given
+#         the min bias cross-section and its uncertainty
+# Step 4: merge histograms into a single file
+# Step 5: calculate the weights of the given trigger path given a
+#         reference path
+#
+# https://twiki.cern.ch/twiki/bin/view/CMS/BrilcalcQuickStart
+# https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupJSONFileforData#Pileup_for_specific_HLT_paths
+# https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupJSONFileforData#Location_of_central_pileup_JSON - for the pileup_latest.txt
+
+# Author: Roberval Walsh
+# Last Updated: 26.09.2023
+# =============================================================================
+
+
 import argparse
 import os
 # Run the stuff in parallel
@@ -21,7 +46,7 @@ NUM_BINS = 100
 parser = argparse.ArgumentParser(description='Obtain pileup weights for HLT paths')
 parser.add_argument('--json', type=str, required=True, help='Path to the Golden JSON file')
 parser.add_argument('--triggers', type=parse_listfile, required=True, help='List of triggers (comma-separated or in a text file)')
-parser.add_argument('--step', type=int, help=f'step to be executed')
+parser.add_argument('--step', type=int, help=f'Step to be executed. If none given, run all steps.')
 parser.add_argument('--normtag', type=str, default=NORMTAG, help=f'Path to the normtag file (default: {NORMTAG})')
 parser.add_argument('--year', type=str, default=YEAR, help=f'Year of data taking for the pileup (default: {YEAR})')
 parser.add_argument('--xsec', type=float, default=MINBIASXSEC, help=f'Minimum bias cross section (default: {MINBIASXSEC})')
@@ -29,17 +54,14 @@ parser.add_argument('--xsec_err', type=float, default=MINBIASXSECERR, help=f'Unc
 parser.add_argument('--period', type=str, default=PERIOD, help=f'Run period (default: {PERIOD})')
 parser.add_argument('--max_bin', type=int, default=MAX_BIN, help=f'Maximum pileup bin (default: {MAX_BIN})')
 parser.add_argument('--num_bins', type=int, default=NUM_BINS, help=f'Number of pileup bins (default: {NUM_BINS})')
-parser.add_argument('--threads', type=int, default=THREADS, help=f'Number of threads (default: {THREADS})')
-parser.add_argument("--keep", action="store_true", help="Keep the root files for each xsec variation, otherwise keep only files with merged histograms")
 parser.add_argument('--reference', type=str, help=f'Reference trigger for pileup weight')
 parser.add_argument('--label', type=str, help=f'Label for the weight file')
+parser.add_argument("--keep", action="store_true", help="Keep the root files for each xsec variation, otherwise keep only files with merged histograms")
+parser.add_argument('--threads', type=int, default=THREADS, help=f'Number of threads (default: {THREADS})')
 
 
 epilog = """
-More information in the links\n
-https://twiki.cern.ch/twiki/bin/view/CMS/BrilcalcQuickStart\n
-https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupJSONFileforData#Pileup_for_specific_HLT_paths\n
-https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupJSONFileforData#Location_of_central_pileup_JSON - for the pileup_latest.txt\n
+More information: $CMSSW_BASE/src/Analysis/Tools/scripts/hlt_pileup.py
 """
 parser.epilog = epilog
 
@@ -66,6 +88,23 @@ for sigma in range(-2, 3):
 print(f'Pileup path: {pileup}')
 
 def merge_histograms():
+    """
+    Merges pileup histograms for each trigger and cross-section variation. The function loops through
+    the specified triggers and for each trigger, it merges the histograms corresponding to different
+    cross-section variations. The merged histograms are normalized, and the resulting histograms are
+    saved in output files.
+
+    Parameters:
+        None (Uses global variables for arguments)
+
+    Global Variables:
+        args (argparse.Namespace): Command-line arguments containing script configuration.
+        output_directory (str): Path to the output directory where merged histograms are saved.
+        xsection (dict): Dictionary containing cross-section variations and their values.
+
+    Returns:
+        None
+    """
     # Loop through each trigger
     for trigger in args.triggers:
         # Create an output root file for the current trigger
@@ -102,6 +141,22 @@ def merge_histograms():
 
 
 def calculate_weights():
+    """
+    Calculates pileup weights for each trigger relative to a reference trigger. The function loops through
+    the specified triggers and for each trigger, calculates pileup weights by dividing histograms from
+    the reference trigger. The resulting weight histograms are saved in output files.
+
+    Parameters:
+        None (Uses global variables for arguments)
+
+    Global Variables:
+        args (argparse.Namespace): Command-line arguments containing script configuration.
+        output_directory (str): Path to the output directory where weight histograms are saved.
+        xsection (dict): Dictionary containing cross-section variations and their values.
+
+    Returns:
+        None
+    """    
     # Open the output root file for the reference trigger
     reference_file = r.TFile(f'{output_directory}/pileupCalc_{args.reference[:-3]}_merged.root', 'READ')
     for trigger in args.triggers:
@@ -147,6 +202,22 @@ def calculate_weights():
 
 # Define a function to execute a step of commands
 def execute_step(step,xsec=('zero',0)):
+    """
+    Executes a specific step of commands in parallel for each trigger. The function generates and
+    executes commands based on the given step and input parameters. The commands are related to
+    pileup analysis and are executed concurrently.
+
+    Parameters:
+        step (int): The step number to execute.
+        xsec (tuple): A tuple containing cross-section variation and its value (default: ('zero', 0)).
+
+    Global Variables:
+        args (argparse.Namespace): Command-line arguments containing script configuration.
+        output_directory (str): Path to the output directory for saving intermediate files.
+
+    Returns:
+        list: A list of results from executing the parallel commands.
+    """    
     # Define cmds based on the step
     cmds = {
         1: [f"brilcalc lumi -c web --byls --normtag {args.normtag} -i {args.json} --hltpath {trigger} -o {output_directory}/brilcalc_{trigger[:-3]}.csv" for trigger in args.triggers],
