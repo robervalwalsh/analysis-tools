@@ -1,5 +1,6 @@
 import subprocess
 import shlex
+import os
 
 def prompt_command(cmd):
     """
@@ -158,3 +159,12 @@ def parse_listfile(list_arg):
         items = list_arg.split(',')
     return items
 
+def directory_from_filename(filename,makedir=True):
+    # Extract the base filename (without path and extension) from args.json
+    base_filename = os.path.splitext(os.path.basename(filename))[0]
+    # Define the output directory
+    directory_name = f'{base_filename}'
+    # Create the output directory if it doesn't exist
+    if not os.path.exists(directory_name) and makedir:
+        os.makedirs(directory_name)
+    return directory_name
