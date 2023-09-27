@@ -15,6 +15,7 @@
 # Step 4: merge histograms into a single file
 # Step 5: calculate the weights of the given trigger path given a
 #         reference path
+# Step 6: skim the output from step 1 to contain only run,LS,avgpu
 #
 # https://twiki.cern.ch/twiki/bin/view/CMS/BrilcalcQuickStart
 # https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupJSONFileforData#Pileup_for_specific_HLT_paths
@@ -30,6 +31,7 @@ import os
 # Run the stuff in parallel
 import concurrent.futures
 import ROOT as r
+import pandas as pd
 
 from Analysis.Tools.toolbox import prompt_command, parse_listfile, directory_from_filename
 
@@ -66,6 +68,8 @@ More information: $CMSSW_BASE/src/Analysis/Tools/scripts/hlt_pileup.py
 parser.epilog = epilog
 
 args = parser.parse_args()
+
+label = f'_{args.label}' if args.label else ""
 
 if args.period != 'Run2':
     print('Not Run2 analysis. Look for the pileup file path at')
@@ -108,12 +112,12 @@ def merge_histograms():
     # Loop through each trigger
     for trigger in args.triggers:
         # Create an output root file for the current trigger
-        output_root_file = r.TFile(f'{output_directory}/pileupCalc_{trigger[:-3]}_merged.root', 'RECREATE')
+        output_root_file = r.TFile(f'{output_directory}/pileupCalc_{trigger[:-3]}{label}_merged.root', 'RECREATE')
      
 
         # Loop through each xsec variation
         for xsec_variation, xsec_value in xsection.items():
-            input_file_path = f'{output_directory}/pileupCalc_{trigger[:-3]}_{xsec_variation}.root'
+            input_file_path = f'{output_directory}/pileupCalc_{trigger[:-3]}_{xsec_variation}{label}.root'
             input_root_file = r.TFile(input_file_path, 'READ')
 
             if input_root_file.IsOpen():
@@ -158,15 +162,15 @@ def calculate_weights():
         None
     """    
     # Open the output root file for the reference trigger
-    reference_file = r.TFile(f'{output_directory}/pileupCalc_{args.reference[:-3]}_merged.root', 'READ')
+    reference_file = r.TFile(f'{output_directory}/pileupCalc_{args.reference[:-3]}{label}_merged.root', 'READ')
     for trigger in args.triggers:
         # Create an output root file for the current trigger
-        weight_label = f'_{args.label}' if args.label else ""
-        weight_file_name = f'{output_directory}/PileupWeight_{trigger[:-3]}{weight_label}.root'
+        # weight_label = f'_{args.label}' if args.label else ""
+        weight_file_name = f'{output_directory}/PileupWeight_{trigger[:-3]}{label}.root'
         weight_output_file = r.TFile(weight_file_name, 'RECREATE')
         weight_output_file.cd()
         # Open the output root file for the current trigger
-        current_file = r.TFile(f'{output_directory}/pileupCalc_{trigger[:-3]}_merged.root', 'READ')
+        current_file = r.TFile(f'{output_directory}/pileupCalc_{trigger[:-3]}{label}_merged.root', 'READ')
         # Loop through each xsec variation
         for xsec_variation, xsec_value in xsection.items():
             # Check if the reference file is open
@@ -220,9 +224,9 @@ def execute_step(step,xsec=('zero',0)):
     """    
     # Define cmds based on the step
     cmds = {
-        1: [f"brilcalc lumi -c web --byls --normtag {args.normtag} -i {args.json} --hltpath {trigger} -o {output_directory}/brilcalc_{trigger[:-3]}.csv" for trigger in args.triggers],
-        2: [f"pileupReCalc_HLTpaths.py -i {output_directory}/brilcalc_{trigger[:-3]}.csv --inputLumiJSON {pileup} --runperiod {args.period} -o {output_directory}/pileupReCalc_{trigger[:-3]}.txt" for trigger in args.triggers],
-        3: [f"pileupCalc.py -i {args.json} --inputLumiJSON {output_directory}/pileupReCalc_{trigger[:-3]}.txt --calcMode true --minBiasXsec {xsec[1]} --maxPileupBin {args.max_bin}  --numPileupBins {args.num_bins} --pileupHistName pileup_{xsec[0]}  {output_directory}/pileupCalc_{trigger[:-3]}_{xsec[0]}.root" for trigger in args.triggers]
+        1: [f"brilcalc lumi -c web --byls --normtag {args.normtag} -i {args.json} --hltpath {trigger} -o {output_directory}/brilcalc_{trigger[:-3]}{label}.csv" for trigger in args.triggers],
+        2: [f"pileupReCalc_HLTpaths.py -i {output_directory}/brilcalc_{trigger[:-3]}{label}.csv --inputLumiJSON {pileup} --runperiod {args.period} -o {output_directory}/pileupReCalc_{trigger[:-3]}{label}.txt" for trigger in args.triggers],
+        3: [f"pileupCalc.py -i {args.json} --inputLumiJSON {output_directory}/pileupReCalc_{trigger[:-3]}{label}.txt --calcMode true --minBiasXsec {xsec[1]} --maxPileupBin {args.max_bin}  --numPileupBins {args.num_bins} --pileupHistName pileup_{xsec[0]}  {output_directory}/pileupCalc_{trigger[:-3]}_{xsec[0]}{label}.root" for trigger in args.triggers]
     }
 
     # Execute the commands for the given step in parallel
@@ -231,9 +235,20 @@ def execute_step(step,xsec=('zero',0)):
 
     return results
 
-
 def prompt_command_parallel(cmd):
     return prompt_command(cmd)
+
+def brilcalc_pileup_perLS():
+    csv_file = f'{output_directory}/brilcalc_{args.reference[:-3]}{label}.csv'
+    df = pd.read_csv(csv_file,comment='#',header=None)
+    df.rename(columns={df.columns[6]: 'avgpu'}, inplace=True)
+    df['lumi_section'] = df.iloc[:, 1].str.split(':').str.get(0)
+    df['run'] = df.iloc[:, 0].str.split(':').str.get(0)
+    selected_columns = ['run', 'lumi_section', 'avgpu']  # Define the columns you want to select and their order
+    df_selected = df[selected_columns]  # Select the specified columns
+    csv_out = f'{output_directory}/pileup_brilcalc_{args.reference[:-3]}{label}.csv'
+    df_selected.to_csv(csv_out, index=False)
+
 
 # Create a ThreadPoolExecutor with the desired number of threads (adjust as needed, see dedicated parser argument)
 if len(args.triggers) <= args.threads:
@@ -245,8 +260,8 @@ if args.step:
     # If a specific step is specified, execute only that step
     steps_to_execute = [args.step]
 else:
-    # If no specific step is specified, execute steps 1 to 4
-    steps_to_execute = range(1, 6)
+    # If no specific step is specified, execute steps 1 to 6
+    steps_to_execute = range(1, 7)
 
 # Loop through the steps to execute
 for step in steps_to_execute:
@@ -269,6 +284,8 @@ for step in steps_to_execute:
             calculate_weights()
         else:
             print("No reference trigger specified")
+    elif step == 6 and args.reference: # using reference, but any trigger is good
+        brilcalc_pileup_perLS()
     else:
         # Handle invalid steps (if any)
         pass
