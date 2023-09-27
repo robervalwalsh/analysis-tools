@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # pileupCalcMC.py 
 
@@ -16,7 +16,7 @@ parser.add_argument("--max"  , dest="max"   , type=int, default=100             
 parser.add_argument("--out"  , dest="out"   , default="MyMCPileupHistogram.root", help="output")
 args = parser.parse_args()
 if not args.pileup:
-   print "nothing to be done" 
+   print("nothing to be done") 
    quit()
    
 puconfig = import_module(args.pileup)
