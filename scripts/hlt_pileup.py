@@ -63,7 +63,7 @@ parser.add_argument('--threads', type=int, default=THREADS, help=f'Number of thr
 
 
 epilog = """
-More information: $CMSSW_BASE/src/Analysis/Tools/scripts/hlt_pileup.py
+More information: $CMSSW_BASE/src/Analysis/Tools/scripts/pileup_hlt.py
 """
 parser.epilog = epilog
 
