@@ -145,10 +145,15 @@ def merge_histograms():
 
 
 def calculate_weights():
+    # TODO: also output the hlt pileup histograms variations
     """
     Calculates pileup weights for each trigger relative to a reference trigger. The function loops through
     the specified triggers and for each trigger, calculates pileup weights by dividing histograms from
     the reference trigger. The resulting weight histograms are saved in output files.
+    N.B.: In MC pileup weights we use the data pileup distribution as the "reference" trigger, the
+    uncertainty variations come from the data/reference trigger. Here we have 2 data inputs: the control
+    trigger and the reference trigger. The uncertainty variations will be taken from the reference trigger.
+    These variations impacts are expected to be anyway much smaller than the statistical uncertainties.
 
     Parameters:
         None (Uses global variables for arguments)
@@ -164,39 +169,45 @@ def calculate_weights():
     # Open the output root file for the reference trigger
     reference_file = r.TFile(f'{output_directory}/pileupCalc_{args.reference[:-3]}{label}_merged.root', 'READ')
     for trigger in args.triggers:
-        # Create an output root file for the current trigger
-        # weight_label = f'_{args.label}' if args.label else ""
-        weight_file_name = f'{output_directory}/PileupWeight_{trigger[:-3]}{label}.root'
-        weight_output_file = r.TFile(weight_file_name, 'RECREATE')
+        # Open the output root file for the trigger
+        trigger_file = r.TFile(f'{output_directory}/pileupCalc_{trigger[:-3]}{label}_merged.root', 'READ')
+        trigger_histogram = trigger_file.Get('pileup_nominal')
+        trigger_histogram.SetName('pileup_hlt')
+        for bin in range(1, trigger_histogram.GetNbinsX() + 1):
+            trigger_histogram.SetBinError(bin, 0.0)
+        # Create an output root file for the trigger
+        weight_output_file = r.TFile(f'{output_directory}/PileupWeight_{trigger[:-3]}{label}.root', 'RECREATE')
+        # Save the trigger pileup histogram
         weight_output_file.cd()
-        # Open the output root file for the current trigger
-        current_file = r.TFile(f'{output_directory}/pileupCalc_{trigger[:-3]}{label}_merged.root', 'READ')
+        trigger_histogram.Write()            
         # Loop through each xsec variation
+        ref_pileups = {}
+        # get reference pileup histograms and save them to the output
         for xsec_variation, xsec_value in xsection.items():
-            # Check if the reference file is open
-            if reference_file.IsOpen():
-                # Get the histogram for the reference trigger
-                reference_histogram = reference_file.Get(f'pileup_{xsec_variation}')
-                # Check if the current file is open
-                if current_file.IsOpen():
-                    # Get the histogram for the current trigger
-                    current_histogram = current_file.Get(f'pileup_{xsec_variation}')
-                    if reference_histogram and current_histogram:
-                        # Create the weight histogram by dividing reference by current
-                        weight_histogram = reference_histogram.Clone()
-                        weight_histogram.Divide(current_histogram)
-                        # Set the name of the weight histogram to include xsec_variation
-                        if xsec_variation == "nominal":
-                            weight_histogram.SetName(f'weight')
-                        else:
-                            weight_histogram.SetName(f'weight_{xsec_variation}')
-                        weight_histogram.SetTitle(f'pilup weight {xsec_variation} : xsection = {int(xsec_value)}')
-                        # Save the weight histogram to the weight output file
-                        weight_output_file.cd()
-                        weight_histogram.Write()
+            # Get the histogram for the reference trigger
+            reference_histogram = reference_file.Get(f'pileup_{xsec_variation}')
+            reference_histogram.SetName(f'pileup_reference_{xsec_variation}')
+            for bin in range(1, reference_histogram.GetNbinsX() + 1):
+                reference_histogram.SetBinError(bin, 0.0)
+            reference_histogram.Write()
+            ref_pileups[xsec_variation] = reference_histogram
 
-        # Close the current file
-        current_file.Close()
+        # Calculate the weights 
+        # It is done this way, just to set the order the histograms appear in the root file
+        # Save the weight histogram to the weight output file
+        weight_output_file.cd()
+        h_weights = {}
+        for xsec_variation, xsec_value in xsection.items():  
+            # Create the weight histogram by dividing reference by trigger
+            # Set the name of the weight histogram to include xsec_variation
+            wname = f'weight' if xsec_variation == "nominal" else f'weight_{xsec_variation}'
+            weight_histogram = ref_pileups[xsec_variation].Clone(wname)
+            weight_histogram.SetTitle(f'pilup weight {xsec_variation} : xsection = {int(xsec_value)}')
+            weight_histogram.Divide(trigger_histogram)
+            weight_histogram.Write()
+            h_weights[xsec_variation] = weight_histogram
+        # Close the trigger file
+        trigger_file.Close()
         # Close the weight output file for the current trigger
         weight_output_file.Close()        
     
