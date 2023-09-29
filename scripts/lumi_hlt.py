@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # todo: print CSV output
+# todo: if no triggers are defined just get the lumi of the JSON file
 
 import argparse
 import os
