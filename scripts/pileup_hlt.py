@@ -251,13 +251,22 @@ def prompt_command_parallel(cmd):
 
 def brilcalc_pileup_perLS():
     csv_file = f'{output_directory}/brilcalc_{args.reference[:-3]}{label}.csv'
+    csv_out = f'{output_directory}/pileup_brilcalc_{args.reference[:-3]}{label}.csv'
     df = pd.read_csv(csv_file,comment='#',header=None)
     df.rename(columns={df.columns[6]: 'avgpu'}, inplace=True)
     df['lumi_section'] = df.iloc[:, 1].str.split(':').str.get(0)
+    df['lumi_section_2'] = df.iloc[:, 1].str.split(':').str.get(1)
+    ls_diff = df[df['lumi_section'] != df['lumi_section_2']]
+    filtered_ls_diff = ls_diff[ls_diff['lumi_section_2'] == 0] # this happens when luminosity recorded is zero
+    if filtered_ls_diff.shape[0] > 0:
+        csv_warning = f'{output_directory}/pileup_brilcalc_{args.reference[:-3]}{label}_WARNING.csv'
+        print('***')
+        print(f'*** WARNING: Check for possible missing lumisections in the file {cvs_warning}')
+        print('***')
+        ls_diff.to_csv(csv_warning, index=False)
     df['run'] = df.iloc[:, 0].str.split(':').str.get(0)
     selected_columns = ['run', 'lumi_section', 'avgpu']  # Define the columns you want to select and their order
     df_selected = df[selected_columns]  # Select the specified columns
-    csv_out = f'{output_directory}/pileup_brilcalc_{args.reference[:-3]}{label}.csv'
     df_selected.to_csv(csv_out, index=False)
 
 
