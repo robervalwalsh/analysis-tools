@@ -242,7 +242,7 @@ def make_plots(histos1,histos2=None,legend1=None,legend2=None,legend_title=None,
                   m12_graph = rp.GetLowerRefGraph()
                   m12_graph.Write()
                h1.Write()
-               h2.Write()
+               # h2.Write()
                output.Close()
 
             if 'pt_jet' in h1.GetName():
@@ -252,7 +252,7 @@ def make_plots(histos1,histos2=None,legend1=None,legend2=None,legend_title=None,
                   h2.GetXaxis().UnZoom()
                   h2.Write()
             
-   output.Close()ex
+   output.Close()
          
    wait()
 
