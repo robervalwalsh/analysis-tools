@@ -376,23 +376,21 @@ FilterResults Analysis::eventFilter(const std::string & path) {
 
    return evtfilter_;
 }
-int Analysis::processJsonFile(const std::string & fileName) {
+int Analysis::processJsonFile(const std::string & file_name) {
    using boost::property_tree::ptree;
-   ptree pt;
-   read_json(fileName , pt);
+   ptree property_tree;
+   read_json(file_name , property_tree);
 
-   for (auto & element: pt) {
-      int run = std::stoi(element.first);
-      std::vector<int> lumiranges;
-      for ( auto & property_array : element.second )  {
-         for ( auto & property : property_array.second )  {
-            lumiranges.push_back(property.second.get_value<int>());
+   for (auto & ptree_element: property_tree) {
+      int run = std::stoi(ptree_element.first);
+      std::vector<int> lumi_ranges;
+      for ( auto & properties : ptree_element.second )  {
+         for ( auto & property : properties.second )  {
+            lumi_ranges.push_back(property.second.get_value<int>());
          }
       }
-      if ( lumiranges.size()%2 != 0 ) return -1;
-//      std::sort(lumiranges.begin(), lumiranges.end());  // not really needed
-
-      json_[run] = lumiranges;
+      if ( lumi_ranges.size()%2 != 0 ) return -1;
+      json_[run] = lumi_ranges;
    }
    return 0;
 }
