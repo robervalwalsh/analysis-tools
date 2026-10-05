@@ -61,12 +61,11 @@ using namespace JME;
 namespace analysis {
    namespace tools {
 
-      class Analysis
-      {
+      class Analysis  {
          public:
-            Analysis(const std::string & inputFilelist, const std::string & evtinfo = "MssmHbb/Events/EventInfo");
+            Analysis(const std::string & inputFilelist, const std::string & evtinfo = "MssmHbb/Events/eventInfo");
             Analysis(std::shared_ptr<Config> cfg);
-           ~Analysis();
+            ~Analysis();
            
             // Info
             void tag(const std::string &);
@@ -219,7 +218,7 @@ namespace analysis {
 
             std::map<std::string, double> xsections_;
             std::map<std::string, bool> triggerResults_;
-            std::map<std::string, int> triggerResultsPS_;
+            std::map<std::string, float> triggerResultsPS_;
             std::map<int,std::vector<std::string> > goodLumi_;
             FilterResults genfilter_;
             FilterResults evtfilter_;
@@ -293,9 +292,9 @@ namespace analysis {
 // -------------------------------------------------------
       // TREES
       template <class Object>
-      std::shared_ptr< PhysicsObjectTree<Object> >  Analysis::addTree(const std::string & unique_name, const std::string & path)
-      {
+      std::shared_ptr< PhysicsObjectTree<Object> >  Analysis::addTree(const std::string & unique_name, const std::string & path) {
          if ( path == "" || unique_name == "" ) return nullptr;
+         std::cout << "addTree -> treeInit_(" << unique_name << path << ")" << std::endl;
          this->treeInit_(unique_name,path);
          t_any_[unique_name] = std::shared_ptr< PhysicsObjectTree<Object> > ( new PhysicsObjectTree<Object>(tree_[unique_name], unique_name) );
          std::string type = boost::core::demangle(typeid(Object).name());
@@ -306,8 +305,7 @@ namespace analysis {
       }
       // --
       template <class Object>
-      std::shared_ptr< PhysicsObjectTree<Object> >  Analysis::tree(const std::string & unique_name)
-      {
+      std::shared_ptr< PhysicsObjectTree<Object> >  Analysis::tree(const std::string & unique_name) {
          // If tree does not exist, return NULL
          std::map<std::string, std::any >::iterator it = t_any_.find(unique_name);
          if ( it == t_any_.end() )
@@ -317,26 +315,29 @@ namespace analysis {
 // -------------------------------------------------------
       // COLLECTIONS
       template <class Object>
-      std::shared_ptr< Collection<Object> >  Analysis::addCollection(const std::string & unique_name)
-      {
+      std::shared_ptr< Collection<Object> >  Analysis::addCollection(const std::string & unique_name) {
          // Still need to see how to deal with collections not originating from the ntuple,
          // e.g. a selected jets collection from the ntuple jets collection.
          
          // If tree does not exist, return NULL
+         std::cout << "addCollection i" << std::endl;
          std::map<std::string, std::any >::iterator it = t_any_.find(unique_name);
          if ( it == t_any_.end() )
             return nullptr;
          
+         std::cout << "addCollection tree" << std::endl;
          auto tree = std::any_cast< std::shared_ptr< PhysicsObjectTree<Object> > > (t_any_[unique_name]);
+         std::cout << "addCollection c_any_" << std::endl;
          c_any_[unique_name] = std::shared_ptr< Collection<Object> > ( new Collection<Object>(tree -> collection()));
+         std::cout << "addCollection ret" << std::endl;
          std::shared_ptr< Collection<Object> > ret = std::any_cast< std::shared_ptr< Collection<Object> > > (c_any_[unique_name]);
          
+         std::cout << "addCollection f" << std::endl;
          return ret;
       }
       
       template <class Object>
-      std::shared_ptr< Collection<Object> >  Analysis::addCollection(const Collection<Object> & collection)
-      {
+      std::shared_ptr< Collection<Object> >  Analysis::addCollection(const Collection<Object> & collection) {
          std::string unique_name = collection.name();
          t_any_[unique_name] = nullptr;
          c_any_[unique_name] = std::shared_ptr< Collection<Object> > ( new Collection<Object>(collection) );
@@ -346,8 +347,7 @@ namespace analysis {
       }
       
       template <class Object>
-      std::shared_ptr< Collection<Object> >  Analysis::addCollection(const std::vector<Object> & objects , const std::string & unique_name )
-      {
+      std::shared_ptr< Collection<Object> >  Analysis::addCollection(const std::vector<Object> & objects , const std::string & unique_name ) {
          Collection<Object> collection(objects,unique_name);
          t_any_[unique_name] = nullptr;
          c_any_[unique_name] = std::shared_ptr< Collection<Object> > ( new Collection<Object>(collection) );
@@ -356,15 +356,13 @@ namespace analysis {
       }
       
       template <class Object>
-      std::shared_ptr< Collection<Object> >  Analysis::collection(const std::string & unique_name)
-      {
+      std::shared_ptr< Collection<Object> >  Analysis::collection(const std::string & unique_name) {
          std::shared_ptr< Collection<Object> > ret = std::any_cast< std::shared_ptr< Collection<Object> > > (c_any_[unique_name]);
          return ret;
       }
       //--
       template <class Object1, class Object2>
-      void Analysis::match(const std::string & collection, const std::string & match_collection, const float & deltaR)
-      {
+      void Analysis::match(const std::string & collection, const std::string & match_collection, const float & deltaR)  {
          if ( match_collection == "" ) return;
          auto o1 = std::any_cast< std::shared_ptr< Collection<Object1> > > (c_any_[collection]);
          auto o2 = std::any_cast< std::shared_ptr< Collection<Object2> > > (c_any_[match_collection]);
@@ -372,19 +370,16 @@ namespace analysis {
       }
       //--
       template <class Object1, class Object2>
-      void Analysis::match(const std::string & collection, const std::vector<std::string> & match_collections, const float & deltaR)
-      {
+      void Analysis::match(const std::string & collection, const std::vector<std::string> & match_collections, const float & deltaR)  {
          for ( auto & mc : match_collections )
             this->match<Object1,Object2>(collection, mc, deltaR);
       }
 
-      template<class Object> void Analysis::defaultCollection(const std::string & unique_name)
-      { 
+      template<class Object> void Analysis::defaultCollection(const std::string & unique_name)  { 
          if ( std::is_same<Object,GenParticle>::value ) defaultGenParticle_ = unique_name; 
       }
       
-      template<class Object> std::string Analysis::defaultCollection()
-      { 
+      template<class Object> std::string Analysis::defaultCollection() { 
          std::string ret;
          if ( std::is_same<Object,GenParticle>::value ) ret = defaultGenParticle_ ;
          return ret; 
