@@ -218,10 +218,10 @@ bool  TriggerAnalyser::l1tMuonsAnalysis() const {
 }
 
 void TriggerAnalyser::l1tjetHistograms(const std::string & label ) {
-   this->output()->cd();
-   if ( ! this->output()->FindObjectAny(label.c_str()) ) {
-      this->output()->mkdir(label.c_str());
-      this->output()->cd(label.c_str());
+   output_rootfile_->cd();
+   if ( ! output_rootfile_->FindObjectAny(label.c_str()) ) {
+      output_rootfile_->mkdir(label.c_str());
+      output_rootfile_->cd(label.c_str());
    } else {
       if ( h1_.find(Form("n_l1tjet_%s"  , label.c_str())) != h1_.end() ) { // the jet histograms already exist
          return;
@@ -235,12 +235,12 @@ void TriggerAnalyser::l1tjetHistograms(const std::string & label ) {
       h1_[Form("eta_l1tjet%d_%s" , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("eta_l1tjet%d" , j+1) , Form("eta_l1tjet%d_%s" , j+1,label.c_str()) , 500 , -5, 5 );
       h1_[Form("phi_l1tjet%d_%s" , j+1,label.c_str())]  = std::make_shared<TH1F>(Form("phi_l1tjet%d" , j+1) , Form("phi_l1tjet%d_%s" , j+1,label.c_str()) , 360 , -180, 180 );
    }
-   this->output()->cd();
+   output_rootfile_->cd();
 }
 
 void TriggerAnalyser::fillL1TJetHistograms(const std::string & label, std::vector<std::shared_ptr<L1TJet> > sel_l1tjets) {
-   this->output()->cd();
-   this->output()->cd(label.c_str());
+   output_rootfile_->cd();
+   output_rootfile_->cd(label.c_str());
    int n = n_hl1tjets_;
    h1_[Form("n_l1tjet_%s"  , label.c_str())] -> Fill(sel_l1tjets.size(), weight_);
    for ( size_t j = 0; j < sel_l1tjets.size(); ++j ) {
@@ -250,7 +250,7 @@ void TriggerAnalyser::fillL1TJetHistograms(const std::string & label, std::vecto
       h1_[Form("eta_l1tjet%d_%s"  , r,label.c_str())] -> Fill(sel_l1tjets[j]->eta(),weight_);
       h1_[Form("phi_l1tjet%d_%s"  , r,label.c_str())] -> Fill(sel_l1tjets[j]->phi(),weight_);
    }
-   this->output()->cd();
+   output_rootfile_->cd();
    cutflow(Form("*** Filling jets histograms - %s",label.c_str()));
 }
 
