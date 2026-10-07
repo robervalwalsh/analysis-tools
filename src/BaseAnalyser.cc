@@ -79,7 +79,7 @@ BaseAnalyser::BaseAnalyser(int argc, char * argv[]) {
          f.Close();
       }
    }
-   this -> pileupHistogram();
+   this->pileupHistogram();
 
    scale_correction_ = 1.;
    if ( config_->scaleFilename() != "" && config_->scaleParameter() != "" ) {
@@ -292,7 +292,7 @@ void BaseAnalyser::actionApplyPileupWeight(const int & var) {
       pileup_weight_label_ += Form(", syst: %+d sig",var);
    }
    cutflow(pileup_weight_label_);
-   this -> fillPileupHistogram();
+   this->fillPileupHistogram();
 }
 
 void BaseAnalyser::actionApplyPileupWeight() {
@@ -300,7 +300,7 @@ void BaseAnalyser::actionApplyPileupWeight() {
 }
 
 void BaseAnalyser::pileupHistogram() {
-   this->output()->cd();
+   output_rootfile_->cd();
    if ( config_->min() > 0 && config_->max() > 0 ) {
       h1_["pileup"] = std::make_shared<TH1F>("pileup" , "pileup" , config_->n() , config_->min() , config_->max() );
       h1_["pileup_w"] = std::make_shared<TH1F>("pileup_w" , "weighted pileup" , config_->n() , config_->min() , config_->max() );
@@ -434,25 +434,25 @@ void BaseAnalyser::actionApplyPrefiringWeight() {
 }
 
 void BaseAnalyser::add1DHistogram(const std::string & label, const std::string & name, const std::string & title, const int & nbins, const float & min, const float & max) {
-   this->output()->cd();
-   if (!this->output()->FindObjectAny(label.c_str())) {
+   output_rootfile_->cd();
+   if (!output_rootfile_->FindObjectAny(label.c_str())) {
       std::cout << "-warning- BaseAnalyser::add1DHistogram - directory with label " << label << " does not exist!" << std::endl;
       return;
    }
-   this->output()->cd(label.c_str());
+   output_rootfile_->cd(label.c_str());
    std::string hist_tag = Form("%s_%s", name.c_str(), label.c_str());
    std::string hist_title = title;
    if ( title == "") hist_title = hist_tag;
    std::string hist_name = name;
    h1_[hist_tag] = std::make_shared<TH1F>(hist_name.c_str(), hist_title.c_str(), nbins, min, max);
-   this->output()->cd();
+   output_rootfile_->cd();
 }
 
 void BaseAnalyser::fill1DHistogram(const std::string & label, const std::string & name, const float & value, const float & weight) {
    std::string hist_tag = Form("%s_%s", name.c_str(), label.c_str());
-   this->output()->cd(label.c_str());
+   output_rootfile_->cd(label.c_str());
    h1_[hist_tag]->Fill(value, weight);
-   this->output()->cd();
+   output_rootfile_->cd();
 }
 
 void BaseAnalyser::actionApplyScaleCorrection(const std::string &title) {
