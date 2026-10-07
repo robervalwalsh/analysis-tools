@@ -94,7 +94,7 @@ namespace analysis {
             std::map<std::string, std::vector<float> > scale_data_;
             float scale_correction_;
             /// is muon analysis
-            bool is_mouns_analysis_;
+            bool is_muons_analysis_;
          private :
             /// name of the executable
             std::string name_executable_;

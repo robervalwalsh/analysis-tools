@@ -472,6 +472,6 @@ bool BaseAnalyser::isMuonsAnalysis() {
    return is_muons_analysis_;
 }
 /// get is muons analysis
-void BaseAnalyser::isMuonsAnalysis(const bool & is_muon_analysis) {
-   is_muons_analysis_ = is_muon_analysis;
+void BaseAnalyser::isMuonsAnalysis(const bool & is_muons_analysis) {
+   is_muons_analysis_ = is_muons_analysis;
 }
