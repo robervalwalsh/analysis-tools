@@ -41,10 +41,7 @@ namespace analysis {
       class Analyser : 
             public analysis::tools::TriggerAnalyser,
             public analysis::tools::JetAnalyser,
-            public analysis::tools::MuonAnalyser
-
-      {
-         
+            public analysis::tools::MuonAnalyser {
          public:
             /// default constructor
             Analyser();
@@ -52,8 +49,6 @@ namespace analysis {
             Analyser(int argc, char * argv[]);
             /// desctructor
            ~Analyser();
-           
-         
             // ----------member data ---------------------------
          protected:
             int num_primary_vertices_;
