@@ -31,9 +31,7 @@
 
 namespace analysis {
    namespace tools {
-
       class MuonAnalyser  : virtual public analysis::tools::BaseAnalyser {
-
          public:
             /// constructors
             MuonAnalyser();
@@ -43,20 +41,15 @@ namespace analysis {
 
             // ----------member data ---------------------------
          protected:
+            bool muons_analysis_;
             std::vector< std::shared_ptr<Muon> > muons_;
-            std::vector< std::shared_ptr<Muon> > selectedMuons_;
-            std::vector< std::shared_ptr<Muon> > onlineMatchedMuons_;
-
-            bool muonsanalysis_;
-
+            std::vector< std::shared_ptr<Muon> > selected_muons_;
+            std::vector< std::shared_ptr<Muon> > online_matched_muons_;
             /// muon ID weight
-            std::shared_ptr<MuonIdWeight> muonIDweights_;
-            std::string muonIDw_label_;
+            std::shared_ptr<MuonIdWeight> muon_id_weights_;
             float getmuonIDWeight(const float & pT, const float & eta, const int & var) const;
-
              // variable to call the function to find scale factor
-            std::unique_ptr<analysis::tools::MuonTriggerEfficiencies> muon_trigger_efficiency_;
-            //std::unique_ptr<analysis::tools::MuonIdWeight> muon_ID_weight_;
+            std::shared_ptr<analysis::tools::MuonTriggerEfficiencies> muon_trigger_efficiency_;
 
          private:
 
@@ -64,15 +57,15 @@ namespace analysis {
             std::vector< std::shared_ptr<Muon> > selectedMuons();
             std::vector< std::shared_ptr<Muon> > onlineMatchedMuons();
             std::vector< std::shared_ptr<Muon> > muons();
+            bool muonsAnalysis();
             float btag(const Muon & , const std::string & );
-
+            std::shared_ptr<MuonIdWeight> muonIDWeights();
+            std::shared_ptr<analysis::tools::MuonTriggerEfficiencies> muonTriggerEfficiency();
             // Sets
-
             // Actions
             virtual bool analysisWithMuons();
             virtual bool selectionMuon(const int &);
             virtual bool selectionMuons();
-//            virtual bool selectionMuon();
             virtual bool selectionMuonId();
             virtual bool selectionNMuons();
 
