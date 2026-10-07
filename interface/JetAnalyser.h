@@ -45,22 +45,19 @@ namespace analysis {
             // ----------member data ---------------------------
          protected:
             std::vector< std::shared_ptr<Jet> > jets_;
-            std::vector< std::shared_ptr<Jet> > selectedJets_;
+            std::vector< std::shared_ptr<Jet> > selected_jets_;
             
             // number of histogrammed jets
-            int n_hjets_;
+            int num_histograms_jets_;
             
-            bool jetsanalysis_;
-            bool applyjer_;
-            bool applyjec_;
+            bool jets_analysis_;
+            bool apply_jet_resolution_;
+            bool apply_jet_corrections_;
             
-            std::map<std::string, std::shared_ptr<BTagCalibrationReader> >bsf_reader_;
-            
-            std::shared_ptr<JetResolutionInfo> jerinfo_;
-            
+            std::map<std::string, std::shared_ptr<BTagCalibrationReader> > btag_scale_factor_reader_;
+            std::shared_ptr<JetResolutionInfo> jet_resolution_info_;
             std::vector<std::string> flavours_;
-            
-            BTagEfficiencies btagEfficiencies_[4];
+            BTagEfficiencies btag_efficiencies_[4];
             
             
          
