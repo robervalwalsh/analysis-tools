@@ -469,9 +469,9 @@ void BaseAnalyser::actionApplyScaleCorrection(const std::string &title) {
 
 /// get is muons analysis
 bool BaseAnalyser::isMuonsAnalysis() {
-   return is_mouns_analysis_;
+   return is_muons_analysis_;
 }
 /// get is muons analysis
 void BaseAnalyser::isMuonsAnalysis(const bool & is_muon_analysis) {
-   is_mouns_analysis_ = is_muon_analysis;
+   is_muons_analysis_ = is_muon_analysis;
 }
