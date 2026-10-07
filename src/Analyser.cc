@@ -22,7 +22,7 @@ Analyser::Analyser() {
 
 
 Analyser::Analyser(int argc, char * argv[]) : BaseAnalyser(argc,argv), TriggerAnalyser(argc,argv), JetAnalyser(argc,argv), MuonAnalyser(argc,argv) {   // not sure the BaseAnalyser should be called here
-   this->isMuonsAnalysis(muon_analysis_); // TODO: understand this
+   this->isMuonsAnalysis(muons_analysis_); // TODO: understand this
 }
 
 Analyser::~Analyser() {
