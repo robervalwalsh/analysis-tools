@@ -19,13 +19,12 @@ using namespace analysis::tools;
 
 //
 // constructors and destructor
-Config::Config()
-{
+Config::Config() {
+   //
 }
 
 // Main constructor
-Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configuration")
-{
+Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configuration") {
    std::string toolspath = Form("%s/src/Analysis/Tools",getenv("CMSSW_BASE"));
    std::string datapath = Form("%s/src/Analysis/Tools/data",getenv("CMSSW_BASE"));
    std::string calibpath = datapath+"/calibrations";
@@ -33,262 +32,284 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
    argc_ = argc;
    argv_ = argv;
    // read configuration options
-   try
-   {
+   try  {
       namespace po = boost::program_options;
       opt_cmd_.add_options()
-         ("help,h","Show help messages")
-         ("config,c",po::value<std::string>(&cfg_),"Configuration file name")
-         ("nevents,n",po::value <int>(&cmdl_evtmax_)-> default_value(-100),"Maximum number of events")  
-         ("ntuple_list,l",po::value <std::string>(&cmdl_inputlist_)-> default_value(""),"File with list of ntuples")  
-         ("output,o",po::value <std::string>(&outputRoot_),"Output root file")
-         ("workflow,w",po::value <int>(&cmdl_wflow_)-> default_value(0),"Workflow number")
-         ("workflow_title",po::value <std::string>(&cmdl_wftitle_)-> default_value(""),"Workflow title")  
-         ("mc",po::bool_switch(&cmdl_mc_),"Run on Monte Carlo")  
+         ("help,h", "Show help messages")
+         // external configuration file
+         ("config,c", po::value<std::string>(&cfg_), "Configuration file name")
+         // Command line options
+         // IO
+         ("ntuple_list,l", po::value <std::string>(&cmdl_inputlist_)-> default_value(""), "File with list of ntuples")  
+         ("output,o", po::value <std::string>(&outputRoot_), "Output root file")
+         // analysis structure
+         ("workflow,w", po::value <int>(&cmdl_wflow_)-> default_value(0), "Workflow number")
+         ("workflow_title", po::value <std::string>(&cmdl_wftitle_)-> default_value(""), "Workflow title")
+         ("atype",po::value<std::string>(&cmdl_atype_)-> default_value(""),"Analysis type, e.g. FH (full hadronic")
+         // requirements
+         ("nevents,n", po::value <int>(&cmdl_evtmax_)-> default_value(-100), "Maximum number of events")
+         ("mc", po::bool_switch(&cmdl_mc_), "Run on Monte Carlo")  
          ("data",po::bool_switch(&cmdl_data_),"Run on data") 
          ("sr",po::bool_switch(&cmdl_sr_),"Signal region")  
          ("cr",po::bool_switch(&cmdl_cr_),"Control region")  
          ("vr",po::bool_switch(&cmdl_vr_),"Validation region")  
+         ("unblind",po::bool_switch(&cmdl_unblind_),"Unblind analysis")
+         // corrections
+            // jets, calo
+         ("scale_parameter",po::value <std::string>(&cmdl_scale_parameter_),"Scale parameter from scaleFilename")
          ("jer",po::value <int>(&jersyst_),"JER systematic variation (sigma)")  
          ("jec",po::value <int>(&jecsyst_),"JEC systematic variation (sigma)")  
          ("jetsf",po::value <int>(&onljetsyst_),"Online jet scale factor systematic variation (sigma)")  
+         ("prefiring",po::value <int>(&prefwsyst_),"Prefiring weight systematic variation (sigma)")  
+            // btag
          ("onlbtagsf",po::value <int>(&onlbtagsyst_),"Online btag scale factor systematic variation (sigma)")
          ("btagsyst",po::value <int>(&btagsf_syst_),"Offline btag scale factor systematic variation (sigma)")
          ("btagsyst_type",po::value <std::string>(&btagsf_syst_type_),"Offline btag scale factor systematic variation type")
-         ("pileup",po::value <int>(&puweightsyst_),"Pileup weight systematic variation (sigma)")  
-         ("muonID",po::value <int>(&muonIDweightsyst_),"Muon ID weight systematic variation (sigma)")  
          ("btagweight",po::bool_switch(&cmdl_bweight_),"Apply btag weight defined in the config file")  
-         ("prefiring",po::value <int>(&prefwsyst_),"Prefiring weight systematic variation (sigma)")  
+            // muon
+         ("muonID",po::value <int>(&muonIDweightsyst_),"Muon ID weight systematic variation (sigma)")  
          ("muonsf",po::value <int>(&onlmuonsyst_),"Online muon scale factor systematic variation (sigma)")
-         ("scale_parameter",po::value <std::string>(&cmdl_scale_parameter_),"Scale parameter from scaleFilename")
-         ("atype",po::value<std::string>(&cmdl_atype_)-> default_value(""),"Analysis type, e.g. FH (full hadronic")
-         ("unblind",po::bool_switch(&cmdl_unblind_),"Unblind analysis")
+            // pileup
+         ("pileup",po::value <int>(&puweightsyst_),"Pileup weight systematic variation (sigma)")  
            ;
 
-// TODO: analysis type from the command line
+      // TODO: analysis type from the command line
 
+      // Options in configuration file
       // analysis info
       opt_cfg_.add_options()
-         ("Info.ntuplesList"             , po::value <std::string>               (&inputlist_)       -> default_value("rootFileList.txt") ,"File with list of ntuples")
-         ("Info.process"                 , po::value <std::string>               (&process_)         -> default_value("MssmHbb")          ,"Process of ntuples")
-         ("Info.events"                  , po::value <std::string>               (&eventsdir_)       -> default_value("Events")           ,"Name of the events directory")
-         ("Info.eventInfo"               , po::value <std::string>               (&eventinfo_)       -> default_value("eventInfo")        ,"eventInfo directory in the tree")
-         ("Info.json"                    , po::value <std::string>               (&json_)            -> default_value("")                 ,"JSON file for data")
-         ("Info.output"                  , po::value <std::string>               (&outputRoot_)      -> default_value("histograms.root")  ,"Output root file")
-         ("Info.seedFile"                , po::value <std::string>               (&seedfile_)        -> default_value("no_seed.txt")      ,"File with seed value for random numbers")
-         ("Info.analysisType"            , po::value <std::string>               (&analysis_type_)   -> default_value("FH")               ,"Type of analysis, e.g. FH= full hadronic")
-         ("Info.blindAnalysis"           , po::value <bool>                      (&blind_)           -> default_value(true)               ,"Flag for blind analysis")
-         ("Info.nloMC"                   , po::value <bool>                      (&nlo_)             -> default_value(false)              ,"Flag for NLO MC samples")
-         ("Info.isMC"                    , po::value <bool>                      (&isMC_)            -> default_value(false)              ,"Flag for MC dataset")
-         ("Info.fullGenWeight"           , po::value <bool>                      (&fullgenweight_)   -> default_value(false)              ,"Flag for full gen weight of MC samples, otherwise only sign")
-         ("Info.signalRegion"            , po::value <bool>                      (&signalregion_)    -> default_value(true)               ,"Flag for signal region")
-         ("Info.validationRegion"        , po::value <bool>                      (&validationregion_)-> default_value(false)              ,"Flag for validation region") 
-         ("Info.eventsMax"               , po::value <int>                       (&nevtmax_)         -> default_value(-1)                 , "Maximum number of events")
-         ("Info.seed"                    , po::value <int>                       (&seed_)            -> default_value(-1)                 , "Seed value for random numbers");
+         ("Info.ntuplesList"             , po::value <std::string>               (&inputlist_)               -> default_value("rootFileList.txt") , "File with list of ntuples")
+         ("Info.process"                 , po::value <std::string>               (&process_)                 -> default_value("MssmHbb")          , "Process of the ntuples, recommended the analyis process, e.g. MssmHbb")
+         ("Info.analysisType"            , po::value <std::string>               (&analysis_type_)           -> default_value("FH")               , "Type of analysis, e.g. FH= full hadronic in the MSSM Hbb")
+         ("Info.events"                  , po::value <std::string>               (&eventsdir_)               -> default_value("Events")           , "Name of the events directory")
+         ("Info.eventInfo"               , po::value <std::string>               (&eventinfo_)               -> default_value("eventInfo")        , "eventInfo directory in the tree")
+         ("Info.json"                    , po::value <std::string>               (&json_)                    -> default_value("")                 , "JSON file for data")
+         ("Info.output"                  , po::value <std::string>               (&outputRoot_)              -> default_value("histograms.root")  , "Output root file")
+         ("Info.seedFile"                , po::value <std::string>               (&seedfile_)                -> default_value("no_seed.txt")      , "File with seed value for random numbers")
+         ("Info.blindAnalysis"           , po::value <bool>                      (&blind_)                   -> default_value(true)               , "Flag for blind analysis")
+         ("Info.nloMC"                   , po::value <bool>                      (&nlo_)                     -> default_value(false)              , "Flag for NLO MC samples")
+         ("Info.isMC"                    , po::value <bool>                      (&isMC_)                    -> default_value(false)              , "Flag for MC dataset")
+         ("Info.fullGenWeight"           , po::value <bool>                      (&fullgenweight_)           -> default_value(false)              , "Flag for full gen weight of MC samples, otherwise only sign")
+         ("Info.signalRegion"            , po::value <bool>                      (&signalregion_)            -> default_value(true)               , "Flag for signal region")
+         ("Info.validationRegion"        , po::value <bool>                      (&validationregion_)        -> default_value(false)              , "Flag for validation region") 
+         ("Info.eventsMax"               , po::value <int>                       (&nevtmax_)                 -> default_value(-1)                 , "Maximum number of events")
+         ("Info.seed"                    , po::value <int>                       (&seed_)                    -> default_value(-1)                 , "Seed value for random numbers")
+         ("Info.runMin"                  , po::value <int>                       (&run_min_)                 -> default_value(-1)                 , "Minimum run number")
+         ("Info.runMax"                  , po::value <int>                       (&run_max_)                 -> default_value(-1)                 , "Maximum run number")
+         ("Info.luminosity"              , po::value <float>                     (&lumi_)                    -> default_value(-1.)                 , "Luminosity in pb-1 to scale histograms")
+         ("Info.nLumiSections"           , po::value <int>                       (&num_lumis_processed_)     -> default_value(-1)                  , "Number of lumi sections processed")
+         ("Info.erasLumi"                , po::value<std::vector<float> >        (&eraslumi_)                -> multitoken()                       , "Lumi of an era")
+         ("Info.eras"                    , po::value<std::vector<std::string> >  (&eras_)                    -> multitoken()                       , "Era of data taking")
+         ;
 
       // Corrections
       opt_cfg_.add_options()
-         ("Corrections.Pileup.reweight"  , po::value <std::string>               (&puweight_)        -> default_value("")                 , "Root file containing pileup weights")
-         ("Corrections.Pileup.reweightSystematcis"  , po::value <int>            (&puweightsyst_)    -> default_value(0)                  , "Pileup weights systematic variations")
-         ("Corrections.Pileup.fromData"  , po::value <std::string>               (&pudata_)          -> default_value("")                 , "CSV file containing pileup per ls in data")
-         ("Corrections.Jets.jerPtRes"    , po::value <std::string>               (&jerptres_)        -> default_value("")                 , "JER pT resolution file")
-         ("Corrections.Jets.jerSF"       , po::value <std::string>               (&jersf_)           -> default_value("")                 , "JER SF file")
-         ("Corrections.Jets.onlinejetSF" , po::value <std::string>               (&onljetsf_)        -> default_value("")                 , "Jet trigger SF file")
-         ("Corrections.Jets.jerSystematics" , po::value <int>                    (&jersyst_)         -> default_value(0)                  , "JER systematic variation (sigma), default = 0")
-         ("Corrections.Jets.jecSystematics" , po::value <int>                    (&jecsyst_)         -> default_value(0)                  , "JEC systematic variation (sigma), default = 0")
-         ("Corrections.Jets.onlinejetSystematics" , po::value <int>              (&onljetsyst_)      -> default_value(0)                  , "Online jet scale factor systematic variation (sigma), default = 0")
-         ("Corrections.BTag.onlinebtagSF" , po::value <std::string>              (&onlbtagsf_)       -> default_value("")                 , "Online btag SF file")
-         ("Corrections.BTag.onlinebtagSystematics" , po::value <int>             (&onlbtagsyst_)     -> default_value(0)                  , "Online btag scale factor systematic variation (sigma), default = 0")
-         ("Corrections.BTag.onlinebtagMuonJetSF" , po::value <std::string>       (&onlbtagsf_muonjet_)       -> default_value("")                 , "Online btag SF file")
-         ("Corrections.BTag.SF"          , po::value <std::string>               (&btagsf_)          -> default_value("")                 , "b-tagging scale factor in CSV format")
-         ("Corrections.BTag.offlineSystematics", po::value <int>                 (&btagsf_syst_)     -> default_value(0)                  , "b-tagging scale factor systematic variation (sigma), default = 0")
-         ("Corrections.BTag.offlineSystematicsType", po::value <std::string>     (&btagsf_syst_type_)-> default_value("")                 , "b-tagging scale factor systematic variation type: empty (sum), correlated, uncorrelated, default = empty")
-         ("Corrections.BTag.Efficiencies1", po::value <std::string>              (&btageff_[0])      -> default_value("")                 , "b-tagging efficiencies in root file")
-         ("Corrections.BTag.Efficiencies2", po::value <std::string>              (&btageff_[1])      -> default_value("")                 , "b-tagging efficiencies in root file")
-         ("Corrections.BTag.Efficiencies3", po::value <std::string>              (&btageff_[2])      -> default_value("")                 , "b-tagging efficiencies in root file")
-         ("Corrections.BTag.Efficiencies4", po::value <std::string>              (&btageff_[3])      -> default_value("")                 , "b-tagging efficiencies in root file")
-
-         ("Corrections.Jets.bRegression" , po::value <bool>                      (&bregression_)     -> default_value(false)              , "Apply b jet energy regression")
-         ("Corrections.PrefiringWeight"  , po::value <bool>                      (&prefw_)           -> default_value(false)              , "Apply L1 prefiring weight")
-         ("Corrections.hemCorrection"    , po::value <bool>                      (&hemCorrection_)   -> default_value(false)              , "Apply HEM correction")
-         ("Corrections.Muons.IDweight"  ,  po::value <std::vector<std::string>>  (&muonIDweight_)    -> multitoken()                      , "Rootfiles containing muonID scale factors")
-         ("Corrections.Muons.IDweightSystematcis"  , po::value <int>             (&muonIDweightsyst_) -> default_value(0)                 , "Muon ID scale factors systematic variations")
-         ("Corrections.Muons.onlinemuonSF" , po::value <std::string>             (&onlmuonsf_)        -> default_value("")                , "Muon trigger SF file")
-         ("Corrections.Muons.onlinemuonSystematics" , po::value <int>            (&onlmuonsyst_)      -> default_value(0)                 , "Online muon scale factor systematic variation (sigma), default = 0")
-         ("Corrections.Scale.file"       , po::value <std::string>               (&scale_file_)      -> default_value("")                 , "Read a CSV file containing scaling factors for a certain parameter")
-         ("Corrections.Scale.parameter"  , po::value <std::string>               (&scale_par_)       -> default_value("")                 , "Parameter of the scale factor to be applied from the scale file")
-         ("Corrections.force"            , po::value <bool>                      (&apply_correct_)   -> default_value(false)              , "Apply corrections internally when above are defined");
+         // pileup corrections
+         ("Corrections.Pileup.reweight"             , po::value <std::string>                (&puweight_)            -> default_value("")     , "Root file containing pileup weights")
+         ("Corrections.Pileup.reweightSystematcis"  , po::value <int>                        (&puweightsyst_)        -> default_value(0)      , "Pileup weights systematic variations")
+         ("Corrections.Pileup.fromData"             , po::value <std::string>                (&pudata_)              -> default_value("")     , "CSV file containing pileup per ls in data")
+         // jets corrections
+         ("Corrections.Jets.jerPtRes"               , po::value <std::string>                (&jerptres_)            -> default_value("")     , "JER pT resolution file")
+         ("Corrections.Jets.jerSF"                  , po::value <std::string>                (&jersf_)               -> default_value("")     , "JER SF file")
+         ("Corrections.Jets.onlinejetSF"            , po::value <std::string>                (&onljetsf_)            -> default_value("")     , "Jet trigger SF file")
+         ("Corrections.Jets.jerSystematics"         , po::value <int>                        (&jersyst_)             -> default_value(0)      , "JER systematic variation (sigma), default = 0")
+         ("Corrections.Jets.jecSystematics"         , po::value <int>                        (&jecsyst_)             -> default_value(0)      , "JEC systematic variation (sigma), default = 0")
+         ("Corrections.Jets.onlinejetSystematics"   , po::value <int>                        (&onljetsyst_)          -> default_value(0)      , "Online jet scale factor systematic variation (sigma), default = 0")
+         ("Corrections.Jets.bRegression"            , po::value <bool>                       (&bregression_)         -> default_value(false)  , "Apply b jet energy regression")
+         // btag corrections
+         ("Corrections.BTag.onlinebtagSF"           , po::value <std::string>                (&onlbtagsf_)           -> default_value("")     , "Online btag SF file")
+         ("Corrections.BTag.onlinebtagSystematics"  , po::value <int>                        (&onlbtagsyst_)         -> default_value(0)      , "Online btag scale factor systematic variation (sigma), default = 0")
+         ("Corrections.BTag.onlinebtagMuonJetSF"    , po::value <std::string>                (&onlbtagsf_muonjet_)   -> default_value("")     , "Online btag SF file")
+         ("Corrections.BTag.SF"                     , po::value <std::string>                (&btagsf_)              -> default_value("")     , "b-tagging scale factor in CSV format")
+         ("Corrections.BTag.offlineSystematics"     , po::value <int>                        (&btagsf_syst_)         -> default_value(0)      , "b-tagging scale factor systematic variation (sigma), default = 0")
+         ("Corrections.BTag.offlineSystematicsType" , po::value <std::string>                (&btagsf_syst_type_)    -> default_value("")     , "b-tagging scale factor systematic variation type: empty (sum), correlated, uncorrelated, default = empty")
+         ("Corrections.BTag.Efficiencies1"          , po::value <std::string>                (&btageff_[0])          -> default_value("")     , "b-tagging efficiencies in root file")
+         ("Corrections.BTag.Efficiencies2"          , po::value <std::string>                (&btageff_[1])          -> default_value("")     , "b-tagging efficiencies in root file")
+         ("Corrections.BTag.Efficiencies3"          , po::value <std::string>                (&btageff_[2])          -> default_value("")     , "b-tagging efficiencies in root file")
+         ("Corrections.BTag.Efficiencies4"          , po::value <std::string>                (&btageff_[3])          -> default_value("")     , "b-tagging efficiencies in root file")
+         // muons corrections
+         ("Corrections.Muons.IDweight"              , po::value <std::vector<std::string> >  (&muonIDweight_)        -> multitoken()          , "Rootfiles containing muonID scale factors")
+         ("Corrections.Muons.IDweightSystematcis"   , po::value <int>                        (&muonIDweightsyst_)    -> default_value(0)      , "Muon ID scale factors systematic variations")
+         ("Corrections.Muons.onlinemuonSF"          , po::value <std::string>                (&onlmuonsf_)           -> default_value("")     , "Muon trigger SF file")
+         ("Corrections.Muons.onlinemuonSystematics" , po::value <int>                        (&onlmuonsyst_)         -> default_value(0)      , "Online muon scale factor systematic variation (sigma), default = 0")
+         // calorimeter corrections
+         ("Corrections.PrefiringWeight"             , po::value <bool>                       (&prefw_)               -> default_value(false)  , "Apply L1 prefiring weight")
+         ("Corrections.hemCorrection"               , po::value <bool>                       (&hemCorrection_)       -> default_value(false)  , "Apply HEM correction")
+         // general scale factors???
+         ("Corrections.Scale.file"                  , po::value <std::string>                (&scale_file_)          -> default_value("")     , "Read a CSV file containing scaling factors for a certain parameter")
+         ("Corrections.Scale.parameter"             , po::value <std::string>                (&scale_par_)           -> default_value("")     , "Parameter of the scale factor to be applied from the scale file")
+         // force applying corrections
+         ("Corrections.force"                       , po::value <bool>                       (&apply_correct_)       -> default_value(false)  , "Apply corrections internally when above are defined");
 
       // jets
       opt_cfg_.add_options()
-         ("Jets.ptMin"                   , po::value <std::vector<float> >       (&jetsptmin_)       -> multitoken()                      , "Mimium pt of the jets")
-         ("Jets.ptMax"                   , po::value <std::vector<float> >       (&jetsptmax_)       -> multitoken()                      , "Maximum pt of the jets")
-         ("Jets.etaMax"                  , po::value <std::vector<float> >       (&jetsetamax_)      -> multitoken()                      , "Maximum |eta| of the jets")
-         ("Jets.jets"                    , po::value <std::string>               (&jetsCol_)         -> default_value("")                 , "Name of the jets collection")
-         ("Jets.id"                      , po::value <std::string>               (&jetsid_)          -> default_value("tight")            , "Jets id criteria for all jets")
-         ("Jets.puId"                    , po::value <std::string>               (&jetspuid_)        -> default_value("loose")            , "Jets pileup id criteria for all jets")
-         ("Jets.ptMaxPuId"               , po::value <float>                     (&jetsptmaxPUID_)   -> default_value(50.)                , "Maximum pt of the jets to check PUID")
-         ("Jets.extendedFlavour"         , po::value <bool>                      (&usejetsextflv_)   -> default_value(false)              , "For splitting results accoding to jet extended flavour")
-         ("Jets.n"                       , po::value <int>                       (&njets_)           -> default_value(-1)                 , "Minimum number of jets")
-         ("Jets.nMin"                    , po::value <int>                       (&njetsmin_)        -> default_value(0)                  , "Minimum number of jets")
-         ("Jets.nMax"                    , po::value <int>                       (&njetsmax_)        -> default_value(-1)                 , "Maximum number of jets")
-         ("Jets.dRMin"                   , po::value <float>                     (&jetsdrmin_)       -> default_value(-1.)                , "Minimum delta R between jets")
-         ("Jets.dRMax"                   , po::value <float>                     (&jetsdrmax_)       -> default_value(-1.)                , "Maximum delta R between jets")
-         ("Jets.dEtaMax"                 , po::value <float>                     (&jetsdetamax_)     -> default_value(-1.)                , "Maximum delta eta between jets")
-         ("Jets.dEtaMin"                 , po::value <float>                     (&jetsdetamin_)     -> default_value(-1.)                , "Minimum delta eta between jets")
-         ("Jets.dPhiMin"                 , po::value <float>                     (&jetsdphimin_)     -> default_value(-1.)                , "Minimum delta phi between jets")
-         ("Jets.dPhiMax"                 , po::value <float>                     (&jetsdphimax_)     -> default_value(-1.)                , "Maximum delta phi between jets")
-         ("Jets.muonsdRMax"              , po::value <float>                     (&jetsmuonsdrmax_)  -> default_value(0.4)                , "Maximum delta R between a jet and a muon")
-         ("Jets.withMuons"               , po::value <bool>                      (&jetswithmuons_)   -> default_value(false)              , "Flag to associate muons to jets")
-         ("Jets.probe"                   , po::value <int>                       (&jet_probe_)       -> default_value(1)                  , "Rank of probe jet")
-         ("Jets.tag"                     , po::value <int>                       (&jet_tag_)         -> default_value(2)                  , "Rank of tag jet");
+         ("Jets.ptMin"             , po::value <std::vector<float> >   (&jetsptmin_)       -> multitoken()            , "Mimium pt of the jets")
+         ("Jets.ptMax"             , po::value <std::vector<float> >   (&jetsptmax_)       -> multitoken()            , "Maximum pt of the jets")
+         ("Jets.etaMax"            , po::value <std::vector<float> >   (&jetsetamax_)      -> multitoken()            , "Maximum |eta| of the jets")
+         ("Jets.jets"              , po::value <std::string>           (&jetsCol_)         -> default_value("")       , "Name of the jets collection")
+         ("Jets.id"                , po::value <std::string>           (&jetsid_)          -> default_value("tight")  , "Jets id criteria for all jets")
+         ("Jets.puId"              , po::value <std::string>           (&jetspuid_)        -> default_value("loose")  , "Jets pileup id criteria for all jets")
+         ("Jets.ptMaxPuId"         , po::value <float>                 (&jetsptmaxPUID_)   -> default_value(50.)      , "Maximum pt of the jets to check PUID")
+         ("Jets.extendedFlavour"   , po::value <bool>                  (&usejetsextflv_)   -> default_value(false)    , "For splitting results accoding to jet extended flavour")
+         ("Jets.n"                 , po::value <int>                   (&njets_)           -> default_value(-1)       , "Minimum number of jets")
+         ("Jets.nMin"              , po::value <int>                   (&njetsmin_)        -> default_value(0)        , "Minimum number of jets")
+         ("Jets.nMax"              , po::value <int>                   (&njetsmax_)        -> default_value(-1)       , "Maximum number of jets")
+         ("Jets.dRMin"             , po::value <float>                 (&jetsdrmin_)       -> default_value(-1.)      , "Minimum delta R between jets")
+         ("Jets.dRMax"             , po::value <float>                 (&jetsdrmax_)       -> default_value(-1.)      , "Maximum delta R between jets")
+         ("Jets.dEtaMax"           , po::value <float>                 (&jetsdetamax_)     -> default_value(-1.)      , "Maximum delta eta between jets")
+         ("Jets.dEtaMin"           , po::value <float>                 (&jetsdetamin_)     -> default_value(-1.)      , "Minimum delta eta between jets")
+         ("Jets.dPhiMin"           , po::value <float>                 (&jetsdphimin_)     -> default_value(-1.)      , "Minimum delta phi between jets")
+         ("Jets.dPhiMax"           , po::value <float>                 (&jetsdphimax_)     -> default_value(-1.)      , "Maximum delta phi between jets")
+         ("Jets.muonsdRMax"        , po::value <float>                 (&jetsmuonsdrmax_)  -> default_value(0.4)      , "Maximum delta R between a jet and a muon")
+         ("Jets.withMuons"         , po::value <bool>                  (&jetswithmuons_)   -> default_value(false)    , "Flag to associate muons to jets")
+         ("Jets.probe"             , po::value <int>                   (&jet_probe_)       -> default_value(1)        , "Rank of probe jet")
+         ("Jets.tag"               , po::value <int>                   (&jet_tag_)         -> default_value(2)        , "Rank of tag jet");
 
       // histograms
       opt_cfg_.add_options()
-         ("Histograms.Jets.splitRegions" , po::value <bool>                      (&histjets_rsplit_) -> default_value(false)              , "Split jets histograms into barrel, barrel-endcap overlap, endcap")
-         ("Histograms.Jets.flavour"      , po::value <bool>                      (&histjets_flavour_)-> default_value(false)              , "Split jets histograms per flavour");
-
+         ("Histograms.Jets.splitRegions" , po::value <bool>   (&histjets_rsplit_) -> default_value(false)  , "Split jets histograms into barrel, barrel-endcap overlap, endcap")
+         ("Histograms.Jets.flavour"      , po::value <bool>   (&histjets_flavour_)-> default_value(false)  , "Split jets histograms per flavour");
 
       // dijets
       opt_cfg_.add_options()
-         ("Dijets.dijets"                , po::value <bool>                      (&dodijet_ )        -> default_value(false)              , "Combine all jets in dijet objects")
-         ("Dijets.ranks"                 , po::value<std::vector<int> >          (&dijet_ranks_)     -> multitoken()                      , "Ranks of the jets to construct and select the diject");
+         ("Dijets.dijets"  , po::value <bool>             (&dodijet_ )     -> default_value(false)   , "Combine all jets in dijet objects")
+         ("Dijets.ranks"   , po::value<std::vector<int> > (&dijet_ranks_)  -> multitoken()           , "Ranks of the jets to construct and select the diject");
 
       // btagging
       opt_cfg_.add_options()
-         ("BTag.wp"                      , po::value <std::vector<std::string> > (&jetsbtagwp_)      -> multitoken()                      ,"Jets btag minimum (with '-' means maximum)")
-         ("BTag.algorithm"               , po::value <std::string>               (&btagalgo_)        -> default_value("")                 ,"BTag algorithm")
-         ("BTag.loose"                   , po::value <float>                     (&btagwploose_)     -> default_value(-10000)             ,"BTag working point LOOSE")
-         ("BTag.medium"                  , po::value <float>                     (&btagwpmedium_)    -> default_value(-10000)             ,"BTag working point MEDIUM")
-         ("BTag.tight"                   , po::value <float>                     (&btagwptight_)     -> default_value(-10000)             ,"BTag working point TIGHT")
-         ("BTag.user"                    , po::value <float>                     (&btagwpxxx_)       -> default_value(-10000)             ,"BTag working point USER-defined")
-         ("BTag.nMin"                    , po::value <int>                       (&nbjetsmin_)       -> default_value(-1)                  ,"Minimum number of btgaged jets")
-         ("BTag.revWP"                   , po::value <std::string>               (&revbtagwp_)       -> default_value("")                 ,"non-Btag working point")
-         ("BTag.revBJet"                 , po::value <int>                       (&revbtagjet_)      -> default_value(-1)                 ,"non-Btag Jet");
+         ("BTag.wp"           , po::value <std::vector<std::string> > (&jetsbtagwp_)      -> multitoken()            ,"Jets btag minimum (with '-' means maximum)")
+         ("BTag.algorithm"    , po::value <std::string>               (&btagalgo_)        -> default_value("")       ,"BTag algorithm")
+         ("BTag.loose"        , po::value <float>                     (&btagwploose_)     -> default_value(-10000)   ,"BTag working point LOOSE")
+         ("BTag.medium"       , po::value <float>                     (&btagwpmedium_)    -> default_value(-10000)   ,"BTag working point MEDIUM")
+         ("BTag.tight"        , po::value <float>                     (&btagwptight_)     -> default_value(-10000)   ,"BTag working point TIGHT")
+         ("BTag.user"         , po::value <float>                     (&btagwpxxx_)       -> default_value(-10000)   ,"BTag working point USER-defined")
+         ("BTag.nMin"         , po::value <int>                       (&nbjetsmin_)       -> default_value(-1)       ,"Minimum number of btgaged jets")
+         ("BTag.revWP"        , po::value <std::string>               (&revbtagwp_)       -> default_value("")       ,"non-Btag working point")
+         ("BTag.revBJet"      , po::value <int>                       (&revbtagjet_)      -> default_value(-1)       ,"non-Btag Jet");
 
       // muons
       opt_cfg_.add_options()
-         ("Muons.ptMin"                  , po::value<std::vector<float> >        (&muonsptmin_)      -> multitoken()                      , "Mimium pt of the muons")
-         ("Muons.ptMax"                  , po::value<std::vector<float> >        (&muonsptmax_)      -> multitoken()                      , "Maximum pt of the muons")
-         ("Muons.etaMax"                 , po::value<std::vector<float> >        (&muonsetamax_)     -> multitoken()                      , "Maximum |eta| of the muons")
-         ("Muons.muons"                  , po::value <std::string>               (&muonsCol_)        -> default_value("")                 , "Name of the muons collection")
-         ("Muons.id"                     , po::value <std::string>               (&muonsid_)         -> default_value("LOOSE")            , "muons id criteria for all muons")
-         ("Muons.nMin"                   , po::value <int>                       (&nmuonsmin_)       -> default_value(0)                  , "Minimum number of muons")
-         ("Muons.nMax"                   , po::value <int>                       (&nmuonsmax_)       -> default_value(-1)                 , "Maximum number of muons")
-         ("Muons.dRMin"                  , po::value <float>                     (&muonsdrmin_)      -> default_value(-1.)                , "Minimum delta R between muons")
-         ("Muons.dRMax"                  , po::value <float>                     (&muonsdrmax_)      -> default_value(-1.)                , "Maximum delta R between muons")
-         ("Muons.veto"                   , po::value <bool>                      (&muonsveto_)       -> default_value(false)              , "Veto events containing muons")
-         ("Muons.vetoTrigger"            , po::value <std::string>               (&muonsveto_trigger_) -> default_value("")               , "Veto events containing muons using the muon trigger");
+         ("Muons.ptMin"         , po::value<std::vector<float> >   (&muonsptmin_)      -> multitoken()             , "Mimium pt of the muons")
+         ("Muons.ptMax"         , po::value<std::vector<float> >   (&muonsptmax_)      -> multitoken()             , "Maximum pt of the muons")
+         ("Muons.etaMax"        , po::value<std::vector<float> >   (&muonsetamax_)     -> multitoken()             , "Maximum |eta| of the muons")
+         ("Muons.muons"         , po::value <std::string>          (&muonsCol_)        -> default_value("")        , "Name of the muons collection")
+         ("Muons.id"            , po::value <std::string>          (&muonsid_)         -> default_value("LOOSE")   , "muons id criteria for all muons")
+         ("Muons.nMin"          , po::value <int>                  (&nmuonsmin_)       -> default_value(0)         , "Minimum number of muons")
+         ("Muons.nMax"          , po::value <int>                  (&nmuonsmax_)       -> default_value(-1)        , "Maximum number of muons")
+         ("Muons.dRMin"         , po::value <float>                (&muonsdrmin_)      -> default_value(-1.)       , "Minimum delta R between muons")
+         ("Muons.dRMax"         , po::value <float>                (&muonsdrmax_)      -> default_value(-1.)       , "Maximum delta R between muons")
+         ("Muons.veto"          , po::value <bool>                 (&muonsveto_)       -> default_value(false)     , "Veto events containing muons")
+         ("Muons.vetoTrigger"   , po::value <std::string>          (&muonsveto_trigger_) -> default_value("")      , "Veto events containing muons using the muon trigger");
 
       // trigger
       opt_cfg_.add_options()
-         ("Trigger.hltPath"              , po::value <std::string>               (&hltPath_)         -> default_value("")                 , "HLT path name")
-         ("Trigger.l1Seed"               , po::value <std::string>               (&l1Seed_)          -> default_value("")                 , "L1 seed name")
-         ("Trigger.results"              , po::value <std::string>               (&triggerCol_)      -> default_value("TriggerResults")   , "Name of the trigger results collection");
+         ("Trigger.hltPath"   , po::value <std::string>  (&hlt_path_)    -> default_value("")                , "HLT path name")
+         ("Trigger.l1Seed"    , po::value <std::string>  (&l1_seed_)     -> default_value("")                , "L1 seed name")
+         ("Trigger.results"   , po::value <std::string>  (&triggerCol_)  -> default_value("TriggerResults")  , "Name of the trigger results collection");
 
       // L1 muontrigger emulation
       opt_cfg_.add_options()
-         ("Trigger.Emulate.Muons.L1.seed"         , po::value <std::string>               (&l1muonemul_)       -> default_value("")                 , "Name of emulated L1 muon trigger")
-         ("Trigger.Emulate.Muons.L1.nMin"         , po::value <int>                       (&l1muonemulnmin_)   -> default_value(-1)                 , "Minimum number of emulated L1 muon trigger objects")
-         ("Trigger.Emulate.Muons.L1.ptMin"        , po::value <float>                     (&l1muonemulptmin_)  -> default_value(0)                  , "Minimum pt of emulated L1 muon trigger objects")
-         ("Trigger.Emulate.Muons.L1.etaMax"       , po::value <float>                     (&l1muonemuletamax_) -> default_value(10)                 , "Maximum |eta|s of emulated L1 muon trigger objects");
+         ("Trigger.Emulate.Muons.L1.seed"     , po::value <std::string>     (&l1muonemul_)       -> default_value("")        , "Name of emulated L1 muon trigger")
+         ("Trigger.Emulate.Muons.L1.nMin"     , po::value <int>             (&l1muonemulnmin_)   -> default_value(-1)        , "Minimum number of emulated L1 muon trigger objects")
+         ("Trigger.Emulate.Muons.L1.ptMin"    , po::value <float>           (&l1muonemulptmin_)  -> default_value(0)         , "Minimum pt of emulated L1 muon trigger objects")
+         ("Trigger.Emulate.Muons.L1.etaMax"   , po::value <float>           (&l1muonemuletamax_) -> default_value(10)        , "Maximum |eta|s of emulated L1 muon trigger objects");
 
       // L3 muontrigger emulation
       opt_cfg_.add_options()
-         ("Trigger.Emulate.Muons.L3.path"         , po::value <std::string>               (&l3muonemul_)       -> default_value("")                 , "Name of emulated L3 muon trigger")
-         ("Trigger.Emulate.Muons.L3.nMin"         , po::value <int>                       (&l3muonemulnmin_)   -> default_value(-1)                 , "Minimum number of emulated L3 muon trigger objects")
-         ("Trigger.Emulate.Muons.L3.ptMin"        , po::value <float>                     (&l3muonemulptmin_)  -> default_value(0)                  , "Minimum pt of emulated L3 muon trigger objects")
-         ("Trigger.Emulate.Muons.L3.etaMax"       , po::value <float>                     (&l3muonemuletamax_) -> default_value(10)                 , "Maximum |eta|s of emulated L3 muon trigger objects");
+         ("Trigger.Emulate.Muons.L3.path"     , po::value <std::string>     (&l3muonemul_)       -> default_value("")        , "Name of emulated L3 muon trigger")
+         ("Trigger.Emulate.Muons.L3.nMin"     , po::value <int>             (&l3muonemulnmin_)   -> default_value(-1)        , "Minimum number of emulated L3 muon trigger objects")
+         ("Trigger.Emulate.Muons.L3.ptMin"    , po::value <float>           (&l3muonemulptmin_)  -> default_value(0)         , "Minimum pt of emulated L3 muon trigger objects")
+         ("Trigger.Emulate.Muons.L3.etaMax"   , po::value <float>           (&l3muonemuletamax_) -> default_value(10)        , "Maximum |eta|s of emulated L3 muon trigger objects");
 
       // L1 jettrigger emulation
       opt_cfg_.add_options()
-         ("Trigger.Emulate.Jets.L1.seed"         , po::value <std::string>               (&l1jetemul_)       -> default_value("")                 , "Name of emulated L1 Jet trigger")
-         ("Trigger.Emulate.Jets.L1.nMin"         , po::value <int>                       (&l1jetemulnmin_)   -> default_value(-1)                 , "Minimum number of emulated L1 Jet trigger objects")
-         ("Trigger.Emulate.Jets.L1.ptMin"        , po::value <float>                     (&l1jetemulptmin_)  -> default_value(0)                  , "Minimum pt of emulated L1 Jet trigger objects")
-         ("Trigger.Emulate.Jets.L1.etaMax"       , po::value <float>                     (&l1jetemuletamax_) -> default_value(10)                 , "Maximum |eta|s of emulated L1 Jet trigger objects");
+         ("Trigger.Emulate.Jets.L1.seed"     , po::value <std::string>      (&l1jetemul_)       -> default_value("")        , "Name of emulated L1 Jet trigger")
+         ("Trigger.Emulate.Jets.L1.nMin"     , po::value <int>              (&l1jetemulnmin_)   -> default_value(-1)        , "Minimum number of emulated L1 Jet trigger objects")
+         ("Trigger.Emulate.Jets.L1.ptMin"    , po::value <float>            (&l1jetemulptmin_)  -> default_value(0)         , "Minimum pt of emulated L1 Jet trigger objects")
+         ("Trigger.Emulate.Jets.L1.etaMax"   , po::value <float>            (&l1jetemuletamax_) -> default_value(10)        , "Maximum |eta|s of emulated L1 Jet trigger objects");
 
       // Calo jettrigger emulation
       opt_cfg_.add_options()
-         ("Trigger.Emulate.Jets.Calo.path"         , po::value <std::string>               (&calojetemul_)       -> default_value("")                 , "Name of emulated Calo Jet trigger")
-         ("Trigger.Emulate.Jets.Calo.nMin"         , po::value <int>                       (&calojetemulnmin_)   -> default_value(-1)                 , "Minimum number of emulated Calo Jet trigger objects")
-         ("Trigger.Emulate.Jets.Calo.ptMin"        , po::value <float>                     (&calojetemulptmin_)  -> default_value(0)                  , "Minimum pt of emulated Calo Jet trigger objects")
-         ("Trigger.Emulate.Jets.Calo.etaMax"       , po::value <float>                     (&calojetemuletamax_) -> default_value(10)                 , "Maximum |eta|s of emulated Calo Jet trigger objects");
+         ("Trigger.Emulate.Jets.Calo.path"     , po::value <std::string>    (&calojetemul_)       -> default_value("")  , "Name of emulated Calo Jet trigger")
+         ("Trigger.Emulate.Jets.Calo.nMin"     , po::value <int>            (&calojetemulnmin_)   -> default_value(-1)  , "Minimum number of emulated Calo Jet trigger objects")
+         ("Trigger.Emulate.Jets.Calo.ptMin"    , po::value <float>          (&calojetemulptmin_)  -> default_value(0)   , "Minimum pt of emulated Calo Jet trigger objects")
+         ("Trigger.Emulate.Jets.Calo.etaMax"   , po::value <float>          (&calojetemuletamax_) -> default_value(10)  , "Maximum |eta|s of emulated Calo Jet trigger objects");
 
       // PF jettrigger emulation
       opt_cfg_.add_options()
-         ("Trigger.Emulate.Jets.PF.path"         , po::value <std::string>               (&pfjetemul_)       -> default_value("")                 , "Name of emulated PF Jet trigger")
-         ("Trigger.Emulate.Jets.PF.nMin"         , po::value <int>                       (&pfjetemulnmin_)   -> default_value(-1)                 , "Minimum number of emulated PF Jet trigger objects")
-         ("Trigger.Emulate.Jets.PF.ptMin"        , po::value <float>                     (&pfjetemulptmin_)  -> default_value(0)                  , "Minimum pt of emulated PF Jet trigger objects")
-         ("Trigger.Emulate.Jets.PF.etaMax"       , po::value <float>                     (&pfjetemuletamax_) -> default_value(10)                 , "Maximum |eta|s of emulated PF Jet trigger objects");
+         ("Trigger.Emulate.Jets.PF.path"    , po::value <std::string>  (&pfjetemul_)       -> default_value("")  , "Name of emulated PF Jet trigger")
+         ("Trigger.Emulate.Jets.PF.nMin"    , po::value <int>          (&pfjetemulnmin_)   -> default_value(-1)  , "Minimum number of emulated PF Jet trigger objects")
+         ("Trigger.Emulate.Jets.PF.ptMin"   , po::value <float>        (&pfjetemulptmin_)  -> default_value(0)   , "Minimum pt of emulated PF Jet trigger objects")
+         ("Trigger.Emulate.Jets.PF.etaMax"  , po::value <float>        (&pfjetemuletamax_) -> default_value(10)  , "Maximum |eta|s of emulated PF Jet trigger objects");
 
       // trigger objects
       opt_cfg_.add_options()
-         ("Trigger.Objects.directory"    , po::value<std::string>                (&triggerObjDir_)   -> default_value("slimmedPatTrigger"), "Name of the trigger objects directory")
-         ("Trigger.Objects.BTag.N"       , po::value<int>                        (&trgObjsNBJets_)   -> default_value(-1)                 , "N btag jets to be matched")
-         ("Trigger.Objects.BTag.Calo"    , po::value<std::string>                (&trgObjsBJets_)    -> default_value("")                 , "Trigger objects for btag jets")
-         ("Trigger.Objects.Jets.N"       , po::value<int>                        (&trgObjsNJets_)    -> default_value(-1)                  , "N jets to be matched")
-         ("Trigger.Objects.Jets.L1"      , po::value<std::string>                (&trgObjsL1Jets_)   -> default_value("")                 , "Trigger objects for L1 jets")
-         ("Trigger.Objects.Jets.Calo"    , po::value<std::string>                (&trgObjsCaloJets_) -> default_value("")                 , "Trigger objects for Calo jets")
-         ("Trigger.Objects.Jets.PF"      , po::value<std::string>                (&trgObjsPFJets_)   -> default_value("")                 , "Trigger objects for PF jets")
-         ("Trigger.Objects.Muons.N"      , po::value<int>                        (&trgObjsNMuons_)   -> default_value(-1)                 , "N muons to be matched")
-         ("Trigger.Objects.Muons.L1"     , po::value<std::string>                (&trgObjsL1Muons_)  -> default_value("")                 , "Trigger objects for L1 muons")
-         ("Trigger.Objects.Muons.L3"     , po::value<std::string>                (&trgObjsL3Muons_)  -> default_value("")                 , "Trigger objects for L3 muons")
-         ("Trigger.Objects.BTag.Calo.MatchDeltaR"    , po::value<float>    (&matchTrgCaloBJetsDrMax_)    -> default_value(0.3)                 , "Max deltaR for btag jets")
-         ("Trigger.Objects.Jets.L1.MatchDeltaR"      , po::value<float>    (&matchTrgL1JetsDrMax_)       -> default_value(0.3)                 , "Max deltaR for L1 jets")
-         ("Trigger.Objects.Jets.Calo.MatchDeltaR"    , po::value<float>    (&matchTrgCaloJetsDrMax_)     -> default_value(0.3)                 , "Max deltaR for Calo jets")
-         ("Trigger.Objects.Jets.PF.MatchDeltaR"      , po::value<float>    (&matchTrgPFJetsDrMax_)       -> default_value(0.3)                 , "Max deltaR for PF jets")
-         ("Trigger.Objects.Muons.L1.MatchDeltaR"     , po::value<float>    (&matchTrgL1MuonsDrMax_)      -> default_value(0.3)                 , "Max deltaR for L1 muons match")
-         ("Trigger.Objects.Muons.L3.MatchDeltaR"     , po::value<float>    (&matchTrgL3MuonsDrMax_)      -> default_value(0.3)                 , "Max deltaR for L3 muons match");
+         ("Trigger.Objects.directory"                , po::value<std::string>    (&triggerObjDir_)             -> default_value("slimmedPatTrigger"), "Name of the trigger objects directory")
+         ("Trigger.Objects.BTag.N"                   , po::value<int>            (&trgObjsNBJets_)             -> default_value(-1)                 , "N btag jets to be matched")
+         ("Trigger.Objects.BTag.Calo"                , po::value<std::string>    (&trgObjsBJets_)              -> default_value("")                 , "Trigger objects for btag jets")
+         ("Trigger.Objects.Jets.N"                   , po::value<int>            (&trgObjsNJets_)              -> default_value(-1)                  , "N jets to be matched")
+         ("Trigger.Objects.Jets.L1"                  , po::value<std::string>    (&trgObjsL1Jets_)             -> default_value("")                 , "Trigger objects for L1 jets")
+         ("Trigger.Objects.Jets.Calo"                , po::value<std::string>    (&trgObjsCaloJets_)           -> default_value("")                 , "Trigger objects for Calo jets")
+         ("Trigger.Objects.Jets.PF"                  , po::value<std::string>    (&trgObjsPFJets_)             -> default_value("")                 , "Trigger objects for PF jets")
+         ("Trigger.Objects.Muons.N"                  , po::value<int>            (&trgObjsNMuons_)             -> default_value(-1)                 , "N muons to be matched")
+         ("Trigger.Objects.Muons.L1"                 , po::value<std::string>    (&trgObjsL1Muons_)            -> default_value("")                 , "Trigger objects for L1 muons")
+         ("Trigger.Objects.Muons.L3"                 , po::value<std::string>    (&trgObjsL3Muons_)            -> default_value("")                 , "Trigger objects for L3 muons")
+         ("Trigger.Objects.BTag.Calo.MatchDeltaR"    , po::value<float>          (&matchTrgCaloBJetsDrMax_)    -> default_value(0.3)                 , "Max deltaR for btag jets")
+         ("Trigger.Objects.Jets.L1.MatchDeltaR"      , po::value<float>          (&matchTrgL1JetsDrMax_)       -> default_value(0.3)                 , "Max deltaR for L1 jets")
+         ("Trigger.Objects.Jets.Calo.MatchDeltaR"    , po::value<float>          (&matchTrgCaloJetsDrMax_)     -> default_value(0.3)                 , "Max deltaR for Calo jets")
+         ("Trigger.Objects.Jets.PF.MatchDeltaR"      , po::value<float>          (&matchTrgPFJetsDrMax_)       -> default_value(0.3)                 , "Max deltaR for PF jets")
+         ("Trigger.Objects.Muons.L1.MatchDeltaR"     , po::value<float>          (&matchTrgL1MuonsDrMax_)      -> default_value(0.3)                 , "Max deltaR for L1 muons match")
+         ("Trigger.Objects.Muons.L3.MatchDeltaR"     , po::value<float>          (&matchTrgL3MuonsDrMax_)      -> default_value(0.3)                 , "Max deltaR for L3 muons match");
 
       // L1 trigger
       opt_cfg_.add_options()
-         ("Trigger.L1T.Jets"                     , po::value <std::string>               (&l1tjetsCol_)      -> default_value("")          , "Name of the L1T jets collection")
-         ("Trigger.L1T.Muons"                    , po::value <std::string>               (&l1tmuonsCol_)     -> default_value("")         , "Name of the L1T muons collection");
+         ("Trigger.L1T.Jets"    , po::value <std::string>   (&l1tjetsCol_)   -> default_value("")  , "Name of the L1T jets collection")
+         ("Trigger.L1T.Muons"   , po::value <std::string>   (&l1tmuonsCol_)  -> default_value("")  , "Name of the L1T muons collection");
 
       // generator level
       opt_cfg_.add_options()
-         ("Generator.genParticles"       , po::value <std::string>               (&genpartsCol_)     -> default_value("")                 , "Name of the gen particle collection")
-         ("Generator.genJets"            , po::value <std::string>               (&genjetsCol_)      -> default_value("")                 , "Name of the gen jets collection");
+         ("Generator.genParticles"  , po::value <std::string>   (&genpartsCol_)  -> default_value("")   , "Name of the gen particle collection")
+         ("Generator.genJets"       , po::value <std::string>   (&genjetsCol_)   -> default_value("")   , "Name of the gen jets collection");
 
       // vertices
       opt_cfg_.add_options()
-         ("Vertices.primaryVertex"          , po::value <std::string>            (&primaryVtxCol_)       -> default_value("")            , "Name of the primary vertex collection")
-         ("Vertices.primaryVertex.notFake"  , po::value <bool>                   (&primaryVtxNotFake_)   -> default_value(true)          , "Primary vertex not fake")
-         ("Vertices.primaryVertex.ndofMin"  , po::value <float>                  (&primaryVtxNdofMin_)   -> default_value(4.)            , "Primary vertex minimum ndof")
-         ("Vertices.primaryVertex.absZMax"  , po::value <float>                  (&primaryVtxAbsZMax_)   -> default_value(24.)           , "Primary vertex maximum abs Z")
-         ("Vertices.primaryVertex.rhoMax"   , po::value <float>                  (&primaryVtxRhoMax_)    -> default_value(2.)            , "Primary vertex maximum Rho");
+         ("Vertices.primaryVertex"          , po::value <std::string>  (&primaryVtxCol_)       -> default_value("")    , "Name of the primary vertex collection")
+         ("Vertices.primaryVertex.notFake"  , po::value <bool>         (&primaryVtxNotFake_)   -> default_value(true)  , "Primary vertex not fake")
+         ("Vertices.primaryVertex.ndofMin"  , po::value <float>        (&primaryVtxNdofMin_)   -> default_value(4.)    , "Primary vertex minimum ndof")
+         ("Vertices.primaryVertex.absZMax"  , po::value <float>        (&primaryVtxAbsZMax_)   -> default_value(24.)   , "Primary vertex maximum abs Z")
+         ("Vertices.primaryVertex.rhoMax"   , po::value <float>        (&primaryVtxRhoMax_)    -> default_value(2.)    , "Primary vertex maximum Rho");
 
       // general
       opt_cfg_.add_options()
-         ("User.doTree"                  , po::value <bool>                      (&do_tree_)         -> default_value(false)              , "Flag for output")
-         ("User.override"                , po::value <bool>                      (&override_)        -> default_value(false)              , "Flag to be used to override procedure, e.g. a selection")
-         ("User.dRMin"                   , po::value <float>                     (&drmin_)           -> default_value(-1.)                , "Minimum delta R between candidates")
-         ("User.dRMax"                   , po::value <float>                     (&drmax_)           -> default_value(-1.)                , "Maximum delta R between candidates")
-         ("User.dEtaMax"                 , po::value <float>                     (&detamax_)         -> default_value(-1.)                , "Maximum delta eta between candidates")
-         ("User.dEtaMin"                 , po::value <float>                     (&detamin_)         -> default_value(-1.)                , "Minimum delta eta between candidates")
-         ("User.dPhiMin"                 , po::value <float>                     (&dphimin_)         -> default_value(-1.)                , "Minimum delta phi between candidates")
-         ("User.dPhiMax"                 , po::value <float>                     (&dphimax_)         -> default_value(-1.)                , "Maximum delta phi between candidates")
-         ("User.massMin"                 , po::value <float>                     (&massmin_)         -> default_value(-1.)                , "Cut on a mass, min value")
-         ("User.massMax"                 , po::value <float>                     (&massmax_)         -> default_value(-1.)                , "Cut on a mass, max value")
-         ("User.min"                     , po::value <float>                     (&min_)             -> default_value(-1.)                , "some minimum value")
-         ("User.max"                     , po::value <float>                     (&max_)             -> default_value(-1.)                , "some maximum value")
-         ("User.scale"                   , po::value <float>                     (&scale_)           -> default_value(-1.)                , "Overall scale for histograms")
-         ("User.workflow"                , po::value <int>                       (&workflow_)        -> default_value(0)                  , "Workflow index defined by user")
-         ("User.workflowTitle"           , po::value <std::string>               (&workflow_title_)  -> default_value("")                 , "Workflow title defined by user")
-         ("User.prescale"                , po::value <int>                       (&prescale_)        -> default_value(1)                  , "Prescale factor")
-         ("User.processId"               , po::value <int>                       (&process_id_)      -> default_value(-1)                 , "User-defined process ID")
-         ("User.n"                       , po::value <int>                       (&n_)               -> default_value(-1)                 , "Some integer")
-         ("User.index"                   , po::value <int>                       (&index_)           -> default_value(-1)                 , "Some User index for user")
-         ("User.float"                   , po::value<std::vector<float> >        (&vfloat_)          ->multitoken()                       , "Float vector")
-         ("User.int"                     , po::value<std::vector<int> >          (&vint_)            ->multitoken()                       , "Integer vector");
+         ("User.doTree"        , po::value <bool>                (&do_tree_)         -> default_value(false)   , "Flag for output")
+         ("User.override"      , po::value <bool>                (&override_)        -> default_value(false)   , "Flag to be used to override procedure, e.g. a selection")
+         ("User.dRMin"         , po::value <float>               (&dr_min_)          -> default_value(-1.)     , "Minimum delta R between candidates")
+         ("User.dRMax"         , po::value <float>               (&dr_max_)          -> default_value(-1.)     , "Maximum delta R between candidates")
+         ("User.dEtaMax"       , po::value <float>               (&deta_max_)        -> default_value(-1.)     , "Maximum delta eta between candidates")
+         ("User.dEtaMin"       , po::value <float>               (&deta_min_)        -> default_value(-1.)     , "Minimum delta eta between candidates")
+         ("User.dPhiMin"       , po::value <float>               (&dphi_min_)        -> default_value(-1.)     , "Minimum delta phi between candidates")
+         ("User.dPhiMax"       , po::value <float>               (&dphi_max_)        -> default_value(-1.)     , "Maximum delta phi between candidates")
+         ("User.massMin"       , po::value <float>               (&massmin_)         -> default_value(-1.)     , "Cut on a mass, min value")
+         ("User.massMax"       , po::value <float>               (&massmax_)         -> default_value(-1.)     , "Cut on a mass, max value")
+         ("User.min"           , po::value <float>               (&min_)             -> default_value(-1.)     , "some minimum value")
+         ("User.max"           , po::value <float>               (&max_)             -> default_value(-1.)     , "some maximum value")
+         ("User.scale"         , po::value <float>               (&scale_)           -> default_value(-1.)     , "Overall scale for histograms")
+         ("User.workflow"      , po::value <int>                 (&workflow_)        -> default_value(0)       , "Workflow index defined by user")
+         ("User.workflowTitle" , po::value <std::string>         (&workflow_title_)  -> default_value("")      , "Workflow title defined by user")
+         ("User.prescale"      , po::value <int>                 (&prescale_)        -> default_value(1)       , "Prescale factor")
+         ("User.processId"     , po::value <int>                 (&process_id_)      -> default_value(-1)      , "User-defined process ID")
+         ("User.n"             , po::value <int>                 (&n_)               -> default_value(-1)      , "Some integer")
+         ("User.index"         , po::value <int>                 (&index_)           -> default_value(-1)      , "Some User index for user")
+         ("User.float"         , po::value<std::vector<float> >  (&vfloat_)          -> multitoken()           , "Float vector")
+         ("User.int"           , po::value<std::vector<int> >    (&vint_)            -> multitoken()           , "Integer vector");
 
-      // others
+      // others not attached to anything, to be used freely in case needed
       opt_cfg_.add_options()
-         ("nMin",po::value <int> (&nmin_)->default_value(0),"Minimum number objects")
-         ("nMax",po::value <int> (&nmax_)->default_value(0),"Maximum number objects")
-         ("ptMin", po::value<std::vector<float> >(&ptmin_)->multitoken(),"Mimium pt of an object")
-         ("ptMax", po::value<std::vector<float> >(&ptmax_)->multitoken(),"Maximum pt of an object")
-         ("etaMax", po::value<std::vector<float> >(&etamax_)->multitoken(),"Maximum |eta| of an object")
+         ("nMin",po::value <int> (&num_min_)->default_value(0),"A minimum number")
+         ("nMax",po::value <int> (&num_max_)->default_value(0),"A maximum number")
+         ("ptMin", po::value<std::vector<float> >(&pt_min_)->multitoken(),"A mimium pt")
+         ("ptMax", po::value<std::vector<float> >(&pt_max_)->multitoken(),"A maximum pt")
+         ("etaMax", po::value<std::vector<float> >(&eta_max_)->multitoken(),"Maximum |eta| of an object")
          ("ptImbalanceMin",po::value <float> (&jetsptimbalmin_)->default_value(-1),"Minimum relative imbalance between two candidates")
          ("ptImbalanceMax",po::value <float> (&jetsptimbalmax_)->default_value(-1),"Maximum relative imbalance between two candidates");
 
@@ -296,7 +317,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
       opt_cfg_.add_options()
          ("qgMin", po::value<std::vector<float> >(&qgmin_)->multitoken(),"Minimum value for q-g likelihood")
          ("qgMax", po::value<std::vector<float> >(&qgmax_)->multitoken(),"Maximum value for q-g likelihood")
-         ("jetsBtagMin", po::value<std::vector<float> >(&jetsbtagmin_)->multitoken(),"Minimum btag of the jets; if < 0 -> reverse btag")
+         ("jetsBtagMin", po::value<std::vector<float> >(&jets_btag_min_)->multitoken(),"Minimum btag of the jets; if < 0 -> reverse btag")
          ("jetsBtagProbB", po::value<std::vector<float> >(&jetsbtagprobb_)->multitoken(),"Maximum (minimum) btag prob b of the jets if >0 (<0)")
          ("jetsBtagProbBB", po::value<std::vector<float> >(&jetsbtagprobbb_)->multitoken(),"Maximum (minimum) btag prob bb of the jets if >0 (<0)")
          ("jetsBtagProbLepB", po::value<std::vector<float> >(&jetsbtagproblepb_)->multitoken(),"Maximum (minimum) btag prob lepb of the jets if >0 (<0)")
@@ -305,7 +326,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("jetsBtagProbLight", po::value<std::vector<float> >(&jetsbtagproblight_)->multitoken(),"Maximum (minimum) btag prob light of the jets if >0 (<0)");
 
       opt_cfg_.add_options()
-         ("triggerMatchDeltaRMax",po::value <float> (&trgmatchdrmax_)->default_value(0.3),"DeltaR max for matching online-offline");
+         ("triggerMatchDeltaRMax",po::value <float> (&trigger_match_drmax_)->default_value(0.3),"DeltaR max for matching online-offline");
 
       // AI
       opt_cfg_.add_options()
@@ -318,28 +339,17 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          ("discriminatorMinAI",po::value <float> (&disc_min_ai_)->default_value(-1001.),"Min value for AI discriminator");
 
       opt_cfg_.add_options()
-         ("crossSectionTree",po::value <std::string> (&xsectiontree_)->default_value(""),"Tree containing cross sections")
-         ("crossSectionType",po::value <std::string> (&xsectiontype_)->default_value("crossSection"),"Type of cross section")
-         ("crossSection",po::value <float> (&xsection_)->default_value(-1.), "Cross section")
-         ("luminosity",po::value <float> (&lumi_)->default_value(-1.), "Luminosity in pb-1 to scale histograms")
-         ("nLumiSections",po::value <int> (&nlumis_)->default_value(-1), "Number of lumi sections processed")
-         ("runMin",po::value <int> (&runmin_)->default_value(-1), "Minimum run number")
-         ("runMax",po::value <int> (&runmax_)->default_value(-1), "Maximum run number")
-         ("pythia8",po::value <bool> (&pythia8_)->default_value(true),"Flag for Pythia8 or other recent generators MC")
-         ("erasLumi", po::value<std::vector<float> >(&eraslumi_)->multitoken(),"Lumi of an era")
-         ("eras", po::value<std::vector<std::string> >(&eras_)->multitoken(),"Era of data taking");
-
-
+         ("Process.crossSectionTree",po::value <std::string> (&xsectiontree_)->default_value(""),"Tree containing cross sections")
+         ("Process.crossSectionType",po::value <std::string> (&xsectiontype_)->default_value("crossSection"),"Type of cross section")
+         ("Process.crossSection",po::value <float> (&xsection_)->default_value(-1.), "Cross section")
+         ("Process.pythia8",po::value <bool> (&pythia8_)->default_value(true),"Flag for Pythia8 or other recent generators MC")
+         ;
 
       po::variables_map vm;
-      try
-      {
-
+      try {
          po::store(po::parse_command_line(argc, argv, opt_cmd_), vm); // can throw
          // --help option
-
-         if ( vm.count("help") )
-         {
+         if ( vm.count("help") ) {
             std::cout << "Analysis Tools command line options - override configuration file options" << std::endl
                       << opt_cmd_ << std::endl;
                     //  << opt_cfg_ << std::endl;
@@ -349,8 +359,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          
          std::ifstream cfg_s(cfg_.c_str());
          po::store(po::parse_config_file(cfg_s, opt_cfg_), vm); // can throw
-         if ( ! vm.count("config") )
-         {
+         if ( ! vm.count("config") ) {
             std::cout << "*** ERROR *** A configuration file must be provided!" << std::endl;
             std::exit(-1);
          }
@@ -359,8 +368,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          
          // Do your stuff
          // overriding isMC_ from command line
-         if ( cmdl_data_ &&  cmdl_mc_ )
-         {
+         if ( cmdl_data_ &&  cmdl_mc_ ) {
             std::cout << "*** ERROR *** You set both --mc and --data options!" << std::endl;
             std::exit(-1);
          }
@@ -374,15 +382,13 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          if ( cmdl_wflow_ > 0 )        workflow_ = cmdl_wflow_;
          // override workflow title
          if ( cmdl_wftitle_ != "" )    workflow_title_ = cmdl_wftitle_;
-         if ( cmdl_sr_ && cmdl_cr_ )
-         {
+         if ( cmdl_sr_ && cmdl_cr_ )  {
             std::cout << "*** ERROR *** You set both --sr and --cr options!" << std::endl;
             std::exit(-1);
          }
          if ( cmdl_sr_ != cmdl_cr_ )  signalregion_ = cmdl_sr_;
 
-         if (cmdl_vr_) // TODO: IMPROVE logics!
-         {
+         if (cmdl_vr_) {// TODO: IMPROVE logics!
             signalregion_ = false;
             validationregion_ = true;
          }
@@ -399,8 +405,7 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          std::transform(btagalgo_.begin(), btagalgo_.end(), btagalgo_.begin(), ::tolower);
 
          samplename_ = "";
-         if ( inputlist_.rfind("tools:",0) == 0 )
-         {
+         if ( inputlist_.rfind("tools:",0) == 0 ) {
             std::vector<std::string> il_parts;
             boost::split(il_parts, inputlist_, [](char c){return c == '/';});
             auto ip_size = il_parts.size();
@@ -415,20 +420,16 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
          if ( onlbtagsf_ != ""  && onlbtagsf_.rfind("tools:",0) == 0 )    onlbtagsf_.replace(0,6,calibpath+"/");
          if ( onlbtagsf_muonjet_ != ""  && onlbtagsf_muonjet_.rfind("tools:",0) == 0 )    onlbtagsf_muonjet_.replace(0,6,calibpath+"/");
          if ( btagsf_    != ""  && btagsf_.rfind("tools:",0) == 0   )    btagsf_.replace(0,6,calibpath+"/");
-         for ( int i = 0; i < 4; i++ )
-            {
+         for ( int i = 0; i < 4; i++ ) {
                if ( btageff_[i]  != ""  && btageff_[i].rfind("tools:",0) == 0  )    btageff_[i].replace(0,6,calibpath+"/");
                if (!cmdl_bweight_) btageff_[i]="";
             }
-         for (unsigned int i = 0; i < muonIDweight_.size(); i++)
-         {
+         for (unsigned int i = 0; i < muonIDweight_.size(); i++)  {
             if ( muonIDweight_[i]    != ""  && muonIDweight_[i].rfind("tools:",0) == 0   )    muonIDweight_[i].replace(0,6,calibpath+"/");
          }
          if ( scale_file_ != "" && scale_file_.rfind("tools:",0) == 0 )       scale_file_.replace(0,6,calibpath+"/");
-
          if ( puweight_ != ""  && puweight_.rfind("tools:",0) == 0 )    puweight_.replace(0,6,calibpath+"/");
          if ( pudata_ != ""  && pudata_.rfind("tools:",0) == 0 )    pudata_.replace(0,6,calibpath+"/");
-
 
          eventinfo_     =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , eventinfo_.c_str()      );
          triggerCol_    =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , triggerCol_.c_str()     );
@@ -447,35 +448,27 @@ Config::Config(int argc, char ** argv) : opt_cmd_("Options"), opt_cfg_("Configur
             l1tmuonsCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , l1tmuonsCol_.c_str()    );
          if ( primaryVtxCol_ != "" )
             primaryVtxCol_   =  Form("%s/%s/%s" , process_.c_str(), eventsdir_.c_str() , primaryVtxCol_.c_str()    );
-          
 
          if ( njetsmax_ < njetsmin_ ) njetsmax_ = -1;
          if ( njetsmin_ < 0 && njetsmax_ > 0 ) njetsmin_ = 0;
 
-         if ( njets_ >= 0 )
-         {
+         if ( njets_ >= 0 ) {
             njetsmin_ = njets_;
             njetsmax_ = njets_;
          }
-      }
-      catch(po::error& e)
-      {
+      } catch(po::error& e) {
          std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
          std::cerr << opt_cmd_ << std::endl;
          throw std::exception();
       }
-
-   }
-   catch(std::exception& e)
-   {
+   } catch(std::exception& e) {
       std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
       throw std::exception();
    }
 
 }
 
-Config::~Config()
-{
+Config::~Config() {
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
 }
@@ -486,27 +479,22 @@ Config::~Config()
 //
 // ------------ method called for each event  ------------
 
-po::options_description  & Config::optionsCMD()
-{
+po::options_description  & Config::optionsCMD() {
    return opt_cmd_;
 }
 
-po::options_description  & Config::optionsCFG()
-{
+po::options_description  & Config::optionsCFG() {
    return opt_cfg_;
 }
 
 
-void Config::loadOptions()
-{
+void Config::loadOptions() {
    po::variables_map vm;
    po::store(po::parse_command_line(argc_, argv_, opt_cmd_), vm);
    po::notify(vm);
    std::ifstream cfg_s(cfg_.c_str());
    po::store(po::parse_config_file(cfg_s, opt_cfg_), vm); // can throw
    po::notify(vm);
-
-
 }
 
 //
@@ -648,8 +636,6 @@ float         Config::triggerMatchCaloJetsDrMax()      const { return matchTrgCa
 float         Config::triggerMatchPFJetsDrMax()        const { return matchTrgPFJetsDrMax_;       }
 float         Config::triggerMatchCaloBJetsDrMax()     const { return matchTrgCaloBJetsDrMax_;    }
 
-
-
 // generator level
 std::string        Config::genJetsCollection()       const { return genjetsCol_; }
 std::string        Config::genParticlesCollection()  const { return genpartsCol_; }
@@ -669,13 +655,11 @@ bool               Config::pythia8()            const { return pythia8_;  }
 
 // btag
 std::string        Config::btagEfficiencies(const int & model)             const  { return btageff_[model-1]; }
-float              Config::btagWP(const std::string & wp) const
-{
+float              Config::btagWP(const std::string & wp) const {
    if ( wp == "loose"  ) return btagwploose_ ;
    if ( wp == "medium" ) return btagwpmedium_;
    if ( wp == "tight"  ) return btagwptight_ ;
    if ( wp == "xxx"    ) return btagwpxxx_;
-
    return -100.;
 }
 
@@ -683,10 +667,8 @@ float              Config::btagWP(const std::string & wp) const
 float Config::massMin() const { return massmin_; }
 float Config::massMax() const { return massmax_; }
 
-
 // AI
-std::vector<std::string> Config::variablesAI(const std::string & t) const
-{
+std::vector<std::string> Config::variablesAI(const std::string & t) const {
    if ( t == "I" ) return varsi_ai_;
    return varsf_ai_;
 }
@@ -711,8 +693,7 @@ bool  Config::histogramJetsRegionSplit() const { return histjets_rsplit_ ; }
 bool  Config::histogramJetsPerFlavour()  const { return histjets_flavour_ ; }
 
 
-std::string Config::outputRoot() const
-{ 
+std::string Config::outputRoot() const { 
    // adding workflow number to the output file
    std::string outputRootWF = outputRoot_;
    auto dotpos = outputRoot_.find_last_of(".");
@@ -765,4 +746,23 @@ float        Config::triggerEmulatePFJetsEtaMax() const { return pfjetemuletamax
 std::vector<float> Config::vectorFloat()  const { return vfloat_ ; }
 std::vector<int>   Config::vectorInt()    const { return vint_   ; }
 
-
+//
+int                Config::nLumiSections()            const { return num_lumis_processed_ ; }
+int                Config::runMin()                   const { return run_min_             ; }
+int                Config::runMax()                   const { return run_max_             ; }
+float              Config::triggerMatchDeltaRMax()    const { return trigger_match_drmax_ ; }
+std::vector<float> Config::jetsBtagMin()              const { return jets_btag_min_       ; }
+int                Config::nMin()                     const { return num_min_             ; }
+int                Config::nMax()                     const { return num_max_             ; }
+std::vector<float> Config::ptMin()                    const { return pt_min_              ; }
+std::vector<float> Config::ptMax()                    const { return pt_max_              ; }
+std::vector<float> Config::etaMax()                   const { return eta_max_             ; }
+float              Config::dRMin()                    const { return dr_min_              ; }
+float              Config::dRMax()                    const { return dr_max_              ; }
+float              Config::dEtaMin()                  const { return deta_max_            ; }
+float              Config::dEtaMax()                  const { return deta_min_            ; }
+float              Config::dPhiMin()                  const { return dphi_min_            ; }
+float              Config::dPhiMax()                  const { return dphi_max_            ; }
+std::string        Config::hltPath()                  const { return hlt_path_            ; }
+std::string        Config::l1Seed()                   const { return l1_seed_             ; }
+ 

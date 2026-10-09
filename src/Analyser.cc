@@ -52,8 +52,8 @@ bool Analyser::event(const int & i) {
       if ( config_->fullGenWeight() ) genweight_type = "full weights";
       cutflow(Form("Generated weighted events (%s)",genweight_type.c_str()));
    }
-   if ( config_->runmin_ > 0 && analysis_->run() < config_->runmin_ ) return false;
-   if ( config_->runmax_ > 0 && analysis_->run() > config_->runmax_ ) return false;
+   if ( config_->runMin() > 0 && analysis_->run() < config_->runMin() ) return false;
+   if ( config_->runMax() > 0 && analysis_->run() > config_->runMax() ) return false;
    if (! config_->isMC() && config_->json() != "" ) {
        auto json = basename(config_->json());
        ok = analysis_->selectJson();

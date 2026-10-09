@@ -123,13 +123,13 @@ bool TriggerAnalyser::selectionTrigger() { // Maybe not use this, use selectionH
 }
 
 bool TriggerAnalyser::selectionHLT() {
-   if ( config_->hltPath_ == "" ) return true;
+   if ( config_->hltPath() == "" ) return true;
    
    ++cutflow_;
-   if ( ! analysis_->triggerResult(config_->hltPath_) ) return false;
+   if ( ! analysis_->triggerResult(config_->hltPath()) ) return false;
    
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,(config_->hltPath_).c_str());
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,(config_->hltPath()).c_str());
    
    h1_["cutflow"] -> Fill(cutflow_,weight_);
 
@@ -137,11 +137,11 @@ bool TriggerAnalyser::selectionHLT() {
 }
 
 bool TriggerAnalyser::selectionL1() {
-   if ( config_->l1Seed_ == "" ) return true;
+   if ( config_->l1Seed() == "" ) return true;
    ++cutflow_;
-   if ( ! analysis_->triggerResult(config_->l1Seed_)  ) return false;
+   if ( ! analysis_->triggerResult(config_->l1Seed())  ) return false;
    if ( std::string(h1_["cutflow"] -> GetXaxis()-> GetBinLabel(cutflow_+1)) == "" ) 
-      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,(config_->l1Seed_).c_str());
+      h1_["cutflow"] -> GetXaxis()-> SetBinLabel(cutflow_+1,(config_->l1Seed()).c_str());
    h1_["cutflow"] -> Fill(cutflow_,weight_);
    return true;
 }
